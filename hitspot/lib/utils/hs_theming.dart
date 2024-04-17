@@ -3,13 +3,6 @@ import 'package:get/get.dart';
 
 class HSTheming extends GetxService {
   static HSTheming instance = Get.find();
-
-  /// Light theme details (lt - lightTheme)
-  // static const Color _ltPrimary = Color(0xFFf2f2f2),
-  //     _ltSecondary = Color(0xFF04cc91),
-  //     _ltAccent = Color(0xFFc2f8eb),
-  //     _ltTileBg = Color.fromARGB(255, 28, 28, 28);
-
   static const Color _mainColor = Color(0xFF04cc91);
 
   final ThemeData lightTheme = ThemeData(
@@ -22,9 +15,18 @@ class HSTheming extends GetxService {
     brightness: Brightness.dark,
   );
 
+  ThemeData get currentTheme => Get.theme;
+  TextTheme get textTheme => currentTheme.textTheme;
+
   @override
   void onReady() {
     print("HSTheming ready!");
     super.onReady();
+  }
+}
+
+extension TextStyleAltering on TextStyle {
+  TextStyle applyBold() {
+    return copyWith(fontWeight: FontWeight.bold);
   }
 }
