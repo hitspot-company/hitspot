@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:get/get.dart';
-import 'package:hitspot/utils/hs_auth.dart';
+import 'package:hitspot/utils/hs_app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  Get.put(HSAuth());
+  await FlutterConfig.loadEnvVariables();
+  Get.put(HSApp());
   runApp(const MyApp());
 }
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData.dark(),
+      theme: HSApp.theming.darkTheme,
       home: const CircularProgressIndicator(),
     );
   }
