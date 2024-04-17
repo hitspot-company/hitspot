@@ -31,14 +31,16 @@ class HSAuth extends GetxService {
     }
   }
 
-  Future<void> register(String email, password) async {
+  Future<UserCredential> register(String email, password) async {
     try {
-      await auth.createUserWithEmailAndPassword(
+      UserCredential createdUser = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      return (createdUser);
     } on FirebaseAuthException catch (e) {
       HSApp.notifications.snackbar.error("Error", e.message!);
+      rethrow;
     } catch (firebaseAuthException) {
-      print("Error registering user: $firebaseAuthException");
+      rethrow;
     }
   }
 

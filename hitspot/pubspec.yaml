@@ -21,6 +21,7 @@ dependencies:
   firebase_core: ^2.20.0
   cloud_firestore: ^4.11.0
   flutter_config: ^2.0.2
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
 
@@ -43,9 +44,13 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+  # General
+    - assets/
+  # Logos
+    - assets/icons/side/
+    - assets/icons/icon/
+    - assets/icons/top/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see
