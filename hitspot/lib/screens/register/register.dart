@@ -6,6 +6,7 @@ import 'package:hitspot/utils/hs_app.dart';
 import 'package:hitspot/utils/hs_display_size.dart';
 import 'package:hitspot/utils/hs_theming.dart';
 import 'package:hitspot/widgets/global/hs_scaffold.dart';
+import 'package:hitspot/widgets/global/hs_textfield.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -66,7 +67,7 @@ class RegisterPage extends StatelessWidget {
                 TextSpan(
                   text: " Terms of Service",
                   style: HSApp.textTheme.bodySmall!
-                      .colorify(Colors.blue)
+                      .colorify(HSApp.theming.mainColor)
                       .boldify(),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () => print("TOS"),
@@ -77,7 +78,7 @@ class RegisterPage extends StatelessWidget {
                 TextSpan(
                   text: " Privacy Policy",
                   style: HSApp.textTheme.bodySmall!
-                      .colorify(Colors.blue)
+                      .colorify(HSApp.theming.mainColor)
                       .boldify(),
                   recognizer: TapGestureRecognizer()..onTap = () => print("PP"),
                 ),
@@ -94,7 +95,7 @@ class RegisterPage extends StatelessWidget {
                 TextSpan(
                   text: " Sign In",
                   style: HSApp.textTheme.bodySmall!
-                      .colorify(Colors.blue)
+                      .colorify(HSApp.theming.mainColor)
                       .boldify(),
                 ),
               ],
@@ -102,32 +103,6 @@ class RegisterPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class HSTextField extends StatelessWidget {
-  const HSTextField({
-    super.key,
-    this.hintText,
-    this.prefixIcon,
-  });
-
-  final String? hintText;
-  final Icon? prefixIcon;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      decoration: InputDecoration(
-        prefixIcon: prefixIcon,
-        hintText: hintText,
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(8.0),
-          ),
-        ),
       ),
     );
   }

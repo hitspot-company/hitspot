@@ -15,6 +15,7 @@ class HSTheming extends GetxService {
     brightness: Brightness.dark,
   );
 
+  Color get mainColor => _mainColor;
   ThemeData get currentTheme => Get.theme;
   TextTheme get textTheme => currentTheme.textTheme;
 
