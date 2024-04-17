@@ -5,14 +5,17 @@ class HSTextField extends StatelessWidget {
     super.key,
     this.hintText,
     this.prefixIcon,
+    this.controller,
   });
 
   final String? hintText;
   final Icon? prefixIcon;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
         hintText: hintText,

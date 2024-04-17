@@ -2,6 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+import 'package:hitspot/controllers/register/register.dart';
 import 'package:hitspot/utils/hs_app.dart';
 import 'package:hitspot/utils/hs_display_size.dart';
 import 'package:hitspot/utils/hs_theming.dart';
@@ -13,6 +15,7 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(RegisterController());
     return HSScaffold(
       sidePadding: 16.0,
       body: ListView(
@@ -36,14 +39,16 @@ class RegisterPage extends StatelessWidget {
           Text("Please enter your details",
               style: HSApp.textTheme.bodyMedium, textAlign: TextAlign.center),
           const Gap(24.0),
-          const HSTextField(
+          HSTextField(
+            controller: controller.emailController,
             hintText: "Email",
-            prefixIcon: Icon(FontAwesomeIcons.envelope),
+            prefixIcon: const Icon(FontAwesomeIcons.envelope),
           ),
           const Gap(24.0),
-          const HSTextField(
+          HSTextField(
+            controller: controller.passwordController,
             hintText: "Password",
-            prefixIcon: Icon(FontAwesomeIcons.lock),
+            prefixIcon: const Icon(FontAwesomeIcons.lock),
           ),
           const Gap(32.0),
           SizedBox(
@@ -54,7 +59,7 @@ class RegisterPage extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
               ),
-              onPressed: () => print("register"),
+              onPressed: controller.register,
               label: const Text("Register"),
               icon: const Icon(FontAwesomeIcons.arrowRight),
             ),

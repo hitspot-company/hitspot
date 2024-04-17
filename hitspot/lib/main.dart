@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:get/get.dart';
+import 'package:hitspot/screens/register/register.dart';
 import 'package:hitspot/utils/hs_app.dart';
 
 void main() async {
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Hitspot',
       theme: HSApp.theming.darkTheme,
       home:
-          const CircularProgressIndicator(), // TODO: Remake as splash screen / some logo animation
+          const RegisterPage(), // TODO: Remake as splash screen / some logo animation
     );
   }
 }

@@ -18,9 +18,9 @@ class HSAuth extends GetxService {
   @override
   void onReady() {
     super.onReady();
-    firebaseUser = Rx<User?>(auth.currentUser);
-    firebaseUser.bindStream(auth.userChanges());
-    ever(firebaseUser, _setInitialScreen);
+    // firebaseUser = Rx<User?>(auth.currentUser);
+    // firebaseUser.bindStream(auth.userChanges());
+    // ever(firebaseUser, _setInitialScreen);
   }
 
   _setInitialScreen(User? user) {
@@ -31,20 +31,19 @@ class HSAuth extends GetxService {
     }
   }
 
-  Future<UserCredential> register(String email, password) async {
+  Future<UserCredential> registerWithEmailAndPassword(
+      String email, password) async {
     try {
       UserCredential createdUser = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
       return (createdUser);
-    } on FirebaseAuthException catch (e) {
-      HSApp.notifications.snackbar.error("Error", e.message!);
-      rethrow;
     } catch (firebaseAuthException) {
+      printError(info: "$firebaseAuthException");
       rethrow;
     }
   }
 
-  void login(String email, password) async {
+  void loginWithEmailAndPassword(String email, password) async {
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (firebaseAuthException) {
@@ -54,5 +53,6 @@ class HSAuth extends GetxService {
 
   Future<void> signOut() async {
     await auth.signOut();
+    HSApp.currentUser.disposeCurrentUser();
   }
 }

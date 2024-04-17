@@ -16,6 +16,7 @@ enum HSUserField {
   emailHidden("email_hidden"),
   createdAt("created_at"),
   bday("birthdate"),
+  isComplete("is_complete"),
   algoliaObjectID("objectID");
 
   final String name;
@@ -30,32 +31,39 @@ class HSUser {
       likedSpots,
       previouslySearchedUsers,
       spots;
-  final String? biogram, email, fullName, profilePicture, username;
+  final String? docID, biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
-  final bool? emailHidden;
+  final bool? emailHidden, isComplete;
 
   Map<String, dynamic> serialize() {
     return {
-      HSUserField.authProvidersIDs.name: authProviderIDs,
-      HSUserField.fcmTokens.name: fcmTokens,
-      HSUserField.followers.name: followers,
-      HSUserField.following.name: following,
-      HSUserField.likedSpots.name: likedSpots,
-      HSUserField.previouslySearchedUsers.name: previouslySearchedUsers,
-      HSUserField.spots.name: spots,
+      HSUserField.authProvidersIDs.name: authProviderIDs ?? [],
+      HSUserField.fcmTokens.name: fcmTokens ?? [],
+      HSUserField.followers.name: followers ?? [],
+      HSUserField.following.name: following ?? [],
+      HSUserField.likedSpots.name: likedSpots ?? [],
+      HSUserField.previouslySearchedUsers.name: previouslySearchedUsers ?? [],
+      HSUserField.spots.name: spots ?? [],
       HSUserField.biogram.name: biogram,
       HSUserField.email.name: email,
       HSUserField.fullName.name: fullName,
       HSUserField.profilePicture.name: profilePicture,
       HSUserField.username.name: username,
       HSUserField.bday.name: birthday,
-      HSUserField.createdAt.name: createdAt,
-      HSUserField.emailHidden.name: emailHidden
+      HSUserField.createdAt.name: createdAt ?? Timestamp.now(),
+      HSUserField.emailHidden.name: emailHidden ?? true,
+      HSUserField.isComplete.name: isComplete ?? false,
     };
   }
 
-  factory HSUser.deserialize(Map<String, dynamic> data) {
+  factory HSUser.fromFirestore(DocumentSnapshot doc) {
+    HSUser ret = HSUser.deserialize(doc.data() as Map<String, dynamic>, doc.id);
+    return (ret);
+  }
+
+  factory HSUser.deserialize(Map<String, dynamic> data, [String? id]) {
     return HSUser(
+      docID: id,
       authProviderIDs: data[HSUserField.authProvidersIDs.name],
       fcmTokens: data[HSUserField.fcmTokens.name],
       followers: data[HSUserField.followers.name],
@@ -71,17 +79,18 @@ class HSUser {
       birthday: data[HSUserField.bday.name],
       createdAt: data[HSUserField.createdAt.name],
       emailHidden: data[HSUserField.emailHidden.name],
+      isComplete: data[HSUserField.isComplete.name],
     );
   }
 
   const HSUser({
-    this.authProviderIDs,
-    this.fcmTokens,
-    this.followers,
-    this.following,
-    this.likedSpots,
-    this.previouslySearchedUsers,
-    this.spots,
+    this.authProviderIDs = const [],
+    this.fcmTokens = const [],
+    this.followers = const [],
+    this.following = const [],
+    this.likedSpots = const [],
+    this.previouslySearchedUsers = const [],
+    this.spots = const [],
     this.biogram,
     this.email,
     this.fullName,
@@ -90,5 +99,7 @@ class HSUser {
     this.birthday,
     this.createdAt,
     this.emailHidden,
+    this.isComplete,
+    this.docID,
   });
 }
