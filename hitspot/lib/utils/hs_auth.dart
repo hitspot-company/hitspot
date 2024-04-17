@@ -54,5 +54,6 @@ class HSAuth extends GetxService {
   Future<void> signOut() async {
     await auth.signOut();
     HSApp.currentUser.disposeCurrentUser();
+    Get.offAndToNamed("/login");
   }
 }

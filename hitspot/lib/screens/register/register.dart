@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -38,7 +39,7 @@ class RegisterPage extends StatelessWidget {
           const Gap(8.0),
           Text("Please enter your details",
               style: HSApp.textTheme.bodyMedium, textAlign: TextAlign.center),
-          const Gap(24.0),
+          const Gap(48.0),
           HSTextField(
             controller: controller.emailController,
             hintText: "Email",
@@ -54,14 +55,18 @@ class RegisterPage extends StatelessWidget {
           SizedBox(
             width: displayWidth(context) - 32.0,
             height: 60,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-              ),
-              onPressed: controller.register,
-              label: const Text("Register"),
-              icon: const Icon(FontAwesomeIcons.arrowRight),
+            child: Obx(
+              () => controller.loading
+                  ? const CupertinoActivityIndicator()
+                  : ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                      ),
+                      onPressed: controller.register,
+                      label: const Text("Register"),
+                      icon: const Icon(FontAwesomeIcons.arrowRight),
+                    ),
             ),
           ),
           const Gap(32.0),

@@ -10,6 +10,7 @@ class HSScaffold extends StatelessWidget {
     this.sidePadding = 8.0,
     this.appBar,
     required this.body,
+    this.ignoring = false,
   });
 
   final bool topSafe;
@@ -17,19 +18,23 @@ class HSScaffold extends StatelessWidget {
   final double sidePadding;
   final Widget? appBar;
   final Widget body;
+  final bool ignoring;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => SystemChannels.textInput.invokeMethod('TextInput.hide'),
-      child: Scaffold(
-        body: SafeArea(
-          top: topSafe,
-          bottom: bottomSafe,
-          child: Padding(
-            padding: EdgeInsets.all(sidePadding),
-            child: Column(
-              children: [if (appBar != null) appBar!, Expanded(child: body)],
+      child: IgnorePointer(
+        ignoring: ignoring,
+        child: Scaffold(
+          body: SafeArea(
+            top: topSafe,
+            bottom: bottomSafe,
+            child: Padding(
+              padding: EdgeInsets.all(sidePadding),
+              child: Column(
+                children: [if (appBar != null) appBar!, Expanded(child: body)],
+              ),
             ),
           ),
         ),

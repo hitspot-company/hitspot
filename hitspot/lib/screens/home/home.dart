@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hitspot/utils/hs_app.dart';
-import 'package:hitspot/utils/hs_auth.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -17,9 +16,7 @@ class HomePage extends StatelessWidget {
               style: HSApp.textTheme.displayMedium,
             ),
             TextButton(
-              onPressed: () => HSAuth.instance
-                  .signOut()
-                  .then((value) => print("signed out")),
+              onPressed: HSApp.auth.signOut,
               child: const Text("Sign Out"),
             ),
           ],
