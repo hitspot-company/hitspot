@@ -18,9 +18,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Hitspot',
       theme: HSApp.theming.darkTheme,
-      home: const CircularProgressIndicator(),
+      home:
+          const CircularProgressIndicator(), // TODO: Remake as splash screen / some logo animation
     );
   }
 }

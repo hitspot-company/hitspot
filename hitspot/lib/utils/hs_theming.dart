@@ -26,7 +26,15 @@ class HSTheming extends GetxService {
 }
 
 extension TextStyleAltering on TextStyle {
-  TextStyle applyBold() {
+  TextStyle boldify() {
     return copyWith(fontWeight: FontWeight.bold);
+  }
+
+  TextStyle hintify() {
+    return copyWith(color: color!.withOpacity(.7));
+  }
+
+  TextStyle colorify(Color newColor) {
+    return copyWith(color: newColor);
   }
 }
