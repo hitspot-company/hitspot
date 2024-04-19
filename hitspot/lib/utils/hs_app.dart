@@ -11,16 +11,16 @@ import 'package:hitspot/utils/hs_theming.dart';
 class HSApp extends GetxService {
   static HSApp instance = Get.find();
 
-  static final auth = HSAuth.instance;
-  static final config = HSConfig.instance;
-  static final notifications = HSNotifications.instance;
-  static final theming = HSTheming.instance;
-  static final currentUser = HSCurrentUser.instance;
-  static final images = HSImages.instance;
-  static final firestore = HSFirestore.instance;
+  late HSAuth auth;
+  late HSConfig config;
+  late HSNotifications notifications;
+  late HSTheming theming;
+  late HSCurrentUser currentUser;
+  late HSImages images;
+  late HSFirestore firestore;
 
-  static TextTheme get textTheme => theming.textTheme;
-  static HSSnackBarService get snackbars => notifications.snackbar;
+  TextTheme get textTheme => theming.textTheme;
+  HSSnackBarService get snackbars => notifications.snackbar;
 
   @override
   void onInit() {
@@ -36,6 +36,13 @@ class HSApp extends GetxService {
 
   @override
   void onReady() {
+    auth = HSAuth.instance;
+    config = HSConfig.instance;
+    notifications = HSNotifications.instance;
+    theming = HSTheming.instance;
+    currentUser = HSCurrentUser.instance;
+    images = HSImages.instance;
+    firestore = HSFirestore.instance;
     print("HSApp ready!");
     super.onReady();
   }

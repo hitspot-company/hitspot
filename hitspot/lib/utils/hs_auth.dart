@@ -8,6 +8,7 @@ class HSAuth extends GetxService {
   static HSAuth instance = Get.find();
   late Rx<User?> firebaseUser;
   final auth = FirebaseAuth.instance;
+  static final app = HSApp.instance;
 
   @override
   void onInit() {
@@ -53,7 +54,7 @@ class HSAuth extends GetxService {
 
   Future<void> signOut() async {
     await auth.signOut();
-    HSApp.currentUser.disposeCurrentUser();
+    app.currentUser.disposeCurrentUser();
     Get.offAndToNamed("/login");
   }
 }

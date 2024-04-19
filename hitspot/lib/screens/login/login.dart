@@ -3,17 +3,16 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:hitspot/const/const.dart';
-import 'package:hitspot/controllers/register/register.dart';
 import 'package:hitspot/utils/hs_app.dart';
 import 'package:hitspot/utils/hs_display_size.dart';
 import 'package:hitspot/utils/hs_theming.dart';
 import 'package:hitspot/widgets/global/hs_scaffold.dart';
 import 'package:hitspot/widgets/global/hs_textfield.dart';
 
-class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   final String title = "Let's register!";
   final String headline = "Please enter your details";
@@ -23,7 +22,8 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(RegisterController());
+    // final controller = Get.put(RegisterController());
+    var controller;
     return HSScaffold(
       sidePadding: 16.0,
       body: ListView(
