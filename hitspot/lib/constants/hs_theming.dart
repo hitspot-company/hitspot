@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-class HSTheming extends GetxService {
-  static HSTheming instance = Get.find();
+class HSTheming {
   static const Color _mainColor = Color(0xFF04cc91);
 
   final ThemeData lightTheme = ThemeData(
@@ -16,14 +14,6 @@ class HSTheming extends GetxService {
   );
 
   Color get mainColor => _mainColor;
-  ThemeData get currentTheme => Get.theme;
-  TextTheme get textTheme => currentTheme.textTheme;
-
-  @override
-  void onReady() {
-    print("HSTheming ready!");
-    super.onReady();
-  }
 }
 
 extension TextStyleAltering on TextStyle {
