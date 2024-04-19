@@ -6,16 +6,28 @@ class HSTextField extends StatelessWidget {
     this.hintText,
     this.prefixIcon,
     this.controller,
+    this.validator,
+    this.onChanged,
+    this.keyboardType,
+    this.obscureText = false,
   });
 
   final String? hintText;
-  final Icon? prefixIcon;
+  final Widget? prefixIcon;
   final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final Function(String)? onChanged;
+  final TextInputType? keyboardType;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      validator: validator,
+      onChanged: onChanged,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
         hintText: hintText,
