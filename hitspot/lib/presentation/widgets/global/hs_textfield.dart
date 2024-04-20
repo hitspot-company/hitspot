@@ -10,6 +10,7 @@ class HSTextField extends StatelessWidget {
     this.onChanged,
     this.keyboardType,
     this.obscureText = false,
+    this.node,
   });
 
   final String? hintText;
@@ -19,11 +20,13 @@ class HSTextField extends StatelessWidget {
   final Function(String)? onChanged;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final FocusNode? node;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      focusNode: node,
       validator: validator,
       onChanged: onChanged,
       obscureText: obscureText,

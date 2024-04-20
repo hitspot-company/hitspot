@@ -8,6 +8,8 @@ import 'package:hitspot/bloc/theme/theme_bloc.dart';
 import 'package:hitspot/constants/hs_const.dart';
 import 'package:hitspot/presentation/screens/auth/auth.dart';
 import 'package:hitspot/presentation/screens/home/home.dart';
+import 'package:hitspot/presentation/screens/login/login.dart';
+import 'package:hitspot/presentation/screens/register/register.dart';
 import 'package:hitspot/repositories/repo/authentication/hs_authentication.dart';
 import 'package:hitspot/repositories/repo/theme/hs_theme.dart';
 import 'package:hitspot/services/authentication/hs_authentication.dart';
@@ -52,6 +54,8 @@ class App extends StatelessWidget {
         return MaterialApp(
           routes: {
             HomePage.id: (context) => const HomePage(),
+            RegisterPage.id: (context) => RegisterPage(),
+            LoginPage.id: (context) => LoginPage(),
           },
           debugShowCheckedModeBanner: false,
           home: const AuthFlowScreen(),

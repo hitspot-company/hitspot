@@ -3,25 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/bloc/auth/authentication_bloc.dart';
 import 'package:hitspot/bloc/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/bloc/form_validator/hs_form_validator_cubit.dart';
 import 'package:hitspot/bloc/form_validator/hs_validator.dart';
 import 'package:hitspot/constants/hs_const.dart';
 import 'package:hitspot/presentation/screens/home/home.dart';
+import 'package:hitspot/presentation/screens/login/login.dart';
 import 'package:hitspot/presentation/widgets/global/hs_appbar.dart';
 import 'package:hitspot/utils/hs_display_size.dart';
 import 'package:hitspot/presentation/widgets/global/hs_scaffold.dart';
 import 'package:hitspot/presentation/widgets/global/hs_textfield.dart';
 import 'package:hitspot/constants/hs_theming.dart';
+import 'package:hitspot/utils/hs_notifications.dart';
 
 class RegisterPage extends StatelessWidget with HSValidator {
+  static const String id = "register_page";
   RegisterPage({super.key});
 
   final String title = "Let's register!";
   final String headline = "Please enter your details";
-  final String buttonText = "Register";
+  final String buttonText = "Sign Up";
   final _formKey = GlobalKey<FormState>();
+  final FocusNode passwordNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +71,7 @@ class RegisterPage extends StatelessWidget with HSValidator {
                       validator: validatePassword,
                       onChanged: formValidatorCubit.updatePassword,
                       obscureText: obscure,
+                      node: passwordNode,
                       hintText: "Password",
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: IconButton(
@@ -89,8 +93,10 @@ class RegisterPage extends StatelessWidget with HSValidator {
                       if (state is HSAuthenticationSuccessState) {
                         Navigator.pushNamedAndRemoveUntil(
                             context, HomePage.id, (route) => false);
-                      } else if (state is AuthenticationFailure) {
-                        print("Error"); // TODO: SHOW ERROR SNACKBAR
+                      } else if (state is HSAuthenticationFailureState) {
+                        HSNotifications.instance
+                            .snackbar(context)
+                            .error(title: "Error", message: state.errorMessage);
                       }
                     },
                     builder: (context, state) {
@@ -110,7 +116,8 @@ class RegisterPage extends StatelessWidget with HSValidator {
                                 AutovalidateMode.onUserInteraction);
                           }
                         },
-                        label: state is HSAuthenticationLoadingState
+                        label: state is HSAuthenticationLoadingState &&
+                                state.isLoading
                             ? const Text("....")
                             : Text(buttonText),
                         icon: const Icon(FontAwesomeIcons.arrowRight),
@@ -131,6 +138,9 @@ class RegisterPage extends StatelessWidget with HSValidator {
                             .bodySmall!
                             .colorify(HSConstants.theming.mainColor)
                             .boldify(),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => Navigator.pushReplacementNamed(
+                              context, LoginPage.id),
                       ),
                     ],
                   ),

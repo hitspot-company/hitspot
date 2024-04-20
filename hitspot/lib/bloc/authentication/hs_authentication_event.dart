@@ -17,4 +17,14 @@ class HSSignUpEvent extends HSAuthenticationEvent {
   List<Object> get props => [email, password];
 }
 
+class HSSignInEvent extends HSAuthenticationEvent {
+  final String email;
+  final String password;
+
+  const HSSignInEvent({required this.email, required this.password});
+
+  @override
+  List<Object> get props => [email, password];
+}
+
 class HSSignOutEvent extends HSAuthenticationEvent {}

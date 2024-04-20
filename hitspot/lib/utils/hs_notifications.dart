@@ -1,46 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:toastification/toastification.dart';
 
-class HSNotifications extends GetxService {
-  static HSNotifications instance = Get.find();
-  late HSSnackBarService snackbar;
-
-  @override
-  void onInit() {
-    Get.put(HSSnackBarService());
-    snackbar = HSSnackBarService.instance;
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    print("HSNotifications ready!");
-    super.onReady();
-  }
+class HSNotifications {
+  static HSNotifications instance = HSNotifications();
+  HSSnackBarService snackbar(snackContext) => HSSnackBarService(snackContext);
 }
 
-class HSSnackBarService extends GetxService {
-  static HSSnackBarService instance = Get.find();
-  final SnackPosition defaultSnackPosition = SnackPosition.BOTTOM;
+class HSSnackBarService {
+  static HSSnackBarService instance(instanceContext) =>
+      HSSnackBarService(instanceContext);
+  final Alignment position = Alignment.bottomCenter;
+  final ToastificationStyle style = ToastificationStyle.fillColored;
+  final Duration autoCloseDuration = const Duration(seconds: 5);
+  final BuildContext context;
 
-  void success(String title, String message) {
-    Get.snackbar(title, message,
-        snackPosition: defaultSnackPosition,
-        backgroundColor: Colors.green,
-        icon: const Icon(Icons.check));
+  const HSSnackBarService(this.context);
+
+  void success({required String title, required String message}) {
+    toastification.show(
+      context: context,
+      type: ToastificationType.success,
+      style: style,
+      alignment: position,
+      title: Text(title),
+      description: Text(message),
+      autoCloseDuration: autoCloseDuration,
+    );
   }
 
-  void warning(String title, String message) {
-    Get.snackbar(title, message,
-        snackPosition: defaultSnackPosition,
-        backgroundColor: Colors.yellow,
-        icon: const Icon(Icons.warning));
+  void warning({required String title, required String message}) {
+    toastification.show(
+      context: context,
+      type: ToastificationType.warning,
+      title: Text(title),
+      style: style,
+      autoCloseDuration: autoCloseDuration,
+      alignment: position,
+      description: Text(message),
+    );
   }
 
-  void error(String title, String message) {
-    Get.snackbar(title, message,
-        snackPosition: defaultSnackPosition,
-        backgroundColor: Colors.red,
-        icon: const Icon(Icons.error));
+  void error({required String title, required String message}) {
+    toastification.show(
+      context: context,
+      style: style,
+      alignment: position,
+      autoCloseDuration: autoCloseDuration,
+      type: ToastificationType.error,
+      title: Text(title),
+      description: Text(message),
+    );
   }
 }

@@ -3,11 +3,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 class HSAuthenticationService {
   final _firebaseAuth = FirebaseAuth.instance;
 
-  Future<UserCredential> registerWithEmailAndPassword(
+  Future<UserCredential> signUpWithEmailAndPassword(
       String email, String password) async {
     try {
       final UserCredential userCredential =
           await _firebaseAuth.createUserWithEmailAndPassword(
+              email: email.trim(), password: password.trim());
+      return (userCredential);
+    } on FirebaseAuthException {
+      rethrow;
+    } catch (e) {
+      print("Unknown error: $e");
+      rethrow;
+    }
+  }
+
+  Future<UserCredential> signInWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      final UserCredential userCredential =
+          await _firebaseAuth.signInWithEmailAndPassword(
               email: email.trim(), password: password.trim());
       return (userCredential);
     } on FirebaseAuthException {

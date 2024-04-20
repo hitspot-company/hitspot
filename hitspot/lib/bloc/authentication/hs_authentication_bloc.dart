@@ -16,7 +16,21 @@ class HSAuthenticationBloc
       emit(const HSAuthenticationLoadingState(true));
       try {
         final UserCredential userCredential = await _hsAuthRepository
-            .registerWithEmailAndPassword(event.email, event.password);
+            .signUpWithEmailAndPassword(event.email, event.password);
+        emit(HSAuthenticationSuccessState(userCredential));
+      } on FirebaseAuthException catch (fa) {
+        emit(HSAuthenticationFailureState(fa.message ?? "Unknown"));
+      } catch (e) {
+        emit(HSAuthenticationFailureState(e.toString()));
+      }
+      emit(const HSAuthenticationLoadingState(false));
+    });
+    on<HSSignInEvent>((event, emit) async {
+      emit(const HSAuthenticationLoadingState(true));
+      try {
+        final UserCredential userCredential = await _hsAuthRepository
+            .signInWithEmailAndPassword(event.email, event.password);
+        print("Sign In successful.");
         emit(HSAuthenticationSuccessState(userCredential));
       } on FirebaseAuthException catch (fa) {
         emit(HSAuthenticationFailureState(fa.message ?? "Unknown"));
