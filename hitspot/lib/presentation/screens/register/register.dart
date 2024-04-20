@@ -7,6 +7,7 @@ import 'package:hitspot/bloc/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/bloc/form_validator/hs_form_validator_cubit.dart';
 import 'package:hitspot/bloc/form_validator/hs_validator.dart';
 import 'package:hitspot/constants/hs_const.dart';
+import 'package:hitspot/presentation/screens/email_validation/email_validation.dart';
 import 'package:hitspot/presentation/screens/home/home.dart';
 import 'package:hitspot/presentation/screens/login/login.dart';
 import 'package:hitspot/presentation/widgets/global/hs_appbar.dart';
@@ -90,10 +91,7 @@ class RegisterPage extends StatelessWidget with HSValidator {
                   child:
                       BlocConsumer<HSAuthenticationBloc, HSAuthenticationState>(
                     listener: (context, state) {
-                      if (state is HSAuthenticationSuccessState) {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, HomePage.id, (route) => false);
-                      } else if (state is HSAuthenticationFailureState) {
+                      if (state is HSAuthenticationFailureState) {
                         HSNotifications.instance
                             .snackbar(context)
                             .error(title: "Error", message: state.errorMessage);

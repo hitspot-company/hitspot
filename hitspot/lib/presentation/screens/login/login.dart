@@ -14,6 +14,7 @@ import 'package:hitspot/utils/hs_display_size.dart';
 import 'package:hitspot/presentation/widgets/global/hs_scaffold.dart';
 import 'package:hitspot/presentation/widgets/global/hs_textfield.dart';
 import 'package:hitspot/constants/hs_theming.dart';
+import 'package:hitspot/utils/hs_notifications.dart';
 
 class LoginPage extends StatelessWidget with HSValidator {
   static const String id = "login_page";
@@ -66,7 +67,6 @@ class LoginPage extends StatelessWidget with HSValidator {
                   selector: (state) => state.obscureText,
                   builder: (context, obscure) {
                     return HSTextField(
-                      validator: validatePassword,
                       onChanged: formValidatorCubit.updatePassword,
                       obscureText: obscure,
                       hintText: "Password",
@@ -91,7 +91,9 @@ class LoginPage extends StatelessWidget with HSValidator {
                         Navigator.pushNamedAndRemoveUntil(
                             context, HomePage.id, (route) => false);
                       } else if (state is HSAuthenticationFailureState) {
-                        print("Error"); // TODO: SHOW ERROR SNACKBAR
+                        HSNotifications.instance
+                            .snackbar(context)
+                            .error(title: "Error", message: state.errorMessage);
                       }
                     },
                     builder: (context, state) {

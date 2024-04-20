@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/repositories/repo/authentication/hs_authentication.dart';
+import 'package:hitspot/repositories/authentication/hs_authentication.dart';
 
 part 'hs_authentication_event.dart';
 part 'hs_authentication_state.dart';
@@ -39,10 +40,11 @@ class HSAuthenticationBloc
       }
       emit(const HSAuthenticationLoadingState(false));
     });
-    on<HSSignOutEvent>((event, emit) {
+    on<HSSignOutEvent>((event, emit) async {
       emit(const HSAuthenticationLoadingState(true));
       try {
-        _hsAuthRepository.signOutUser();
+        await _hsAuthRepository
+            .signOutUser(); // BUG: The state does not change on the register page
       } catch (e) {
         print("Could not sign out: $e");
       }

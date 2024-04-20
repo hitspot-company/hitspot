@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HSTheming {
+  static HSTheming instance = HSTheming();
   static const Color _mainColor = Color(0xFF04cc91);
 
   final ThemeData lightTheme = ThemeData(
