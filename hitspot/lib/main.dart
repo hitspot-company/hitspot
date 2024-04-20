@@ -8,13 +8,11 @@ import 'package:hitspot/bloc/theme/theme_bloc.dart';
 import 'package:hitspot/constants/hs_const.dart';
 import 'package:hitspot/presentation/screens/auth/auth.dart';
 import 'package:hitspot/presentation/screens/home/home.dart';
-import 'package:hitspot/presentation/screens/register/register.dart';
-import 'package:hitspot/repositories/repo/auth/hs_auth.dart';
+import 'package:hitspot/repositories/repo/authentication/hs_authentication.dart';
 import 'package:hitspot/repositories/repo/theme/hs_theme.dart';
+import 'package:hitspot/services/authentication/hs_authentication.dart';
 import 'package:hitspot/services/theme/hs_theme.dart';
 import 'package:hitspot/utils/hs_app_bloc_observer.dart';
-
-import 'bloc/auth/authentication_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +28,14 @@ void main() async {
                   ..add(HSInitialThemeSetEvent())),
         BlocProvider(
           create: (context) => HSFormValidatorCubit(),
-        )
+        ),
+        BlocProvider(
+          create: (context) => HSAuthenticationBloc(
+            HSAuthenticationRepository(
+              authenticationService: HSAuthenticationService(),
+            ),
+          ),
+        ),
       ],
       child: const App(),
     ),
@@ -45,6 +50,9 @@ class App extends StatelessWidget {
     return BlocBuilder<HSThemeBloc, HSThemeState>(
       builder: (context, state) {
         return MaterialApp(
+          routes: {
+            HomePage.id: (context) => const HomePage(),
+          },
           debugShowCheckedModeBanner: false,
           home: const AuthFlowScreen(),
           title: HSConstants.title,

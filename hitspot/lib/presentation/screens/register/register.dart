@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/bloc/auth/authentication_bloc.dart';
+import 'package:hitspot/bloc/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/bloc/form_validator/hs_form_validator_cubit.dart';
 import 'package:hitspot/bloc/form_validator/hs_validator.dart';
 import 'package:hitspot/constants/hs_const.dart';
+import 'package:hitspot/presentation/screens/home/home.dart';
 import 'package:hitspot/presentation/widgets/global/hs_appbar.dart';
 import 'package:hitspot/utils/hs_display_size.dart';
 import 'package:hitspot/presentation/widgets/global/hs_scaffold.dart';
@@ -80,20 +83,39 @@ class RegisterPage extends StatelessWidget with HSValidator {
                 SizedBox(
                   width: displayWidth(context) - 32.0,
                   height: 60,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                      } else {
-                        formValidatorCubit.updateAutovalidateMode(
-                            AutovalidateMode.onUserInteraction);
+                  child:
+                      BlocConsumer<HSAuthenticationBloc, HSAuthenticationState>(
+                    listener: (context, state) {
+                      if (state is HSAuthenticationSuccessState) {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, HomePage.id, (route) => false);
+                      } else if (state is AuthenticationFailure) {
+                        print("Error"); // TODO: SHOW ERROR SNACKBAR
                       }
                     },
-                    label: Text(buttonText),
-                    icon: const Icon(FontAwesomeIcons.arrowRight),
+                    builder: (context, state) {
+                      return ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            BlocProvider.of<HSAuthenticationBloc>(context).add(
+                                HSSignUpEvent(
+                                    email: formValidatorCubit.state.email,
+                                    password: formValidatorCubit.state.email));
+                          } else {
+                            formValidatorCubit.updateAutovalidateMode(
+                                AutovalidateMode.onUserInteraction);
+                          }
+                        },
+                        label: state is HSAuthenticationLoadingState
+                            ? const Text("....")
+                            : Text(buttonText),
+                        icon: const Icon(FontAwesomeIcons.arrowRight),
+                      );
+                    },
                   ),
                 ),
                 const Gap(16.0),
