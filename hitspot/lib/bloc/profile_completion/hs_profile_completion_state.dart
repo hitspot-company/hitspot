@@ -1,40 +1,56 @@
-part of 'hs_profile_completion_bloc.dart';
+part of 'hs_profile_completion_cubit.dart';
 
 sealed class HSProfileCompletionState extends Equatable {
-  const HSProfileCompletionState(
-      {this.step = 0, this.bday = '', this.fullname = '', this.username = ''});
-
-  final String bday;
+  final int step;
   final String fullname;
   final String username;
-  final int step;
+  final String bday;
+  final List<Object?> preferences;
+
+  const HSProfileCompletionState(
+      {this.step = 0,
+      this.bday = '',
+      this.username = '',
+      this.fullname = '',
+      this.preferences = const []});
 
   HSProfileCompletionState copyWith({
+    int? step,
     String? fullname,
     String? username,
     String? bday,
-    required int step,
+    List<Object?>? preferences,
   });
 
   @override
-  List<Object> get props => [step, bday, username, fullname];
+  List<Object> get props => [step, bday, username, fullname, preferences];
 }
 
-final class HSProfileCompletionUpdateState extends HSProfileCompletionState {
-  const HSProfileCompletionUpdateState(
-      {super.bday, super.fullname, super.step, super.username});
+final class HSProfileCompletionUpdate extends HSProfileCompletionState {
+  const HSProfileCompletionUpdate(
+      {super.step,
+      super.bday,
+      super.fullname,
+      super.username,
+      super.preferences});
 
   @override
-  HSProfileCompletionUpdateState copyWith({
+  HSProfileCompletionUpdate copyWith({
+    int? step,
     String? fullname,
     String? username,
     String? bday,
-    required int step,
+    List<Object?>? preferences,
   }) {
-    return HSProfileCompletionUpdateState(
-        step: step,
-        fullname: fullname ?? this.fullname,
-        username: username ?? this.username,
-        bday: bday ?? this.bday);
+    return HSProfileCompletionUpdate(
+      step: step ?? this.step,
+      fullname: fullname ?? this.fullname,
+      username: username ?? this.username,
+      bday: bday ?? this.bday,
+      preferences: preferences ?? this.preferences,
+    );
   }
+
+  @override
+  List<Object> get props => [step, bday, fullname, username, preferences];
 }
