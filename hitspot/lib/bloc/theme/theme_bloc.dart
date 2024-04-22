@@ -20,7 +20,7 @@ class HSThemeBloc extends Bloc<HSThemeEvent, HSThemeState> {
       }
     });
     on<HSThemeSwitchEvent>((event, emit) {
-      final isDark = state.theme == HSConstants.theming.darkTheme;
+      final isDark = state.theme == HSApp.theming.darkTheme;
       emit(isDark ? HSThemeStateLight() : HSThemeStateDark());
       _repo.setTheme(isDark);
     });

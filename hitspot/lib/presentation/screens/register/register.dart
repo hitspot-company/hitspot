@@ -34,7 +34,7 @@ class RegisterPage extends StatelessWidget with HSValidator {
       sidePadding: 16.0,
       appBar: HSAppBar(
         center: Image.asset(
-          HSConstants.assets.textLogoPath,
+          HSApp.assets.textLogoPath,
         ),
       ),
       body: BlocSelector<HSFormValidatorCubit, HSFormValidatorState,
@@ -134,7 +134,7 @@ class RegisterPage extends StatelessWidget with HSValidator {
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall!
-                            .colorify(HSConstants.theming.mainColor)
+                            .colorify(HSApp.theming.mainColor)
                             .boldify(),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () => Navigator.pushReplacementNamed(
@@ -154,7 +154,7 @@ class RegisterPage extends StatelessWidget with HSValidator {
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall!
-                            .colorify(HSConstants.theming.mainColor)
+                            .colorify(HSApp.theming.mainColor)
                             .boldify(),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () => print("TOS"),
@@ -167,7 +167,7 @@ class RegisterPage extends StatelessWidget with HSValidator {
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall!
-                            .colorify(HSConstants.theming.mainColor)
+                            .colorify(HSApp.theming.mainColor)
                             .boldify(),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () => print("PP"),

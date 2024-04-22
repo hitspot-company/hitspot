@@ -11,6 +11,8 @@ class HSTextField extends StatelessWidget {
     this.keyboardType,
     this.obscureText = false,
     this.node,
+    this.onTap,
+    this.readOnly = false,
   });
 
   final String? hintText;
@@ -20,17 +22,21 @@ class HSTextField extends StatelessWidget {
   final Function(String)? onChanged;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final bool readOnly;
   final FocusNode? node;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: readOnly,
       controller: controller,
       focusNode: node,
       validator: validator,
       onChanged: onChanged,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      onTap: onTap,
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
         hintText: hintText,

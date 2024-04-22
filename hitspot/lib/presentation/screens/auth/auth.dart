@@ -24,7 +24,7 @@ class AuthFlowScreen extends StatelessWidget {
           //     );
           //   }
           // }
-          return const ProfileCompletionPage();
+          return ProfileCompletionPage();
         },
       ),
     );

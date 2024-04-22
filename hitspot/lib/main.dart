@@ -61,7 +61,7 @@ class App extends StatelessWidget {
           },
           debugShowCheckedModeBanner: false,
           home: const AuthFlowScreen(),
-          title: HSConstants.title,
+          title: HSApp.title,
           theme: state.theme,
         );
       },

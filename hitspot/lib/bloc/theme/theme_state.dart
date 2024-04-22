@@ -10,9 +10,9 @@ sealed class HSThemeState extends Equatable {
 }
 
 final class HSThemeStateDark extends HSThemeState {
-  HSThemeStateDark() : super(HSConstants.theming.darkTheme);
+  HSThemeStateDark() : super(HSApp.theming.darkTheme);
 }
 
 final class HSThemeStateLight extends HSThemeState {
-  HSThemeStateLight() : super(HSConstants.theming.lightTheme);
+  HSThemeStateLight() : super(HSApp.theming.lightTheme);
 }

@@ -78,7 +78,7 @@ class EmailValidationPage extends StatelessWidget {
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall!
-                            .colorify(HSConstants.theming.mainColor)
+                            .colorify(HSApp.theming.mainColor)
                             .boldify(),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () =>
