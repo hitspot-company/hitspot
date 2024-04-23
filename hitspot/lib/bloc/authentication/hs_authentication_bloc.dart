@@ -31,7 +31,6 @@ class HSAuthenticationBloc
       try {
         final UserCredential userCredential = await _hsAuthRepository
             .signInWithEmailAndPassword(event.email, event.password);
-        print("Sign In successful.");
         emit(HSAuthenticationSuccessState(userCredential));
       } on FirebaseAuthException catch (fa) {
         emit(HSAuthenticationFailureState(fa.message ?? "Unknown"));

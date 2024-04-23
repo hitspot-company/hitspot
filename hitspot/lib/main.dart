@@ -5,7 +5,7 @@ import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/bloc/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/bloc/form_validator/hs_form_validator_cubit.dart';
 import 'package:hitspot/bloc/theme/theme_bloc.dart';
-import 'package:hitspot/constants/hs_const.dart';
+import 'package:hitspot/constants/hs_app.dart';
 import 'package:hitspot/presentation/screens/auth/auth.dart';
 import 'package:hitspot/presentation/screens/email_validation/email_validation.dart';
 import 'package:hitspot/presentation/screens/home/home.dart';

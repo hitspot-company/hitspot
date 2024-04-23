@@ -17,6 +17,7 @@ enum HSUserField {
   createdAt("created_at"),
   bday("birthdate"),
   isComplete("is_complete"),
+  tags("tags"),
   algoliaObjectID("objectID");
 
   final String name;
@@ -30,6 +31,7 @@ class HSUser {
       following,
       likedSpots,
       previouslySearchedUsers,
+      tags,
       spots;
   final String? docID, biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
@@ -53,6 +55,7 @@ class HSUser {
       HSUserField.createdAt.name: createdAt ?? Timestamp.now(),
       HSUserField.emailHidden.name: emailHidden ?? true,
       HSUserField.isComplete.name: isComplete ?? false,
+      HSUserField.tags.name: tags ?? false,
     };
   }
 
@@ -80,6 +83,7 @@ class HSUser {
       createdAt: data[HSUserField.createdAt.name],
       emailHidden: data[HSUserField.emailHidden.name],
       isComplete: data[HSUserField.isComplete.name],
+      tags: data[HSUserField.tags.name],
     );
   }
 
@@ -101,6 +105,7 @@ class HSUser {
     this.emailHidden,
     this.isComplete,
     this.docID,
+    this.tags,
   });
 
   HSUser copyWith({
@@ -111,6 +116,7 @@ class HSUser {
     List? likedSpots,
     List? previouslySearchedUsers,
     List? spots,
+    List? tags,
     String? docID,
     String? biogram,
     String? email,
@@ -141,6 +147,32 @@ class HSUser {
       createdAt: createdAt ?? this.createdAt,
       emailHidden: emailHidden ?? this.emailHidden,
       isComplete: isComplete ?? this.isComplete,
+      tags: tags ?? this.tags,
     );
+  }
+
+  @override
+  String toString() {
+    return """"
+User ($docID) details:
+authProviderIDs: $authProviderIDs,
+fcmTokens: $fcmTokens,
+followers: $followers,
+following: $following,
+likedSpots: $likedSpots,
+previouslySearchedUsers: $previouslySearchedUsers,
+spots: $spots,
+docID: $docID,
+biogram: $biogram,
+email: $email,
+fullName: $fullName,
+profilePicture: $profilePicture,
+username: $username,
+birthday: $birthday,
+createdAt: $createdAt,
+emailHidden: $emailHidden,
+isComplete: $isComplete,
+tags: $tags,
+""";
   }
 }

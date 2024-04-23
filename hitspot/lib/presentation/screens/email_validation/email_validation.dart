@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/bloc/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/bloc/email_validation/hs_email_validation_bloc.dart';
-import 'package:hitspot/constants/hs_const.dart';
+import 'package:hitspot/constants/hs_app.dart';
 import 'package:hitspot/constants/hs_theming.dart';
 import 'package:hitspot/presentation/screens/home/home.dart';
 import 'package:hitspot/presentation/screens/register/register.dart';

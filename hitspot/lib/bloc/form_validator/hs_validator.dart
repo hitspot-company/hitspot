@@ -26,4 +26,18 @@ mixin HSValidator {
     }
     return null;
   }
+
+  String? validateFullname(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Full name is required';
+    }
+    return null;
+  }
+
+  String? validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Username is required';
+    }
+    return null;
+  }
 }
