@@ -1,4 +1,4 @@
-package com.example.hitspot
+package com.company.hitspot
 
 import io.flutter.embedding.android.FlutterActivity
 
