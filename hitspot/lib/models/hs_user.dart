@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 enum HSUserField {
   username("username"),
@@ -16,7 +17,8 @@ enum HSUserField {
   emailHidden("email_hidden"),
   createdAt("created_at"),
   bday("birthdate"),
-  algoliaObjectID("objectID");
+  algoliaObjectID("objectID"),
+  isProfileCompleted("is_profile_completed");
 
   final String name;
   const HSUserField(this.name);
@@ -33,6 +35,7 @@ class HSUser {
   final String? biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
   final bool? emailHidden;
+  final bool? isProfileCompleted;
 
   Map<String, dynamic> serialize() {
     return {
@@ -50,7 +53,8 @@ class HSUser {
       HSUserField.username.name: username,
       HSUserField.bday.name: birthday,
       HSUserField.createdAt.name: createdAt,
-      HSUserField.emailHidden.name: emailHidden
+      HSUserField.emailHidden.name: emailHidden,
+      HSUserField.isProfileCompleted.name: isProfileCompleted
     };
   }
 
@@ -71,6 +75,7 @@ class HSUser {
       birthday: data[HSUserField.bday.name],
       createdAt: data[HSUserField.createdAt.name],
       emailHidden: data[HSUserField.emailHidden.name],
+      isProfileCompleted: data[HSUserField.isProfileCompleted.name],
     );
   }
 
@@ -90,5 +95,6 @@ class HSUser {
     this.birthday,
     this.createdAt,
     this.emailHidden,
+    this.isProfileCompleted,
   });
 }
