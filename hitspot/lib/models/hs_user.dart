@@ -74,6 +74,8 @@ class HSUser {
     );
   }
 
+  factory HSUser.fromFirebaseUser(User firebaseUser) {}
+
   const HSUser({
     this.authProviderIDs,
     this.fcmTokens,

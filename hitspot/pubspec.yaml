@@ -17,11 +17,12 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.6.6
-  firebase_auth: ^4.11.1
-  firebase_core: ^2.30.0
+  firebase_auth: ^4.19.4
+  firebase_core: ^2.30.1
   cloud_firestore: ^4.11.0
   flutter_config: ^2.0.2
   auto_size_text: ^3.0.0
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
 
