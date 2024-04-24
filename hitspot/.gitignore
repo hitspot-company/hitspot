@@ -45,4 +45,6 @@ app.*.map.json
 # Environment variables
 .env
 
+# Firebase environments config
 lib/firebase_options.dart
+packages/hs_firebase_config/lib/src/hs_firebase_config.*.dart
