@@ -20,9 +20,13 @@ class HSAuthenticationRepository {
 
   Stream<HSUser?> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      final user = firebaseUser?.toUser;
-      return user;
+      _user = firebaseUser?.toUser;
+      return _user;
     });
+  }
+
+  HSUser? get currentUser {
+    return _user;
   }
 
   /// Creates a new user with the provided [email] and [password].

@@ -23,6 +23,9 @@ dependencies:
   flutter_config: ^2.0.2
   auto_size_text: ^3.0.0
   google_sign_in: ^6.2.1
+  bloc: ^8.1.4
+  flutter_bloc: ^8.1.5
+  equatable: ^2.0.5
 
 dev_dependencies:
 
