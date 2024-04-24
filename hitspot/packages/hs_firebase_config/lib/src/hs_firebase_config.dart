@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hs_firebase_config/src/hs_firebase_config.dev.dart';
+import 'package:hs_firebase_config/src/hs_firebase_config.staging.dart';
 
 enum Environment {
   development,
@@ -15,7 +16,7 @@ class HSFirebaseConfigLoader {
       case Environment.development:
         return HSDevelopmentFirebaseOptions.currentPlatform;
       case Environment.staging:
-        return FirebaseConfigStaging();
+        return HSStagingFirebaseOptions.currentPlatform;
       case Environment.production:
         return FirebaseConfigProd();
       default:

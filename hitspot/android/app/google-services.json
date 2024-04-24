@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "145078839676",
-    "project_id": "hitspot-2092c",
-    "storage_bucket": "hitspot-2092c.appspot.com"
+    "project_number": "622200499408",
+    "project_id": "hitspot-staging",
+    "storage_bucket": "hitspot-staging.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:145078839676:android:66659f5c349007e9135cf9",
+        "mobilesdk_app_id": "1:622200499408:android:13c6c0f209b29478b1c2d5",
         "android_client_info": {
           "package_name": "com.company.hitspot"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "145078839676-derf212dal3jtirhadpeftbejm97u31r.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAmfr06x8ufZJg8rJZdJtTpEgZXJszJI1M"
+          "current_key": "AIzaSyDLZ70jOnOiWUjpybLQNWcWcUvLdFCDMVs"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "145078839676-derf212dal3jtirhadpeftbejm97u31r.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
