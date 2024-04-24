@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "622200499408",
-    "project_id": "hitspot-staging",
-    "storage_bucket": "hitspot-staging.appspot.com"
+    "project_number": "863272170210",
+    "project_id": "hitspot-production",
+    "storage_bucket": "hitspot-production.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:622200499408:android:13c6c0f209b29478b1c2d5",
+        "mobilesdk_app_id": "1:863272170210:android:1bbfaf2e4c7eb8732364bb",
         "android_client_info": {
           "package_name": "com.company.hitspot"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDLZ70jOnOiWUjpybLQNWcWcUvLdFCDMVs"
+          "current_key": "AIzaSyAmIv7lriRX04A3Yk2VFO5_7F0wcayqxyA"
         }
       ],
       "services": {
