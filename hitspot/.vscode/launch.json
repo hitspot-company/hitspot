@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "Debug Mode",
+        "name": "Development Environment Debug Mode",
         "request": "launch",
         "type": "dart",
         "program": "lib/main.dart",
@@ -15,6 +15,38 @@
 		"toolArgs": [
 			"--dart-define",
 			"ENVIRONMENT=dev"
+		]
+      },
+      {
+        "name": "Production Environment Debug Mode",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "",
+        "flutterMode": "debug",
+        "env": {
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=prod"
+		]
+      },
+      {
+        "name": "Invalid Environment Debug Mode",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "",
+        "flutterMode": "debug",
+        "env": {
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=invalid"
 		]
       },
       {
