@@ -23,7 +23,7 @@ class HSFirebaseConfigLoader {
         return prod.DefaultFirebaseOptions.currentPlatform;
       default:
         throw Exception(
-            'Invalid environment. Please use one of the available options: dev, staging or prod.');
+            'Invalid environment. The app cannot be used. Please relaunch using one of the available environments: dev, staging or prod.');
     }
   }
 
