@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hs_firebase_config/src/hs_firebase_config.dev.dart';
-import 'package:hs_firebase_config/src/hs_firebase_config.prod.dart';
-import 'package:hs_firebase_config/src/hs_firebase_config.staging.dart';
+import 'package:hs_firebase_config/src/hs_firebase_config.dev.dart' as dev;
+import 'package:hs_firebase_config/src/hs_firebase_config.prod.dart' as prod;
+import 'package:hs_firebase_config/src/hs_firebase_config.staging.dart'
+    as staging;
 
 enum HSFirebaseEnvironment {
   development,
@@ -14,11 +15,11 @@ class HSFirebaseConfigLoader {
   static FirebaseOptions load(HSFirebaseEnvironment env) {
     switch (env) {
       case HSFirebaseEnvironment.development:
-        return HSDevelopmentFirebaseOptions.currentPlatform;
+        return dev.DefaultFirebaseOptions.currentPlatform;
       case HSFirebaseEnvironment.staging:
-        return HSStagingFirebaseOptions.currentPlatform;
+        return staging.DefaultFirebaseOptions.currentPlatform;
       case HSFirebaseEnvironment.production:
-        return HSProdFirebaseOptions.currentPlatform;
+        return prod.DefaultFirebaseOptions.currentPlatform;
       default:
         throw Exception('Invalid environment');
     }
