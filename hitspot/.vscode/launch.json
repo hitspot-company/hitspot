@@ -12,7 +12,10 @@
         "env": {
           "RELEASE_MODE": "false"
         },
-        // "preLaunchTask": "flutter pub get"
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=dev"
+		]
       },
       {
         "name": "Release Mode",

@@ -26,6 +26,8 @@ dependencies:
   bloc: ^8.1.4
   flutter_bloc: ^8.1.5
   equatable: ^2.0.5
+  hs_firebase_config:
+    path: packages/hs_firebase_config
 
 dev_dependencies:
 

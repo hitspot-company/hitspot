@@ -9,11 +9,12 @@ enum HSFirebaseEnvironment {
   development,
   staging,
   production,
+  invalid;
 }
 
 class HSFirebaseConfigLoader {
-  static FirebaseOptions load(HSFirebaseEnvironment env) {
-    switch (env) {
+  static FirebaseOptions get loadOptions {
+    switch (fromEnvironment) {
       case HSFirebaseEnvironment.development:
         return dev.DefaultFirebaseOptions.currentPlatform;
       case HSFirebaseEnvironment.staging:
@@ -21,7 +22,22 @@ class HSFirebaseConfigLoader {
       case HSFirebaseEnvironment.production:
         return prod.DefaultFirebaseOptions.currentPlatform;
       default:
-        throw Exception('Invalid environment');
+        throw Exception(
+            'Invalid environment. Please use one of the available options: dev, staging or prod.');
+    }
+  }
+
+  static HSFirebaseEnvironment get fromEnvironment {
+    const env = String.fromEnvironment("ENVIRONMENT");
+    switch (env) {
+      case "dev" || "development":
+        return HSFirebaseEnvironment.development;
+      case "prod" || "production":
+        return HSFirebaseEnvironment.production;
+      case "stage" || "staging":
+        return HSFirebaseEnvironment.staging;
+      default:
+        return HSFirebaseEnvironment.invalid;
     }
   }
 }
