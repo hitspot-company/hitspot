@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import 'package:get/get.dart';
 import 'package:hitspot/models/hs_user.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
-import 'package:hitspot/utils/hs_app.dart';
 
 part 'hs_app_state.dart';
 part 'hs_app_events.dart';
