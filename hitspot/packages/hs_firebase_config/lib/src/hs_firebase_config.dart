@@ -2,8 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hs_firebase_config/src/hs_firebase_config.dev.dart' as dev;
 import 'package:hs_firebase_config/src/hs_firebase_config.prod.dart' as prod;
-import 'package:hs_firebase_config/src/hs_firebase_config.staging.dart'
-    as staging;
+import 'package:hs_firebase_config/src/hs_firebase_config.stag.dart' as staging;
 
 enum HSFirebaseEnvironment {
   development,
