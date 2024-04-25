@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "Debug Mode",
+        "name": "Development Environment Debug Mode",
         "request": "launch",
         "type": "dart",
         "program": "lib/main.dart",
@@ -12,10 +12,13 @@
         "env": {
           "RELEASE_MODE": "false"
         },
-        // "preLaunchTask": "flutter pub get"
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=dev"
+		]
       },
       {
-        "name": "Release Mode",
+        "name": "Development Environment Release Mode",
         "request": "launch",
         "type": "dart",
         "program": "lib/main.dart",
@@ -23,9 +26,93 @@
         "cwd": "",
         "flutterMode": "release",
         "env": {
-          "RELEASE_MODE": "true"
-        }
-      }
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=dev"
+		]
+      },
+      {
+        "name": "Production Environment Debug Mode",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "",
+        "flutterMode": "debug",
+        "env": {
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=prod"
+		]
+      },
+      {
+        "name": "Production Environment Release Mode",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "",
+        "flutterMode": "release",
+        "env": {
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=prod"
+		]
+      },
+      {
+        "name": "Staging Environment Debug Mode",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "",
+        "flutterMode": "debug",
+        "env": {
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=staging"
+		]
+      },
+      {
+        "name": "Staging Environment Release Mode",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "",
+        "flutterMode": "release",
+        "env": {
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=staging"
+		]
+      },
+      {
+        "name": "Invalid Environment Mode (TESTING PURPOSES)",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "",
+        "flutterMode": "debug",
+        "env": {
+          "RELEASE_MODE": "false"
+        },
+		"toolArgs": [
+			"--dart-define",
+			"ENVIRONMENT=invalid"
+		]
+      },
     ]
   }
   

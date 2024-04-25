@@ -6,12 +6,11 @@ import 'package:hitspot/blocs/authentication/hs_app_bloc.dart';
 import 'package:hitspot/firebase_options.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
 import 'package:hitspot/utils/hs_app.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/widgets/global/hs_appbar.dart';
+import 'package:hs_firebase_config/hs_firebase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(options: HSFirebaseConfigLoader.loadOptions);
   await FlutterConfig.loadEnvVariables();
 
   final authenticationRepository = HSAuthenticationRepository();
