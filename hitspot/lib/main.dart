@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:get/get.dart';
 import 'package:hitspot/blocs/authentication/hs_app_bloc.dart';
 import 'package:hitspot/firebase_options.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
-import 'package:hitspot/utils/hs_app.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
 
 void main() async {
