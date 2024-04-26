@@ -1,6 +1,7 @@
 part of 'hs_app_bloc.dart';
 
 enum HSAppStatus {
+  loading,
   authenticated,
   profileNotCompleted,
   unauthenticated,
@@ -14,6 +15,8 @@ final class HSAppState extends Equatable {
     required this.status,
     this.user = const HSUser(),
   });
+
+  const HSAppState.loading() : this._(status: HSAppStatus.loading);
 
   const HSAppState.authenticated(HSUser user)
       : this._(status: HSAppStatus.authenticated, user: user);

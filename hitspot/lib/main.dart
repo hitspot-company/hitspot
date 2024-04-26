@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/blocs/authentication/hs_app_bloc.dart';
 import 'package:hitspot/blocs/theme/hs_theme_bloc.dart';
+import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/login/view/login_page.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
 import 'package:hitspot/repositories/hs_theme.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +63,15 @@ class App extends StatelessWidget {
               home: FlowBuilder<HSAppStatus>(
                 state: context.read<HSAuthenticationBloc>().state.status,
                 onGeneratePages: (appStatus, pages) => [
+                  if (appStatus == HSAppStatus.loading)
+                    MaterialPage(
+                      child: HSScaffold(
+                        body: Center(
+                          child: LoadingAnimationWidget.beat(
+                              color: HSTheme.instance.mainColor, size: 32.0),
+                        ),
+                      ),
+                    ),
                   LoginPage.page(),
                   if (appStatus == HSAppStatus.profileNotCompleted)
                     const MaterialPage(

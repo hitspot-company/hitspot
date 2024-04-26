@@ -17,7 +17,7 @@ class HSAuthenticationBloc extends Bloc<HSAppEvent, HSAppState> {
   HSAuthenticationBloc(
       {required HSAuthenticationRepository authenticationRepository})
       : _authenticationRepository = authenticationRepository,
-        super(const HSAppState.unauthenticated()) {
+        super(const HSAppState.loading()) {
     on<_HSAppUserChanged>(_onUserChanged);
 
     on<HSAppLogoutRequested>(_onLogoutRequested);

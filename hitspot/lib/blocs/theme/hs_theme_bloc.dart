@@ -8,11 +8,11 @@ part 'hs_theme_event.dart';
 part 'hs_theme_state.dart';
 
 class HSThemeBloc extends Bloc<HSThemeEvent, HSThemeState> {
-  final HSThemeRepository _repo;
+  final HSThemeRepository _themeRepository;
 
-  HSThemeBloc(this._repo) : super(HSThemeStateDark()) {
+  HSThemeBloc(this._themeRepository) : super(HSThemeStateDark()) {
     on<HSInitialThemeSetEvent>((event, emit) async {
-      final bool hasDarkTheme = await _repo.isDark();
+      final bool hasDarkTheme = await _themeRepository.isDark();
       if (hasDarkTheme) {
         emit(HSThemeStateDark());
       } else {
@@ -22,7 +22,7 @@ class HSThemeBloc extends Bloc<HSThemeEvent, HSThemeState> {
     on<HSThemeSwitchEvent>((event, emit) {
       final isDark = state.theme == HSTheme.instance.darkTheme;
       emit(isDark ? HSThemeStateLight() : HSThemeStateDark());
-      _repo.setTheme(isDark);
+      _themeRepository.setTheme(isDark);
     });
   }
 }

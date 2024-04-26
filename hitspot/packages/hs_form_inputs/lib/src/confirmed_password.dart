@@ -27,7 +27,7 @@ extension Explanation on ConfirmedPasswordValidationError {
   String? get name {
     switch (this) {
       case ConfirmedPasswordValidationError.mismatch:
-        return 'Password have to match';
+        return 'Passwords have to match';
       default:
         return null;
     }
