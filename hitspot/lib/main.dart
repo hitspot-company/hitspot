@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/blocs/authentication/hs_app_bloc.dart';
 import 'package:hitspot/blocs/theme/hs_theme_bloc.dart';
 import 'package:hitspot/login/view/login_page.dart';
-import 'package:hitspot/register/view/register_page.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
 import 'package:hitspot/repositories/hs_theme.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
@@ -55,7 +55,27 @@ class App extends StatelessWidget {
           selector: (state) => state.theme,
           builder: (context, currentTheme) {
             return MaterialApp(
-                theme: currentTheme, title: "Hitspot", home: const LoginPage());
+              theme: currentTheme,
+              title: "Hitspot",
+              home: FlowBuilder<HSAppStatus>(
+                state: context.read<HSAuthenticationBloc>().state.status,
+                onGeneratePages: (appStatus, pages) => [
+                  LoginPage.page(),
+                  if (appStatus == HSAppStatus.profileNotCompleted)
+                    const MaterialPage(
+                      child: Center(
+                        child: Text("PROFILE NOT COMPLETE"),
+                      ),
+                    ),
+                  if (appStatus == HSAppStatus.authenticated)
+                    const MaterialPage(
+                      child: Center(
+                        child: Text("HOME PAGE"),
+                      ),
+                    ),
+                ],
+              ),
+            );
           },
         ),
       ),

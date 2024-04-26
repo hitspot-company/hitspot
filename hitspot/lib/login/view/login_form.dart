@@ -8,6 +8,7 @@ import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/login/cubit/login_cubit.dart';
 import 'package:hitspot/register/view/register_page.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -157,9 +158,6 @@ class _LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HSLoginCubit, HSLoginState>(
       builder: (context, state) {
-        if (state.status.isInProgress) {
-          return const CircularProgressIndicator();
-        }
         return ElevatedButton.icon(
           key: const Key('loginForm_continue_raisedButton'),
           style: ElevatedButton.styleFrom(
@@ -171,8 +169,15 @@ class _LoginButton extends StatelessWidget {
               context.read<HSLoginCubit>().logInWithCredentials();
             }
           },
-          icon: const Icon(FontAwesomeIcons.arrowRight),
-          label: Text(buttonText),
+          icon: state.status.isInProgress
+              ? const SizedBox()
+              : const Icon(FontAwesomeIcons.arrowRight),
+          label: state.status.isInProgress
+              ? LoadingAnimationWidget.staggeredDotsWave(
+                  size: 24.0,
+                  color: HSTheme.instance.mainColor,
+                )
+              : Text(buttonText),
         );
       },
     );

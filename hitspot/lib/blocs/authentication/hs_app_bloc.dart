@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:get/get.dart';
 import 'package:hitspot/models/hs_user.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
 
@@ -18,11 +17,7 @@ class HSAuthenticationBloc extends Bloc<HSAppEvent, HSAppState> {
   HSAuthenticationBloc(
       {required HSAuthenticationRepository authenticationRepository})
       : _authenticationRepository = authenticationRepository,
-        super(
-          authenticationRepository.currentUser != null
-              ? HSAppState.authenticated(authenticationRepository.currentUser!)
-              : const HSAppState.unauthenticated(),
-        ) {
+        super(const HSAppState.unauthenticated()) {
     on<_HSAppUserChanged>(_onUserChanged);
 
     on<HSAppLogoutRequested>(_onLogoutRequested);
@@ -36,7 +31,7 @@ class HSAuthenticationBloc extends Bloc<HSAppEvent, HSAppState> {
     HSAppState state = const HSAppState.unauthenticated();
 
     if (event.user != null) {
-      if (event.user!.isProfileCompleted!) {
+      if (event.user!.isProfileCompleted ?? false) {
         state = HSAppState.authenticated(event.user!);
       } else {
         state = HSAppState.profileNotCompleted(event.user!);
