@@ -4,6 +4,7 @@ class HSTextField extends StatelessWidget {
   const HSTextField({
     super.key,
     this.hintText,
+    this.errorText,
     this.prefixIcon,
     this.controller,
     this.validator,
@@ -13,6 +14,7 @@ class HSTextField extends StatelessWidget {
     this.node,
     this.onTap,
     this.readOnly = false,
+    this.onTapPrefix,
   });
 
   final String? hintText;
@@ -25,6 +27,8 @@ class HSTextField extends StatelessWidget {
   final bool readOnly;
   final FocusNode? node;
   final VoidCallback? onTap;
+  final String? errorText;
+  final VoidCallback? onTapPrefix;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +42,8 @@ class HSTextField extends StatelessWidget {
       keyboardType: keyboardType,
       onTap: onTap,
       decoration: InputDecoration(
-        prefixIcon: prefixIcon,
+        errorText: errorText,
+        prefixIcon: GestureDetector(onTap: onTapPrefix, child: prefixIcon),
         hintText: hintText,
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/blocs/authentication/hs_app_bloc.dart';
 import 'package:hitspot/blocs/theme/hs_theme_bloc.dart';
+import 'package:hitspot/login/view/login_page.dart';
 import 'package:hitspot/presentation/screens/register/register_page.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
 import 'package:hitspot/repositories/hs_theme.dart';
@@ -39,27 +40,25 @@ class App extends StatelessWidget {
     return RepositoryProvider.value(
       value: _authenticationRepository,
       child: MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (_) => HSAuthenticationBloc(
-                authenticationRepository: _authenticationRepository,
-              ),
+        providers: [
+          BlocProvider(
+            create: (_) => HSAuthenticationBloc(
+              authenticationRepository: _authenticationRepository,
             ),
-            BlocProvider(
-              create: (_) =>
-                  HSThemeBloc(_themeRepository)..add(HSInitialThemeSetEvent()),
-            ),
-          ],
-          child: BlocSelector<HSThemeBloc, HSThemeState, ThemeData>(
-            selector: (state) => state.theme,
-            builder: (context, currentTheme) {
-              return MaterialApp(
-                theme: currentTheme,
-                title: "Hitspot",
-                home: const RegisterPage(),
-              );
-            },
-          )),
+          ),
+          BlocProvider(
+            create: (_) =>
+                HSThemeBloc(_themeRepository)..add(HSInitialThemeSetEvent()),
+          ),
+        ],
+        child: BlocSelector<HSThemeBloc, HSThemeState, ThemeData>(
+          selector: (state) => state.theme,
+          builder: (context, currentTheme) {
+            return MaterialApp(
+                theme: currentTheme, title: "Hitspot", home: const LoginPage());
+          },
+        ),
+      ),
     );
   }
 }
