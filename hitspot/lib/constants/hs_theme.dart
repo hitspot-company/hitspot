@@ -15,6 +15,8 @@ final class HSTheme {
   );
 
   Color get mainColor => _mainColor;
+
+  TextTheme textTheme(context) => Theme.of(context).textTheme;
 }
 
 extension TextStyleAltering on TextStyle {

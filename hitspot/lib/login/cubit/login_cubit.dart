@@ -8,8 +8,8 @@ import 'package:hs_form_inputs/hs_form_inputs.dart';
 
 part 'login_state.dart';
 
-class LoginCubit extends Cubit<LoginState> {
-  LoginCubit(this._authenticationRepository) : super(const LoginState());
+class HSLoginCubit extends Cubit<HSLoginState> {
+  HSLoginCubit(this._authenticationRepository) : super(const HSLoginState());
 
   final HSAuthenticationRepository _authenticationRepository;
 

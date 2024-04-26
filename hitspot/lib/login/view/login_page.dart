@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hitspot/constants/hs_assets.dart';
 import 'package:hitspot/login/cubit/login_cubit.dart';
 import 'package:hitspot/login/view/login_form.dart';
 import 'package:hitspot/presentation/widgets/hs_appbar.dart';
@@ -14,13 +15,13 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HSScaffold(
-      appBar: HSAppBar(title: 'Login'),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: BlocProvider(
-          create: (_) => LoginCubit(context.read<HSAuthenticationRepository>()),
-          child: const LoginForm(),
-        ),
+      sidePadding: 16.0,
+      appBar: HSAppBar(
+        center: Image.asset(HSAssets.instance.textLogo),
+      ),
+      body: BlocProvider(
+        create: (_) => HSLoginCubit(context.read<HSAuthenticationRepository>()),
+        child: const LoginForm(),
       ),
     );
   }
