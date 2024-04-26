@@ -5,7 +5,7 @@ import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/blocs/authentication/hs_app_bloc.dart';
 import 'package:hitspot/blocs/theme/hs_theme_bloc.dart';
 import 'package:hitspot/login/view/login_page.dart';
-import 'package:hitspot/presentation/screens/register/register_page.dart';
+import 'package:hitspot/register/view/register_page.dart';
 import 'package:hitspot/repositories/hs_authentication_repository.dart';
 import 'package:hitspot/repositories/hs_theme.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
