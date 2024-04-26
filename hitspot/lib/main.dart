@@ -3,7 +3,9 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:hitspot/authentication/bloc/hs_app_bloc.dart';
+import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/profile_incomplete/view/profile_incomplete_page.dart';
+import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/login/view/login_page.dart';
@@ -64,23 +66,11 @@ class App extends StatelessWidget {
                 state: context
                     .select((HSAuthenticationBloc bloc) => bloc.state.status),
                 onGeneratePages: (appStatus, pages) => [
-                  if (appStatus == HSAppStatus.loading)
-                    MaterialPage(
-                      child: HSScaffold(
-                        body: Center(
-                          child: LoadingAnimationWidget.beat(
-                              color: HSTheme.instance.mainColor, size: 32.0),
-                        ),
-                      ),
-                    ),
+                  if (appStatus == HSAppStatus.loading) SplashPage.page(),
                   if (appStatus == HSAppStatus.unauthenticated)
                     LoginPage.page(),
                   if (appStatus == HSAppStatus.profileNotCompleted)
-                    const MaterialPage(
-                      child: Center(
-                        child: Text("PROFILE NOT COMPLETE"),
-                      ),
-                    ),
+                    ProfileIncompletePage.page(),
                   if (appStatus == HSAppStatus.authenticated)
                     const MaterialPage(
                       child: Center(

@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
@@ -30,76 +31,62 @@ class LoginForm extends StatelessWidget {
             );
         }
       },
-      child: ListView(
+      child: Column(
         children: [
-          const Gap(32.0),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.displaySmall!.boldify(),
-            textAlign: TextAlign.center,
+          ListView(
+            shrinkWrap: true,
+            children: [
+              const Gap(32.0),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.displaySmall!.boldify(),
+                textAlign: TextAlign.center,
+              ),
+              const Gap(8.0),
+              Text(headline,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center),
+              const Gap(48.0),
+              _EmailInput(),
+              const Gap(24.0),
+              _PasswordInput(),
+              const Gap(32.0),
+              _LoginButton(),
+              const Gap(16.0),
+              Text.rich(
+                TextSpan(
+                  text: "Don't have an account?",
+                  style: Theme.of(context).textTheme.bodySmall!.hintify(),
+                  children: [
+                    TextSpan(
+                      text: " Sign Up",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .colorify(HSTheme.instance.mainColor)
+                          .boldify(),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => Navigator.of(context)
+                            .push<void>(RegisterPage.route()),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ],
           ),
-          const Gap(8.0),
-          Text(headline,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center),
-          const Gap(48.0),
-          _EmailInput(),
+          const Spacer(),
+          const Row(
+            children: [
+              Expanded(child: Divider()),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text("Alternatively"),
+              ),
+              Expanded(child: Divider()),
+            ],
+          ),
           const Gap(24.0),
-          _PasswordInput(),
-          const Gap(32.0),
-          _LoginButton(),
-          const Gap(16.0),
-          Text.rich(
-            TextSpan(
-              text: "Already have an account?",
-              style: Theme.of(context).textTheme.bodySmall!.hintify(),
-              children: [
-                TextSpan(
-                  text: " Sign In",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () =>
-                        Navigator.of(context).push<void>(RegisterPage.route()),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.right,
-          ),
-          const Gap(32.0),
-          Text.rich(
-            TextSpan(
-              text: "By creating an account you agree to our",
-              children: [
-                TextSpan(
-                  text: " Terms of Service",
-                  style: HSTheme.instance
-                      .textTheme(context)
-                      .bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () => print("TOS"),
-                ),
-                const TextSpan(
-                  text: " and",
-                ),
-                TextSpan(
-                  text: " Privacy Policy",
-                  style: HSTheme.instance
-                      .textTheme(context)
-                      .bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()..onTap = () => print("PP"),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
-          ),
           _GoogleLoginButton(),
         ],
       ),
