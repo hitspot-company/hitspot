@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/hs_assets.dart';
 import 'package:hitspot/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/register/view/register_form.dart';
-import 'package:hitspot/repositories/hs_authentication_repository.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 

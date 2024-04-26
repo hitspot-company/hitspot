@@ -1,8 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
-import 'package:hitspot/exceptions/authentication/sign_up_with_email_and_password_failure.dart';
-import 'package:hitspot/repositories/hs_authentication_repository.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
 
 part 'hs_register_state.dart';

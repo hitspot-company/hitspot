@@ -3,13 +3,13 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:hitspot/blocs/authentication/hs_app_bloc.dart';
-import 'package:hitspot/blocs/theme/hs_theme_bloc.dart';
+import 'package:hitspot/authentication/bloc/hs_app_bloc.dart';
+import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/login/view/login_page.dart';
-import 'package:hitspot/repositories/hs_authentication_repository.dart';
-import 'package:hitspot/repositories/hs_theme.dart';
+import 'package:hs_theme_repository/hs_form_inputs.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -61,7 +61,8 @@ class App extends StatelessWidget {
               theme: currentTheme,
               title: "Hitspot",
               home: FlowBuilder<HSAppStatus>(
-                state: context.read<HSAuthenticationBloc>().state.status,
+                state: context
+                    .select((HSAuthenticationBloc bloc) => bloc.state.status),
                 onGeneratePages: (appStatus, pages) => [
                   if (appStatus == HSAppStatus.loading)
                     MaterialPage(
@@ -72,7 +73,8 @@ class App extends StatelessWidget {
                         ),
                       ),
                     ),
-                  LoginPage.page(),
+                  if (appStatus == HSAppStatus.unauthenticated)
+                    LoginPage.page(),
                   if (appStatus == HSAppStatus.profileNotCompleted)
                     const MaterialPage(
                       child: Center(

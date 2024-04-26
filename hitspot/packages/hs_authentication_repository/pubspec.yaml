@@ -1,0 +1,14 @@
+name: hs_authentication_repository
+description: Hitspot package to manage authentication utilities
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  firebase_core: ^2.30.0
+  google_sign_in: ^6.2.1
+  firebase_auth: ^4.19.4
+  cloud_firestore: ^4.11.0
+

@@ -5,7 +5,7 @@ import 'package:hitspot/login/cubit/login_cubit.dart';
 import 'package:hitspot/login/view/login_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:hitspot/repositories/hs_authentication_repository.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

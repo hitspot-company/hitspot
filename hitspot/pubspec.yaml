@@ -30,6 +30,10 @@ dependencies:
     path: packages/hs_firebase_config
   hs_form_inputs:
     path: packages/hs_form_inputs
+  hs_authentication_repository:
+    path: packages/hs_authentication_repository
+  hs_theme_repository:
+    path: packages/hs_theme_repository
   shared_preferences: ^2.2.3
   font_awesome_flutter: ^10.7.0
   formz: ^0.7.0

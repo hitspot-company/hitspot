@@ -1,11 +1,7 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hitspot/exceptions/authentication/log_in_with_email_and_password_failure.dart';
-import 'package:hitspot/exceptions/authentication/log_in_with_google_failure.dart';
-import 'package:hitspot/exceptions/authentication/log_out_failure.dart';
-import 'package:hitspot/exceptions/authentication/sign_up_with_email_and_password_failure.dart';
-import 'package:hitspot/models/hs_user.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 class HSAuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
