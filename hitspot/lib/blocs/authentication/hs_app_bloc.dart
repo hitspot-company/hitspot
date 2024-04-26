@@ -9,12 +9,14 @@ import 'package:hitspot/repositories/hs_authentication_repository.dart';
 part 'hs_app_state.dart';
 part 'hs_app_events.dart';
 
-class HSAppBloc extends Bloc<HSAppEvent, HSAppState> {
+// TODO: Verify whether HSApp --> HSAuthentication is the right change
+class HSAuthenticationBloc extends Bloc<HSAppEvent, HSAppState> {
   final HSAuthenticationRepository _authenticationRepository;
   late final StreamSubscription<HSUser?> _userSubscription;
 
   // TODO: Add emitting not completed state
-  HSAppBloc({required HSAuthenticationRepository authenticationRepository})
+  HSAuthenticationBloc(
+      {required HSAuthenticationRepository authenticationRepository})
       : _authenticationRepository = authenticationRepository,
         super(
           authenticationRepository.currentUser != null

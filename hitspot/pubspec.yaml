@@ -28,6 +28,8 @@ dependencies:
   equatable: ^2.0.5
   hs_firebase_config:
     path: packages/hs_firebase_config
+  shared_preferences: ^2.2.3
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
 

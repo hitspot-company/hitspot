@@ -1,0 +1,28 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hitspot/constants/hs_theme.dart';
+import 'package:hitspot/repositories/hs_theme.dart';
+
+part 'hs_theme_event.dart';
+part 'hs_theme_state.dart';
+
+class HSThemeBloc extends Bloc<HSThemeEvent, HSThemeState> {
+  final HSThemeRepository _repo;
+
+  HSThemeBloc(this._repo) : super(HSThemeStateDark()) {
+    on<HSInitialThemeSetEvent>((event, emit) async {
+      final bool hasDarkTheme = await _repo.isDark();
+      if (hasDarkTheme) {
+        emit(HSThemeStateDark());
+      } else {
+        emit(HSThemeStateLight());
+      }
+    });
+    on<HSThemeSwitchEvent>((event, emit) {
+      final isDark = state.theme == HSTheme.instance.darkTheme;
+      emit(isDark ? HSThemeStateLight() : HSThemeStateDark());
+      _repo.setTheme(isDark);
+    });
+  }
+}
