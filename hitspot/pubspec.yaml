@@ -32,6 +32,8 @@ dependencies:
     path: packages/hs_form_inputs
   hs_authentication_repository:
     path: packages/hs_authentication_repository
+  hs_database_repository:
+    path: packages/hs_database_repository
   hs_theme_repository:
     path: packages/hs_theme_repository
   shared_preferences: ^2.2.3
