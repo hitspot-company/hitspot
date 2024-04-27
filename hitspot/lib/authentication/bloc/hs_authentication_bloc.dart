@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 
 part 'hs_authentication_state.dart';
 part 'hs_authentication_events.dart';
@@ -10,11 +11,14 @@ part 'hs_authentication_events.dart';
 class HSAuthenticationBloc
     extends Bloc<HSAuthenticationEvent, HSAuthenticationState> {
   final HSAuthenticationRepository _authenticationRepository;
+  final HSDatabaseRepository _databaseRepository;
   late final StreamSubscription<HSUser?> _userSubscription;
 
   HSAuthenticationBloc(
-      {required HSAuthenticationRepository authenticationRepository})
+      {required HSDatabaseRepository databaseRepository,
+      required HSAuthenticationRepository authenticationRepository})
       : _authenticationRepository = authenticationRepository,
+        _databaseRepository = databaseRepository,
         super(const HSAuthenticationState.loading()) {
     on<_HSAppUserChanged>(_onUserChanged);
     on<HSAppLogoutRequested>(_onLogoutRequested);
@@ -34,10 +38,22 @@ class HSAuthenticationBloc
     HSAuthenticationState state = const HSAuthenticationState.unauthenticated();
 
     if (event.user != null) {
-      if (event.user!.isProfileCompleted ?? false) {
-        state = HSAuthenticationState.authenticated(event.user!);
+      HSUser? newUser;
+      try {
+        newUser =
+            await _databaseRepository.getUserFromDatabase(event.user!.uid!);
+        if (newUser == null) {
+          await _databaseRepository.updateUserInfoInDatabase(event.user!);
+          newUser = event.user!;
+        }
+      } catch (_) {
+        emit(state);
+      }
+
+      if (newUser!.isProfileCompleted ?? false) {
+        state = HSAuthenticationState.authenticated(newUser);
       } else {
-        state = HSAuthenticationState.profileNotCompleted(event.user!);
+        state = HSAuthenticationState.profileNotCompleted(newUser);
       }
     }
     emit(state);

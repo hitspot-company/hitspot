@@ -7,12 +7,14 @@ class HSDatabaseRepository {
   static final db = FirebaseFirestore.instance;
   static final usersCollection = db.collection("users");
 
+  // If user does not exist in database, it wil create a new document
   Future<void> updateUserInfoInDatabase(HSUser user) async {
     try {
       await usersCollection
           .doc(user.uid)
           .set(user.serialize())
           .timeout(const Duration(seconds: 3));
+      print("Updated user info in database");
     } catch (_) {
       throw const DatabaseConnectionFailure('An unknown exception occured');
     }
@@ -32,6 +34,8 @@ class HSDatabaseRepository {
 
       Map<String, dynamic> snapshotInJson =
           snapshot.data() as Map<String, dynamic>;
+
+      print("Got user info from database");
 
       return HSUser.deserialize(snapshotInJson);
     } catch (_) {

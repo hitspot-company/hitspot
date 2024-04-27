@@ -50,7 +50,7 @@ class HSUser {
       HSUserField.bday.name: birthday,
       HSUserField.createdAt.name: createdAt,
       HSUserField.emailHidden.name: emailHidden,
-      HSUserField.isProfileCompleted.name: isProfileCompleted
+      HSUserField.isProfileCompleted.name: isProfileCompleted ?? false
     };
   }
 
