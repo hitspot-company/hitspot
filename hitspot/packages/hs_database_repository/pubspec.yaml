@@ -8,4 +8,3 @@ environment:
 
 dependencies:
   cloud_firestore: ^4.11.0
-

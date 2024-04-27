@@ -1,5 +1,5 @@
-name: hs_database_repository
-description: Hitspot package to manage database utilities
+name: hs_debug_logger
+description: Hitspot package to print debug info
 publish_to: 'none'
 version: 1.0.0+1
 

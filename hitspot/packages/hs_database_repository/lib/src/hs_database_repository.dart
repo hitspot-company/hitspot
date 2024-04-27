@@ -14,7 +14,6 @@ class HSDatabaseRepository {
           .doc(user.uid)
           .set(user.serialize())
           .timeout(const Duration(seconds: 3));
-      print("Updated user info in database");
     } catch (_) {
       throw const DatabaseConnectionFailure('An unknown exception occured');
     }
@@ -34,8 +33,6 @@ class HSDatabaseRepository {
 
       Map<String, dynamic> snapshotInJson =
           snapshot.data() as Map<String, dynamic>;
-
-      print("Got user info from database");
 
       return HSUser.deserialize(snapshotInJson);
     } catch (_) {

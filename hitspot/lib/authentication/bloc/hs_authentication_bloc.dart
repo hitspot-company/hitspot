@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 part 'hs_authentication_state.dart';
 part 'hs_authentication_events.dart';
@@ -45,6 +46,9 @@ class HSAuthenticationBloc
         if (newUser == null) {
           await _databaseRepository.updateUserInfoInDatabase(event.user!);
           newUser = event.user!;
+          HSDebugLogger.logSuccess("Added user info to database!");
+        } else {
+          HSDebugLogger.logSuccess("Fetched user info from database!");
         }
       } catch (_) {
         emit(state);

@@ -318,6 +318,13 @@ packages:
       relative: true
     source: path
     version: "1.0.0+1"
+  hs_debug_logger:
+    dependency: "direct main"
+    description:
+      path: "packages/hs_debug_logger"
+      relative: true
+    source: path
+    version: "1.0.0+1"
   hs_firebase_config:
     dependency: "direct main"
     description:
