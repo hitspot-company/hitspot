@@ -1,27 +1,30 @@
-part of 'hs_app_bloc.dart';
+part of 'hs_authentication_bloc.dart';
 
 enum HSAppStatus {
+  loading,
   authenticated,
   profileNotCompleted,
   unauthenticated,
 }
 
-final class HSAppState extends Equatable {
+final class HSAuthenticationState extends Equatable {
   final HSAppStatus status;
   final HSUser user;
 
-  const HSAppState._({
+  const HSAuthenticationState._({
     required this.status,
     this.user = const HSUser(),
   });
 
-  const HSAppState.authenticated(HSUser user)
+  const HSAuthenticationState.loading() : this._(status: HSAppStatus.loading);
+
+  const HSAuthenticationState.authenticated(HSUser user)
       : this._(status: HSAppStatus.authenticated, user: user);
 
-  const HSAppState.profileNotCompleted(HSUser user)
+  const HSAuthenticationState.profileNotCompleted(HSUser user)
       : this._(status: HSAppStatus.profileNotCompleted, user: user);
 
-  const HSAppState.unauthenticated()
+  const HSAuthenticationState.unauthenticated()
       : this._(status: HSAppStatus.unauthenticated);
 
   @override

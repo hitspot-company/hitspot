@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 enum HSUserField {
   username("username"),
@@ -9,7 +8,6 @@ enum HSUserField {
   following("following"),
   spots("spots"),
   fcmTokens("fcm_tokens"),
-  authProvidersIDs("auth_providers_IDs"),
   previouslySearchedUsers("previously_searched_users"),
   email("email"),
   fullName("full_name"),
@@ -25,21 +23,19 @@ enum HSUserField {
 }
 
 class HSUser {
-  final List? authProviderIDs,
-      fcmTokens,
+  final List? fcmTokens,
       followers,
       following,
       likedSpots,
       previouslySearchedUsers,
       spots;
-  final String? biogram, email, fullName, profilePicture, username;
+  final String? uid, biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
   final bool? emailHidden;
   final bool? isProfileCompleted;
 
   Map<String, dynamic> serialize() {
     return {
-      HSUserField.authProvidersIDs.name: authProviderIDs,
       HSUserField.fcmTokens.name: fcmTokens,
       HSUserField.followers.name: followers,
       HSUserField.following.name: following,
@@ -60,7 +56,6 @@ class HSUser {
 
   factory HSUser.deserialize(Map<String, dynamic> data) {
     return HSUser(
-      authProviderIDs: data[HSUserField.authProvidersIDs.name],
       fcmTokens: data[HSUserField.fcmTokens.name],
       followers: data[HSUserField.followers.name],
       following: data[HSUserField.following.name],
@@ -75,12 +70,12 @@ class HSUser {
       birthday: data[HSUserField.bday.name],
       createdAt: data[HSUserField.createdAt.name],
       emailHidden: data[HSUserField.emailHidden.name],
-      isProfileCompleted: data[HSUserField.isProfileCompleted.name],
+      isProfileCompleted: data[HSUserField.isProfileCompleted.name] ?? false,
     );
   }
 
   const HSUser({
-    this.authProviderIDs,
+    this.uid,
     this.fcmTokens,
     this.followers,
     this.following,

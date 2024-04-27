@@ -1,0 +1,11 @@
+name: hs_form_inputs
+description: Hitspot package to manage various form inputs
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  formz: ^0.7.0
+  

@@ -36,3 +36,5 @@ setup_environment() {
 yes | setup_environment "DEVELOPMENT" $DEV $DEV_OUT
 yes | setup_environment "STAGING" $STAGING $STAGING_OUT
 yes | setup_environment "PRODUCTION" $PROD $PROD_OUT
+
+rm -f ../ios/Runner/GoogleService-Info.plist
