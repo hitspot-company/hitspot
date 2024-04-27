@@ -6,7 +6,8 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 class HSAuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn = GoogleSignIn.standard();
-  HSUser? _user;
+
+  HSUser? currentUser;
 
   HSAuthenticationRepository({
     firebase_auth.FirebaseAuth? firebaseAuth,
@@ -14,13 +15,9 @@ class HSAuthenticationRepository {
 
   Stream<HSUser?> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      _user = firebaseUser?.toUser;
-      return _user;
+      currentUser = firebaseUser?.toUser;
+      return currentUser;
     });
-  }
-
-  HSUser? get currentUser {
-    return _user;
   }
 
   /// Creates a new user with the provided [email] and [password].

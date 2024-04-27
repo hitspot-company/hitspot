@@ -12,8 +12,9 @@ part 'hs_authentication_events.dart';
 class HSAuthenticationBloc
     extends Bloc<HSAuthenticationEvent, HSAuthenticationState> {
   final HSAuthenticationRepository _authenticationRepository;
-  final HSDatabaseRepository _databaseRepository;
   late final StreamSubscription<HSUser?> _userSubscription;
+
+  final HSDatabaseRepository _databaseRepository;
 
   HSAuthenticationBloc(
       {required HSDatabaseRepository databaseRepository,
@@ -43,6 +44,8 @@ class HSAuthenticationBloc
       try {
         newUser =
             await _databaseRepository.getUserFromDatabase(event.user!.uid!);
+
+        // If user's document does not exist in database, create it
         if (newUser == null) {
           await _databaseRepository.updateUserInfoInDatabase(event.user!);
           newUser = event.user!;
@@ -50,6 +53,7 @@ class HSAuthenticationBloc
         } else {
           HSDebugLogger.logSuccess("Fetched user info from database!");
         }
+        _authenticationRepository.currentUser = newUser;
       } catch (_) {
         emit(state);
       }
