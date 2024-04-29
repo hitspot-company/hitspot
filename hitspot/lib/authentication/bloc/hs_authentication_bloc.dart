@@ -56,9 +56,10 @@ class HSAuthenticationBloc
         _authenticationRepository.currentUser = newUser;
       } catch (_) {
         emit(state);
+        return;
       }
 
-      if (newUser!.isProfileCompleted ?? false) {
+      if (newUser.isProfileCompleted ?? false) {
         state = HSAuthenticationState.authenticated(newUser);
       } else {
         state = HSAuthenticationState.profileNotCompleted(newUser);
