@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 part 'hs_authentication_state.dart';
 part 'hs_authentication_events.dart';
@@ -12,9 +14,13 @@ class HSAuthenticationBloc
   final HSAuthenticationRepository _authenticationRepository;
   late final StreamSubscription<HSUser?> _userSubscription;
 
+  final HSDatabaseRepository _databaseRepository;
+
   HSAuthenticationBloc(
-      {required HSAuthenticationRepository authenticationRepository})
+      {required HSDatabaseRepository databaseRepository,
+      required HSAuthenticationRepository authenticationRepository})
       : _authenticationRepository = authenticationRepository,
+        _databaseRepository = databaseRepository,
         super(const HSAuthenticationState.loading()) {
     on<_HSAppUserChanged>(_onUserChanged);
     on<HSAppLogoutRequested>(_onLogoutRequested);
@@ -34,10 +40,29 @@ class HSAuthenticationBloc
     HSAuthenticationState state = const HSAuthenticationState.unauthenticated();
 
     if (event.user != null) {
-      if (event.user!.isProfileCompleted ?? false) {
-        state = HSAuthenticationState.authenticated(event.user!);
+      HSUser? newUser;
+      try {
+        newUser =
+            await _databaseRepository.getUserFromDatabase(event.user!.uid!);
+
+        // If user's document does not exist in database, create it
+        if (newUser == null) {
+          await _databaseRepository.updateUserInfoInDatabase(event.user!);
+          newUser = event.user!;
+          HSDebugLogger.logSuccess("Added user info to database!");
+        } else {
+          HSDebugLogger.logSuccess("Fetched user info from database!");
+        }
+        _authenticationRepository.currentUser = newUser;
+      } catch (_) {
+        emit(state);
+        return;
+      }
+
+      if (newUser.isProfileCompleted ?? false) {
+        state = HSAuthenticationState.authenticated(newUser);
       } else {
-        state = HSAuthenticationState.profileNotCompleted(event.user!);
+        state = HSAuthenticationState.profileNotCompleted(newUser);
       }
     }
     emit(state);

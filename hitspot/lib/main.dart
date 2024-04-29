@@ -9,6 +9,7 @@ import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/login/view/login_page.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_theme_repository/hs_form_inputs.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -20,6 +21,7 @@ void main() async {
   await Firebase.initializeApp(options: HSFirebaseConfigLoader.loadOptions);
   await FlutterConfig.loadEnvVariables();
   final authenticationRepository = HSAuthenticationRepository();
+  final databaseRepository = HSDatabaseRepository();
   final themeRepository = HSThemeRepository();
 
   // Bind Firebase authentication stream to our HSUser
@@ -27,19 +29,23 @@ void main() async {
   runApp(App(
     themeRepository: themeRepository,
     authenticationRepository: authenticationRepository,
+    databaseRepository: databaseRepository,
   ));
 }
 
 class App extends StatelessWidget {
   final HSAuthenticationRepository _authenticationRepository;
+  final HSDatabaseRepository _databaseRepository;
   final HSThemeRepository _themeRepository;
 
   const App(
       {required HSThemeRepository themeRepository,
       required HSAuthenticationRepository authenticationRepository,
+      required HSDatabaseRepository databaseRepository,
       super.key})
       : _themeRepository = themeRepository,
-        _authenticationRepository = authenticationRepository;
+        _authenticationRepository = authenticationRepository,
+        _databaseRepository = databaseRepository;
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
@@ -49,6 +55,7 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (_) => HSAuthenticationBloc(
               authenticationRepository: _authenticationRepository,
+              databaseRepository: _databaseRepository,
             ),
           ),
           BlocProvider(
