@@ -1,14 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/profile_incomplete/cubit/hs_profile_completion_cubit.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
 
 class ProfileCompletionForm extends StatelessWidget {
-  const ProfileCompletionForm({super.key});
+  ProfileCompletionForm({super.key});
+
+  final FocusNode birthdayNode = FocusNode();
+  final FocusNode usernameNode = FocusNode();
+  final FocusNode fullnameNode = FocusNode();
+  final FocusNode confirmNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +27,9 @@ class ProfileCompletionForm extends StatelessWidget {
         return Stepper(
           currentStep: currentStep,
           onStepTapped: profileCompletionCubit.updateStep,
-          onStepContinue: () =>
-              profileCompletionCubit.updateStep(currentStep + 1),
-          onStepCancel: () =>
-              profileCompletionCubit.updateStep(currentStep - 1),
+          onStepContinue: profileCompletionCubit.onStepContinue,
+          onStepCancel: profileCompletionCubit.onStepCancel,
+          controlsBuilder: _controlsBuilder,
           steps: [
             const Step(
               title: Text("Birthdate"),
@@ -54,24 +60,54 @@ class ProfileCompletionForm extends StatelessWidget {
                 ],
               ),
             ),
+            Step(
+                title: const Text("Confirm"),
+                content: Align(
+                  alignment: Alignment.topLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Your details",
+                        style: HSTheme.instance.textTheme(context).titleMedium,
+                      ),
+                      const Gap(16.0),
+                      Text(
+                        profileCompletionCubit.state.birthday
+                            .dateTimeToReadableString(),
+                      ),
+                      const Gap(16.0),
+                      Text(
+                        profileCompletionCubit.state.username.value,
+                      ),
+                      const Gap(16.0),
+                      Text(profileCompletionCubit.state.fullname.value),
+                    ],
+                  ),
+                )),
           ],
         );
       },
     );
   }
 
-  Widget? _stepIconBuilder(int itemIndex, StepState itemState) {
-    switch (itemIndex) {
-      case 0:
-        return const Icon(FontAwesomeIcons.user);
-      default:
-        return const Icon(FontAwesomeIcons.user);
-    }
+  Widget _controlsBuilder(BuildContext context, ControlsDetails details) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          HSButton(onPressed: details.onStepCancel!, child: const Text('BACK')),
+          HSButton(
+              onPressed: details.onStepContinue!, child: const Text('SAVE')),
+        ],
+      ),
+    );
   }
 }
 
 class _UsernameGuidelines extends StatelessWidget {
-  const _UsernameGuidelines({super.key});
+  const _UsernameGuidelines() : super();
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +157,7 @@ class _UsernameGuidelines extends StatelessWidget {
 }
 
 class _BirthdayInput extends StatelessWidget {
-  const _BirthdayInput({super.key});
+  const _BirthdayInput();
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +193,8 @@ class _UsernameInput extends StatelessWidget {
           previous.username != current.username ||
           previous.usernameAvailable != current.usernameAvailable,
       builder: (context, state) => HSTextField(
+        textInputAction: TextInputAction.next,
+        scrollPadding: const EdgeInsets.all(84.0),
         key: const Key('ProfileCompletionForm_usernameInput_textField'),
         onChanged: context.read<HSProfileCompletionCubit>().updateUsername,
         hintText: "Username",
@@ -205,8 +243,14 @@ class _FullnameInput extends StatelessWidget {
   }
 }
 
-extension ToReadable on String {
-  String? dateTimeToReadableString() {
+extension ProfileCompletionExtensions on String {
+  String dateTimeToReadableString() {
     return toString().split(" ").elementAt(0);
+  }
+
+  Timestamp? dateTimeStringToTimestamp() {
+    final DateTime date = DateTime.parse(this);
+    final Timestamp ts = Timestamp.fromDate(date);
+    return (ts);
   }
 }

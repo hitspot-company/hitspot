@@ -15,6 +15,8 @@ class HSTextField extends StatelessWidget {
     this.onTap,
     this.readOnly = false,
     this.onTapPrefix,
+    this.scrollPadding = const EdgeInsets.all(20.0),
+    this.textInputAction,
   });
 
   final String? hintText;
@@ -29,10 +31,13 @@ class HSTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final String? errorText;
   final VoidCallback? onTapPrefix;
+  final EdgeInsets scrollPadding;
+  final TextInputAction? textInputAction;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      scrollPadding: scrollPadding,
       readOnly: readOnly,
       controller: controller,
       focusNode: node,
@@ -40,6 +45,7 @@ class HSTextField extends StatelessWidget {
       onChanged: onChanged,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      textInputAction: textInputAction,
       onTap: onTap,
       decoration: InputDecoration(
         errorText: errorText,
