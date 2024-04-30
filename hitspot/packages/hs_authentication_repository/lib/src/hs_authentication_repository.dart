@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_authentication_repository/src/exceptions/log_in_with_apple_failure.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class HSAuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
@@ -74,6 +76,20 @@ class HSAuthenticationRepository {
       throw LogInWithGoogleFailure.fromCode(e.code);
     } catch (_) {
       throw const LogInWithGoogleFailure();
+    }
+  }
+
+  /// Starts the Sign In with Apple Flow.
+  ///
+  /// Throws a [LogInWithAppleFailure] if an exception occurs.
+  Future<void> logInWithApple() async {
+    try {
+      final appleProvider = firebase_auth.AppleAuthProvider();
+      await _firebaseAuth.signInWithProvider(appleProvider);
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw LogInWithAppleFailure.fromCode(e.code);
+    } catch (_) {
+      throw const LogInWithAppleFailure();
     }
   }
 

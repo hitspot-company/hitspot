@@ -44,6 +44,7 @@ dependencies:
   gap: ^3.0.1
   flow_builder: ^0.1.0
   loading_animation_widget: ^1.2.1
+  sign_in_with_apple: ^6.1.0
 
 dev_dependencies:
 

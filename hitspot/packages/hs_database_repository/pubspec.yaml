@@ -8,3 +8,5 @@ environment:
 
 dependencies:
   cloud_firestore: ^4.11.0
+  hs_authentication_repository:
+    path: ../hs_authentication_repository

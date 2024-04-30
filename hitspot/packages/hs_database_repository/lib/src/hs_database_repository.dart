@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-
 import 'exceptions/database_connection_failure.dart';
 
 class HSDatabaseRepository {
