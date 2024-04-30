@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/hs_theme.dart';
-import 'package:hitspot/login/view/login_page.dart';
 import 'package:hitspot/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 class HSScaffold extends StatelessWidget {
   const HSScaffold({
@@ -31,7 +30,7 @@ class HSScaffold extends StatelessWidget {
             top: topSafe,
             bottom: bottomSafe,
             child: Padding(
-              padding: EdgeInsets.all(sidePadding),
+              padding: EdgeInsets.symmetric(horizontal: sidePadding),
               child: Column(
                 children: [if (appBar != null) appBar!, Expanded(child: body)],
               ),

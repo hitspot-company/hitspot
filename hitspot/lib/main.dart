@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/profile_incomplete/view/profile_incomplete_page.dart';
+import 'package:hitspot/profile_incomplete/view/profile_completion_form.dart';
+import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/constants/hs_theme.dart';
@@ -48,8 +49,15 @@ class App extends StatelessWidget {
         _databaseRepository = databaseRepository;
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: _authenticationRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => HSAuthenticationRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => HSDatabaseRepository(),
+        ),
+      ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
@@ -77,7 +85,7 @@ class App extends StatelessWidget {
                   if (appStatus == HSAppStatus.unauthenticated)
                     LoginPage.page(),
                   if (appStatus == HSAppStatus.profileNotCompleted)
-                    ProfileIncompletePage.page(),
+                    ProfileCompletionPage.page(),
                   if (appStatus == HSAppStatus.authenticated)
                     const MaterialPage(
                       child: Center(
