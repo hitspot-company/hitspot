@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 part 'login_state.dart';
 
@@ -61,6 +62,23 @@ class HSLoginCubit extends Cubit<HSLoginState> {
       await _authenticationRepository.logInWithGoogle();
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on LogInWithGoogleFailure catch (e) {
+      emit(
+        state.copyWith(
+          errorMessage: e.message,
+          status: FormzSubmissionStatus.failure,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: FormzSubmissionStatus.failure));
+    }
+  }
+
+  Future<void> logInWithApple() async {
+    emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
+    try {
+      await _authenticationRepository.logInWithApple();
+      emit(state.copyWith(status: FormzSubmissionStatus.success));
+    } on LogInWithAppleFailure catch (e) {
       emit(
         state.copyWith(
           errorMessage: e.message,

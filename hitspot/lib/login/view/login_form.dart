@@ -88,6 +88,8 @@ class LoginForm extends StatelessWidget {
           ),
           const Gap(24.0),
           _GoogleLoginButton(),
+          const Gap(24.0),
+          _AppleLoginButton(),
         ],
       ),
     );
@@ -189,6 +191,28 @@ class _GoogleLoginButton extends StatelessWidget {
       ),
       icon: const Icon(FontAwesomeIcons.google, color: Colors.white),
       onPressed: () => context.read<HSLoginCubit>().logInWithGoogle(),
+    );
+  }
+}
+
+class _AppleLoginButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ElevatedButton.icon(
+      key: const Key('loginForm_appleLogin_raisedButton'),
+      label: const Text(
+        'SIGN IN WITH APPLE',
+        style: TextStyle(color: Colors.white),
+      ),
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        backgroundColor: theme.colorScheme.secondary,
+      ),
+      icon: const Icon(FontAwesomeIcons.apple, color: Colors.white),
+      onPressed: () => context.read<HSLoginCubit>().logInWithApple(),
     );
   }
 }
