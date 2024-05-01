@@ -44,7 +44,7 @@ class HSUsersRepository {
       Map<String, dynamic> snapshotInJson =
           snapshot.data() as Map<String, dynamic>;
 
-      return HSUser.deserialize(snapshotInJson);
+      return HSUser.deserialize(snapshotInJson, uid: snapshot.id);
     } catch (_) {
       throw const DatabaseConnectionFailure('An unknown exception occured');
     }

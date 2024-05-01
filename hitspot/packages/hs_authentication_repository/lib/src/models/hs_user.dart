@@ -54,8 +54,9 @@ class HSUser {
     };
   }
 
-  factory HSUser.deserialize(Map<String, dynamic> data) {
+  factory HSUser.deserialize(Map<String, dynamic> data, {String? uid}) {
     return HSUser(
+      uid: uid,
       fcmTokens: data[HSUserField.fcmTokens.name],
       followers: data[HSUserField.followers.name],
       following: data[HSUserField.following.name],
