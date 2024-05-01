@@ -3,91 +3,108 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/profile_incomplete/cubit/hs_profile_completion_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
+import 'package:hs_toasts/hs_toasts.dart';
 
 class ProfileCompletionForm extends StatelessWidget {
-  ProfileCompletionForm({super.key});
-
-  final FocusNode birthdayNode = FocusNode();
-  final FocusNode usernameNode = FocusNode();
-  final FocusNode fullnameNode = FocusNode();
-  final FocusNode confirmNode = FocusNode();
+  const ProfileCompletionForm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<HSProfileCompletionCubit, HSProfileCompletionState,
-        int>(
-      selector: (state) => state.step,
-      builder: (context, currentStep) {
-        final profileCompletionCubit = context.read<HSProfileCompletionCubit>();
-        return Stepper(
-          currentStep: currentStep,
-          onStepTapped: profileCompletionCubit.updateStep,
-          onStepContinue: profileCompletionCubit.onStepContinue,
-          onStepCancel: profileCompletionCubit.onStepCancel,
-          controlsBuilder: _controlsBuilder,
-          steps: [
-            const Step(
-              title: Text("Birthdate"),
-              content: _BirthdayInput(),
-            ),
-            Step(
-              title: const Text("Username"),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _UsernameGuidelines(),
-                  const Gap(16.0),
-                  _UsernameInput(),
-                ],
-              ),
-            ),
-            Step(
-              title: const Text("Full name"),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Make it easier for your friends to find you using your name.",
-                    style: HSTheme.instance.textTheme(context).titleMedium,
-                  ),
-                  const Gap(16.0),
-                  _FullnameInput(),
-                ],
-              ),
-            ),
-            Step(
-                title: const Text("Confirm"),
-                content: Align(
-                  alignment: Alignment.topLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Your details",
-                        style: HSTheme.instance.textTheme(context).titleMedium,
-                      ),
-                      const Gap(16.0),
-                      Text(
-                        profileCompletionCubit.state.birthday
-                            .dateTimeToReadableString(),
-                      ),
-                      const Gap(16.0),
-                      Text(
-                        profileCompletionCubit.state.username.value,
-                      ),
-                      const Gap(16.0),
-                      Text(profileCompletionCubit.state.fullname.value),
-                    ],
-                  ),
-                )),
-          ],
-        );
+    return BlocListener<HSProfileCompletionCubit, HSProfileCompletionState>(
+      listener: (context, state) {
+        if (state.error.isNotEmpty) {
+          HSToasts.snack(
+            context,
+            snackType: HSSnackType.error,
+            title: "Error",
+            descriptionText: state.error,
+          );
+        } else if (state.pageComplete) {
+          final authBloc = context.read<HSAuthenticationBloc>();
+          final currentUser = authBloc.state.user;
+          context
+              .read<HSAuthenticationBloc>()
+              .add(HSAppUserChanged(currentUser));
+        }
       },
+      child:
+          BlocSelector<HSProfileCompletionCubit, HSProfileCompletionState, int>(
+        selector: (state) => state.step,
+        builder: (context, currentStep) {
+          final profileCompletionCubit =
+              context.read<HSProfileCompletionCubit>();
+          return Stepper(
+            currentStep: currentStep,
+            onStepTapped: profileCompletionCubit.updateStep,
+            onStepContinue: profileCompletionCubit.onStepContinue,
+            onStepCancel: profileCompletionCubit.onStepCancel,
+            controlsBuilder: _controlsBuilder,
+            steps: [
+              const Step(
+                title: Text("Birthdate"),
+                content: _BirthdayInput(),
+              ),
+              Step(
+                title: const Text("Username"),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _UsernameGuidelines(),
+                    const Gap(16.0),
+                    _UsernameInput(),
+                  ],
+                ),
+              ),
+              Step(
+                title: const Text("Full name"),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Make it easier for your friends to find you using your name.",
+                      style: HSTheme.instance.textTheme(context).titleMedium,
+                    ),
+                    const Gap(16.0),
+                    _FullnameInput(),
+                  ],
+                ),
+              ),
+              Step(
+                  title: const Text("Confirm"),
+                  content: Align(
+                    alignment: Alignment.topLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Your details",
+                          style:
+                              HSTheme.instance.textTheme(context).titleMedium,
+                        ),
+                        const Gap(16.0),
+                        Text(
+                          profileCompletionCubit.state.birthday
+                              .dateTimeToReadableString(),
+                        ),
+                        const Gap(16.0),
+                        Text(
+                          profileCompletionCubit.state.username.value,
+                        ),
+                        const Gap(16.0),
+                        Text(profileCompletionCubit.state.fullname.value),
+                      ],
+                    ),
+                  )),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -95,11 +112,27 @@ class ProfileCompletionForm extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          HSButton(onPressed: details.onStepCancel!, child: const Text('BACK')),
-          HSButton(
-              onPressed: details.onStepContinue!, child: const Text('SAVE')),
+          Expanded(
+              child: details.currentStep != 0
+                  ? HSButton(
+                      onPressed: details.onStepCancel!,
+                      child: const Text('BACK'))
+                  : const SizedBox()),
+          const Gap(8.0),
+          Expanded(
+            child: details.currentStep == 3
+                ? HSButton(
+                    onPressed: () => context
+                        .read<HSProfileCompletionCubit>()
+                        .completeUserProfile(
+                            context.read<HSAuthenticationBloc>().state.user),
+                    child: const Text('SAVE'))
+                : HSButton(
+                    onPressed: details.onStepContinue!,
+                    child: const Text('NEXT'),
+                  ),
+          ),
         ],
       ),
     );
@@ -252,5 +285,9 @@ extension ProfileCompletionExtensions on String {
     final DateTime date = DateTime.parse(this);
     final Timestamp ts = Timestamp.fromDate(date);
     return (ts);
+  }
+
+  DateTime stringToDateTime() {
+    return DateTime.parse(this);
   }
 }

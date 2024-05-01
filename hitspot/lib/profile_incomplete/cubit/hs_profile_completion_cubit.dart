@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_form.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -17,7 +16,7 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
   void onStepContinue() {
     // The confirmation step
     if (state.step != 3) {
-      emit(state.copyWith(step: state.step + 1));
+      emit(state.copyWith(step: state.step + 1, error: ""));
     } else {
       print("Confirm");
     }
@@ -26,7 +25,7 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
   void onStepCancel() {
     // The first step
     if (state.step != 0) {
-      emit(state.copyWith(step: state.step - 1));
+      emit(state.copyWith(step: state.step - 1, error: ""));
     } else {
       print("Zero reached");
     }
@@ -49,15 +48,39 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
 
   Future<void> completeUserProfile(HSUser currentUser) async {
     try {
+      if (!fieldsValid()) return;
       final HSUser updatedUser = currentUser.copyWith(
         birthday: state.birthday.dateTimeStringToTimestamp(),
         username: state.username.value,
         fullName: state.fullname.value,
+        isProfileCompleted: true,
       );
       await _hsDatabaseRepository.completeUserProfile(updatedUser);
-      await FirebaseAuth.instance.currentUser!.reload();
+      emit(state.copyWith(pageComplete: true));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
+  }
+
+  bool fieldsValid() {
+    try {
+      final DateTime now = DateTime.now();
+      final DateTime minimalAge = DateTime(now.year - 18, now.month, now.day);
+      if (state.birthday.stringToDateTime().isBefore(minimalAge)) {
+        throw "You have to be at least 18 to use Hitspot";
+      }
+      if (!state.usernameAvailable) {
+        throw "The username is not available";
+      }
+      if (state.fullname.displayError != null) {
+        throw "The name is invalid";
+      }
+      return (true);
+    } catch (_) {
+      emit(state.copyWith(error: _.toString()));
+      emit(state.copyWith(error: ""));
+      HSDebugLogger.logError(_.toString());
+    }
+    return (false);
   }
 }
