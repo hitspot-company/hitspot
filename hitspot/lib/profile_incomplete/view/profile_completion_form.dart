@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,8 +9,6 @@ import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
-import 'package:hs_toasts/hs_toasts.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ProfileCompletionForm extends StatelessWidget {
   const ProfileCompletionForm({super.key});
@@ -20,22 +17,16 @@ class ProfileCompletionForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<HSProfileCompletionCubit, HSProfileCompletionState>(
       listener: (context, state) {
-        if (state.error.isNotEmpty) {
-          HSToasts.snack(
-            context,
-            snackType: HSSnackType.error,
-            title: "Error",
-            descriptionText: state.error,
-          );
-        } else if (state.pageComplete) {
+        if (state.pageComplete) {
           final authBloc = context.read<HSAuthenticationBloc>();
           final currentUser = authBloc.state.user;
-          context
-              .read<HSAuthenticationBloc>()
-              .add(HSAppUserChanged(currentUser));
+          authBloc.add(HSAppUserChanged(currentUser));
         }
       },
-      buildWhen: (previous, current) => previous.step != current.step,
+      buildWhen: (previous, current) =>
+          previous.step != current.step ||
+          previous.usernameValidationState != current.usernameValidationState ||
+          previous.loading != current.loading,
       builder: (context, state) {
         final int currentStep = state.step;
         final profileCompletionCubit = context.read<HSProfileCompletionCubit>();
@@ -46,9 +37,9 @@ class ProfileCompletionForm extends StatelessWidget {
           onStepCancel: profileCompletionCubit.onStepCancel,
           controlsBuilder: _controlsBuilder,
           steps: [
-            const Step(
-              title: Text("Birthdate"),
-              content: _BirthdayInput(),
+            Step(
+              title: const Text("Birthdate"),
+              content: _BirthdayInput(profileCompletionCubit),
             ),
             Step(
               title: const Text("Username"),
@@ -57,7 +48,7 @@ class ProfileCompletionForm extends StatelessWidget {
                 children: [
                   const _UsernameGuidelines(),
                   const Gap(16.0),
-                  _UsernameInput(),
+                  _UsernameInput(profileCompletionCubit),
                 ],
               ),
             ),
@@ -71,7 +62,7 @@ class ProfileCompletionForm extends StatelessWidget {
                     style: HSTheme.instance.textTheme(context).titleMedium,
                   ),
                   const Gap(16.0),
-                  _FullnameInput(),
+                  _FullnameInput(profileCompletionCubit),
                 ],
               ),
             ),
@@ -92,43 +83,75 @@ class ProfileCompletionForm extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Expanded(
-              child: details.currentStep != 0
-                  ? HSButton(
-                      onPressed: details.onStepCancel!,
-                      child: const Text('BACK'))
-                  : const SizedBox()),
+            child: details.currentStep != 0
+                ? HSButton(
+                    onPressed: details.onStepCancel!, child: const Text('BACK'))
+                : const SizedBox(),
+          ),
           const Gap(8.0),
           Expanded(
-            child: details.currentStep == 3
-                ? HSButton(
-                    onPressed: () => context
-                        .read<HSProfileCompletionCubit>()
-                        .completeUserProfile(
-                            context.read<HSAuthenticationBloc>().state.user),
-                    child: const Text('SAVE'))
-                : HSButton(
-                    onPressed: details.onStepContinue!,
-                    child: const Text('NEXT'),
-                  ),
+            child: getNextButton(context, details),
           ),
         ],
       ),
     );
   }
 
-  // VoidCallback? getNextCallback(BuildContext context, ControlsDetails details) {
-  //   switch (details.currentStep) {
-  //     case 0:
-  //       return details.onStepContinue;
-  //     case 3:
-  //       return
-  //   }
-  // }
+  HSButton getNextButton(BuildContext context, ControlsDetails details) {
+    final profileCompletionCubit = context.read<HSProfileCompletionCubit>();
+    final currentUser = context.read<HSAuthenticationBloc>().state.user;
+    final usernameValidationState =
+        profileCompletionCubit.state.usernameValidationState;
+    if (details.currentStep == 3) {
+      if (profileCompletionCubit.state.loading) {
+        return const HSButton(
+          onPressed: null,
+          child: HSLoadingIndicator(
+            size: 32.0,
+          ),
+        );
+      }
+      return HSButton(
+        onPressed: () =>
+            profileCompletionCubit.completeUserProfile(currentUser),
+        child: const Text('SAVE'),
+      );
+    } else if (details.currentStep == 1) {
+      switch (usernameValidationState) {
+        case UsernameValidationState.unknown:
+          return HSButton(
+            onPressed: profileCompletionCubit.isUsernameValid,
+            child: const Text('VERIFY'),
+          );
+        case UsernameValidationState.verifying:
+          return const HSButton(
+            onPressed: null,
+            child: HSLoadingIndicator(
+              size: 32.0,
+            ),
+          );
+        case UsernameValidationState.unavailable:
+          return const HSButton(
+            onPressed: null,
+            child: Text("NEXT"),
+          );
+        case UsernameValidationState.available:
+          return HSButton(
+            onPressed: details.onStepContinue!,
+            child: const Text("NEXT"),
+          );
+      }
+    } else {
+      return HSButton(
+        onPressed: details.onStepContinue!,
+        child: const Text('NEXT'),
+      );
+    }
+  }
 }
 
 class _ConfirmationDetails extends StatelessWidget {
   const _ConfirmationDetails({
-    super.key,
     required this.profileCompletionCubit,
   });
 
@@ -140,10 +163,6 @@ class _ConfirmationDetails extends StatelessWidget {
         bool>(
       selector: (state) => state.loading,
       builder: (context, loading) {
-        if (loading) {
-          return LoadingAnimationWidget.waveDots(
-              color: HSTheme.instance.mainColor, size: 64.0);
-        }
         return Align(
           alignment: Alignment.topLeft,
           child: Column(
@@ -155,8 +174,8 @@ class _ConfirmationDetails extends StatelessWidget {
               ),
               const Gap(16.0),
               Text(
-                profileCompletionCubit.state.birthday.value,
-                // .dateTimeToReadableString(),
+                profileCompletionCubit.state.birthday.value
+                    .dateTimeToReadableString(),
               ),
               const Gap(16.0),
               Text(
@@ -223,13 +242,16 @@ class _UsernameGuidelines extends StatelessWidget {
 }
 
 class _BirthdayInput extends StatelessWidget {
-  const _BirthdayInput();
+  const _BirthdayInput(this._profileCompletionCubit);
+
+  final HSProfileCompletionCubit _profileCompletionCubit;
 
   @override
   Widget build(BuildContext context) {
-    final profileCompletionCubit = context.read<HSProfileCompletionCubit>();
     return BlocBuilder<HSProfileCompletionCubit, HSProfileCompletionState>(
-      buildWhen: (previous, current) => previous.birthday != current.birthday,
+      buildWhen: (previous, current) =>
+          previous.birthday != current.birthday ||
+          previous.birthdayError != current.birthdayError,
       builder: (context, state) => HSTextField(
         key: const Key('ProfileCompletionForm_birthdayInput_textField'),
         prefixIcon: const Icon(FontAwesomeIcons.cakeCandles),
@@ -242,39 +264,66 @@ class _BirthdayInput extends StatelessWidget {
               firstDate: DateTime(now.year - 100, now.month, now.day),
               lastDate: DateTime(now.year - 18, now.month, now.day));
           if (pickedDate != null) {
-            // profileCompletionCubit.updateBirthday(pickedDate.toString());
+            _profileCompletionCubit.updateBirthday(pickedDate.toString());
           }
         },
-        hintText: "date of birth", // state.birthday.dateTimeToReadableString(),
-      ),
-    );
-  }
-}
-
-class _UsernameInput extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<HSProfileCompletionCubit, HSProfileCompletionState>(
-      buildWhen: (previous, current) =>
-          previous.username != current.username ||
-          previous.usernameAvailable != current.usernameAvailable,
-      builder: (context, state) => HSTextField(
-        textInputAction: TextInputAction.next,
-        scrollPadding: const EdgeInsets.all(84.0),
-        key: const Key('ProfileCompletionForm_usernameInput_textField'),
-        onChanged: context.read<HSProfileCompletionCubit>().updateUsername,
-        hintText: "Username",
-        prefixIcon: Icon(state.username.error != null
-            ? FontAwesomeIcons.exclamation
-            : FontAwesomeIcons.check),
+        hintText: _hintText(state.birthday),
         errorText: _errorText(state),
       ),
     );
   }
 
+  String _hintText(Birthdate birthday) {
+    if (!birthday.isPure) {
+      return birthday.value.dateTimeToReadableString();
+    }
+    return "Date of Birth";
+  }
+
+  String? _errorText(HSProfileCompletionState state) {
+    if (state.birthdayError.isNotEmpty) {
+      return state.birthdayError;
+    }
+    return null;
+  }
+}
+
+class _UsernameInput extends StatelessWidget {
+  const _UsernameInput(this._profileCompletionCubit);
+  final HSProfileCompletionCubit _profileCompletionCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSProfileCompletionCubit, HSProfileCompletionState>(
+      buildWhen: (previous, current) =>
+          previous.username != current.username ||
+          previous.usernameValidationState != current.usernameValidationState,
+      builder: (context, state) => HSTextField(
+        textInputAction: TextInputAction.next,
+        scrollPadding: const EdgeInsets.all(84.0),
+        key: const Key('ProfileCompletionForm_usernameInput_textField'),
+        onChanged: _profileCompletionCubit.updateUsername,
+        hintText: "Username",
+        prefixIcon: _getPrefixIcon(state.usernameValidationState),
+        errorText: _errorText(state),
+      ),
+    );
+  }
+
+  Icon _getPrefixIcon(UsernameValidationState usernameValidationState) {
+    switch (usernameValidationState) {
+      case UsernameValidationState.available:
+        return const Icon(FontAwesomeIcons.check, color: Colors.green);
+      case UsernameValidationState.unavailable:
+        return const Icon(FontAwesomeIcons.exclamation, color: Colors.red);
+      default:
+        return const Icon(FontAwesomeIcons.question);
+    }
+  }
+
   String? _errorText(HSProfileCompletionState state) {
     UsernameValidationError? error = state.username.displayError;
-    if (!state.usernameAvailable) {
+    if (state.usernameValidationState == UsernameValidationState.unavailable) {
       error = UsernameValidationError.unavailable;
     }
     if (error == null) return null;
@@ -294,19 +343,27 @@ class _UsernameInput extends StatelessWidget {
 }
 
 class _FullnameInput extends StatelessWidget {
+  const _FullnameInput(this._profileCompletionCubit);
+  final HSProfileCompletionCubit _profileCompletionCubit;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HSProfileCompletionCubit, HSProfileCompletionState>(
       buildWhen: (previous, current) => previous.fullname != current.fullname,
       builder: (context, state) => HSTextField(
         key: const Key('ProfileCompletionForm_usernameInput_textField'),
-        onChanged: context.read<HSProfileCompletionCubit>().updateFullname,
+        onChanged: _profileCompletionCubit.updateFullname,
         hintText: "Name and Surname",
         prefixIcon: const Icon(FontAwesomeIcons.solidUser),
-        errorText: state.fullname.displayError != null
-            ? "Invalid name and surname"
-            : null,
+        errorText: _errorText(state),
       ),
     );
+  }
+
+  String? _errorText(HSProfileCompletionState state) {
+    if (state.fullname.displayError != null) {
+      return "Invalid name and surname";
+    }
+    return null;
   }
 }

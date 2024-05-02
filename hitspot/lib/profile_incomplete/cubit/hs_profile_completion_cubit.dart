@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:hitspot/profile_incomplete/view/profile_completion_form.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -23,9 +22,12 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
           }
           break;
         case 1:
-          if (await isUsernameValid()) {
-            emit(
-                state.copyWith(step: state.step + 1, username: state.username));
+          if (state.usernameValidationState ==
+              UsernameValidationState.available) {
+            emit(state.copyWith(
+              step: state.step + 1,
+              username: state.username,
+            ));
           }
           break;
         case 2:
@@ -42,7 +44,6 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
       }
     } catch (e) {
       HSDebugLogger.logError(e.toString());
-      emitError(e.toString());
     }
   }
 
@@ -54,23 +55,38 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
   bool isBirthdateValid() {
     final DateTime now = DateTime.now();
     final DateTime minimalAge = DateTime(now.year - 18, now.month, now.day);
-    // if (state.birthday.isEmpty) {
-    //   throw "Birthday cannot be empty";
-    // } else if (state.birthday.stringToDateTime().isAfter(minimalAge)) {
-    //   throw "You have to be at least 18 years old to use Hitspot";
-    // }
+    if (state.birthday.value.isEmpty) {
+      emit(state.copyWith(birthdayError: "Please choose a date."));
+      throw "Birthday cannot be empty";
+    } else if (state.birthday.dateTime.isAfter(minimalAge)) {
+      emit(state.copyWith(
+          birthdayError: "You have to be at least 18 years old."));
+      throw "You have to be at least 18 years old to use Hitspot";
+    }
     return true;
   }
 
-  Future<bool> isUsernameValid() async {
-    final String username = state.username.value;
-    if (username.isEmpty) throw "Username cannot be empty";
-    if (state.username.displayError != null) throw "Invalid username.";
-    if (!(await _hsDatabaseRepository.isUsernameAvailable(username))) {
-      emit(state.copyWith(usernameAvailable: false));
-      throw "The username is unavailable. Try another one.";
+  bool isUsernameFollowingGuidelines() {
+    return state.username.isValid;
+  }
+
+  Future<void> isUsernameValid() async {
+    emit(state.copyWith(
+        usernameValidationState: UsernameValidationState.verifying));
+    await Future.delayed(const Duration(seconds: 2));
+    if (!isUsernameFollowingGuidelines()) {
+      emit(state.copyWith(
+          usernameValidationState: UsernameValidationState.unknown));
+      return;
     }
-    return true;
+    if (!(await _hsDatabaseRepository
+        .isUsernameAvailable(state.username.value))) {
+      emit(state.copyWith(
+          usernameValidationState: UsernameValidationState.unavailable));
+      return;
+    }
+    emit(state.copyWith(
+        usernameValidationState: UsernameValidationState.available));
   }
 
   bool isFullnameValid() {
@@ -87,30 +103,31 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
 
   void updateStep(int newStep) => emit(state.copyWith(step: newStep));
 
-  void updateUsername(String newUsername) async => emit(state.copyWith(
-      username: Username.dirty(newUsername), usernameAvailable: true));
+  void updateUsername(String newUsername) => emit(state.copyWith(
+      username: Username.dirty(newUsername),
+      usernameValidationState: UsernameValidationState.unknown));
 
   void updateFullname(String newFullname) =>
       emit(state.copyWith(fullname: Fullname.dirty(newFullname)));
 
-  void updateBirthday(Birthdate newBirthday) =>
-      emit(state.copyWith(birthday: newBirthday));
+  void updateBirthday(String newBirthday) => emit(state.copyWith(
+      birthdayError: "", birthday: Birthdate.dirty(newBirthday)));
 
   Future<void> completeUserProfile(HSUser currentUser) async {
     emit(state.copyWith(loading: true));
-    await Future.delayed(const Duration(seconds: 3));
-    // try {
-    //   final HSUser updatedUser = currentUser.copyWith(
-    //     birthday: state.birthday.dateTimeStringToTimestamp(),
-    //     username: state.username.value,
-    //     fullName: state.fullname.value,
-    //     isProfileCompleted: true,
-    //   );
-    //   await _hsDatabaseRepository.completeUserProfile(updatedUser);
-    //   emit(state.copyWith(pageComplete: true));
-    // } catch (_) {
-    //   HSDebugLogger.logError(_.toString());
-    // }
+    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final HSUser updatedUser = currentUser.copyWith(
+        birthday: state.birthday.value.dateTimeStringToTimestamp(),
+        username: state.username.value,
+        fullName: state.fullname.value,
+        isProfileCompleted: true,
+      );
+      await _hsDatabaseRepository.completeUserProfile(updatedUser);
+      emit(state.copyWith(pageComplete: true));
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+    }
     emit(state.copyWith(loading: false));
   }
 }
