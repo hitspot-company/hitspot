@@ -9,3 +9,4 @@ environment:
 dependencies:
   formz: ^0.7.0
   regexpattern: ^2.6.0
+  cloud_firestore: ^4.11.0

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_form.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/splash/view/splash_page.dart';
@@ -86,12 +87,7 @@ class App extends StatelessWidget {
                     LoginPage.page(),
                   if (appStatus == HSAppStatus.profileNotCompleted)
                     ProfileCompletionPage.page(),
-                  if (appStatus == HSAppStatus.authenticated)
-                    const MaterialPage(
-                      child: Center(
-                        child: Text("HOME PAGE"),
-                      ),
-                    ),
+                  if (appStatus == HSAppStatus.authenticated) HomePage.page(),
                 ],
               ),
             );

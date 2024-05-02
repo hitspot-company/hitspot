@@ -1,7 +1,14 @@
 import 'package:formz/formz.dart';
 
 /// Validation errors for the [Username] [FormzInput].
-enum UsernameValidationError { invalid, short, long, unavailable, notLowerCase }
+enum UsernameValidationError {
+  none,
+  invalid,
+  short,
+  long,
+  unavailable,
+  notLowerCase
+}
 
 /// {@template usernmae}
 /// Form input for an username input.

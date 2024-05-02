@@ -6,18 +6,20 @@ final class HSProfileCompletionState extends Equatable {
     this.username = const Username.pure(),
     this.fullname = const Fullname.pure(),
     this.usernameAvailable = false,
-    this.birthday = "",
+    this.birthday = const Birthdate.pure(),
     this.pageComplete = false,
     this.error = "",
+    this.loading = false,
   });
 
   final int step;
   final Username username;
   final Fullname fullname;
   final bool usernameAvailable;
-  final String birthday;
+  final Birthdate birthday;
   final bool pageComplete;
   final String error;
+  final bool loading;
 
   @override
   List<Object?> get props => [
@@ -28,6 +30,7 @@ final class HSProfileCompletionState extends Equatable {
         usernameAvailable,
         pageComplete,
         error,
+        loading,
       ];
 
   HSProfileCompletionState copyWith({
@@ -35,9 +38,10 @@ final class HSProfileCompletionState extends Equatable {
     Username? username,
     Fullname? fullname,
     bool? usernameAvailable,
-    String? birthday,
+    Birthdate? birthday,
     bool? pageComplete,
     String? error,
+    bool? loading,
   }) {
     return HSProfileCompletionState(
       step: step ?? this.step,
@@ -47,6 +51,7 @@ final class HSProfileCompletionState extends Equatable {
       birthday: birthday ?? this.birthday,
       pageComplete: pageComplete ?? this.pageComplete,
       error: error ?? this.error,
+      loading: loading ?? this.loading,
     );
   }
 }
