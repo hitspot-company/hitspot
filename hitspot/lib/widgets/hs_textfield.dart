@@ -6,6 +6,9 @@ class HSTextField extends StatelessWidget {
     this.hintText,
     this.errorText,
     this.prefixIcon,
+    this.onTapPrefix,
+    this.suffixIcon,
+    this.onTapSuffix,
     this.controller,
     this.validator,
     this.onChanged,
@@ -14,13 +17,16 @@ class HSTextField extends StatelessWidget {
     this.node,
     this.onTap,
     this.readOnly = false,
-    this.onTapPrefix,
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.textInputAction,
+    this.fillColor,
   });
 
   final String? hintText;
   final Widget? prefixIcon;
+  final VoidCallback? onTapPrefix;
+  final Widget? suffixIcon;
+  final VoidCallback? onTapSuffix;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final Function(String)? onChanged;
@@ -30,12 +36,14 @@ class HSTextField extends StatelessWidget {
   final FocusNode? node;
   final VoidCallback? onTap;
   final String? errorText;
-  final VoidCallback? onTapPrefix;
   final EdgeInsets scrollPadding;
   final TextInputAction? textInputAction;
+  final Color? fillColor;
 
   @override
   Widget build(BuildContext context) {
+    assert(!(prefixIcon != null && suffixIcon != null),
+        "Suffix and prefix cannot be used at the same time");
     return TextFormField(
       scrollPadding: scrollPadding,
       readOnly: readOnly,
@@ -48,11 +56,19 @@ class HSTextField extends StatelessWidget {
       textInputAction: textInputAction,
       onTap: onTap,
       decoration: InputDecoration(
+        fillColor: fillColor,
+        filled: fillColor != null ? true : false,
         errorText: errorText,
-        prefixIcon: GestureDetector(onTap: onTapPrefix, child: prefixIcon),
+        prefixIcon: suffixIcon != null
+            ? null
+            : GestureDetector(onTap: onTapPrefix, child: prefixIcon),
+        suffixIcon: prefixIcon != null
+            ? null
+            : GestureDetector(onTap: onTapSuffix, child: suffixIcon),
         hintText: hintText,
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(
+        border: OutlineInputBorder(
+          borderSide: fillColor != null ? BorderSide.none : const BorderSide(),
+          borderRadius: const BorderRadius.all(
             Radius.circular(8.0),
           ),
         ),

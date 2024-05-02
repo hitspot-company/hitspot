@@ -106,6 +106,7 @@ class _EmailInput extends StatelessWidget {
         onChanged: (email) => context.read<HSLoginCubit>().emailChanged(email),
         keyboardType: TextInputType.emailAddress,
         hintText: "Email",
+        fillColor: HSTheme.instance.textfieldFillColor,
         prefixIcon: const Icon(FontAwesomeIcons.envelope),
         errorText: state.email.displayError != null ? "Invalid email" : null,
       ),
@@ -126,6 +127,7 @@ class _PasswordInput extends StatelessWidget {
           onChanged: (password) =>
               context.read<HSLoginCubit>().passwordChanged(password),
           obscureText: !state.isPasswordVisible,
+          fillColor: HSTheme.instance.textfieldFillColor,
           errorText:
               state.password.displayError != null ? 'invalid password' : null,
           hintText: "Password",

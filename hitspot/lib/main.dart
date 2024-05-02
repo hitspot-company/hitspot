@@ -5,18 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/home/view/home_page.dart';
-import 'package:hitspot/profile_incomplete/view/profile_completion_form.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
-import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/login/view/login_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_theme_repository/hs_form_inputs.dart';
-import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:hs_theme_repository/hs_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

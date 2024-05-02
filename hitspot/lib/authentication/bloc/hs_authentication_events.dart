@@ -13,7 +13,3 @@ final class HSAppUserChanged extends HSAuthenticationEvent {
 
   const HSAppUserChanged(this.user);
 }
-
-final class HSAppUserReload extends HSAuthenticationEvent {
-  const HSAppUserReload();
-}

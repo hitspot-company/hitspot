@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
+import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/constants/hs_assets.dart';
 import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_searchbar.dart';
-import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,24 +20,39 @@ class HomePage extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            surfaceTintColor: Colors.transparent,
             title: Image.asset(
               HSAssets.instance.textLogo,
               height: 30,
             ),
             actions: <Widget>[
               IconButton(
-                icon: const Icon(FontAwesomeIcons.bell),
-                onPressed: () => HSDebugLogger.logInfo("Notification"),
-              ),
+                  icon: const Icon(FontAwesomeIcons.bell),
+                  onPressed: () => context.read<HSAuthenticationBloc>().add(
+                      const HSAppLogoutRequested()) // HSDebugLogger.logInfo("Notification"),
+                  ),
             ],
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(
+                "Hello ${HSApp.instance.username}",
+                style: HSTheme.instance.textTheme(context).displaySmall,
+              ),
+            ),
             floating: true,
             pinned: true,
           ),
+          const SliverToBoxAdapter(
+            child: Gap(16.0),
+          ),
           const SliverAppBar(
+            surfaceTintColor: Colors.transparent,
             stretch: true,
-            title: HSSearchBar(),
+            title: HSSearchBar(
+              height: 60.0,
+            ),
             centerTitle: true,
             pinned: true,
+            toolbarHeight: 60,
           ),
         ],
       ),

@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/hs_theme.dart';
-import 'package:hs_theme_repository/hs_form_inputs.dart';
+import 'package:hs_theme_repository/hs_theme.dart';
 
 part 'hs_theme_event.dart';
 part 'hs_theme_state.dart';
