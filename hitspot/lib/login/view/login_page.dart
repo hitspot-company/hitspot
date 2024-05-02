@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/constants/hs_assets.dart';
+import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/login/cubit/login_cubit.dart';
 import 'package:hitspot/login/view/login_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';

@@ -9,6 +9,7 @@ import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/login/view/login_page.dart';
+import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
@@ -74,6 +75,7 @@ class App extends StatelessWidget {
             return MaterialApp(
               theme: currentTheme,
               title: "Hitspot",
+              navigatorKey: HSNavigationService.instance.navigatorKey,
               home: FlowBuilder<HSAppStatus>(
                 state: context
                     .select((HSAuthenticationBloc bloc) => bloc.state.status),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/home/view/home_search.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
@@ -14,8 +14,12 @@ class HSSearchBar extends StatelessWidget {
     return SizedBox(
       height: height,
       child: HSTextField(
-        suffixIcon: const Icon(FontAwesomeIcons.magnifyingGlass),
-        fillColor: const Color.fromARGB(16, 158, 158, 158),
+        readOnly: true,
+        suffixIcon: const Icon(
+          FontAwesomeIcons.magnifyingGlass,
+          color: Colors.grey,
+        ),
+        fillColor: HSApp.instance.textFieldFillColor,
         hintText: "Search...",
         onTap: () async {
           await showSearch(context: context, delegate: HSHomeSearchDelegate());

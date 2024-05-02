@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/constants/hs_theme.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class HSLoadingIndicator extends StatelessWidget {

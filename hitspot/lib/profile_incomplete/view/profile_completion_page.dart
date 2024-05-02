@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/constants/hs_theme.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/profile_incomplete/cubit/hs_profile_completion_cubit.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';

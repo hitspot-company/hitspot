@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 final class HSTheme {
-  static HSTheme instance = HSTheme();
+  // SINGLETON
+  HSTheme._internal();
+  static final HSTheme _instance = HSTheme._internal();
+  static HSTheme get instance => _instance;
+
   static const Color _mainColor = Color(0xFF04cc91);
   static const Color _textfieldFillColor = Color.fromARGB(16, 158, 158, 158);
 
