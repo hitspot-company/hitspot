@@ -22,9 +22,10 @@ class HSSpotsRepository {
       FirebaseStorage.instanceFor(bucket: "gs://spots_images");
 
   static final GeoFlutterFire geoHashManager = GeoFlutterFire();
+
   final int _THUMBNAIL_SIZE = 100;
 
-  void createSpot() {
+  Future<void> createSpot(String title) async {
     // Get data and create HSSpot based on that data
 
     // Create geo hash based on latitude & longitude
@@ -40,11 +41,6 @@ class HSSpotsRepository {
     }
 
     try {
-      await spotsCollection
-          .doc(spot.uid)
-          .set(spot.serialize())
-          .timeout(const Duration(seconds: 3));
-
       // Retrieve document's id
       DocumentReference docRef = await spotsCollection.add(spot.serialize());
       spot.uid = docRef.id;
@@ -72,11 +68,8 @@ class HSSpotsRepository {
         }
       }
 
-      // Save second time with image URLs saved
-      await spotsCollection
-          .doc(spot.uid)
-          .set(spot.serialize())
-          .timeout(const Duration(seconds: 3));
+      // Update current data with image URLs saved
+      await spotsCollection.doc(spot.uid).update(spot.serializeImages());
     } catch (_) {
       throw DatabaseRepositoryFailure(
           "There was an error in saving spot to database!");

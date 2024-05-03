@@ -11,6 +11,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_search_repository/hs_search.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 class HSApp {
@@ -34,9 +35,12 @@ class HSApp {
   TextTheme get textTheme => theme.textTheme;
   TextStyle? get headlineMedium => textTheme.headlineMedium;
   Color? get textFieldFillColor => theme.textfieldFillColor;
+
   void changeTheme() => themeBloc.add(HSThemeSwitchEvent());
+
   double get screenWidth => MediaQuery.of(context!).size.width;
   double get screenHeight => MediaQuery.of(context!).size.height;
+
   HSThemeRepository get themeRepository => HSThemeRepository.instance;
 
   // POPUPS
@@ -67,6 +71,10 @@ class HSApp {
     authBloc.add(const HSAppLogoutRequested());
     navi.logout();
   }
+
+  // DATABASE
+  HSDatabaseRepository get databaseRepository =>
+      context!.read<HSDatabaseRepository>();
 
   // CURRENT USER
   HSUser get currentUser => authBloc.state.user;

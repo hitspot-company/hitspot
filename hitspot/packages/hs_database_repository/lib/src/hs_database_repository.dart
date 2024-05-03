@@ -51,6 +51,9 @@ class HSDatabaseRepository {
     }
   }
 
+  Future<void> createSpot({required String title}) async =>
+      await _spotsRepository.createSpot(title);
+
   Future<bool> userIsUsernameAvailable(String username) async =>
       await _usersRepository.isUsernameAvailable(username);
 

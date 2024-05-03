@@ -57,10 +57,7 @@ class HSUsersRepository {
   // If user does not exist in database, it wil create a new document
   Future<void> updateUserInfoInDatabase(HSUser user) async {
     try {
-      await _usersCollection
-          .doc(user.uid)
-          .set(user.serialize())
-          .timeout(const Duration(seconds: 3));
+      await _usersCollection.doc(user.uid).set(user.serialize());
     } catch (_) {
       throw DatabaseRepositoryFailure('An unknown exception occured');
     }
@@ -68,10 +65,7 @@ class HSUsersRepository {
 
   Future<HSUser?> getUserFromDatabase(String uid) async {
     try {
-      DocumentSnapshot snapshot = await _usersCollection
-          .doc(uid)
-          .get()
-          .timeout(const Duration(seconds: 5));
+      DocumentSnapshot snapshot = await _usersCollection.doc(uid).get();
 
       // If user is not in database return null
       if (!snapshot.exists) {

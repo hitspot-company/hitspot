@@ -71,6 +71,14 @@ class HSSpot {
     };
   }
 
+  Map<String, dynamic> serializeImages() {
+    return {
+      HSSpotField.numberOfImagesUploaded.field: numberOfImagesUploaded,
+      HSSpotField.fullImages.field: description,
+      HSSpotField.fullImages.field: fullImages,
+    };
+  }
+
   factory HSSpot.deserialize(Map<String, dynamic> data) {
     return HSSpot(
       uid: data[HSSpotField.uid.field],
