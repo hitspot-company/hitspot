@@ -43,4 +43,6 @@ class LogInWithAppleFailure implements Exception {
         return const LogInWithAppleFailure();
     }
   }
+
+  bool get isDefault => message == 'An unknown exception occurred.';
 }

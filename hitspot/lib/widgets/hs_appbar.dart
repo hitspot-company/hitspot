@@ -13,6 +13,7 @@ class HSAppBar extends StatelessWidget {
     this.maxLines = 1,
     this.fontSize = 18.0,
     this.enableDefaultBackButton = false,
+    this.titleBold = false,
   }) {
     assert(center != null || title != null,
         "Either a center widget or title should be provided.");
@@ -28,34 +29,38 @@ class HSAppBar extends StatelessWidget {
   final int maxLines;
   final double fontSize;
   final bool enableDefaultBackButton;
+  final bool titleBold;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
           if (enableDefaultBackButton)
-            IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(FontAwesomeIcons.arrowLeft)),
-          if (left != null) left!,
+            Align(
+              alignment: Alignment.topLeft,
+              child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(FontAwesomeIcons.arrowLeft)),
+            ),
+          if (left != null) Align(alignment: Alignment.topLeft, child: left!),
           if (center != null)
-            Expanded(child: center!)
+            Align(alignment: Alignment.topCenter, child: center!)
           else
-            Expanded(
+            Align(
+              alignment: Alignment.topCenter,
               child: AutoSizeText(
                 title!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: titleBold ? FontWeight.bold : FontWeight.normal,
                     fontSize: fontSize),
                 maxLines: maxLines,
               ),
             ),
-          if (right != null) right!
+          if (right != null) Align(alignment: Alignment.topRight, child: right!)
         ],
       ),
     );

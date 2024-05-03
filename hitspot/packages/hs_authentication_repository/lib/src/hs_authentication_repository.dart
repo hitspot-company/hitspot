@@ -51,6 +51,7 @@ class HSAuthenticationRepository {
         password: password,
       );
     } on firebase_auth.FirebaseAuthException catch (e) {
+      print(e.message);
       throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
       throw const LogInWithEmailAndPasswordFailure();

@@ -54,8 +54,9 @@ class HSUser {
     };
   }
 
-  factory HSUser.deserialize(Map<String, dynamic> data) {
+  factory HSUser.deserialize(Map<String, dynamic> data, {String? uid}) {
     return HSUser(
+      uid: uid,
       fcmTokens: data[HSUserField.fcmTokens.name],
       followers: data[HSUserField.followers.name],
       following: data[HSUserField.following.name],
@@ -71,6 +72,45 @@ class HSUser {
       createdAt: data[HSUserField.createdAt.name],
       emailHidden: data[HSUserField.emailHidden.name],
       isProfileCompleted: data[HSUserField.isProfileCompleted.name] ?? false,
+    );
+  }
+
+  HSUser copyWith({
+    List? fcmTokens,
+    List? followers,
+    List? following,
+    List? likedSpots,
+    List? previouslySearchedUsers,
+    List? spots,
+    String? uid,
+    String? biogram,
+    String? email,
+    String? fullName,
+    String? profilePicture,
+    String? username,
+    Timestamp? birthday,
+    Timestamp? createdAt,
+    bool? emailHidden,
+    bool? isProfileCompleted,
+  }) {
+    return HSUser(
+      fcmTokens: fcmTokens ?? this.fcmTokens,
+      followers: followers ?? this.followers,
+      following: following ?? this.following,
+      likedSpots: likedSpots ?? this.likedSpots,
+      previouslySearchedUsers:
+          previouslySearchedUsers ?? this.previouslySearchedUsers,
+      spots: spots ?? this.spots,
+      uid: uid ?? this.uid,
+      biogram: biogram ?? this.biogram,
+      email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
+      profilePicture: profilePicture ?? this.profilePicture,
+      username: username ?? this.username,
+      birthday: birthday ?? this.birthday,
+      createdAt: createdAt ?? this.createdAt,
+      emailHidden: emailHidden ?? this.emailHidden,
+      isProfileCompleted: isProfileCompleted ?? this.isProfileCompleted,
     );
   }
 

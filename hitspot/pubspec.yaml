@@ -38,6 +38,8 @@ dependencies:
     path: packages/hs_theme_repository
   hs_debug_logger:
     path: packages/hs_debug_logger
+  hs_toasts:
+    path: packages/hs_toasts
   shared_preferences: ^2.2.3
   font_awesome_flutter: ^10.7.0
   formz: ^0.7.0
@@ -45,6 +47,7 @@ dependencies:
   flow_builder: ^0.1.0
   loading_animation_widget: ^1.2.1
   sign_in_with_apple: ^6.1.0
+  toastification: ^1.2.1
 
 dev_dependencies:
 

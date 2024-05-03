@@ -3,18 +3,18 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/profile_incomplete/view/profile_incomplete_page.dart';
+import 'package:hitspot/home/view/home_page.dart';
+import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
-import 'package:hitspot/constants/hs_theme.dart';
 import 'package:hitspot/login/view/login_page.dart';
+import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_theme_repository/hs_form_inputs.dart';
-import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:hs_theme_repository/hs_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,8 +48,15 @@ class App extends StatelessWidget {
         _databaseRepository = databaseRepository;
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: _authenticationRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => HSAuthenticationRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => HSDatabaseRepository(),
+        ),
+      ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
@@ -59,9 +66,8 @@ class App extends StatelessWidget {
             ),
           ),
           BlocProvider(
-            create: (_) =>
-                HSThemeBloc(_themeRepository)..add(HSInitialThemeSetEvent()),
-          ),
+              create: (_) =>
+                  HSThemeBloc(_themeRepository)..add(HSInitialThemeSetEvent())),
         ],
         child: BlocSelector<HSThemeBloc, HSThemeState, ThemeData>(
           selector: (state) => state.theme,
@@ -69,27 +75,41 @@ class App extends StatelessWidget {
             return MaterialApp(
               theme: currentTheme,
               title: "Hitspot",
-              home: FlowBuilder<HSAppStatus>(
-                state: context
-                    .select((HSAuthenticationBloc bloc) => bloc.state.status),
-                onGeneratePages: (appStatus, pages) => [
-                  if (appStatus == HSAppStatus.loading) SplashPage.page(),
-                  if (appStatus == HSAppStatus.unauthenticated)
-                    LoginPage.page(),
-                  if (appStatus == HSAppStatus.profileNotCompleted)
-                    ProfileIncompletePage.page(),
-                  if (appStatus == HSAppStatus.authenticated)
-                    const MaterialPage(
-                      child: Center(
-                        child: Text("HOME PAGE"),
-                      ),
-                    ),
+              navigatorKey: HSNavigationService.instance.navigatorKey,
+              builder: (context, child) => Overlay(
+                initialEntries: [
+                  OverlayEntry(
+                    builder: (context) =>
+                        child ??
+                        const Center(
+                          child: Text("OVERLAY ERROR"),
+                        ),
+                  ),
                 ],
               ),
+              home: const _HSFlowBuilder(),
             );
           },
         ),
       ),
+    );
+  }
+}
+
+class _HSFlowBuilder extends StatelessWidget {
+  const _HSFlowBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return FlowBuilder<HSAppStatus>(
+      state: context.select((HSAuthenticationBloc bloc) => bloc.state.status),
+      onGeneratePages: (appStatus, pages) => [
+        if (appStatus == HSAppStatus.loading) SplashPage.page(),
+        if (appStatus == HSAppStatus.unauthenticated) LoginPage.page(),
+        if (appStatus == HSAppStatus.profileNotCompleted)
+          ProfileCompletionPage.page(),
+        if (appStatus == HSAppStatus.authenticated) HomePage.page(),
+      ],
     );
   }
 }

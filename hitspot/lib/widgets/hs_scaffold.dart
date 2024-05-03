@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 class HSScaffold extends StatelessWidget {
   const HSScaffold({
@@ -11,6 +10,7 @@ class HSScaffold extends StatelessWidget {
     this.appBar,
     required this.body,
     this.ignoring = false,
+    this.resizeToAvoidBottomInset = true,
   });
 
   final bool topSafe;
@@ -19,6 +19,7 @@ class HSScaffold extends StatelessWidget {
   final Widget? appBar;
   final Widget body;
   final bool ignoring;
+  final bool resizeToAvoidBottomInset;
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +28,12 @@ class HSScaffold extends StatelessWidget {
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(
+          resizeToAvoidBottomInset: resizeToAvoidBottomInset,
           body: SafeArea(
             top: topSafe,
             bottom: bottomSafe,
             child: Padding(
-              padding: EdgeInsets.all(sidePadding),
+              padding: EdgeInsets.symmetric(horizontal: sidePadding),
               child: Column(
                 children: [if (appBar != null) appBar!, Expanded(child: body)],
               ),

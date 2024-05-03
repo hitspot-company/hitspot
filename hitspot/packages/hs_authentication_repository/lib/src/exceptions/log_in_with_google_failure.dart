@@ -43,4 +43,6 @@ class LogInWithGoogleFailure implements Exception {
         return const LogInWithGoogleFailure();
     }
   }
+
+  bool get isDefault => message == 'An unknown exception occurred.';
 }

@@ -22,7 +22,7 @@ class HSAuthenticationBloc
       : _authenticationRepository = authenticationRepository,
         _databaseRepository = databaseRepository,
         super(const HSAuthenticationState.loading()) {
-    on<_HSAppUserChanged>(_onUserChanged);
+    on<HSAppUserChanged>(_onUserChanged);
     on<HSAppLogoutRequested>(_onLogoutRequested);
     _delayedUserStreamSubscription();
   }
@@ -31,12 +31,12 @@ class HSAuthenticationBloc
   Future<void> _delayedUserStreamSubscription() async {
     await Future.delayed(const Duration(seconds: 3));
     _userSubscription = _authenticationRepository.user.listen(
-      (user) => add(_HSAppUserChanged(user)),
+      (user) => add(HSAppUserChanged(user)),
     );
   }
 
   void _onUserChanged(
-      _HSAppUserChanged event, Emitter<HSAuthenticationState> emit) async {
+      HSAppUserChanged event, Emitter<HSAuthenticationState> emit) async {
     HSAuthenticationState state = const HSAuthenticationState.unauthenticated();
 
     if (event.user != null) {

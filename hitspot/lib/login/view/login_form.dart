@@ -1,218 +1,185 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/constants/hs_theme.dart';
-import 'package:hitspot/login/cubit/login_cubit.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/register/view/register_page.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
+import 'package:hitspot/login/cubit/login_cubit.dart';
+import 'package:hitspot/widgets/auth/hs_auth_button.dart';
+import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
+import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
+import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
 
-  final String title = "Welcome Back!";
-  final String headline = "Let's log in";
+  final String title = "Log in to Hitspot";
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<HSLoginCubit, HSLoginState>(
-      listener: (context, state) {
-        if (state.status.isFailure) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? 'Authentication Failure'),
-              ),
-            );
-        }
-      },
-      child: Column(
-        children: [
-          ListView(
-            shrinkWrap: true,
-            children: [
-              const Gap(32.0),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.displaySmall!.boldify(),
-                textAlign: TextAlign.center,
-              ),
-              const Gap(8.0),
-              Text(headline,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center),
-              const Gap(48.0),
-              _EmailInput(),
-              const Gap(24.0),
-              _PasswordInput(),
-              const Gap(32.0),
-              _LoginButton(),
-              const Gap(16.0),
-              Text.rich(
+    final hsApp = HSApp.instance;
+    final hsNavigation = hsApp.navigation;
+    final loginCubit = context.read<HSLoginCubit>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Gap(32.0),
+        const HSAuthPageTitle(
+          leftTitle: "Log in to ",
+          rightTitle: "Hitspot",
+        ),
+        const Gap(24.0),
+        _EmailInput(loginCubit),
+        const Gap(24.0),
+        _PasswordInput(loginCubit),
+        const Gap(16.0),
+        SizedBox(
+          width: double.maxFinite,
+          child: Text.rich(
+            TextSpan(
+              text: "Don't have an account?",
+              style: hsApp.textTheme.bodySmall!.hintify(),
+              children: [
                 TextSpan(
-                  text: "Don't have an account?",
-                  style: Theme.of(context).textTheme.bodySmall!.hintify(),
-                  children: [
-                    TextSpan(
-                      text: " Sign Up",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall!
-                          .colorify(HSTheme.instance.mainColor)
-                          .boldify(),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () => Navigator.of(context)
-                            .push<void>(RegisterPage.route()),
-                    ),
-                  ],
+                  text: " Sign Up",
+                  style: hsApp.textTheme.bodySmall!
+                      .colorify(HSTheme.instance.mainColor)
+                      .boldify(),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () => hsNavigation.push(RegisterPage.route()),
                 ),
-                textAlign: TextAlign.right,
-              ),
-            ],
+              ],
+            ),
+            textAlign: TextAlign.right,
           ),
-          const Spacer(),
-          const Row(
+        ),
+        const Gap(32.0),
+        _LoginButton(loginCubit),
+        const Gap(32.0),
+        const HSAuthHorizontalDivider(),
+        const Gap(24.0),
+        HSSocialLoginButtons.google(loginCubit.logInWithGoogle),
+        const Gap(24.0),
+        HSSocialLoginButtons.apple(loginCubit.logInWithApple),
+        const Spacer(),
+        const Text.rich(
+          TextSpan(
+            text:
+                "Hitspot uses cookies for analytics, personalised content and ads. By using Hitspot's services you agree to this use of cookies.",
             children: [
-              Expanded(child: Divider()),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text("Alternatively"),
+              TextSpan(
+                text: " Learn more",
+                style: TextStyle(
+                  color: Color.fromARGB(255, 130, 130, 130),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Expanded(child: Divider()),
             ],
           ),
-          const Gap(24.0),
-          _GoogleLoginButton(),
-          const Gap(24.0),
-          _AppleLoginButton(),
-        ],
-      ),
+          style: TextStyle(
+            color: Colors.grey,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }
 
 class _EmailInput extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<HSLoginCubit, HSLoginState>(
-      buildWhen: (previous, current) => previous.email != current.email,
-      builder: (context, state) => HSTextField(
-        key: const Key("loginForm_emailInput_textField"),
-        onChanged: (email) => context.read<HSLoginCubit>().emailChanged(email),
-        keyboardType: TextInputType.emailAddress,
-        hintText: "Email",
-        prefixIcon: const Icon(FontAwesomeIcons.envelope),
-        errorText: state.email.displayError != null ? "Invalid email" : null,
-      ),
-    );
-  }
-}
+  const _EmailInput(this._loginCubit);
+  final HSLoginCubit _loginCubit;
 
-class _PasswordInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HSLoginCubit, HSLoginState>(
       buildWhen: (previous, current) =>
+          previous.email != current.email ||
+          previous.errorMessage != current.errorMessage,
+      builder: (context, state) => HSTextField(
+        key: const Key("loginForm_emailInput_textField"),
+        onChanged: _loginCubit.emailChanged,
+        keyboardType: TextInputType.emailAddress,
+        hintText: "email@example.com",
+        suffixIcon: const Icon(FontAwesomeIcons.envelope),
+        errorText: _errorText(state),
+      ),
+    );
+  }
+
+  String? _errorText(HSLoginState state) {
+    if (state.email.displayError != null) return "Invalid email address.";
+    // TODO: Move under password
+    if (state.errorMessage != null && state.errorMessage == "") {
+      return "Invalid credentials.";
+    }
+    return null;
+  }
+}
+
+class _PasswordInput extends StatelessWidget {
+  const _PasswordInput(this._loginCubit);
+  final HSLoginCubit _loginCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSLoginCubit, HSLoginState>(
+      buildWhen: (previous, current) =>
+          previous.errorMessage != current.errorMessage ||
           previous.password != current.password ||
           previous.isPasswordVisible != current.isPasswordVisible,
       builder: (context, state) {
         return HSTextField(
           key: const Key('loginForm_passwordInput_textField'),
-          onChanged: (password) =>
-              context.read<HSLoginCubit>().passwordChanged(password),
+          onChanged: _loginCubit.passwordChanged,
           obscureText: !state.isPasswordVisible,
-          errorText:
-              state.password.displayError != null ? 'invalid password' : null,
-          hintText: "Password",
-          onTapPrefix: () =>
-              context.read<HSLoginCubit>().togglePasswordVisibility(),
-          prefixIcon: Icon(state.isPasswordVisible
-              ? FontAwesomeIcons.lockOpen
-              : FontAwesomeIcons.lock),
+          errorText: _errorText(state),
+          hintText: "Your Password",
+          onTapSuffix: _loginCubit.togglePasswordVisibility,
+          suffixIcon: Icon(_getSuffixIcon(state)),
         );
       },
     );
   }
+
+  String? _errorText(HSLoginState state) {
+    String? error;
+
+    if (state.errorMessage != null) {
+      error = state.errorMessage;
+    }
+    return error;
+  }
+
+  IconData _getSuffixIcon(HSLoginState state) {
+    return state.isPasswordVisible
+        ? FontAwesomeIcons.eye
+        : FontAwesomeIcons.eyeSlash;
+  }
 }
 
 class _LoginButton extends StatelessWidget {
+  const _LoginButton(this._loginCubit);
+  final HSLoginCubit _loginCubit;
   final String buttonText = "Sign In";
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HSLoginCubit, HSLoginState>(
       builder: (context, state) {
-        return ElevatedButton.icon(
-          key: const Key('loginForm_continue_raisedButton'),
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-          ),
-          onPressed: () {
-            if (state.isValid) {
-              context.read<HSLoginCubit>().logInWithCredentials();
-            }
-          },
-          icon: state.status.isInProgress
-              ? const SizedBox()
-              : const Icon(FontAwesomeIcons.arrowRight),
-          label: state.status.isInProgress
-              ? LoadingAnimationWidget.staggeredDotsWave(
-                  size: 24.0,
-                  color: HSTheme.instance.mainColor,
-                )
-              : Text(buttonText),
+        return HSAuthButton(
+          buttonText: buttonText,
+          loading: state.status.isInProgress,
+          valid: state.isValid,
+          callback: _loginCubit.logInWithCredentials,
         );
       },
-    );
-  }
-}
-
-class _GoogleLoginButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ElevatedButton.icon(
-      key: const Key('loginForm_googleLogin_raisedButton'),
-      label: const Text(
-        'SIGN IN WITH GOOGLE',
-        style: TextStyle(color: Colors.white),
-      ),
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        backgroundColor: theme.colorScheme.secondary,
-      ),
-      icon: const Icon(FontAwesomeIcons.google, color: Colors.white),
-      onPressed: () => context.read<HSLoginCubit>().logInWithGoogle(),
-    );
-  }
-}
-
-class _AppleLoginButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ElevatedButton.icon(
-      key: const Key('loginForm_appleLogin_raisedButton'),
-      label: const Text(
-        'SIGN IN WITH APPLE',
-        style: TextStyle(color: Colors.white),
-      ),
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        backgroundColor: theme.colorScheme.secondary,
-      ),
-      icon: const Icon(FontAwesomeIcons.apple, color: Colors.white),
-      onPressed: () => context.read<HSLoginCubit>().logInWithApple(),
     );
   }
 }

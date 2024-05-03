@@ -8,8 +8,8 @@ final class HSAppLogoutRequested extends HSAuthenticationEvent {
   const HSAppLogoutRequested();
 }
 
-final class _HSAppUserChanged extends HSAuthenticationEvent {
+final class HSAppUserChanged extends HSAuthenticationEvent {
   final HSUser? user;
 
-  const _HSAppUserChanged(this.user);
+  const HSAppUserChanged(this.user);
 }
