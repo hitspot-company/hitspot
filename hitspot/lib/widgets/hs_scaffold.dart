@@ -10,6 +10,7 @@ class HSScaffold extends StatelessWidget {
     this.appBar,
     required this.body,
     this.ignoring = false,
+    this.resizeToAvoidBottomInset = true,
   });
 
   final bool topSafe;
@@ -18,6 +19,7 @@ class HSScaffold extends StatelessWidget {
   final Widget? appBar;
   final Widget body;
   final bool ignoring;
+  final bool resizeToAvoidBottomInset;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,7 @@ class HSScaffold extends StatelessWidget {
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(
+          resizeToAvoidBottomInset: resizeToAvoidBottomInset,
           body: SafeArea(
             top: topSafe,
             bottom: bottomSafe,

@@ -15,10 +15,8 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HSScaffold(
-      sidePadding: 16.0,
-      appBar: HSAppBar(
-        center: Image.asset(HSAssets.instance.textLogo),
-      ),
+      resizeToAvoidBottomInset: false,
+      sidePadding: 24.0,
       body: BlocProvider(
         create: (_) => HSLoginCubit(context.read<HSAuthenticationRepository>()),
         child: const LoginForm(),

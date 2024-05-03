@@ -65,9 +65,8 @@ class App extends StatelessWidget {
             ),
           ),
           BlocProvider(
-            create: (_) =>
-                HSThemeBloc(_themeRepository)..add(HSInitialThemeSetEvent()),
-          ),
+              create: (_) =>
+                  HSThemeBloc(_themeRepository)..add(HSInitialThemeSetEvent())),
         ],
         child: BlocSelector<HSThemeBloc, HSThemeState, ThemeData>(
           selector: (state) => state.theme,

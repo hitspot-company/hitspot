@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
@@ -18,17 +19,24 @@ class HSApp {
   BuildContext? get context => navigatorKey.currentContext;
 
   // THEMING
+  HSThemeBloc get themeBloc => BlocProvider.of<HSThemeBloc>(context!);
   HSTheme get theme => HSTheme.instance;
+  ThemeData get currentTheme => theme.currentTheme(context);
   TextTheme get textTheme => theme.textTheme(context);
   TextStyle? get headlineMedium => textTheme.headlineMedium;
   Color? get textFieldFillColor => theme.textfieldFillColor;
+  void changeTheme() => themeBloc.add(HSThemeSwitchEvent());
+
+  // POPUPS
+  // HSToasts get toasts => HSToasts.
 
   // ASSETS
   HSAssets get assets => HSAssets.instance;
 
   // AUTHENTICATION
-  HSAuthenticationBloc get authBloc => BlocProvider.of<HSAuthenticationBloc>(
-      HSNavigationService.instance.navigatorKey.currentContext!);
+  HSAuthenticationBloc get authBloc =>
+      BlocProvider.of<HSAuthenticationBloc>(context!);
+  void logout() => authBloc.add(const HSAppLogoutRequested());
 
   // CURRENT USER
   HSUser get currentUser => authBloc.state.user;

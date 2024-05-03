@@ -23,6 +23,7 @@ final class HSTheme {
   Color get textfieldFillColor => _textfieldFillColor;
 
   TextTheme textTheme(context) => Theme.of(context).textTheme;
+  ThemeData currentTheme(context) => Theme.of(context);
 }
 
 extension TextStyleAltering on TextStyle {
