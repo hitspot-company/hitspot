@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+typedef UserID = String;
+
 enum HSUserField {
   username("username"),
   boards("boards"),
