@@ -50,7 +50,7 @@ class HSUsersRepository {
           .update(user.copyWith(createdAt: now).serialize())
           .timeout(const Duration(seconds: 3));
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      throw DatabaseRepositoryFailure('An unknown exception occured');
     }
   }
 
@@ -62,7 +62,7 @@ class HSUsersRepository {
           .set(user.serialize())
           .timeout(const Duration(seconds: 3));
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      throw DatabaseRepositoryFailure('An unknown exception occured');
     }
   }
 
@@ -83,6 +83,7 @@ class HSUsersRepository {
 
       return HSUser.deserialize(snapshotInJson, uid: snapshot.id);
     } catch (_) {
+      throw DatabaseRepositoryFailure('An unknown exception occured');
       return null;
     }
   }
@@ -95,7 +96,7 @@ class HSUsersRepository {
           .get();
       return (query.count == 0);
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      throw DatabaseRepositoryFailure('An unknown exception occured');
     }
   }
 

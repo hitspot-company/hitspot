@@ -7,6 +7,7 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/hs_database_repository_boards.dart';
 import 'package:hs_database_repository/src/hs_database_repository_trips.dart';
 import 'package:hs_database_repository/src/hs_database_repository_users.dart';
+import 'package:hs_database_repository/src/hs_database_repository_spots.dart';
 
 class HSDatabaseRepository {
   const HSDatabaseRepository();
@@ -20,6 +21,7 @@ class HSDatabaseRepository {
   static final _usersRepository = HSUsersRepository();
   static final _boardsRepository = HSBoardsRepository(boards, users);
   static final _tripsRepository = HSTripsRepository(trips, users);
+  static final _spotsRepository = HSSpotsRepository();
 
   Future<void> userFollow(HSUser currentUser, HSUser user) async =>
       await _usersRepository.followUser(currentUser, user);

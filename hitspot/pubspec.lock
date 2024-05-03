@@ -189,26 +189,26 @@ packages:
     dependency: "direct main"
     description:
       name: cloud_firestore
-      sha256: "531a471f7eb9ae57bc8dc727c1fb424f7fe8817e84229fd527246af681bcf01c"
+      sha256: "58ea77912e355cfd4e49f858e01d5ab4f99c7181ebd545b3fbeae25d6677dff6"
       url: "https://pub.dev"
     source: hosted
-    version: "4.17.0"
+    version: "4.17.2"
   cloud_firestore_platform_interface:
     dependency: transitive
     description:
       name: cloud_firestore_platform_interface
-      sha256: "1014ed707aafc41828704eac18bc5ebad37641f66614db334e4f22e57ae7f568"
+      sha256: "9cb7d350c08c3d4987d34f418037aca3882649cdad5158440b4b932232edcf82"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.0"
+    version: "6.2.2"
   cloud_firestore_web:
     dependency: transitive
     description:
       name: cloud_firestore_web
-      sha256: be74d6d998807afe5bbe67c94ce4379b330c6817b8151488ce534a8c25d2df51
+      sha256: "28db029962ebdcb8caf80f0c109f359ebcefa983b85fb62e5a220b1a577d84b5"
       url: "https://pub.dev"
     source: hosted
-    version: "3.12.0"
+    version: "3.12.2"
   collection:
     dependency: transitive
     description:
@@ -217,14 +217,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
-  crypto:
-    dependency: transitive
-    description:
-      name: crypto
-      sha256: ff625774173754681d66daaf4a448684fb04b78f902da9cb3d308c19cc5e8bab
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.3"
   cross_file:
     dependency: transitive
     description:
@@ -441,6 +433,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.9.4"
+  fixnum:
+    dependency: transitive
+    description:
+      name: fixnum
+      sha256: "25517a4deb0c03aa0f32fd12db525856438902d9c16536311e76cdc57b31d7d1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   flex_color_picker:
     dependency: "direct main"
     description:
@@ -723,13 +723,6 @@ packages:
       relative: true
     source: path
     version: "1.0.0+1"
-  hs_spot_model:
-    dependency: "direct main"
-    description:
-      path: "packages/hs_spot_model"
-      relative: true
-    source: path
-    version: "1.0.0+1"
   hs_mailing_repository:
     dependency: "direct main"
     description:
@@ -782,6 +775,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  iconsax_flutter:
+    dependency: transitive
+    description:
+      name: iconsax_flutter
+      sha256: "95b65699da8ea98f87c5d232f06b0debaaf1ec1332b697e4d90969ec9a93037d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   image:
     dependency: "direct main"
     description:
@@ -1110,6 +1111,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
+  pausable_timer:
+    dependency: transitive
+    description:
+      name: pausable_timer
+      sha256: "6ef1a95441ec3439de6fb63f39a011b67e693198e7dae14e20675c3c00e86074"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0+3"
   petitparser:
     dependency: transitive
     description:
@@ -1142,6 +1151,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
+  regexpattern:
+    dependency: transitive
+    description:
+      name: regexpattern
+      sha256: "86b9c9c076cfbd2021c7a887a312a71d962c3a29906c911277da8343e4ac901b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.0"
   rxdart:
     dependency: transitive
     description:

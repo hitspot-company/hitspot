@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
-import 'package:hs_spot_model/hs_spot.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:hs_database_repository/src/models/hs_spot.dart';
 
 class HSSpotsRepository {
   final db = FirebaseFirestore.instance;

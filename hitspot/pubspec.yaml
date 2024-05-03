@@ -44,8 +44,6 @@ dependencies:
     path: packages/hs_mailing_repository
   hs_search_repository:
     path: packages/hs_search_repository
-  hs_spot_model:
-    path: packages/hs_spot_model
   shared_preferences: ^2.2.3
   font_awesome_flutter: ^10.7.0
   formz: ^0.7.0
