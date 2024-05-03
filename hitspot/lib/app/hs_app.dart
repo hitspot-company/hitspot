@@ -34,7 +34,7 @@ class HSApp {
           {required HSSnackType snackType,
           required String title,
           String? description}) =>
-      toasts.snack(context!,
+      toasts.toast(context!,
           snackType: snackType, title: title, descriptionText: description);
 
   // ASSETS

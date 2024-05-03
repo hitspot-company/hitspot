@@ -13,6 +13,7 @@ class Fullname extends FormzInput<String, FullnameValidationError> {
   /// {@macro fullname}
   const Fullname.dirty([super.value = '']) : super.dirty();
 
+  /// The value is never null [pure state is '']
   @override
   FullnameValidationError? validator(String? value) {
     return !value!.isEmpty ? null : FullnameValidationError.invalid;

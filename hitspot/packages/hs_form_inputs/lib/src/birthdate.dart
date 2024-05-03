@@ -20,11 +20,6 @@ class Birthdate extends FormzInput<String, BirthdateValidationError> {
 
   @override
   BirthdateValidationError? validator(String? value) {
-    if (value == null || value.isEmpty) return BirthdateValidationError.empty;
-    final DateTime date = value.stringToDateTime();
-    final DateTime now = DateTime.now();
-    final DateTime min = DateTime(now.year - 18, now.month, now.day);
-    if (date.isBefore(min)) return BirthdateValidationError.tooYoung;
     return null;
   }
 }

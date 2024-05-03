@@ -10,7 +10,7 @@ class HSToasts {
   static final HSToasts _instance = HSToasts._internal();
   static HSToasts get instance => _instance;
 
-  void snack(
+  void toast(
     BuildContext context, {
     required HSSnackType snackType,
     required String title,

@@ -115,7 +115,10 @@ class _EmailInput extends StatelessWidget {
 
   String? _errorText(HSLoginState state) {
     if (state.email.displayError != null) return "Invalid email address.";
-    // if (state.errorMessage != null && state.errorMessage == "") return "";
+    // TODO: Move under password
+    if (state.errorMessage != null && state.errorMessage == "") {
+      return "Invalid credentials.";
+    }
     return null;
   }
 }
