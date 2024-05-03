@@ -3,6 +3,7 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
@@ -75,22 +76,40 @@ class App extends StatelessWidget {
               theme: currentTheme,
               title: "Hitspot",
               navigatorKey: HSNavigationService.instance.navigatorKey,
-              home: FlowBuilder<HSAppStatus>(
-                state: context
-                    .select((HSAuthenticationBloc bloc) => bloc.state.status),
-                onGeneratePages: (appStatus, pages) => [
-                  if (appStatus == HSAppStatus.loading) SplashPage.page(),
-                  if (appStatus == HSAppStatus.unauthenticated)
-                    LoginPage.page(),
-                  if (appStatus == HSAppStatus.profileNotCompleted)
-                    ProfileCompletionPage.page(),
-                  if (appStatus == HSAppStatus.authenticated) HomePage.page(),
+              builder: (context, child) => Overlay(
+                initialEntries: [
+                  OverlayEntry(
+                    builder: (context) =>
+                        child ??
+                        const Center(
+                          child: Text("OVERLAY ERROR"),
+                        ),
+                  ),
                 ],
               ),
+              home: const _HSFlowBuilder(),
             );
           },
         ),
       ),
+    );
+  }
+}
+
+class _HSFlowBuilder extends StatelessWidget {
+  const _HSFlowBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return FlowBuilder<HSAppStatus>(
+      state: context.select((HSAuthenticationBloc bloc) => bloc.state.status),
+      onGeneratePages: (appStatus, pages) => [
+        if (appStatus == HSAppStatus.loading) SplashPage.page(),
+        if (appStatus == HSAppStatus.unauthenticated) LoginPage.page(),
+        if (appStatus == HSAppStatus.profileNotCompleted)
+          ProfileCompletionPage.page(),
+        if (appStatus == HSAppStatus.authenticated) HomePage.page(),
+      ],
     );
   }
 }

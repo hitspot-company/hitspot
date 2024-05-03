@@ -1,8 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
+import 'package:hs_toasts/hs_toasts.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 part 'login_state.dart';
@@ -85,6 +88,10 @@ class HSLoginCubit extends Cubit<HSLoginState> {
           status: FormzSubmissionStatus.failure,
         ),
       );
+      HSApp.instance.showToast(
+          snackType: HSSnackType.error, title: "Authentication Error");
+      HSDebugLogger.logError(
+          "Authentication Error: ${e.runtimeType.toString()}");
     } catch (_) {
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }

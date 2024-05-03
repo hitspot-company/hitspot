@@ -25,13 +25,13 @@ class LoginForm extends StatelessWidget {
       listener: (context, state) {
         if (state.status.isFailure) {
           // TODO: Change to HSToasts
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? 'Authentication Failure'),
-              ),
-            );
+          // ScaffoldMessenger.of(context)
+          //   ..hideCurrentSnackBar()
+          //   ..showSnackBar(
+          //     SnackBar(
+          //       content: Text(state.errorMessage ?? 'Authentication Failure'),
+          //     ),
+          //   );
         }
       },
       child: Column(

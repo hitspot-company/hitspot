@@ -6,6 +6,7 @@ import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_toasts/hs_toasts.dart';
 
 class HSApp {
   // SINGLETON
@@ -28,7 +29,13 @@ class HSApp {
   void changeTheme() => themeBloc.add(HSThemeSwitchEvent());
 
   // POPUPS
-  // HSToasts get toasts => HSToasts.
+  HSToasts get toasts => HSToasts.instance;
+  void showToast(
+          {required HSSnackType snackType,
+          required String title,
+          String? description}) =>
+      toasts.snack(context!,
+          snackType: snackType, title: title, descriptionText: description);
 
   // ASSETS
   HSAssets get assets => HSAssets.instance;
