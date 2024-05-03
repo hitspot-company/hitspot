@@ -8,7 +8,6 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/login/cubit/login_cubit.dart';
-import 'package:hitspot/register/view/register_page.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -19,6 +18,9 @@ class LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hsApp = HSApp.instance;
+    final hsNavigation = hsApp.navigation;
+    final loginCubit = context.read<HSLoginCubit>();
     return BlocListener<HSLoginCubit, HSLoginState>(
       listener: (context, state) {
         if (state.status.isFailure) {
@@ -38,29 +40,28 @@ class LoginForm extends StatelessWidget {
           const Gap(32.0),
           Text(
             title,
-            style: HSApp.instance.textTheme.displaySmall!.boldify(),
+            style: hsApp.textTheme.displaySmall!.boldify(),
             textAlign: TextAlign.left,
           ),
           const Gap(24.0),
-          _EmailInput(),
+          _EmailInput(loginCubit),
           const Gap(24.0),
-          _PasswordInput(),
+          _PasswordInput(loginCubit),
           const Gap(16.0),
           SizedBox(
             width: double.maxFinite,
             child: Text.rich(
               TextSpan(
                 text: "Don't have an account?",
-                style: HSApp.instance.textTheme.bodySmall!.hintify(),
+                style: hsApp.textTheme.bodySmall!.hintify(),
                 children: [
                   TextSpan(
                     text: " Sign Up",
-                    style: HSApp.instance.textTheme.bodySmall!
+                    style: hsApp.textTheme.bodySmall!
                         .colorify(HSTheme.instance.mainColor)
                         .boldify(),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () => Navigator.of(context)
-                          .push<void>(RegisterPage.route()),
+                      ..onTap = () => hsNavigation.pop(),
                   ),
                 ],
               ),
@@ -68,7 +69,7 @@ class LoginForm extends StatelessWidget {
             ),
           ),
           const Gap(32.0),
-          _LoginButton(),
+          _LoginButton(loginCubit),
           const Gap(32.0),
           const Row(
             children: [
@@ -84,9 +85,9 @@ class LoginForm extends StatelessWidget {
             ],
           ),
           const Gap(24.0),
-          _GoogleLoginButton(),
+          _GoogleLoginButton(loginCubit),
           const Gap(24.0),
-          _AppleLoginButton(),
+          _AppleLoginButton(loginCubit),
           const Spacer(),
           const Text.rich(
             TextSpan(
@@ -114,13 +115,16 @@ class LoginForm extends StatelessWidget {
 }
 
 class _EmailInput extends StatelessWidget {
+  const _EmailInput(this._loginCubit);
+  final HSLoginCubit _loginCubit;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HSLoginCubit, HSLoginState>(
       buildWhen: (previous, current) => previous.email != current.email,
       builder: (context, state) => HSTextField(
         key: const Key("loginForm_emailInput_textField"),
-        onChanged: (email) => context.read<HSLoginCubit>().emailChanged(email),
+        onChanged: _loginCubit.emailChanged,
         keyboardType: TextInputType.emailAddress,
         hintText: "email@example.com",
         suffixIcon: const Icon(FontAwesomeIcons.envelope),
@@ -131,6 +135,9 @@ class _EmailInput extends StatelessWidget {
 }
 
 class _PasswordInput extends StatelessWidget {
+  const _PasswordInput(this._loginCubit);
+  final HSLoginCubit _loginCubit;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HSLoginCubit, HSLoginState>(
@@ -140,24 +147,28 @@ class _PasswordInput extends StatelessWidget {
       builder: (context, state) {
         return HSTextField(
           key: const Key('loginForm_passwordInput_textField'),
-          onChanged: (password) =>
-              context.read<HSLoginCubit>().passwordChanged(password),
+          onChanged: _loginCubit.passwordChanged,
           obscureText: !state.isPasswordVisible,
           errorText:
               state.password.displayError != null ? 'invalid password' : null,
           hintText: "Your Password",
-          onTapSuffix: () =>
-              context.read<HSLoginCubit>().togglePasswordVisibility(),
-          suffixIcon: Icon(state.isPasswordVisible
-              ? FontAwesomeIcons.eye
-              : FontAwesomeIcons.eyeSlash),
+          onTapSuffix: _loginCubit.togglePasswordVisibility,
+          suffixIcon: Icon(_getSuffixIcon(state)),
         );
       },
     );
   }
+
+  IconData _getSuffixIcon(HSLoginState state) {
+    return state.isPasswordVisible
+        ? FontAwesomeIcons.eye
+        : FontAwesomeIcons.eyeSlash;
+  }
 }
 
 class _LoginButton extends StatelessWidget {
+  const _LoginButton(this._loginCubit);
+  final HSLoginCubit _loginCubit;
   final String buttonText = "Sign In";
 
   @override
@@ -176,7 +187,7 @@ class _LoginButton extends StatelessWidget {
                 : Text(buttonText),
             onPressed: () {
               if (state.isValid) {
-                context.read<HSLoginCubit>().logInWithCredentials();
+                _loginCubit.logInWithCredentials();
               }
             },
           ),
@@ -187,6 +198,8 @@ class _LoginButton extends StatelessWidget {
 }
 
 class _GoogleLoginButton extends StatelessWidget {
+  const _GoogleLoginButton(this._loginCubit);
+  final HSLoginCubit _loginCubit;
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = HSApp.instance.currentTheme;
@@ -208,13 +221,16 @@ class _GoogleLoginButton extends StatelessWidget {
           elevation: 0.0,
         ),
         icon: const Icon(FontAwesomeIcons.google),
-        onPressed: () => context.read<HSLoginCubit>().logInWithGoogle(),
+        onPressed: _loginCubit.logInWithGoogle,
       ),
     );
   }
 }
 
 class _AppleLoginButton extends StatelessWidget {
+  const _AppleLoginButton(this._loginCubit);
+  final HSLoginCubit _loginCubit;
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = HSApp.instance.currentTheme;
@@ -236,7 +252,7 @@ class _AppleLoginButton extends StatelessWidget {
           elevation: 0.0,
         ),
         icon: const Icon(FontAwesomeIcons.apple),
-        onPressed: () => context.read<HSLoginCubit>().logInWithApple(),
+        onPressed: _loginCubit.logInWithApple,
       ),
     );
   }
