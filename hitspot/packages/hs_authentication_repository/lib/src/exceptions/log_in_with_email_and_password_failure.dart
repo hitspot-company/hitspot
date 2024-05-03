@@ -27,4 +27,6 @@ class LogInWithEmailAndPasswordFailure implements Exception {
         return const LogInWithEmailAndPasswordFailure();
     }
   }
+
+  bool get isDefault => message == 'An unknown exception occurred.';
 }

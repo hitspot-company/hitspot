@@ -13,6 +13,9 @@ class HSNavigationService {
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+  dynamic push(Route<void> route, {dynamic arguments}) =>
+      navigatorKey.currentState?.push<void>(route);
+
   dynamic pushNamed(String route, {dynamic arguments}) {
     return navigatorKey.currentState?.pushNamed(route, arguments: arguments);
   }

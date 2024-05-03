@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
@@ -16,6 +17,8 @@ class RegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hsApp = HSApp.instance;
+    final hsNavigation = hsApp.navigation;
     return BlocListener<HSRegisterCubit, HSRegisterState>(
       listener: (context, state) {
         if (state.status.isSuccess) {
@@ -62,7 +65,7 @@ class RegisterForm extends StatelessWidget {
                       .colorify(HSTheme.instance.mainColor)
                       .boldify(),
                   recognizer: TapGestureRecognizer()
-                    ..onTap = () => Navigator.of(context).pop(),
+                    ..onTap = () => hsNavigation.pop(),
                 ),
               ],
             ),

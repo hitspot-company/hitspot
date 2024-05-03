@@ -41,6 +41,8 @@ class HSApp {
   HSAssets get assets => HSAssets.instance;
 
   // AUTHENTICATION
+  HSAuthenticationRepository get authRepository =>
+      context!.read<HSAuthenticationRepository>();
   HSAuthenticationBloc get authBloc =>
       BlocProvider.of<HSAuthenticationBloc>(context!);
   void logout() => authBloc.add(const HSAppLogoutRequested());
