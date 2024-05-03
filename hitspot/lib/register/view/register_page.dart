@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/register/view/register_form.dart';
-import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -18,14 +16,10 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       sidePadding: 16.0,
-      appBar: HSAppBar(
-        center: Image.asset(HSAssets.instance.textLogo),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: BlocProvider<HSRegisterCubit>(
-          create: (_) =>
-              HSRegisterCubit(context.read<HSAuthenticationRepository>()),
+          create: (_) => HSRegisterCubit(HSApp.instance.authRepository),
           child: const RegisterForm(),
         ),
       ),

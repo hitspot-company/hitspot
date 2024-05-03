@@ -9,6 +9,10 @@ import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/register/view/register_page.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/login/cubit/login_cubit.dart';
+import 'package:hitspot/widgets/auth/hs_auth_button.dart';
+import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
+import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
+import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -26,7 +30,10 @@ class LoginForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Gap(32.0),
-        _PageTitle(hsApp: hsApp),
+        const HSAuthPageTitle(
+          leftTitle: "Log in to ",
+          rightTitle: "Hitspot",
+        ),
         const Gap(24.0),
         _EmailInput(loginCubit),
         const Gap(24.0),
@@ -55,23 +62,11 @@ class LoginForm extends StatelessWidget {
         const Gap(32.0),
         _LoginButton(loginCubit),
         const Gap(32.0),
-        const Row(
-          children: [
-            Expanded(child: Divider()),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                "OR",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            Expanded(child: Divider()),
-          ],
-        ),
+        const HSAuthHorizontalDivider(),
         const Gap(24.0),
-        _GoogleLoginButton(loginCubit),
+        HSSocialLoginButtons.google(loginCubit.logInWithGoogle),
         const Gap(24.0),
-        _AppleLoginButton(loginCubit),
+        HSSocialLoginButtons.apple(loginCubit.logInWithApple),
         const Spacer(),
         const Text.rich(
           TextSpan(
@@ -93,31 +88,6 @@ class LoginForm extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ],
-    );
-  }
-}
-
-class _PageTitle extends StatelessWidget {
-  const _PageTitle({
-    super.key,
-    required this.hsApp,
-  });
-
-  final HSApp hsApp;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        text: "Log in to ",
-        children: [
-          TextSpan(
-            text: "Hitspot",
-            style: const TextStyle().colorify(hsApp.theme.mainColor),
-          ),
-        ],
-      ),
-      style: hsApp.textTheme.displaySmall!.boldify(),
     );
   }
 }
@@ -200,103 +170,13 @@ class _LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HSLoginCubit, HSLoginState>(
       builder: (context, state) {
-        return SizedBox(
-          width: double.maxFinite,
-          child: CupertinoButton(
-            color: HSApp.instance.theme.mainColor,
-            child: state.status.isInProgress
-                ? LoadingAnimationWidget.staggeredDotsWave(
-                    size: 24.0,
-                    color: Colors.white,
-                  )
-                : Text(buttonText),
-            onPressed: () {
-              if (state.isValid) {
-                _loginCubit.logInWithCredentials();
-              }
-            },
-          ),
+        return HSAuthButton(
+          buttonText: buttonText,
+          loading: state.status.isInProgress,
+          valid: state.isValid,
+          callback: _loginCubit.logInWithCredentials,
         );
       },
-    );
-  }
-}
-
-class _GoogleLoginButton extends StatelessWidget {
-  const _GoogleLoginButton(this._loginCubit);
-  final HSLoginCubit _loginCubit;
-  final String labelText = "Continue with Google";
-
-  @override
-  Widget build(BuildContext context) {
-    return _SocialLoginButton(
-      labelText: labelText,
-      icon: const Icon(FontAwesomeIcons.google),
-      onPressed: _loginCubit.logInWithGoogle,
-    );
-  }
-}
-
-class _AppleLoginButton extends StatelessWidget {
-  const _AppleLoginButton(this._loginCubit);
-  final HSLoginCubit _loginCubit;
-  final String labelText = "Continue with Apple";
-
-  @override
-  Widget build(BuildContext context) {
-    return _SocialLoginButton(
-      labelText: labelText,
-      icon: const Icon(FontAwesomeIcons.apple),
-      onPressed: _loginCubit.logInWithApple,
-    );
-  }
-}
-
-class _SocialLoginButton extends StatelessWidget {
-  const _SocialLoginButton({
-    super.key,
-    required this.labelText,
-    required this.icon,
-    this.onPressed,
-  });
-
-  final String labelText;
-  final VoidCallback? onPressed;
-  final Icon icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = HSApp.instance.currentTheme;
-    return SizedBox(
-      width: double.maxFinite,
-      height: 44.0,
-      child: ElevatedButton(
-        key: key,
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            side: BorderSide(color: HSApp.instance.theme.mainColor, width: 1.0),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          backgroundColor: theme.scaffoldBackgroundColor,
-          elevation: 0.0,
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: icon,
-            ),
-            Center(
-              child: Text(
-                labelText,
-                style: TextStyle(color: theme.colorScheme.secondary).boldify(),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

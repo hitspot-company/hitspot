@@ -7,103 +7,89 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/register/cubit/hs_register_cubit.dart';
+import 'package:hitspot/widgets/auth/hs_auth_button.dart';
+import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
+import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
+import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class RegisterForm extends StatelessWidget {
   const RegisterForm({super.key});
-
-  final String title = "Welcome!";
-  final String headline = "Let's Sign Up";
 
   @override
   Widget build(BuildContext context) {
     final hsApp = HSApp.instance;
     final hsNavigation = hsApp.navigation;
-    return BlocListener<HSRegisterCubit, HSRegisterState>(
-      listener: (context, state) {
-        if (state.status.isSuccess) {
-          Navigator.of(context).pop();
-        } else if (state.status.isFailure) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'Sign Up Failure')),
-            );
-        }
-      },
-      child: ListView(
-        children: [
-          const Gap(32.0),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.displaySmall!.boldify(),
-            textAlign: TextAlign.center,
+    final registerCubit = context.read<HSRegisterCubit>();
+    return ListView(
+      children: [
+        const Gap(32.0),
+        const HSAuthPageTitle(
+          leftTitle: "Create a ",
+          rightTitle: "free account",
+        ),
+        const Gap(24.0),
+        HSSocialLoginButtons.google(registerCubit.logInWithGoogle),
+        const Gap(24.0),
+        HSSocialLoginButtons.apple(registerCubit.logInWithApple),
+        const Gap(24.0),
+        const HSAuthHorizontalDivider(),
+        const Gap(24.0),
+        _EmailInput(),
+        const Gap(32.0),
+        _SignUpButton(registerCubit),
+        const Gap(16.0),
+        Text.rich(
+          TextSpan(
+            text: "Already have an account?",
+            style: Theme.of(context).textTheme.bodySmall!.hintify(),
+            children: [
+              TextSpan(
+                text: " Sign In",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .colorify(HSTheme.instance.mainColor)
+                    .boldify(),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => hsNavigation.pop(),
+              ),
+            ],
           ),
-          const Gap(8.0),
-          Text(headline,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center),
-          const Gap(48.0),
-          _EmailInput(),
-          const Gap(24.0),
-          _PasswordInput(),
-          const Gap(24.0),
-          _ConfirmPasswordInput(),
-          const Gap(32.0),
-          _SignUpButton(),
-          const Gap(16.0),
-          Text.rich(
-            TextSpan(
-              text: "Already have an account?",
-              style: Theme.of(context).textTheme.bodySmall!.hintify(),
-              children: [
-                TextSpan(
-                  text: " Sign In",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () => hsNavigation.pop(),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.right,
+          textAlign: TextAlign.right,
+        ),
+        const Gap(32.0),
+        Text.rich(
+          TextSpan(
+            text: "By creating an account you agree to our",
+            children: [
+              TextSpan(
+                text: " Terms of Service",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .colorify(HSTheme.instance.mainColor)
+                    .boldify(),
+                recognizer: TapGestureRecognizer()..onTap = () => print("TOS"),
+              ),
+              const TextSpan(
+                text: " and",
+              ),
+              TextSpan(
+                text: " Privacy Policy",
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .colorify(HSTheme.instance.mainColor)
+                    .boldify(),
+                recognizer: TapGestureRecognizer()..onTap = () => print("PP"),
+              ),
+            ],
           ),
-          const Gap(32.0),
-          Text.rich(
-            TextSpan(
-              text: "By creating an account you agree to our",
-              children: [
-                TextSpan(
-                  text: " Terms of Service",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () => print("TOS"),
-                ),
-                const TextSpan(
-                  text: " and",
-                ),
-                TextSpan(
-                  text: " Privacy Policy",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()..onTap = () => print("PP"),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }
@@ -184,28 +170,20 @@ class _ConfirmPasswordInput extends StatelessWidget {
 }
 
 class _SignUpButton extends StatelessWidget {
-  final String buttonText = "SIGN UP";
+  const _SignUpButton(this._registerCubit);
+  final String buttonText = "Continue with Email";
+  final HSRegisterCubit _registerCubit;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HSRegisterCubit, HSRegisterState>(
       builder: (context, state) {
-        if (state.status.isInProgress) {
-          return const CircularProgressIndicator();
-        }
-        return ElevatedButton.icon(
-          key: const Key('RegisterForm_continue_raisedButton'),
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-          ),
-          onPressed: () {
-            if (state.isValid) {
-              context.read<HSRegisterCubit>().signUpFormSubmitted();
-            }
-          },
-          icon: const Icon(FontAwesomeIcons.arrowRight),
-          label: Text(buttonText),
+        return HSAuthButton(
+          buttonText: buttonText,
+          loading: state.status.isInProgress,
+          valid: state.isValid,
+          callback: () => HSDebugLogger.logInfo(
+              "TO BE IMPLEMENTED USING ANIMATED OPACITY AND SHIT"),
         );
       },
     );
