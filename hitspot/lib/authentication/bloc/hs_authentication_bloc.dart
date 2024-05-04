@@ -29,7 +29,7 @@ class HSAuthenticationBloc
 
   /// Used to artificially prolong splash screen time
   Future<void> _delayedUserStreamSubscription() async {
-    await Future.delayed(const Duration(seconds: 3));
+    // await Future.delayed(const Duration(seconds: 3));
     _userSubscription = _authenticationRepository.user.listen(
       (user) => add(HSAppUserChanged(user)),
     );

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
@@ -14,6 +15,21 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
 
   final HSAuthenticationRepository _authenticationRepository;
 
+  double get opacity =>
+      state.registerPageState == HSRegisterPageState.initial ? 0.0 : 1.0;
+
+  bool get passwordInputVisible => opacity != 0.0;
+
+  void changeRegisterPageState(HSRegisterPageState pageState) {
+    if (state.email.value.isEmpty) {
+      emit(state.copyWith(errorMessage: "Email cannot be empty"));
+    } else if (state.email.isNotValid) {
+      emit(state.copyWith(errorMessage: "Invalid email address"));
+    } else {
+      emit(state.copyWith(errorMessage: null, registerPageState: pageState));
+    }
+  }
+
   void togglePasswordVisibility() =>
       emit(state.copyWith(isPasswordVisible: !state.isPasswordVisible));
 
@@ -22,10 +38,10 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
     emit(
       state.copyWith(
         email: email,
+        errorMessage: null,
         isValid: Formz.validate([
           email,
           state.password,
-          state.confirmedPassword,
         ]),
       ),
     );
@@ -33,41 +49,20 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
 
   void passwordChanged(String value) {
     final password = Password.dirty(value);
-    final confirmedPassword = ConfirmedPassword.dirty(
-      password: password.value,
-      value: state.confirmedPassword.value,
-    );
     emit(
       state.copyWith(
+        errorMessage: null,
         password: password,
-        confirmedPassword: confirmedPassword,
         isValid: Formz.validate([
           state.email,
           password,
-          confirmedPassword,
-        ]),
-      ),
-    );
-  }
-
-  void confirmedPasswordChanged(String value) {
-    final confirmedPassword = ConfirmedPassword.dirty(
-      password: state.password.value,
-      value: value,
-    );
-    emit(
-      state.copyWith(
-        confirmedPassword: confirmedPassword,
-        isValid: Formz.validate([
-          state.email,
-          state.password,
-          confirmedPassword,
         ]),
       ),
     );
   }
 
   Future<void> signUpFormSubmitted() async {
+    HSDebugLogger.logInfo("SignUpFormSubmitted");
     if (!state.isValid) return;
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
@@ -77,6 +72,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
       );
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on SignUpWithEmailAndPasswordFailure catch (e) {
+      HSDebugLogger.logError(e.message);
       emit(
         state.copyWith(
           errorMessage: e.message,

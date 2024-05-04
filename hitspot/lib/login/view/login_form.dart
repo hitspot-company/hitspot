@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +13,6 @@ import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -115,7 +113,6 @@ class _EmailInput extends StatelessWidget {
 
   String? _errorText(HSLoginState state) {
     if (state.email.displayError != null) return "Invalid email address.";
-    // TODO: Move under password
     if (state.errorMessage != null && state.errorMessage == "") {
       return "Invalid credentials.";
     }
@@ -177,7 +174,7 @@ class _LoginButton extends StatelessWidget {
           buttonText: buttonText,
           loading: state.status.isInProgress,
           valid: state.isValid,
-          callback: _loginCubit.logInWithCredentials,
+          onPressed: _loginCubit.logInWithCredentials,
         );
       },
     );

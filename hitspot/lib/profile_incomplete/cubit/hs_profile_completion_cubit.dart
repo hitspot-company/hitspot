@@ -71,6 +71,12 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
   }
 
   Future<void> isUsernameValid() async {
+    if (state.username.value.isEmpty) {
+      emit(state.copyWith(
+        usernameValidationState: UsernameValidationState.empty,
+      ));
+      return;
+    }
     emit(state.copyWith(
         usernameValidationState: UsernameValidationState.verifying));
     await Future.delayed(const Duration(seconds: 2));

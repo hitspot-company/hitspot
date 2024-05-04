@@ -9,11 +9,11 @@ class HSAuthButton extends StatelessWidget {
       required this.buttonText,
       required this.loading,
       required this.valid,
-      required this.callback});
+      required this.onPressed});
   final String buttonText;
   final bool loading;
   final bool valid;
-  final VoidCallback callback;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class HSAuthButton extends StatelessWidget {
       width: double.maxFinite,
       child: CupertinoButton(
         color: HSApp.instance.theme.mainColor,
-        onPressed: callback,
+        onPressed: onPressed,
         child: loading
             ? const HSLoadingIndicator(
                 color: Colors.white,

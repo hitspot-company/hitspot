@@ -49,7 +49,7 @@ class ProfileCompletionPage extends StatelessWidget {
           BlocProvider(
             create: (context) =>
                 HSProfileCompletionCubit(context.read<HSDatabaseRepository>()),
-            child: ProfileCompletionForm(),
+            child: const ProfileCompletionForm(),
           ),
         ],
       ),

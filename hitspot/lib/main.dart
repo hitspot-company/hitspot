@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
@@ -23,6 +23,7 @@ void main() async {
   final authenticationRepository = HSAuthenticationRepository();
   final databaseRepository = HSDatabaseRepository();
   final themeRepository = HSThemeRepository();
+  Animate.restartOnHotReload = true;
 
   // Bind Firebase authentication stream to our HSUser
   await authenticationRepository.user.first;
