@@ -121,7 +121,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
   }
 
   void _showErrorSnackbar(String message) => HSApp.instance.showToast(
-      snackType: HSSnackType.error,
+      snackType: HSToastType.error,
       title: "Authentication Error",
       description: message);
 }

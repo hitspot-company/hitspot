@@ -20,6 +20,14 @@ class HSAuthenticationRepository {
     });
   }
 
+  Future<void> sendResetPasswordEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (_) {
+      throw SendResetPasswordEmailFailure();
+    }
+  }
+
   /// Creates a new user with the provided [email] and [password].
   ///
   /// Throws a [SignUpWithEmailAndPasswordFailure] if an exception occurs.

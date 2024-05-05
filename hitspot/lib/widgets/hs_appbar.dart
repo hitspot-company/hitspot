@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hitspot/app/hs_app.dart';
 
 class HSAppBar extends StatelessWidget {
   HSAppBar({
@@ -41,15 +42,16 @@ class HSAppBar extends StatelessWidget {
             Align(
               alignment: Alignment.topLeft,
               child: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(FontAwesomeIcons.arrowLeft)),
+                onPressed: HSApp.instance.navigation.pop,
+                icon: const Icon(FontAwesomeIcons.arrowLeft),
+              ),
             ),
           if (left != null) Align(alignment: Alignment.topLeft, child: left!),
           if (center != null)
-            Align(alignment: Alignment.topCenter, child: center!)
+            Align(alignment: Alignment.center, child: center!)
           else
             Align(
-              alignment: Alignment.topCenter,
+              alignment: Alignment.center,
               child: AutoSizeText(
                 title!,
                 textAlign: TextAlign.center,

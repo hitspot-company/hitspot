@@ -31,11 +31,17 @@ class HSApp {
   // POPUPS
   HSToasts get toasts => HSToasts.instance;
   void showToast(
-          {required HSSnackType snackType,
+          {required HSToastType snackType,
           required String title,
-          String? description}) =>
-      toasts.toast(context!,
-          snackType: snackType, title: title, descriptionText: description);
+          String? description,
+          Alignment? alignment}) =>
+      toasts.toast(
+        context!,
+        toastType: snackType,
+        title: title,
+        descriptionText: description,
+        alignment: alignment,
+      );
 
   // ASSETS
   HSAssets get assets => HSAssets.instance;

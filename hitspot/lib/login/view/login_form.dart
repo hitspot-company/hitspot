@@ -5,7 +5,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/password_reset/view/password_reset_page.dart';
 import 'package:hitspot/register/view/register_page.dart';
+import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/login/cubit/login_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
@@ -36,21 +38,24 @@ class LoginForm extends StatelessWidget {
         _EmailInput(loginCubit),
         const Gap(24.0),
         _PasswordInput(loginCubit),
+        const Gap(32.0),
+        _LoginButton(loginCubit),
         const Gap(16.0),
         SizedBox(
           width: double.maxFinite,
           child: Text.rich(
             TextSpan(
-              text: "Don't have an account?",
+              text: "Forgot password?",
               style: hsApp.textTheme.bodySmall!.hintify(),
               children: [
                 TextSpan(
-                  text: " Sign Up",
+                  text: " Click here",
                   style: hsApp.textTheme.bodySmall!
                       .colorify(HSTheme.instance.mainColor)
                       .boldify(),
                   recognizer: TapGestureRecognizer()
-                    ..onTap = () => hsNavigation.push(RegisterPage.route()),
+                    ..onTap =
+                        () => hsNavigation.push(PasswordResetPage.route()),
                 ),
               ],
             ),
@@ -58,13 +63,13 @@ class LoginForm extends StatelessWidget {
           ),
         ),
         const Gap(32.0),
-        _LoginButton(loginCubit),
-        const Gap(32.0),
         const HSAuthHorizontalDivider(),
         const Gap(24.0),
         HSSocialLoginButtons.google(loginCubit.logInWithGoogle),
         const Gap(24.0),
         HSSocialLoginButtons.apple(loginCubit.logInWithApple),
+        const Gap(16.0),
+        _SignUpText(hsApp: hsApp, hsNavigation: hsNavigation),
         const Spacer(),
         const Text.rich(
           TextSpan(
@@ -86,6 +91,40 @@ class LoginForm extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+}
+
+class _SignUpText extends StatelessWidget {
+  const _SignUpText({
+    required this.hsApp,
+    required this.hsNavigation,
+  });
+
+  final HSApp hsApp;
+  final HSNavigationService hsNavigation;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.maxFinite,
+      child: Text.rich(
+        TextSpan(
+          text: "Don't have an account?",
+          style: hsApp.textTheme.bodySmall!.hintify(),
+          children: [
+            TextSpan(
+              text: " Sign Up",
+              style: hsApp.textTheme.bodySmall!
+                  .colorify(HSTheme.instance.mainColor)
+                  .boldify(),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => hsNavigation.push(RegisterPage.route()),
+            ),
+          ],
+        ),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }
