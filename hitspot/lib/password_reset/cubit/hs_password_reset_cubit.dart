@@ -29,7 +29,7 @@ class HSPasswordResetCubit extends Cubit<HSPasswordResetState> {
       await Future.delayed(const Duration(seconds: 2));
       await _authenticationRepository.sendResetPasswordEmail(state.email.value);
       _app.showToast(
-          snackType: HSToastType.success,
+          toastType: HSToastType.success,
           alignment: Alignment.bottomCenter,
           title: "Email Sent",
           description: "Please check your inbox for a reset link.");

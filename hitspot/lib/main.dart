@@ -11,6 +11,7 @@ import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/login/view/login_page.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
+import 'package:hitspot/verify_email/view/verify_email_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
@@ -107,6 +108,7 @@ class _HSFlowBuilder extends StatelessWidget {
       onGeneratePages: (appStatus, pages) => [
         if (appStatus == HSAppStatus.loading) SplashPage.page(),
         if (appStatus == HSAppStatus.unauthenticated) LoginPage.page(),
+        if (appStatus == HSAppStatus.emailNotVerified) VerifyEmailPage.page(),
         if (appStatus == HSAppStatus.profileNotCompleted)
           ProfileCompletionPage.page(),
         if (appStatus == HSAppStatus.authenticated) HomePage.page(),

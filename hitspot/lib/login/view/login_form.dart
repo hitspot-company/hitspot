@@ -41,25 +41,13 @@ class LoginForm extends StatelessWidget {
         const Gap(32.0),
         _LoginButton(loginCubit),
         const Gap(16.0),
-        SizedBox(
-          width: double.maxFinite,
-          child: Text.rich(
-            TextSpan(
-              text: "Forgot password?",
-              style: hsApp.textTheme.bodySmall!.hintify(),
-              children: [
-                TextSpan(
-                  text: " Click here",
-                  style: hsApp.textTheme.bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap =
-                        () => hsNavigation.push(PasswordResetPage.route()),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.right,
+        _TextPrompt(
+          prompt: "Forgot password?",
+          pressableText: " Reset",
+          textAlign: TextAlign.right,
+          promptColor: hsApp.theme.mainColor,
+          onTap: () => hsNavigation.push(
+            PasswordResetPage.route(),
           ),
         ),
         const Gap(32.0),
@@ -69,34 +57,53 @@ class LoginForm extends StatelessWidget {
         const Gap(24.0),
         HSSocialLoginButtons.apple(loginCubit.logInWithApple),
         const Gap(16.0),
-        _SignUpText(hsApp: hsApp, hsNavigation: hsNavigation),
-        const Spacer(),
-        const Text.rich(
-          TextSpan(
-            text:
-                "Hitspot uses cookies for analytics, personalised content and ads. By using Hitspot's services you agree to this use of cookies.",
-            children: [
-              TextSpan(
-                text: " Learn more",
-                style: TextStyle(
-                  color: Color.fromARGB(255, 130, 130, 130),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+        _TextPrompt(
+          prompt: "Don't have an account?",
+          pressableText: " Sign Up",
+          promptColor: hsApp.theme.mainColor,
+          onTap: () => hsNavigation.push(
+            RegisterPage.route(),
           ),
-          style: TextStyle(
-            color: Colors.grey,
-          ),
-          textAlign: TextAlign.center,
         ),
+        const Spacer(),
+        const _Footer(),
       ],
     );
   }
 }
 
-class _SignUpText extends StatelessWidget {
-  const _SignUpText({
+class _Footer extends StatelessWidget {
+  const _Footer();
+
+  final String info =
+      "Hitspot uses cookies for analytics, personalised content and ads. By using Hitspot's services you agree to this use of cookies.";
+  final String pressableText = " Learn more";
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        text: info,
+        children: [
+          TextSpan(
+            text: pressableText,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 130, 130, 130),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      style: const TextStyle(
+        color: Colors.grey,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+class _ForgotPassword extends StatelessWidget {
+  const _ForgotPassword({
     required this.hsApp,
     required this.hsNavigation,
   });
@@ -104,26 +111,69 @@ class _SignUpText extends StatelessWidget {
   final HSApp hsApp;
   final HSNavigationService hsNavigation;
 
+  final String prompt = "Forgot password?";
+  final String pressableText = " Click here?";
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.maxFinite,
       child: Text.rich(
         TextSpan(
-          text: "Don't have an account?",
+          text: prompt,
           style: hsApp.textTheme.bodySmall!.hintify(),
           children: [
             TextSpan(
-              text: " Sign Up",
+              text: pressableText,
               style: hsApp.textTheme.bodySmall!
                   .colorify(HSTheme.instance.mainColor)
                   .boldify(),
               recognizer: TapGestureRecognizer()
-                ..onTap = () => hsNavigation.push(RegisterPage.route()),
+                ..onTap = () => hsNavigation.push(PasswordResetPage.route()),
             ),
           ],
         ),
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.right,
+      ),
+    );
+  }
+}
+
+class _TextPrompt extends StatelessWidget {
+  const _TextPrompt({
+    required this.prompt,
+    required this.pressableText,
+    required this.promptColor,
+    required this.onTap,
+    this.textAlign = TextAlign.center,
+  });
+
+  final String prompt;
+  final String pressableText;
+  final Color promptColor;
+  final TextAlign textAlign;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final HSApp app = HSApp.instance;
+    return SizedBox(
+      width: double.maxFinite,
+      child: Text.rich(
+        TextSpan(
+          text: prompt,
+          style: app.textTheme.bodySmall!.hintify(),
+          children: [
+            TextSpan(
+              text: pressableText,
+              style: app.textTheme.bodySmall!
+                  .colorify(HSTheme.instance.mainColor)
+                  .boldify(),
+              recognizer: TapGestureRecognizer()..onTap = () => onTap(),
+            ),
+          ],
+        ),
+        textAlign: textAlign,
       ),
     );
   }

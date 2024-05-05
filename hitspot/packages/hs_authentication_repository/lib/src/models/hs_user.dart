@@ -16,6 +16,7 @@ enum HSUserField {
   createdAt("created_at"),
   bday("birthdate"),
   algoliaObjectID("objectID"),
+  isEmailVerified("is_email_verified"),
   isProfileCompleted("is_profile_completed");
 
   final String name;
@@ -32,7 +33,7 @@ class HSUser {
   final String? uid, biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
   final bool? emailHidden;
-  final bool? isProfileCompleted;
+  final bool? isProfileCompleted, isEmailVerified;
 
   Map<String, dynamic> serialize() {
     return {
@@ -50,7 +51,8 @@ class HSUser {
       HSUserField.bday.name: birthday,
       HSUserField.createdAt.name: createdAt,
       HSUserField.emailHidden.name: emailHidden,
-      HSUserField.isProfileCompleted.name: isProfileCompleted ?? false
+      HSUserField.isProfileCompleted.name: isProfileCompleted ?? false,
+      HSUserField.isEmailVerified.name: isEmailVerified ?? false
     };
   }
 
@@ -72,6 +74,7 @@ class HSUser {
       createdAt: data[HSUserField.createdAt.name],
       emailHidden: data[HSUserField.emailHidden.name],
       isProfileCompleted: data[HSUserField.isProfileCompleted.name] ?? false,
+      isEmailVerified: data[HSUserField.isEmailVerified.name] ?? false,
     );
   }
 
@@ -92,6 +95,7 @@ class HSUser {
     Timestamp? createdAt,
     bool? emailHidden,
     bool? isProfileCompleted,
+    bool? isEmailVerified,
   }) {
     return HSUser(
       fcmTokens: fcmTokens ?? this.fcmTokens,
@@ -111,6 +115,7 @@ class HSUser {
       createdAt: createdAt ?? this.createdAt,
       emailHidden: emailHidden ?? this.emailHidden,
       isProfileCompleted: isProfileCompleted ?? this.isProfileCompleted,
+      isEmailVerified: isEmailVerified ?? this.isEmailVerified,
     );
   }
 
@@ -131,5 +136,6 @@ class HSUser {
     this.createdAt,
     this.emailHidden,
     this.isProfileCompleted,
+    this.isEmailVerified,
   });
 }

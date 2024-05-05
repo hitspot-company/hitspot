@@ -58,11 +58,12 @@ class HSAuthenticationBloc
         emit(state);
         return;
       }
-
-      if (newUser.isProfileCompleted ?? false) {
-        state = HSAuthenticationState.authenticated(newUser);
-      } else {
+      if (newUser.isEmailVerified != true) {
+        state = const HSAuthenticationState.emailNotVerified();
+      } else if (newUser.isProfileCompleted != true) {
         state = HSAuthenticationState.profileNotCompleted(newUser);
+      } else {
+        state = HSAuthenticationState.authenticated(newUser);
       }
     }
     emit(state);

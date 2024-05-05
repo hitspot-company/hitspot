@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
@@ -62,7 +63,6 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
   }
 
   Future<void> signUpFormSubmitted() async {
-    HSDebugLogger.logInfo("SignUpFormSubmitted");
     if (!state.isValid) return;
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
@@ -71,6 +71,8 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
         password: state.password.value,
       );
       emit(state.copyWith(status: FormzSubmissionStatus.success));
+      // TODO: Handle redirection to email verification after sign up
+      HSApp.instance.authBloc.add(HSAppUserChanged(HSApp.instance.currentUser));
     } on SignUpWithEmailAndPasswordFailure catch (e) {
       HSDebugLogger.logError(e.message);
       emit(
@@ -121,7 +123,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
   }
 
   void _showErrorSnackbar(String message) => HSApp.instance.showToast(
-      snackType: HSToastType.error,
+      toastType: HSToastType.error,
       title: "Authentication Error",
       description: message);
 }

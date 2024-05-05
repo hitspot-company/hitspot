@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_authentication_repository/src/exceptions/is_email_verified_failure.dart';
+import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
 
 class HSAuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
@@ -18,6 +20,25 @@ class HSAuthenticationRepository {
       currentUser = firebaseUser?.toUser;
       return currentUser;
     });
+  }
+
+  Future<bool> isEmailVerified() async {
+    try {
+      if (_firebaseAuth.currentUser == null)
+        throw IsEmailVerifiedFailure("The user is not signed in.");
+      await _firebaseAuth.currentUser!.reload();
+      return _firebaseAuth.currentUser!.emailVerified;
+    } catch (_) {
+      throw IsEmailVerifiedFailure();
+    }
+  }
+
+  Future<void> sendEmailVerification() async {
+    try {
+      await _firebaseAuth.currentUser!.sendEmailVerification();
+    } catch (_) {
+      throw SendVerificationEmailFailure();
+    }
   }
 
   Future<void> sendResetPasswordEmail(String email) async {
@@ -37,6 +58,7 @@ class HSAuthenticationRepository {
         email: email,
         password: password,
       );
+      await _firebaseAuth.currentUser!.sendEmailVerification();
     } on firebase_auth.FirebaseAuthException catch (e) {
       throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
@@ -122,6 +144,7 @@ extension on firebase_auth.User {
     return HSUser(
       uid: uid,
       email: email,
+      isEmailVerified: this.emailVerified,
     );
   }
 }
