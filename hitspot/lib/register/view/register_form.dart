@@ -14,6 +14,7 @@ import 'package:hitspot/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
+import 'package:hitspot/widgets/hs_text_prompt.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
 class RegisterForm extends StatelessWidget {
@@ -49,25 +50,12 @@ class _RegisterFirstPage extends StatelessWidget {
         _AnimatedPasswordInput(registerCubit),
         _SignUpButton(registerCubit),
         const Gap(16.0),
-        SizedBox(
-          width: double.maxFinite,
-          child: Text.rich(
-            TextSpan(
-              text: "Already have an account?",
-              style: hsApp.textTheme.bodySmall!.hintify(),
-              children: [
-                TextSpan(
-                  text: " Sign In",
-                  style: hsApp.textTheme.bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () => hsNavigation.pop(),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.right,
-          ),
+        HSTextPrompt(
+          prompt: "Already have an account?",
+          pressableText: " Sign In",
+          promptColor: hsApp.theme.mainColor,
+          onTap: () => hsNavigation.pop(),
+          textAlign: TextAlign.right,
         ),
       ],
     );

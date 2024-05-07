@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
@@ -15,6 +16,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
       : super(const HSRegisterState());
 
   final HSAuthenticationRepository _authenticationRepository;
+  final HSNavigationService _hsNavigationService = HSApp.instance.navigation;
 
   double get opacity =>
       state.registerPageState == HSRegisterPageState.initial ? 0.0 : 1.0;
@@ -70,9 +72,11 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
         email: state.email.value,
         password: state.password.value,
       );
+      HSApp.instance.authBloc.add(HSAppUserChanged(
+          HSApp.instance.currentUser.copyWith(isEmailVerified: false)));
+      await Future.delayed(const Duration(seconds: 1));
+      _hsNavigationService.pop();
       emit(state.copyWith(status: FormzSubmissionStatus.success));
-      // TODO: Handle redirection to email verification after sign up
-      HSApp.instance.authBloc.add(HSAppUserChanged(HSApp.instance.currentUser));
     } on SignUpWithEmailAndPasswordFailure catch (e) {
       HSDebugLogger.logError(e.message);
       emit(

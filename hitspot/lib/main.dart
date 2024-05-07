@@ -106,12 +106,16 @@ class _HSFlowBuilder extends StatelessWidget {
     return FlowBuilder<HSAppStatus>(
       state: context.select((HSAuthenticationBloc bloc) => bloc.state.status),
       onGeneratePages: (appStatus, pages) => [
-        if (appStatus == HSAppStatus.loading) SplashPage.page(),
-        if (appStatus == HSAppStatus.unauthenticated) LoginPage.page(),
-        if (appStatus == HSAppStatus.emailNotVerified) VerifyEmailPage.page(),
-        if (appStatus == HSAppStatus.profileNotCompleted)
-          ProfileCompletionPage.page(),
-        if (appStatus == HSAppStatus.authenticated) HomePage.page(),
+        if (appStatus == HSAppStatus.loading)
+          SplashPage.page()
+        else if (appStatus == HSAppStatus.unauthenticated)
+          LoginPage.page()
+        else if (appStatus == HSAppStatus.emailNotVerified)
+          VerifyEmailPage.page()
+        else if (appStatus == HSAppStatus.profileNotCompleted)
+          ProfileCompletionPage.page()
+        else if (appStatus == HSAppStatus.authenticated)
+          HomePage.page(),
       ],
     );
   }

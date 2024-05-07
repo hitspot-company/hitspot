@@ -14,6 +14,7 @@ import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
+import 'package:hitspot/widgets/hs_text_prompt.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
 class LoginForm extends StatelessWidget {
@@ -41,7 +42,7 @@ class LoginForm extends StatelessWidget {
         const Gap(32.0),
         _LoginButton(loginCubit),
         const Gap(16.0),
-        _TextPrompt(
+        HSTextPrompt(
           prompt: "Forgot password?",
           pressableText: " Reset",
           textAlign: TextAlign.right,
@@ -57,7 +58,7 @@ class LoginForm extends StatelessWidget {
         const Gap(24.0),
         HSSocialLoginButtons.apple(loginCubit.logInWithApple),
         const Gap(16.0),
-        _TextPrompt(
+        HSTextPrompt(
           prompt: "Don't have an account?",
           pressableText: " Sign Up",
           promptColor: hsApp.theme.mainColor,
@@ -134,46 +135,6 @@ class _ForgotPassword extends StatelessWidget {
           ],
         ),
         textAlign: TextAlign.right,
-      ),
-    );
-  }
-}
-
-class _TextPrompt extends StatelessWidget {
-  const _TextPrompt({
-    required this.prompt,
-    required this.pressableText,
-    required this.promptColor,
-    required this.onTap,
-    this.textAlign = TextAlign.center,
-  });
-
-  final String prompt;
-  final String pressableText;
-  final Color promptColor;
-  final TextAlign textAlign;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final HSApp app = HSApp.instance;
-    return SizedBox(
-      width: double.maxFinite,
-      child: Text.rich(
-        TextSpan(
-          text: prompt,
-          style: app.textTheme.bodySmall!.hintify(),
-          children: [
-            TextSpan(
-              text: pressableText,
-              style: app.textTheme.bodySmall!
-                  .colorify(HSTheme.instance.mainColor)
-                  .boldify(),
-              recognizer: TapGestureRecognizer()..onTap = () => onTap(),
-            ),
-          ],
-        ),
-        textAlign: textAlign,
       ),
     );
   }

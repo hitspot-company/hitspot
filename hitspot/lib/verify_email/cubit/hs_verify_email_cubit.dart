@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
@@ -19,10 +21,14 @@ class HSVerifyEmailCubit extends Cubit<HSVerifyEmailState> {
     try {
       bool emailVerified = await _authenticationRepository.isEmailVerified();
       if (emailVerified) {
+        final HSUser updatedUser =
+            _app.currentUser.copyWith(isEmailVerified: true);
+        await _app.databaseRepository.updateUserInfoInDatabase(updatedUser);
         emit(state.copyWith(
             emailVerificationState: HSEmailVerificationState.verified));
+        _app.authBloc.add(HSAppUserChanged(_app.currentUser));
+        return;
       }
-      return;
     } catch (_) {
       _app.showToast(
           toastType: HSToastType.error,
@@ -40,6 +46,11 @@ class HSVerifyEmailCubit extends Cubit<HSVerifyEmailState> {
       await _authenticationRepository.sendEmailVerification();
       emit(state.copyWith(
           emailVerificationState: HSEmailVerificationState.resent));
+      _app.showToast(
+          toastType: HSToastType.success,
+          title: "Sent",
+          alignment: Alignment.bottomCenter,
+          description: "The link has been resent to your inbox.");
       return;
     } catch (_) {
       _app.showToast(

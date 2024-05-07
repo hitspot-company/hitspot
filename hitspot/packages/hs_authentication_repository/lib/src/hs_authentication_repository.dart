@@ -15,6 +15,14 @@ class HSAuthenticationRepository {
     firebase_auth.FirebaseAuth? firebaseAuth,
   }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance;
 
+  Future<void> reloadCurrentUser() async {
+    try {
+      await _firebaseAuth.currentUser!.reload();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<HSUser?> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       currentUser = firebaseUser?.toUser;
@@ -37,6 +45,7 @@ class HSAuthenticationRepository {
     try {
       await _firebaseAuth.currentUser!.sendEmailVerification();
     } catch (_) {
+      print(_.toString());
       throw SendVerificationEmailFailure();
     }
   }

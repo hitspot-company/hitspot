@@ -44,14 +44,15 @@ class HSAppBar extends StatelessWidget {
         children: [
           if (enableDefaultBackButton)
             Align(
-              alignment: Alignment.topLeft,
+              alignment: Alignment.centerLeft,
               child: IconButton(
                 onPressed:
                     defaultBackButtonCallback ?? HSApp.instance.navigation.pop,
                 icon: const Icon(FontAwesomeIcons.arrowLeft),
               ),
             ),
-          if (left != null) Align(alignment: Alignment.topLeft, child: left!),
+          if (left != null)
+            Align(alignment: Alignment.centerLeft, child: left!),
           if (center != null)
             Align(alignment: Alignment.center, child: center!)
           else
@@ -67,7 +68,8 @@ class HSAppBar extends StatelessWidget {
                 maxLines: maxLines,
               ),
             ),
-          if (right != null) Align(alignment: Alignment.topRight, child: right!)
+          if (right != null)
+            Align(alignment: Alignment.centerRight, child: right!)
         ],
       ),
     );

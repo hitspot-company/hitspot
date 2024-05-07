@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/verify_email/view/verify_email_page.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -59,7 +61,7 @@ class HSAuthenticationBloc
         return;
       }
       if (newUser.isEmailVerified != true) {
-        state = const HSAuthenticationState.emailNotVerified();
+        state = HSAuthenticationState.emailNotVerified(newUser);
       } else if (newUser.isProfileCompleted != true) {
         state = HSAuthenticationState.profileNotCompleted(newUser);
       } else {

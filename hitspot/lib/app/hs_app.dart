@@ -6,6 +6,7 @@ import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 class HSApp {
@@ -56,4 +57,8 @@ class HSApp {
   // CURRENT USER
   HSUser get currentUser => authBloc.state.user;
   String? get username => currentUser.username;
+
+  // DATABASE
+  HSDatabaseRepository get databaseRepository =>
+      context!.read<HSDatabaseRepository>();
 }
