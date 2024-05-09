@@ -6,7 +6,7 @@ class HSScaffold extends StatelessWidget {
     super.key,
     this.topSafe = true,
     this.bottomSafe = true,
-    this.sidePadding = 8.0,
+    this.sidePadding = 16.0,
     this.appBar,
     required this.body,
     this.ignoring = false,

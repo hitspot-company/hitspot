@@ -8,10 +8,16 @@ enum UsernameValidationError {
   long,
   notVerified,
   unavailable,
-  notLowerCase
+  notLowerCase,
 }
 
-enum UsernameValidationState { unknown, verifying, unavailable, available }
+enum UsernameValidationState {
+  unknown,
+  empty,
+  verifying,
+  unavailable,
+  available
+}
 
 /// {@template usernmae}
 /// Form input for an username input.

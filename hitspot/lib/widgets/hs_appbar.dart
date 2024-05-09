@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hitspot/app/hs_app.dart';
 
 class HSAppBar extends StatelessWidget {
   HSAppBar({
@@ -14,11 +15,14 @@ class HSAppBar extends StatelessWidget {
     this.fontSize = 18.0,
     this.enableDefaultBackButton = false,
     this.titleBold = false,
+    this.defaultBackButtonCallback,
   }) {
     assert(center != null || title != null,
         "Either a center widget or title should be provided.");
     assert(!(enableDefaultBackButton && left != null),
         "enableDefaultBackButton and left cannot be used at the same time.");
+    assert(!(!enableDefaultBackButton && defaultBackButtonCallback != null),
+        "In order to use the default defaultBackButtonCallback you need to enable the defaultBackButton.");
   }
 
   final double height;
@@ -30,6 +34,7 @@ class HSAppBar extends StatelessWidget {
   final double fontSize;
   final bool enableDefaultBackButton;
   final bool titleBold;
+  final VoidCallback? defaultBackButtonCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +44,20 @@ class HSAppBar extends StatelessWidget {
         children: [
           if (enableDefaultBackButton)
             Align(
-              alignment: Alignment.topLeft,
+              alignment: Alignment.centerLeft,
               child: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(FontAwesomeIcons.arrowLeft)),
+                onPressed:
+                    defaultBackButtonCallback ?? HSApp.instance.navigation.pop,
+                icon: const Icon(FontAwesomeIcons.arrowLeft),
+              ),
             ),
-          if (left != null) Align(alignment: Alignment.topLeft, child: left!),
+          if (left != null)
+            Align(alignment: Alignment.centerLeft, child: left!),
           if (center != null)
-            Align(alignment: Alignment.topCenter, child: center!)
+            Align(alignment: Alignment.center, child: center!)
           else
             Align(
-              alignment: Alignment.topCenter,
+              alignment: Alignment.center,
               child: AutoSizeText(
                 title!,
                 textAlign: TextAlign.center,
@@ -60,7 +68,8 @@ class HSAppBar extends StatelessWidget {
                 maxLines: maxLines,
               ),
             ),
-          if (right != null) Align(alignment: Alignment.topRight, child: right!)
+          if (right != null)
+            Align(alignment: Alignment.centerRight, child: right!)
         ],
       ),
     );

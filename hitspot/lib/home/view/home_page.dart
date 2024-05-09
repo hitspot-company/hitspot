@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';

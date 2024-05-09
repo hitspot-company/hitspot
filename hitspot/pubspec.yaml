@@ -40,6 +40,8 @@ dependencies:
     path: packages/hs_debug_logger
   hs_toasts:
     path: packages/hs_toasts
+  hs_mailing_repository:
+    path: packages/hs_mailing_repository
   shared_preferences: ^2.2.3
   font_awesome_flutter: ^10.7.0
   formz: ^0.7.0
@@ -48,6 +50,8 @@ dependencies:
   loading_animation_widget: ^1.2.1
   sign_in_with_apple: ^6.1.0
   toastification: ^1.2.1
+  flutter_animate: ^4.5.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
 
@@ -74,9 +78,10 @@ flutter:
   # General
     - assets/
   # Logos
-    - assets/icons/side/
-    - assets/icons/icon/
-    - assets/icons/top/
+    - assets/icons/logo/
+    - assets/icons/logotype/
+  # Configuration
+    - .env
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see

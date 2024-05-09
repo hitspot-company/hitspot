@@ -4,6 +4,6 @@ class HSAssets {
   static HSAssets get instance => _instance;
 
   static const String _iconsPath = "assets/icons";
-  final String textLogo = "$_iconsPath/side/ZIELONY.png";
-  final String logo = "$_iconsPath/icon/ZIELONY.png";
+  final String textLogo = "$_iconsPath/logotype/rounded_green.png";
+  final String logo = "$_iconsPath/logo/green.png";
 }

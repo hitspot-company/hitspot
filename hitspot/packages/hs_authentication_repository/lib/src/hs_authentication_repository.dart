@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_authentication_repository/src/exceptions/log_in_with_apple_failure.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:hs_authentication_repository/src/exceptions/is_email_verified_failure.dart';
+import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
 
 class HSAuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
@@ -15,11 +15,46 @@ class HSAuthenticationRepository {
     firebase_auth.FirebaseAuth? firebaseAuth,
   }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance;
 
+  Future<void> reloadCurrentUser() async {
+    try {
+      await _firebaseAuth.currentUser!.reload();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<HSUser?> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       currentUser = firebaseUser?.toUser;
       return currentUser;
     });
+  }
+
+  Future<bool> isEmailVerified() async {
+    try {
+      if (_firebaseAuth.currentUser == null)
+        throw IsEmailVerifiedFailure("The user is not signed in.");
+      await _firebaseAuth.currentUser!.reload();
+      return _firebaseAuth.currentUser!.emailVerified;
+    } catch (_) {
+      throw IsEmailVerifiedFailure();
+    }
+  }
+
+  Future<void> sendEmailVerification() async {
+    try {
+      await _firebaseAuth.currentUser!.sendEmailVerification();
+    } catch (_) {
+      throw SendVerificationEmailFailure();
+    }
+  }
+
+  Future<void> sendResetPasswordEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (_) {
+      throw SendResetPasswordEmailFailure();
+    }
   }
 
   /// Creates a new user with the provided [email] and [password].
@@ -31,6 +66,7 @@ class HSAuthenticationRepository {
         email: email,
         password: password,
       );
+      await _firebaseAuth.currentUser!.sendEmailVerification();
     } on firebase_auth.FirebaseAuthException catch (e) {
       throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
@@ -116,6 +152,7 @@ extension on firebase_auth.User {
     return HSUser(
       uid: uid,
       email: email,
+      isEmailVerified: this.emailVerified,
     );
   }
 }

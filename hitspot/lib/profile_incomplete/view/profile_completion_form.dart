@@ -32,16 +32,18 @@ class ProfileCompletionForm extends StatelessWidget {
         final profileCompletionCubit = context.read<HSProfileCompletionCubit>();
         return Stepper(
           currentStep: currentStep,
-          onStepTapped: profileCompletionCubit.updateStep,
+          onStepTapped: null, //profileCompletionCubit.updateStep,
           onStepContinue: profileCompletionCubit.onStepContinue,
           onStepCancel: profileCompletionCubit.onStepCancel,
           controlsBuilder: _controlsBuilder,
           steps: [
             Step(
+              state: StepState.disabled,
               title: const Text("Birthdate"),
               content: _BirthdayInput(profileCompletionCubit),
             ),
             Step(
+              state: StepState.disabled,
               title: const Text("Username"),
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,6 +55,7 @@ class ProfileCompletionForm extends StatelessWidget {
               ),
             ),
             Step(
+              state: StepState.disabled,
               title: const Text("Full name"),
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,6 +70,7 @@ class ProfileCompletionForm extends StatelessWidget {
               ),
             ),
             Step(
+              state: StepState.disabled,
               title: const Text("Confirm"),
               content: _ConfirmationDetails(
                   profileCompletionCubit: profileCompletionCubit),
@@ -118,7 +122,7 @@ class ProfileCompletionForm extends StatelessWidget {
       );
     } else if (details.currentStep == 1) {
       switch (usernameValidationState) {
-        case UsernameValidationState.unknown:
+        case UsernameValidationState.unknown || UsernameValidationState.empty:
           return HSButton(
             onPressed: profileCompletionCubit.isUsernameValid,
             child: const Text('VERIFY'),
@@ -325,6 +329,8 @@ class _UsernameInput extends StatelessWidget {
     UsernameValidationError? error = state.username.displayError;
     if (state.usernameValidationState == UsernameValidationState.unavailable) {
       error = UsernameValidationError.unavailable;
+    } else if (state.usernameValidationState == UsernameValidationState.empty) {
+      error = UsernameValidationError.invalid;
     }
     if (error == null) return null;
     switch (error) {

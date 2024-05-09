@@ -6,6 +6,7 @@ import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 class HSApp {
@@ -31,11 +32,17 @@ class HSApp {
   // POPUPS
   HSToasts get toasts => HSToasts.instance;
   void showToast(
-          {required HSSnackType snackType,
+          {required HSToastType toastType,
           required String title,
-          String? description}) =>
-      toasts.toast(context!,
-          snackType: snackType, title: title, descriptionText: description);
+          String? description,
+          Alignment? alignment}) =>
+      toasts.toast(
+        context!,
+        toastType: toastType,
+        title: title,
+        descriptionText: description,
+        alignment: alignment,
+      );
 
   // ASSETS
   HSAssets get assets => HSAssets.instance;
@@ -50,4 +57,8 @@ class HSApp {
   // CURRENT USER
   HSUser get currentUser => authBloc.state.user;
   String? get username => currentUser.username;
+
+  // DATABASE
+  HSDatabaseRepository get databaseRepository =>
+      context!.read<HSDatabaseRepository>();
 }

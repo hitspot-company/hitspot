@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/profile_incomplete/cubit/hs_profile_completion_cubit.dart';
@@ -20,9 +21,12 @@ class ProfileCompletionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HSUser currentUser = context.read<HSAuthenticationBloc>().state.user;
+    final app = HSApp.instance;
     return HSScaffold(
       appBar: HSAppBar(
         title: "Complete Profile",
+        enableDefaultBackButton: true,
+        defaultBackButtonCallback: app.logout,
       ),
       body: ListView(
         shrinkWrap: true,
@@ -49,7 +53,7 @@ class ProfileCompletionPage extends StatelessWidget {
           BlocProvider(
             create: (context) =>
                 HSProfileCompletionCubit(context.read<HSDatabaseRepository>()),
-            child: ProfileCompletionForm(),
+            child: const ProfileCompletionForm(),
           ),
         ],
       ),

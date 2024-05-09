@@ -3,6 +3,7 @@ part of 'hs_authentication_bloc.dart';
 enum HSAppStatus {
   loading,
   authenticated,
+  emailNotVerified,
   profileNotCompleted,
   unauthenticated,
 }
@@ -20,6 +21,9 @@ final class HSAuthenticationState extends Equatable {
 
   const HSAuthenticationState.authenticated(HSUser user)
       : this._(status: HSAppStatus.authenticated, user: user);
+
+  const HSAuthenticationState.emailNotVerified(HSUser user)
+      : this._(status: HSAppStatus.emailNotVerified, user: user);
 
   const HSAuthenticationState.profileNotCompleted(HSUser user)
       : this._(status: HSAppStatus.profileNotCompleted, user: user);

@@ -2,8 +2,12 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
+import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 part 'hs_register_state.dart';
@@ -13,6 +17,22 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
       : super(const HSRegisterState());
 
   final HSAuthenticationRepository _authenticationRepository;
+  final HSNavigationService _hsNavigationService = HSApp.instance.navigation;
+
+  double get opacity =>
+      state.registerPageState == HSRegisterPageState.initial ? 0.0 : 1.0;
+
+  bool get passwordInputVisible => opacity != 0.0;
+
+  void changeRegisterPageState(HSRegisterPageState pageState) {
+    if (state.email.value.isEmpty) {
+      emit(state.copyWith(errorMessage: "Email cannot be empty"));
+    } else if (state.email.isNotValid) {
+      emit(state.copyWith(errorMessage: "Invalid email address"));
+    } else {
+      emit(state.copyWith(errorMessage: null, registerPageState: pageState));
+    }
+  }
 
   void togglePasswordVisibility() =>
       emit(state.copyWith(isPasswordVisible: !state.isPasswordVisible));
@@ -22,10 +42,10 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
     emit(
       state.copyWith(
         email: email,
+        errorMessage: null,
         isValid: Formz.validate([
           email,
           state.password,
-          state.confirmedPassword,
         ]),
       ),
     );
@@ -33,35 +53,13 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
 
   void passwordChanged(String value) {
     final password = Password.dirty(value);
-    final confirmedPassword = ConfirmedPassword.dirty(
-      password: password.value,
-      value: state.confirmedPassword.value,
-    );
     emit(
       state.copyWith(
+        errorMessage: null,
         password: password,
-        confirmedPassword: confirmedPassword,
         isValid: Formz.validate([
           state.email,
           password,
-          confirmedPassword,
-        ]),
-      ),
-    );
-  }
-
-  void confirmedPasswordChanged(String value) {
-    final confirmedPassword = ConfirmedPassword.dirty(
-      password: state.password.value,
-      value: value,
-    );
-    emit(
-      state.copyWith(
-        confirmedPassword: confirmedPassword,
-        isValid: Formz.validate([
-          state.email,
-          state.password,
-          confirmedPassword,
         ]),
       ),
     );
@@ -75,17 +73,29 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
         email: state.email.value,
         password: state.password.value,
       );
-      emit(state.copyWith(status: FormzSubmissionStatus.success));
+      await _completeRegistration();
     } on SignUpWithEmailAndPasswordFailure catch (e) {
+      HSDebugLogger.logError(e.message);
       emit(
         state.copyWith(
           errorMessage: e.message,
           status: FormzSubmissionStatus.failure,
         ),
       );
+    } on HSSendEmailException catch (e) {
+      HSDebugLogger.logError("Error sending welcome email: ${e.message}");
+      await _completeRegistration();
     } catch (_) {
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }
+  }
+
+  Future<void> _completeRegistration() async {
+    HSApp.instance.authBloc.add(HSAppUserChanged(
+        HSApp.instance.currentUser.copyWith(isEmailVerified: false)));
+    await Future.delayed(const Duration(seconds: 1));
+    _hsNavigationService.pop();
+    emit(state.copyWith(status: FormzSubmissionStatus.success));
   }
 
   Future<void> logInWithGoogle() async {
@@ -125,7 +135,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
   }
 
   void _showErrorSnackbar(String message) => HSApp.instance.showToast(
-      snackType: HSSnackType.error,
+      toastType: HSToastType.error,
       title: "Authentication Error",
       description: message);
 }

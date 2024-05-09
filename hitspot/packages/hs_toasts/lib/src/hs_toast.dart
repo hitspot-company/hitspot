@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 
-enum HSSnackType { success, error, warning }
+enum HSToastType { success, error, warning }
 
 class HSToasts {
   // SINGLETON
@@ -12,7 +12,7 @@ class HSToasts {
 
   void toast(
     BuildContext context, {
-    required HSSnackType snackType,
+    required HSToastType toastType,
     required String title,
     Widget? description,
     String? descriptionText,
@@ -25,23 +25,23 @@ class HSToasts {
     assert(!(description != null && descriptionText != null),
         "Description and DescriptionText cannot be non-null at the same time");
 
-    ToastificationType toastType;
+    ToastificationType chosenType;
     Icon toastIcon;
     Color toastColor;
 
-    switch (snackType) {
-      case HSSnackType.success:
-        toastType = ToastificationType.success;
+    switch (toastType) {
+      case HSToastType.success:
+        chosenType = ToastificationType.success;
         toastIcon = icon ?? const Icon(FontAwesomeIcons.check);
         toastColor = primaryColor ?? Colors.green;
         break;
-      case HSSnackType.error:
-        toastType = ToastificationType.error;
+      case HSToastType.error:
+        chosenType = ToastificationType.error;
         toastIcon = icon ?? const Icon(FontAwesomeIcons.exclamation);
         toastColor = primaryColor ?? Colors.red;
         break;
-      case HSSnackType.warning:
-        toastType = ToastificationType.warning;
+      case HSToastType.warning:
+        chosenType = ToastificationType.warning;
         toastIcon = icon ?? const Icon(FontAwesomeIcons.triangleExclamation);
         toastColor = primaryColor ?? Colors.yellow;
         break;
@@ -49,7 +49,7 @@ class HSToasts {
 
     toastification.show(
       context: context,
-      type: toastType,
+      type: chosenType,
       style: ToastificationStyle.fillColored,
       autoCloseDuration: Duration(seconds: autoCloseDurationTime),
       title: Text(title),

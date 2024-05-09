@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,15 +5,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/password_reset/view/password_reset_page.dart';
 import 'package:hitspot/register/view/register_page.dart';
+import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/login/cubit/login_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
+import 'package:hitspot/widgets/hs_text_prompt.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -38,56 +39,103 @@ class LoginForm extends StatelessWidget {
         _EmailInput(loginCubit),
         const Gap(24.0),
         _PasswordInput(loginCubit),
-        const Gap(16.0),
-        SizedBox(
-          width: double.maxFinite,
-          child: Text.rich(
-            TextSpan(
-              text: "Don't have an account?",
-              style: hsApp.textTheme.bodySmall!.hintify(),
-              children: [
-                TextSpan(
-                  text: " Sign Up",
-                  style: hsApp.textTheme.bodySmall!
-                      .colorify(HSTheme.instance.mainColor)
-                      .boldify(),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () => hsNavigation.push(RegisterPage.route()),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.right,
-          ),
-        ),
         const Gap(32.0),
         _LoginButton(loginCubit),
+        const Gap(16.0),
+        HSTextPrompt(
+          prompt: "Forgot password?",
+          pressableText: " Reset",
+          textAlign: TextAlign.right,
+          promptColor: hsApp.theme.mainColor,
+          onTap: () => hsNavigation.push(
+            PasswordResetPage.route(),
+          ),
+        ),
         const Gap(32.0),
         const HSAuthHorizontalDivider(),
         const Gap(24.0),
         HSSocialLoginButtons.google(loginCubit.logInWithGoogle),
         const Gap(24.0),
         HSSocialLoginButtons.apple(loginCubit.logInWithApple),
-        const Spacer(),
-        const Text.rich(
-          TextSpan(
-            text:
-                "Hitspot uses cookies for analytics, personalised content and ads. By using Hitspot's services you agree to this use of cookies.",
-            children: [
-              TextSpan(
-                text: " Learn more",
-                style: TextStyle(
-                  color: Color.fromARGB(255, 130, 130, 130),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+        const Gap(16.0),
+        HSTextPrompt(
+          prompt: "Don't have an account?",
+          pressableText: " Sign Up",
+          promptColor: hsApp.theme.mainColor,
+          onTap: () => hsNavigation.push(
+            RegisterPage.route(),
           ),
-          style: TextStyle(
-            color: Colors.grey,
-          ),
-          textAlign: TextAlign.center,
         ),
+        const Spacer(),
+        const _Footer(),
       ],
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  const _Footer();
+
+  final String info =
+      "Hitspot uses cookies for analytics, personalised content and ads. By using Hitspot's services you agree to this use of cookies.";
+  final String pressableText = " Learn more";
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        text: info,
+        children: [
+          TextSpan(
+            text: pressableText,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 130, 130, 130),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      style: const TextStyle(
+        color: Colors.grey,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+class _ForgotPassword extends StatelessWidget {
+  const _ForgotPassword({
+    required this.hsApp,
+    required this.hsNavigation,
+  });
+
+  final HSApp hsApp;
+  final HSNavigationService hsNavigation;
+
+  final String prompt = "Forgot password?";
+  final String pressableText = " Click here?";
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.maxFinite,
+      child: Text.rich(
+        TextSpan(
+          text: prompt,
+          style: hsApp.textTheme.bodySmall!.hintify(),
+          children: [
+            TextSpan(
+              text: pressableText,
+              style: hsApp.textTheme.bodySmall!
+                  .colorify(HSTheme.instance.mainColor)
+                  .boldify(),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => hsNavigation.push(PasswordResetPage.route()),
+            ),
+          ],
+        ),
+        textAlign: TextAlign.right,
+      ),
     );
   }
 }
@@ -115,7 +163,6 @@ class _EmailInput extends StatelessWidget {
 
   String? _errorText(HSLoginState state) {
     if (state.email.displayError != null) return "Invalid email address.";
-    // TODO: Move under password
     if (state.errorMessage != null && state.errorMessage == "") {
       return "Invalid credentials.";
     }
@@ -177,7 +224,7 @@ class _LoginButton extends StatelessWidget {
           buttonText: buttonText,
           loading: state.status.isInProgress,
           valid: state.isValid,
-          callback: _loginCubit.logInWithCredentials,
+          onPressed: _loginCubit.logInWithCredentials,
         );
       },
     );
