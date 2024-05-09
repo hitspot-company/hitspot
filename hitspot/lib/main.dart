@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
@@ -17,6 +18,8 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 
+// TODO: Create a package / utility class to load .env values
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: HSFirebaseConfigLoader.loadOptions);
@@ -25,6 +28,7 @@ void main() async {
   final databaseRepository = HSDatabaseRepository();
   final themeRepository = HSThemeRepository();
   Animate.restartOnHotReload = true;
+  await dotenv.load(fileName: ".env");
 
   // Bind Firebase authentication stream to our HSUser
   await authenticationRepository.user.first;

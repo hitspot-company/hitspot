@@ -7,7 +7,6 @@ import 'package:hitspot/password_reset/cubit/hs_password_reset_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class PasswordResetForm extends StatelessWidget {
   const PasswordResetForm({super.key});
@@ -79,7 +78,6 @@ class _EmailInput extends StatelessWidget {
             previous.errorMessage != current.errorMessage ||
             previous.email != current.email,
         builder: (context, state) {
-          HSDebugLogger.logError("New error: ${state.errorMessage}");
           return HSTextField(
             suffixIcon: const Icon(FontAwesomeIcons.envelope),
             hintText: "Email",

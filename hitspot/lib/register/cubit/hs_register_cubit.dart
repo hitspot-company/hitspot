@@ -72,10 +72,10 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
         email: state.email.value,
         password: state.password.value,
       );
-      HSApp.instance.authBloc.add(HSAppUserChanged(
-          HSApp.instance.currentUser.copyWith(isEmailVerified: false)));
-      await Future.delayed(const Duration(seconds: 1));
-      _hsNavigationService.pop();
+      // HSApp.instance.authBloc.add(HSAppUserChanged(
+      //     HSApp.instance.currentUser.copyWith(isEmailVerified: false)));
+      // await Future.delayed(const Duration(seconds: 1));
+      // _hsNavigationService.pop();
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on SignUpWithEmailAndPasswordFailure catch (e) {
       HSDebugLogger.logError(e.message);
