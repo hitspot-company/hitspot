@@ -45,7 +45,6 @@ class HSAuthenticationRepository {
     try {
       await _firebaseAuth.currentUser!.sendEmailVerification();
     } catch (_) {
-      print(_.toString());
       throw SendVerificationEmailFailure();
     }
   }
@@ -54,7 +53,6 @@ class HSAuthenticationRepository {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     } catch (_) {
-      print("ERROR: ${_.toString()}");
       throw SendResetPasswordEmailFailure();
     }
   }
