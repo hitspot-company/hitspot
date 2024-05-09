@@ -80,8 +80,9 @@ class VerifyEmailForm extends StatelessWidget {
         );
       case HSEmailVerificationState.unverified:
         return const Text(
-          "Your email address is not verified. Have u checked your inbox.",
+          "Your email address is not verified. Have you checked your inbox?",
           style: textStyle,
+          textAlign: TextAlign.center,
         );
       default:
         return null;

@@ -12,6 +12,4 @@ dependencies:
   firebase_auth: ^4.19.4
   cloud_firestore: ^4.11.0
   sign_in_with_apple: ^6.1.0
-  hs_mailing_repository:
-    path: ../hs_mailing_repository
 

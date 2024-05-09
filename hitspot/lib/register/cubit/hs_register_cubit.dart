@@ -7,6 +7,7 @@ import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
+import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 part 'hs_register_state.dart';
@@ -72,11 +73,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
         email: state.email.value,
         password: state.password.value,
       );
-      // HSApp.instance.authBloc.add(HSAppUserChanged(
-      //     HSApp.instance.currentUser.copyWith(isEmailVerified: false)));
-      // await Future.delayed(const Duration(seconds: 1));
-      // _hsNavigationService.pop();
-      emit(state.copyWith(status: FormzSubmissionStatus.success));
+      await _completeRegistration();
     } on SignUpWithEmailAndPasswordFailure catch (e) {
       HSDebugLogger.logError(e.message);
       emit(
@@ -85,9 +82,20 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
           status: FormzSubmissionStatus.failure,
         ),
       );
+    } on HSSendEmailException catch (e) {
+      HSDebugLogger.logError("Error sending welcome email: ${e.message}");
+      await _completeRegistration();
     } catch (_) {
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }
+  }
+
+  Future<void> _completeRegistration() async {
+    HSApp.instance.authBloc.add(HSAppUserChanged(
+        HSApp.instance.currentUser.copyWith(isEmailVerified: false)));
+    await Future.delayed(const Duration(seconds: 1));
+    _hsNavigationService.pop();
+    emit(state.copyWith(status: FormzSubmissionStatus.success));
   }
 
   Future<void> logInWithGoogle() async {

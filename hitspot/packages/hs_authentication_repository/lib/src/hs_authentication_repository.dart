@@ -4,12 +4,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_authentication_repository/src/exceptions/is_email_verified_failure.dart';
 import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
-import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 
 class HSAuthenticationRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn = GoogleSignIn.standard();
-  final HSMailingRepository _mailingRepository = HSMailingRepository();
 
   HSUser? currentUser;
 
@@ -65,19 +63,17 @@ class HSAuthenticationRepository {
   ///
   /// Throws a [SignUpWithEmailAndPasswordFailure] if an exception occurs.
   Future<void> signUp({required String email, required String password}) async {
-    _mailingRepository.sendEmail(HSMailType.welcome);
-    // TODO: UNcomment
-    // try {
-    //   await _firebaseAuth.createUserWithEmailAndPassword(
-    //     email: email,
-    //     password: password,
-    //   );
-    //   await _firebaseAuth.currentUser!.sendEmailVerification();
-    // } on firebase_auth.FirebaseAuthException catch (e) {
-    //   throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
-    // } catch (_) {
-    //   throw const SignUpWithEmailAndPasswordFailure();
-    // }
+    try {
+      await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      await _firebaseAuth.currentUser!.sendEmailVerification();
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
+    } catch (_) {
+      throw const SignUpWithEmailAndPasswordFailure();
+    }
   }
 
   /// Signs in with the provided [email] and [password].
