@@ -72,6 +72,7 @@ class HSLoginCubit extends Cubit<HSLoginState> {
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
       await _authenticationRepository.logInWithApple();
+
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on LogInWithAppleFailure catch (e) {
       _emitFailure();

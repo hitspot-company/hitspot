@@ -28,14 +28,14 @@ class HSAuthenticationBloc
         super(const HSAuthenticationState.loading()) {
     on<HSAppUserChanged>(_onUserChanged);
     on<HSAppLogoutRequested>(_onLogoutRequested);
-    _delayedUserStreamSubscription();
   }
 
   /// Used to artificially prolong splash screen time
-  Future<void> _delayedUserStreamSubscription() async {
+  Future<void> initializeStreamSubscription() async {
     _userSubscription = _authenticationRepository.user.listen(
       (user) => add(HSAppUserChanged(user)),
     );
+    HSDebugLogger.logInfo("Initialized");
   }
 
   void _onUserChanged(

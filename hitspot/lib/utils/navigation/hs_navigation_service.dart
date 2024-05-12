@@ -16,6 +16,9 @@ class HSNavigationService {
   dynamic push(Route<void> route, {dynamic arguments}) =>
       navigatorKey.currentState?.push<void>(route);
 
+  dynamic pushReplacement(Route<void> route, {dynamic arguments}) =>
+      navigatorKey.currentState?.pushReplacement(route);
+
   dynamic pushNamed(String route, {dynamic arguments}) {
     return navigatorKey.currentState?.pushNamed(route, arguments: arguments);
   }
