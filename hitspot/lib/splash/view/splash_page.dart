@@ -36,6 +36,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       backgroundColor: HSApp.instance.theme.mainColor,
       body: Lottie.asset(
         controller: _controller,
+        frameRate: const FrameRate(60),
         onLoaded: (composition) {
           _controller.duration = composition.duration;
           _controller.forward();
