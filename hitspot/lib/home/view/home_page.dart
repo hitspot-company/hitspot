@@ -103,7 +103,7 @@ class HomePage extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: CupertinoButton(
-              onPressed: HSApp.instance.changeTheme,
+              onPressed: HSApp.instance.logout,
               color: Colors.amber,
               child: const Text("SIGN OUT"),
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -33,28 +32,29 @@ class EditProfilePage extends StatelessWidget {
             slivers: [
               SliverAppBar(
                 surfaceTintColor: Colors.transparent,
-                expandedHeight: 200.0,
+                expandedHeight: 240.0,
                 automaticallyImplyLeading: false,
                 flexibleSpace: FlexibleSpaceBar(
-                    background: Column(
-                  children: [
-                    InkWell(
-                      radius: 60.0,
-                      onTap: () => print("edit picture"),
-                      child: HSUserAvatar(
-                        imgUrl: app.currentUser.profilePicture,
-                        radius: 60,
-                        iconSize: 40,
+                  background: Column(
+                    children: [
+                      InkWell(
+                        radius: 60.0,
+                        onTap: () => print("edit picture"),
+                        child: HSUserAvatar(
+                          imgUrl: app.currentUser.profilePicture,
+                          radius: 80,
+                          iconSize: 40,
+                        ),
                       ),
-                    ),
-                    const Gap(8.0),
-                    CupertinoButton(
-                      onPressed: () => print("edit picture"),
-                      child: const Text("Edit profile picture"),
-                    ),
-                    const Divider(),
-                  ],
-                )),
+                      const Gap(8.0),
+                      CupertinoButton(
+                        onPressed: () => print("edit picture"),
+                        child: const Text("Edit profile picture"),
+                      ),
+                      const Divider(),
+                    ],
+                  ),
+                ),
               ),
               const SliverToBoxAdapter(child: Gap(24.0)),
               SliverToBoxAdapter(

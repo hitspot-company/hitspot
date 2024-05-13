@@ -57,6 +57,9 @@ class HSAuthenticationBloc
           HSDebugLogger.logSuccess("Fetched user info from database!");
         }
         _authenticationRepository.currentUser = newUser;
+      } on DatabaseConnectionFailure catch (_) {
+        HSDebugLogger.logError("Connection error: ${_.message}");
+        return;
       } on HSSendEmailException catch (e) {
         HSDebugLogger.logError(e.message);
         emit(state);

@@ -81,3 +81,18 @@ class _DoneButton extends StatelessWidget {
     }
   }
 }
+
+// class _Biogram extends EditValuePage {
+//   const _Biogram({
+//     this.maxLines = 5,
+//     this.maxCharacters = 128,
+//   });
+
+//   final int maxLines;
+//   final int maxCharacters;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return EditValuePage();
+//   }
+// }

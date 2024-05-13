@@ -21,7 +21,7 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
 
   final String userID;
   final HSDatabaseRepository databaseRepository;
-  late final HSUser userData;
+  late final HSUser? userData;
   final ScrollController scrollController = ScrollController();
 
   Future<void> _getUserData(event, emit) async {

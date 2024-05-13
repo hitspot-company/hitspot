@@ -17,10 +17,11 @@ class HSUsersRepository {
   }
 
   Future<void> completeUserProfile(HSUser user) async {
+    final now = Timestamp.now();
     try {
       await _usersCollection
           .doc(user.uid)
-          .update(user.serialize())
+          .update(user.copyWith(createdAt: now).serialize())
           .timeout(const Duration(seconds: 3));
     } catch (_) {
       throw const DatabaseConnectionFailure('An unknown exception occured');
@@ -56,7 +57,7 @@ class HSUsersRepository {
 
       return HSUser.deserialize(snapshotInJson, uid: snapshot.id);
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      return null;
     }
   }
 

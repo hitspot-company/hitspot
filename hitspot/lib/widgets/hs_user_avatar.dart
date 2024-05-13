@@ -3,17 +3,25 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HSUserAvatar extends StatelessWidget {
   const HSUserAvatar(
-      {super.key, this.imgUrl, required this.radius, this.iconSize});
+      {super.key,
+      this.imgUrl,
+      required this.radius,
+      this.iconSize,
+      this.loading = false});
 
   final String? imgUrl;
   final double radius;
   final double? iconSize;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
-    assert(!(imgUrl != null && iconSize != null),
-        "The icon size cannot be used when the image is not null.");
-    if (imgUrl == null) {
+    if (loading) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.black.withOpacity(.04),
+      );
+    } else if (imgUrl == null) {
       return CircleAvatar(
         radius: radius,
         child: Center(
@@ -26,7 +34,7 @@ class HSUserAvatar extends StatelessWidget {
     } else {
       return CircleAvatar(
         radius: radius,
-        child: Center(child: Image.network(imgUrl!)),
+        backgroundImage: NetworkImage(imgUrl!),
       );
     }
   }

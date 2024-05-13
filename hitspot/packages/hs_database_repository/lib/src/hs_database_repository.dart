@@ -14,13 +14,13 @@ class HSDatabaseRepository {
   Future<void> updateUserInfoInDatabase(HSUser user) async =>
       await _usersRepository.updateUserInfoInDatabase(user);
 
-  Future<HSUser> getUserFromDatabase(String uid) async {
+  Future<HSUser?> getUserFromDatabase(String uid) async {
     try {
       HSUser? user = await _usersRepository.getUserFromDatabase(uid);
       if (user == null) throw DatabaseConnectionFailure("The user is null");
       return (user);
     } catch (e) {
-      throw DatabaseConnectionFailure("$e");
+      return null;
     }
   }
 

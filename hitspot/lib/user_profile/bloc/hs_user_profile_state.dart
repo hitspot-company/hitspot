@@ -13,7 +13,7 @@ final class HSUserProfileInitialLoading extends HSUserProfileState {}
 
 final class HSUserProfileReady extends HSUserProfileState {
   const HSUserProfileReady(this.user);
-  final HSUser user;
+  final HSUser? user;
 }
 
 final class HSUserProfileError extends HSUserProfileState {

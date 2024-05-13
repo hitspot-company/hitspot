@@ -1,7 +1,8 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
@@ -10,14 +11,12 @@ import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
 import 'package:hitspot/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
-import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
-import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -39,10 +38,10 @@ class UserProfilePage extends StatelessWidget {
             );
           case HSUserProfileReady():
             final user =
-                state.user.copyWith(spots: List.generate(16, (index) => null));
+                state.user!.copyWith(spots: List.generate(16, (index) => null));
             return HSScaffold(
               appBar: HSAppBar(
-                title: "@${state.user.username}",
+                title: "",
                 titleBold: true,
                 enableDefaultBackButton: true,
               ),
@@ -50,7 +49,50 @@ class UserProfilePage extends StatelessWidget {
                 controller: controller,
                 slivers: [
                   _UserDataAppBar(user: user),
+                  const SliverToBoxAdapter(
+                    child: Gap(16.0),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: Divider(
+                      thickness: .1,
+                    ),
+                  ),
+                  if (user.biogram != null)
+                    SliverAppBar(
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Text(user.biogram!),
+                      ),
+                      expandedHeight: 200.0, // initial height
+                      automaticallyImplyLeading: false,
+                      surfaceTintColor: Colors.transparent,
+                    ),
+                  const SliverToBoxAdapter(
+                    child: Gap(16.0),
+                  ),
                   _StatsAppBar(user: user),
+                  SliverToBoxAdapter(
+                      child: Row(
+                    children: [
+                      const SizedBox(
+                        width: 16.0,
+                        child: Divider(
+                          thickness: .1,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          "Spots",
+                          style: HSApp.instance.textTheme.headlineSmall,
+                        ),
+                      ),
+                      const Expanded(
+                        child: Divider(
+                          thickness: .1,
+                        ),
+                      )
+                    ],
+                  )),
                   const SliverToBoxAdapter(
                     child: Gap(16.0),
                   ),
@@ -152,24 +194,14 @@ class _UserDataAppBar extends StatelessWidget {
     return SliverAppBar(
       surfaceTintColor: Colors.transparent,
       expandedHeight: 140.0,
-      floating: true,
-      snap: false,
-      pinned: false,
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(
         background: Row(
           children: [
             Expanded(
-              child: CircleAvatar(
-                radius: 60,
-                child: SizedBox(
-                  width: 60,
-                  child: ClipOval(
-                    child: Image.asset(
-                      HSAssets.instance.logo,
-                    ),
-                  ),
-                ),
+              child: HSUserAvatar(
+                radius: 70.0,
+                imgUrl: user.profilePicture,
               ),
             ),
             Expanded(
@@ -184,8 +216,24 @@ class _UserDataAppBar extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
-                    user.biogram ?? "Biogram",
+                  AutoSizeText.rich(
+                    TextSpan(
+                      text: "Member since: ",
+                      children: [
+                        TextSpan(
+                            text: user.createdAt
+                                ?.toDate()
+                                .toString()
+                                .split(" ")
+                                .elementAt(0),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.normal,
+                                color: Colors.grey)),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle().boldify(),
+                    maxLines: 1,
                   ),
                 ],
               ),
@@ -193,6 +241,17 @@ class _UserDataAppBar extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Image _getImage(HSUser user) {
+    if (user.profilePicture == null) {
+      return Image.asset(
+        HSAssets.instance.logo,
+      );
+    }
+    return Image.network(
+      user.profilePicture!,
     );
   }
 }
@@ -243,39 +302,38 @@ class _SpotTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final child = ClipRRect(
-      borderRadius: BorderRadius.circular(20.0),
-      child: Container(
-        height: extent,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          color: Colors.grey,
-        ),
-        child: Image.network(
-          _imgUrl(index),
-          fit: BoxFit.cover,
-          colorBlendMode: BlendMode.difference,
-          color: Colors.black,
+    return CachedNetworkImage(
+      imageUrl: _imgUrl(index),
+      progressIndicatorBuilder: (context, url, progress) => _loadingWidget(),
+      // placeholder: (context, url) => _loadingWidget(),
+      imageBuilder: (context, imageProvider) => ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: Container(
+          height: extent,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
       ),
-    ).animate().fadeIn();
-
-    if (bottomSpace == null) {
-      return child;
-    }
-
-    return Column(
-      children: [
-        Expanded(child: child),
-        Container(
-          height: bottomSpace,
-          color: Colors.green,
-        )
-      ],
     );
   }
 
+  Widget _loadingWidget() => ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: Container(
+          height: extent,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            color: Colors.black.withOpacity(.04),
+          ),
+        ),
+      );
+
   String _imgUrl(int index) {
-    return "https://picsum.photos/20$index";
+    return "https://picsum.photos/40$index";
   }
 }
