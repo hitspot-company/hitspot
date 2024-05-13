@@ -11,9 +11,10 @@ class UserProfileProvider extends StatelessWidget {
 
   static Route<void> route(String userID) {
     return MaterialPageRoute<void>(
-        builder: (_) => UserProfileProvider(
-              userID: userID,
-            ));
+      builder: (_) => UserProfileProvider(
+        userID: userID,
+      ),
+    );
   }
 
   @override

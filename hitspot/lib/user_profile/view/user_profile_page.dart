@@ -1,15 +1,19 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tilt/flutter_tilt.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
+import 'package:hitspot/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
+import 'package:hitspot/widgets/auth/hs_auth_button.dart';
+import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -50,37 +54,17 @@ class UserProfilePage extends StatelessWidget {
                   const SliverToBoxAdapter(
                     child: Gap(16.0),
                   ),
-                  SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 24.0,
-                      crossAxisSpacing: 24.0,
-                      crossAxisCount: 3,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return AbsorbPointer(
-                          child: Tilt(
-                            shadowConfig: const ShadowConfig(disable: true),
-                            borderRadius: BorderRadius.circular(20.0),
-                            tiltConfig: TiltConfig(
-                              initial: _calculateTiltOffset(),
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.0),
-                                image: DecorationImage(
-                                    image: NetworkImage(_imgUrl(index)),
-                                    fit: BoxFit.cover,
-                                    colorFilter: const ColorFilter.mode(
-                                        Colors.black, BlendMode.difference)),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      childCount: user.spots!.length,
-                    ),
+                  SliverMasonryGrid.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 8.0,
+                    crossAxisSpacing: 8.0,
+                    childCount: user.spots?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      return _SpotTile(
+                        index: index,
+                        extent: (index % 3 + 2) * 100,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -92,10 +76,6 @@ class UserProfilePage extends StatelessWidget {
         }
       },
     );
-  }
-
-  String _imgUrl(int index) {
-    return "https://picsum.photos/20$index";
   }
 
   Offset _calculateTiltOffset() {
@@ -111,7 +91,6 @@ class UserProfilePage extends StatelessWidget {
 
 class _StatsAppBar extends StatelessWidget {
   const _StatsAppBar({
-    super.key,
     required this.user,
   });
 
@@ -149,14 +128,12 @@ class _StatsAppBar extends StatelessWidget {
           const SizedBox(
             height: 24.0,
           ),
-          SizedBox(
-            width: double.infinity,
-            child: CupertinoButton(
-              color: HSApp.instance.theme.mainColor,
-              child: const Text("Edit Profile"),
-              onPressed: () => HSDebugLogger.logInfo("follow"),
+          HSSocialLoginButtons.custom(
+            labelText: "EDIT PROFILE",
+            onPressed: () => HSApp.instance.navigation.push(
+              EditProfileProvider.route(),
             ),
-          )
+          ),
         ],
       )),
     );
@@ -247,5 +224,58 @@ class _StatsChip extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _SpotTile extends StatelessWidget {
+  const _SpotTile({
+    Key? key,
+    required this.index,
+    this.extent,
+    this.backgroundColor,
+    this.bottomSpace,
+  }) : super(key: key);
+
+  final int index;
+  final double? extent;
+  final double? bottomSpace;
+  final Color? backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = ClipRRect(
+      borderRadius: BorderRadius.circular(20.0),
+      child: Container(
+        height: extent,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: Colors.grey,
+        ),
+        child: Image.network(
+          _imgUrl(index),
+          fit: BoxFit.cover,
+          colorBlendMode: BlendMode.difference,
+          color: Colors.black,
+        ),
+      ),
+    ).animate().fadeIn();
+
+    if (bottomSpace == null) {
+      return child;
+    }
+
+    return Column(
+      children: [
+        Expanded(child: child),
+        Container(
+          height: bottomSpace,
+          color: Colors.green,
+        )
+      ],
+    );
+  }
+
+  String _imgUrl(int index) {
+    return "https://picsum.photos/20$index";
   }
 }

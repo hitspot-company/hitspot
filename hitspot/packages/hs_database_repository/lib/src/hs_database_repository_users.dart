@@ -6,6 +6,16 @@ class HSUsersRepository {
   static final _db = FirebaseFirestore.instance;
   final _usersCollection = _db.collection("users");
 
+  Future<void> updateField(HSUser user, String field, String newValue) async {
+    try {
+      await _usersCollection.doc(user.uid).update({
+        field: newValue,
+      }).timeout(const Duration(seconds: 3));
+    } catch (_) {
+      throw DatabaseConnectionFailure("The field $field could not be updated.");
+    }
+  }
+
   Future<void> completeUserProfile(HSUser user) async {
     try {
       await _usersCollection
@@ -34,7 +44,7 @@ class HSUsersRepository {
       DocumentSnapshot snapshot = await _usersCollection
           .doc(uid)
           .get()
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 5));
 
       // If user is not in database return null
       if (!snapshot.exists) {
