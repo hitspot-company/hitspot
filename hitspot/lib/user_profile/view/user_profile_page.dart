@@ -1,8 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_tilt/flutter_tilt.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
@@ -19,8 +20,10 @@ class UserProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = ScrollController();
     final app = HSApp.instance;
     return BlocBuilder<HSUserProfileBloc, HSUserProfileState>(
+      buildWhen: (previous, current) => previous.props != current.props,
       builder: (context, state) {
         switch (state) {
           case HSUserProfileInitialLoading():
@@ -40,6 +43,7 @@ class UserProfilePage extends StatelessWidget {
                 enableDefaultBackButton: true,
               ),
               body: CustomScrollView(
+                controller: controller,
                 slivers: [
                   _UserDataAppBar(user: user),
                   _StatsAppBar(user: user),
@@ -49,18 +53,32 @@ class UserProfilePage extends StatelessWidget {
                   SliverGrid(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 16.0,
-                      crossAxisSpacing: 16.0,
+                      mainAxisSpacing: 24.0,
+                      crossAxisSpacing: 24.0,
                       crossAxisCount: 3,
                     ),
                     delegate: SliverChildBuilderDelegate(
-                      (context, index) => Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20.0),
-                          color:
-                              index.isEven ? Colors.teal : Colors.purpleAccent,
-                        ),
-                      ),
+                      (context, index) {
+                        return AbsorbPointer(
+                          child: Tilt(
+                            shadowConfig: const ShadowConfig(disable: true),
+                            borderRadius: BorderRadius.circular(20.0),
+                            tiltConfig: TiltConfig(
+                              initial: _calculateTiltOffset(),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.0),
+                                image: DecorationImage(
+                                    image: NetworkImage(_imgUrl(index)),
+                                    fit: BoxFit.cover,
+                                    colorFilter: const ColorFilter.mode(
+                                        Colors.black, BlendMode.difference)),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                       childCount: user.spots!.length,
                     ),
                   ),
@@ -74,6 +92,20 @@ class UserProfilePage extends StatelessWidget {
         }
       },
     );
+  }
+
+  String _imgUrl(int index) {
+    return "https://picsum.photos/20$index";
+  }
+
+  Offset _calculateTiltOffset() {
+    final random = Random();
+    const double factor = 2.5;
+    final double rx =
+        random.nextDouble() * factor * (random.nextInt(2) % 2 == 0 ? 1 : -1);
+    final double ry =
+        random.nextDouble() * factor * (random.nextInt(2) % 2 == 0 ? 1 : -1);
+    return Offset(rx, ry);
   }
 }
 
@@ -89,37 +121,50 @@ class _StatsAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverAppBar(
       surfaceTintColor: Colors.transparent,
-      expandedHeight: 70.0,
+      expandedHeight: 150.0,
       floating: true,
       snap: false,
       pinned: false,
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(
-        background: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _StatsChip(
-              label: "Followers",
-              value: user.followers?.length,
+          background: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _StatsChip(
+                label: "Followers",
+                value: user.followers?.length,
+              ),
+              _StatsChip(
+                label: "Following",
+                value: user.following?.length,
+              ),
+              _StatsChip(
+                label: "Spots",
+                value: user.spots?.length,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 24.0,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: CupertinoButton(
+              color: HSApp.instance.theme.mainColor,
+              child: const Text("Edit Profile"),
+              onPressed: () => HSDebugLogger.logInfo("follow"),
             ),
-            _StatsChip(
-              label: "Following",
-              value: user.following?.length,
-            ),
-            _StatsChip(
-              label: "Spots",
-              value: user.spots?.length,
-            ),
-          ],
-        ),
-      ),
+          )
+        ],
+      )),
     );
   }
 }
 
 class _UserDataAppBar extends StatelessWidget {
   const _UserDataAppBar({
-    super.key,
     required this.user,
   });
 
@@ -162,12 +207,8 @@ class _UserDataAppBar extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: CupertinoButton(
-                        color: HSApp.instance.theme.mainColor,
-                        child: const Text("Follow"),
-                        onPressed: () => HSDebugLogger.logInfo("follow")),
+                  Text(
+                    user.biogram ?? "Biogram",
                   ),
                 ],
               ),
