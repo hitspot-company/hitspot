@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -14,7 +13,7 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
     required this.userID,
   }) : super(HSUserProfileInitialLoading()) {
     on<HSUserProfileInitialEvent>((event, emit) async {
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 300));
       await _getUserData(event, emit);
     });
   }

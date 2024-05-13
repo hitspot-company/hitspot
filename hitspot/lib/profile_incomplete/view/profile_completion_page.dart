@@ -43,7 +43,7 @@ class ProfileCompletionPage extends StatelessWidget {
                   ),
                 ],
               ),
-              style: HSTheme.instance.textTheme(context).titleMedium,
+              style: HSTheme.instance.textTheme.titleMedium,
               maxLines: 1,
             ),
           ),

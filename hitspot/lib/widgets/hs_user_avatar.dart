@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/widgets/hs_shimmer.dart';
 
 class HSUserAvatar extends StatelessWidget {
   const HSUserAvatar(
@@ -17,9 +19,11 @@ class HSUserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: Colors.black.withOpacity(.04),
+      return HSShimmer(
+        child: CircleAvatar(
+          radius: radius,
+          backgroundColor: HSApp.instance.theme.currentTheme.highlightColor,
+        ),
       );
     } else if (imgUrl == null) {
       return CircleAvatar(

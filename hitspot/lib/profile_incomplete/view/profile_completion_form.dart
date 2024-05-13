@@ -62,7 +62,7 @@ class ProfileCompletionForm extends StatelessWidget {
                 children: [
                   Text(
                     "Make it easier for your friends to find you using your name.",
-                    style: HSTheme.instance.textTheme(context).titleMedium,
+                    style: HSTheme.instance.textTheme.titleMedium,
                   ),
                   const Gap(16.0),
                   _FullnameInput(profileCompletionCubit),
@@ -174,7 +174,7 @@ class _ConfirmationDetails extends StatelessWidget {
             children: [
               Text(
                 "Your details",
-                style: HSTheme.instance.textTheme(context).titleMedium,
+                style: HSTheme.instance.textTheme.titleMedium,
               ),
               const Gap(16.0),
               Text(

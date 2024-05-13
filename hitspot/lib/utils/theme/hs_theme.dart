@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 
 final class HSTheme {
   // SINGLETON
@@ -12,18 +14,21 @@ final class HSTheme {
   final ThemeData lightTheme = ThemeData(
     colorSchemeSeed: _mainColor,
     brightness: Brightness.light,
-  );
+  ).copyWith(highlightColor: Colors.black);
 
   final ThemeData darkTheme = ThemeData(
     colorSchemeSeed: _mainColor,
     brightness: Brightness.dark,
-  );
+  ).copyWith(highlightColor: Colors.black.withOpacity(.08));
 
+  Color get highlightColor => currentTheme.highlightColor;
   Color get mainColor => _mainColor;
   Color get textfieldFillColor => _textfieldFillColor;
 
-  TextTheme textTheme(context) => Theme.of(context).textTheme;
-  ThemeData currentTheme(context) => Theme.of(context);
+  BuildContext get context =>
+      HSNavigationService.instance.navigatorKey.currentContext!;
+  TextTheme get textTheme => Theme.of(context).textTheme;
+  ThemeData get currentTheme => Theme.of(context);
 }
 
 extension TextStyleAltering on TextStyle {

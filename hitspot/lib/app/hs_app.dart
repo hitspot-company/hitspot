@@ -23,8 +23,8 @@ class HSApp {
   // THEMING
   HSThemeBloc get themeBloc => BlocProvider.of<HSThemeBloc>(context!);
   HSTheme get theme => HSTheme.instance;
-  ThemeData get currentTheme => theme.currentTheme(context);
-  TextTheme get textTheme => theme.textTheme(context);
+  ThemeData get currentTheme => theme.currentTheme;
+  TextTheme get textTheme => theme.textTheme;
   TextStyle? get headlineMedium => textTheme.headlineMedium;
   Color? get textFieldFillColor => theme.textfieldFillColor;
   void changeTheme() => themeBloc.add(HSThemeSwitchEvent());

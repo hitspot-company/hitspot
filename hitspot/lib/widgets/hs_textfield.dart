@@ -59,7 +59,6 @@ class HSTextField extends StatelessWidget {
         child: TextFormField(
           autofocus: autofocus,
           scrollPadding: scrollPadding,
-          // readOnly: readOnly,
           controller: controller,
           focusNode: node,
           validator: validator,
@@ -67,7 +66,6 @@ class HSTextField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
-          // onTap: onTap,
           initialValue: initialValue,
           decoration: InputDecoration(
             fillColor: fillColor,
