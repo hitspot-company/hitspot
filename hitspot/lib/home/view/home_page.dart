@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/user_profile/view/user_profile_provider.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -15,20 +16,37 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final app = HSApp.instance;
+    final navi = app.navigation;
     return HSScaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             surfaceTintColor: Colors.transparent,
-            title: Image.asset(
-              HSAssets.instance.textLogo,
-              height: 30,
+            title: Align(
+              alignment: Alignment.centerLeft,
+              child: Image.asset(
+                HSAssets.instance.textLogo,
+                height: 30,
+                alignment: Alignment.centerLeft,
+              ),
             ),
             actions: <Widget>[
               IconButton(
-                icon: const Icon(FontAwesomeIcons.bell),
-                onPressed: HSApp.instance.logout,
-              ), // HSDebugLogger.logInfo("Notification"),
+                icon: CircleAvatar(
+                  foregroundImage: app.currentUser.profilePicture != null
+                      ? NetworkImage(app.currentUser.profilePicture!)
+                      : null,
+                  child: app.currentUser.profilePicture == null
+                      ? const Icon(FontAwesomeIcons.solidUser)
+                      : null,
+                ),
+                onPressed: () => navi.push(
+                  UserProfileProvider.route(
+                    app.currentUser.uid!,
+                  ),
+                ),
+              ),
             ],
             floating: true,
             pinned: true,
@@ -75,7 +93,19 @@ class HomePage extends StatelessWidget {
             child: CupertinoButton(
               onPressed: HSApp.instance.changeTheme,
               color: HSApp.instance.theme.mainColor,
-              child: const Text("Change theme!"),
+              child: const Text("CHANGE THEME"),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 32.0,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: CupertinoButton(
+              onPressed: HSApp.instance.changeTheme,
+              color: Colors.amber,
+              child: const Text("SIGN OUT"),
             ),
           )
         ],

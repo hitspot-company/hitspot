@@ -1,6 +1,7 @@
 part of 'hs_authentication_bloc.dart';
 
 enum HSAppStatus {
+  splash,
   loading,
   authenticated,
   emailNotVerified,

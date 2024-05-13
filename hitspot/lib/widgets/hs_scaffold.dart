@@ -11,6 +11,7 @@ class HSScaffold extends StatelessWidget {
     required this.body,
     this.ignoring = false,
     this.resizeToAvoidBottomInset = true,
+    this.backgroundColor,
   });
 
   final bool topSafe;
@@ -20,6 +21,7 @@ class HSScaffold extends StatelessWidget {
   final Widget body;
   final bool ignoring;
   final bool resizeToAvoidBottomInset;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class HSScaffold extends StatelessWidget {
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(
+          backgroundColor: backgroundColor,
           resizeToAvoidBottomInset: resizeToAvoidBottomInset,
           body: SafeArea(
             top: topSafe,
