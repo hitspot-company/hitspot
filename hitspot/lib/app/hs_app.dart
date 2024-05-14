@@ -7,6 +7,7 @@ import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_search_repository/hs_search.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 class HSApp {
@@ -61,4 +62,8 @@ class HSApp {
   // DATABASE
   HSDatabaseRepository get databaseRepository =>
       context!.read<HSDatabaseRepository>();
+
+  // Full Text Search
+  HSSearchRepository get searchRepository =>
+      context!.read<HSSearchRepository>();
 }

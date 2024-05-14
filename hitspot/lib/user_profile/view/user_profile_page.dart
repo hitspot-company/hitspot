@@ -1,11 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
 import 'package:hitspot/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -22,6 +22,7 @@ class UserProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final textTheme = HSApp.instance.textTheme;
     final controller = ScrollController();
     return BlocBuilder<HSUserProfileBloc, HSUserProfileState>(
       buildWhen: (previous, current) => previous.props != current.props,
@@ -80,7 +81,10 @@ class UserProfilePage extends StatelessWidget {
                 if (user.biogram != null)
                   SliverAppBar(
                     flexibleSpace: FlexibleSpaceBar(
-                      background: Text(user.biogram!),
+                      background: Text(
+                        user.biogram!,
+                        style: textTheme.bodyMedium,
+                      ),
                     ),
                     expandedHeight: 200.0,
                     automaticallyImplyLeading: false,
@@ -135,8 +139,8 @@ class _SpotsHeadline extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
-            "Spots",
-            style: HSApp.instance.textTheme.headlineSmall,
+            "SPOTS",
+            style: HSApp.instance.textTheme.headlineMedium,
           ),
         ),
         const Expanded(
@@ -349,32 +353,11 @@ class _UserDataAppBarReady extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text("@${user.username}"),
         Text(
           "${user.fullName}",
-          style: const TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-          ),
+          style: textTheme.headlineSmall!.hintify(),
         ),
-        AutoSizeText.rich(
-          TextSpan(
-            text: "Member since: ",
-            children: [
-              TextSpan(
-                  text: user.createdAt
-                      ?.toDate()
-                      .toString()
-                      .split(" ")
-                      .elementAt(0),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.normal, color: Colors.grey)),
-            ],
-          ),
-          textAlign: TextAlign.center,
-          style: const TextStyle().boldify(),
-          maxLines: 1,
-        ),
+        Text("@${user.username}", style: textTheme.headlineLarge),
       ],
     );
   }
@@ -457,11 +440,8 @@ class _StatsChipReady extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         children: [
-          Text(label),
-          Text(
-            '${value ?? 0}',
-            style: const TextStyle().boldify(),
-          ),
+          Text(label, style: textTheme.headlineSmall),
+          Text('${value ?? 0}', style: textTheme.headlineSmall),
         ],
       ),
     );

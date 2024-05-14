@@ -60,14 +60,14 @@ class HomePage extends StatelessWidget {
                   children: [
                     TextSpan(
                         text: HSApp.instance.username,
-                        style: HSApp.instance.textTheme.headlineSmall),
+                        style: HSApp.instance.textTheme.headlineMedium),
                     TextSpan(
                         text: " ,\nWhere would you like to go?",
                         style:
-                            HSApp.instance.textTheme.headlineSmall!.hintify()),
+                            HSApp.instance.textTheme.headlineLarge!.hintify()),
                   ],
                 ),
-                style: HSApp.instance.textTheme.headlineSmall!.hintify()),
+                style: HSApp.instance.textTheme.headlineMedium!.hintify()),
             floating: true,
             pinned: true,
           ),

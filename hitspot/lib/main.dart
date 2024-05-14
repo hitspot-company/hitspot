@@ -16,6 +16,7 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
 import 'package:hs_mailing_repository/hs_mailing_repository.dart';
+import 'package:hs_search_repository/hs_search.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 
 void main() async {
@@ -26,12 +27,14 @@ void main() async {
   final databaseRepository = HSDatabaseRepository();
   final themeRepository = HSThemeRepository();
   final mailingRepository = HSMailingRepository();
+  final searchRepository = HSSearchRepository();
   Animate.restartOnHotReload = true;
 
   // Bind Firebase authentication stream to our HSUser
   await authenticationRepository.user.first;
   runApp(App(
     mailingRepository: mailingRepository,
+    searchRepository: searchRepository,
     themeRepository: themeRepository,
     authenticationRepository: authenticationRepository,
     databaseRepository: databaseRepository,
@@ -43,16 +46,19 @@ class App extends StatelessWidget {
   final HSDatabaseRepository _databaseRepository;
   final HSThemeRepository _themeRepository;
   final HSMailingRepository _mailingRepository;
+  final HSSearchRepository _searchRepository;
 
   const App(
       {required HSThemeRepository themeRepository,
       required HSAuthenticationRepository authenticationRepository,
       required HSDatabaseRepository databaseRepository,
       required HSMailingRepository mailingRepository,
+      required HSSearchRepository searchRepository,
       super.key})
       : _themeRepository = themeRepository,
         _authenticationRepository = authenticationRepository,
         _mailingRepository = mailingRepository,
+        _searchRepository = searchRepository,
         _databaseRepository = databaseRepository;
   @override
   Widget build(BuildContext context) {
@@ -66,6 +72,9 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => HSMailingRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => HSSearchRepository(),
         ),
       ],
       child: MultiBlocProvider(
