@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 
 class HSSocialLoginButtons {
@@ -69,7 +70,9 @@ class _SocialLoginButton extends StatelessWidget {
             Center(
               child: Text(
                 labelText,
-                style: TextStyle(color: theme.colorScheme.secondary).boldify(),
+                style: textTheme.headlineSmall!
+                    .colorify(theme.colorScheme.secondary)
+                    .boldify(),
               ),
             ),
           ],

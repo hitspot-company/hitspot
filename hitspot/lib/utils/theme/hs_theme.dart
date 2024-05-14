@@ -21,7 +21,6 @@ final class HSTheme {
     colorSchemeSeed: _mainColor,
     brightness: Brightness.dark,
     textTheme: _HSTextThemes.darkTextTheme,
-    typography: Typography(white: Typography.whiteCupertino),
   ).copyWith(highlightColor: Colors.black.withOpacity(.08));
 
   Color get highlightColor => currentTheme.highlightColor;

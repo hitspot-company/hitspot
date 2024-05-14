@@ -29,6 +29,8 @@ class HSApp {
   TextStyle? get headlineMedium => textTheme.headlineMedium;
   Color? get textFieldFillColor => theme.textfieldFillColor;
   void changeTheme() => themeBloc.add(HSThemeSwitchEvent());
+  double get screenWidth => MediaQuery.of(context!).size.width;
+  double get screenHeight => MediaQuery.of(context!).size.height;
 
   // POPUPS
   HSToasts get toasts => HSToasts.instance;

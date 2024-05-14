@@ -1,8 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
@@ -186,6 +188,22 @@ class _SpotsGrid extends StatelessWidget {
           child: HSShimmerSkeleton(
             height: (index % 3 + 2) * 100,
           ),
+        ),
+      );
+    } else if (spots.isEmpty) {
+      return SliverFillRemaining(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(FontAwesomeIcons.mapLocation, size: 80.0),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(
+                "THERE ARE NO SPOTS HERE",
+                style: textTheme.headlineLarge,
+              ),
+            ),
+          ],
         ),
       );
     }

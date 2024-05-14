@@ -7,3 +7,5 @@ HSApp get app => HSApp.instance;
 TextTheme get textTheme => app.textTheme;
 HSTheme get currentTheme => app.theme;
 HSNavigationService get navi => app.navigation;
+double get screenWidth => app.screenWidth;
+double get screenHeight => app.screenHeight;

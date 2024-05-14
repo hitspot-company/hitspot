@@ -9,7 +9,7 @@ import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
-import 'package:hitspot/login/view/login_page.dart';
+import 'package:hitspot/login/view/login_provider.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hitspot/verify_email/view/verify_email_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
