@@ -1,7 +1,5 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -52,7 +50,7 @@ class UserProfilePage extends StatelessWidget {
                   child: Gap(16.0),
                 ),
                 _StatsAppBar.loading(),
-                const _SpotsHeadline(),
+                const _Headline(title: "SPOTS"),
                 const SliverToBoxAdapter(
                   child: Gap(16.0),
                 ),
@@ -75,28 +73,23 @@ class UserProfilePage extends StatelessWidget {
                 const SliverToBoxAdapter(
                   child: Gap(16.0),
                 ),
-                const SliverToBoxAdapter(
-                  child: Divider(
-                    thickness: .1,
-                  ),
-                ),
                 if (user.biogram != null)
-                  SliverAppBar(
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Text(
-                        user.biogram!,
-                        style: textTheme.bodyMedium,
-                      ),
-                    ),
-                    expandedHeight: 200.0,
-                    automaticallyImplyLeading: false,
-                    surfaceTintColor: Colors.transparent,
+                  SliverMainAxisGroup(
+                    slivers: [
+                      const _Headline(title: "BIO"),
+                      SliverToBoxAdapter(
+                        child: Text(
+                          user.biogram!,
+                          style: textTheme.titleSmall,
+                        ),
+                      )
+                    ],
                   ),
                 const SliverToBoxAdapter(
                   child: Gap(16.0),
                 ),
                 _StatsAppBar.ready(user: user),
-                const _SpotsHeadline(),
+                const _Headline(title: "SPOTS"),
                 const SliverToBoxAdapter(
                   child: Gap(16.0),
                 ),
@@ -122,36 +115,37 @@ class UserProfilePage extends StatelessWidget {
   }
 }
 
-class _SpotsHeadline extends StatelessWidget {
-  const _SpotsHeadline({
-    super.key,
-  });
+class _Headline extends StatelessWidget {
+  const _Headline({required this.title});
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
-        child: Row(
-      children: [
-        const SizedBox(
-          width: 16.0,
-          child: Divider(
-            thickness: .1,
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 16.0,
+            child: Divider(
+              thickness: .1,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            "SPOTS",
-            style: HSApp.instance.textTheme.headlineMedium,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              title,
+              style: HSApp.instance.textTheme.headlineMedium,
+            ),
           ),
-        ),
-        const Expanded(
-          child: Divider(
-            thickness: .1,
+          const Expanded(
+            child: Divider(
+              thickness: .1,
+            ),
           ),
-        )
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
 
@@ -257,7 +251,8 @@ class _StatsAppBar extends StatelessWidget {
           background: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
             children: [
               _StatsChip(
                 label: "Followers",
@@ -342,6 +337,7 @@ class _UserDataAppBar extends StatelessWidget {
               child: HSUserAvatar(
                 loading: loading,
                 radius: 70.0,
+                iconSize: 50,
                 imgUrl: user?.profilePicture,
               ),
             ),

@@ -22,8 +22,9 @@ class HSSearchRepository {
   Stream<List<HSUser>> streamUsers(String query) {
     try {
       usersSearcher.query(query);
-      return usersSearcher.responses
-          .map((e) => e.hits.map(HSUser.deserialize).toList());
+      return usersSearcher.responses.map((e) => e.hits
+          .map((e) => HSUser.deserialize(e, uid: e["objectID"]))
+          .toList());
     } catch (e) {
       throw HSSearchException.users();
     }
@@ -127,7 +128,12 @@ class UsersHitsPage {
   final int? nextPageKey;
 
   factory UsersHitsPage.fromResponse(SearchResponse response) {
-    final items = response.hits.map(HSUser.deserialize).toList();
+    final items = response.hits.map((e) {
+      for (var element in e.entries) {
+        print("entry: ${element.key} : ${element.value}");
+      }
+      return HSUser.deserialize(e);
+    }).toList();
     final isLastPage = response.page >= response.nbPages;
     final nextPageKey = isLastPage ? null : response.page + 1;
     return UsersHitsPage(items, response.page, nextPageKey);

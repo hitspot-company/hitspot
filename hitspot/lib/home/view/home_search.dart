@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/user_profile/view/user_profile_provider.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
@@ -130,7 +132,11 @@ class HSHomeSearchDelegate extends SearchDelegate<String> {
       stream: _searchRepository.streamUsers(query),
       builder: (BuildContext context, AsyncSnapshot<List<HSUser>> snapshot) {
         if (!snapshot.hasData) {
-          return const Text("No data");
+          return Center(
+              child: Text(
+            "No data",
+            style: textTheme.headlineLarge,
+          ));
         }
         final List<HSUser> suggestions = snapshot.data!;
         return ListView.builder(
@@ -138,6 +144,7 @@ class HSHomeSearchDelegate extends SearchDelegate<String> {
           itemBuilder: (BuildContext context, int index) {
             final user = suggestions[index];
             return ListTile(
+              onTap: () => navi.push(UserProfileProvider.route(user.uid!)),
               title: Text("@${user.username}"),
               subtitle: Text(user.fullName ?? ""),
               leading: HSUserAvatar(

@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 
 class HSAppBar extends StatelessWidget {
   HSAppBar({
@@ -61,7 +62,7 @@ class HSAppBar extends StatelessWidget {
               child: AutoSizeText(
                 title!,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: textTheme.headlineMedium!.copyWith(
                     color: Colors.white,
                     fontWeight: titleBold ? FontWeight.bold : FontWeight.normal,
                     fontSize: fontSize),
