@@ -14,6 +14,7 @@ import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hitspot/widgets/hs_user_monitor.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
@@ -334,11 +335,13 @@ class _UserDataAppBar extends StatelessWidget {
         background: Row(
           children: [
             Expanded(
-              child: HSUserAvatar(
-                loading: loading,
-                radius: 70.0,
-                iconSize: 50,
-                imgUrl: user?.profilePicture,
+              child: HSUserMonitor(
+                child: HSUserAvatar(
+                  loading: loading,
+                  radius: 70.0,
+                  iconSize: 50,
+                  imgUrl: user?.profilePicture,
+                ),
               ),
             ),
             Expanded(

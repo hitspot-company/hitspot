@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/user_profile/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:hitspot/user_profile/edit_profile/edit_value/view/edit_value_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hitspot/widgets/hs_user_monitor.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 class EditProfilePage extends StatelessWidget {
@@ -18,6 +21,7 @@ class EditProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = HSApp.instance;
+    final editProfileCubit = context.read<EditProfileCubit>();
     return HSScaffold(
       appBar: HSAppBar(
         title: "EDIT PROFILE",
@@ -37,14 +41,35 @@ class EditProfilePage extends StatelessWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   background: Column(
                     children: [
-                      InkWell(
-                        radius: 60.0,
-                        onTap: () => print("edit picture"),
-                        child: HSUserAvatar(
-                          imgUrl: app.currentUser.profilePicture,
-                          radius: 80,
-                          iconSize: 40,
-                        ),
+                      BlocBuilder<EditProfileCubit, EditProfileState>(
+                        builder: (context, state) {
+                          final HSImageChangeState imageChangeState =
+                              state.imageChangeState;
+                          final double progress = state.changeProgress;
+                          late final Widget child;
+                          switch (imageChangeState) {
+                            case HSImageChangeState.choosing ||
+                                  HSImageChangeState.setting ||
+                                  HSImageChangeState.uploading:
+                              child = const HSUserAvatar(
+                                radius: 80.0,
+                                loading: true,
+                              );
+                            default:
+                              child = InkWell(
+                                radius: 60.0,
+                                onTap: editProfileCubit.chooseImage,
+                                child: HSUserMonitor(
+                                  child: HSUserAvatar(
+                                    imgUrl: app.currentUser.profilePicture,
+                                    radius: 80,
+                                    iconSize: 50,
+                                  ),
+                                ),
+                              );
+                          }
+                          return child;
+                        },
                       ),
                       const Gap(8.0),
                       CupertinoButton(
