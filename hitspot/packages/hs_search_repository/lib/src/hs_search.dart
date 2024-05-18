@@ -22,22 +22,10 @@ class HSSearchRepository {
   Stream<List<HSUser>> streamUsers(String query) {
     try {
       usersSearcher.query(query);
+      print("query: $query");
       return usersSearcher.responses.map((e) => e.hits
           .map((e) => HSUser.deserialize(e, uid: e["objectID"]))
           .toList());
-    } catch (e) {
-      throw HSSearchException.users();
-    }
-  }
-
-  Future<List<HSUser>> fetchUsers(String query) async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 500));
-      usersSearcher.query(query);
-      final List<HSUser> items =
-          usersSearcher.lastResponse?.hits.map(HSUser.deserialize).toList() ??
-              [];
-      return items;
     } catch (e) {
       throw HSSearchException.users();
     }

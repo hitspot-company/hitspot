@@ -73,7 +73,7 @@ class EditProfilePage extends StatelessWidget {
                       ),
                       const Gap(8.0),
                       CupertinoButton(
-                        onPressed: () => print("edit picture"),
+                        onPressed: editProfileCubit.chooseImage,
                         child: const Text("Edit profile picture"),
                       ),
                       const Divider(),
@@ -86,7 +86,7 @@ class EditProfilePage extends StatelessWidget {
                 child: _TextEditPrompt(
                   fieldName: 'Full name',
                   fieldDescription:
-                      "Your full name is used to make it easier fo your friends to find your profile.",
+                      "Your full name is used to make it easier for your friends to find your profile.",
                   initialValue: app.currentUser.fullName ?? "",
                   field: HSUserField.fullName.name,
                 ),
@@ -96,7 +96,7 @@ class EditProfilePage extends StatelessWidget {
                 child: _TextEditPrompt(
                   fieldName: 'Username',
                   fieldDescription:
-                      "Your username is your unique identifier amongs other users. Make it stand out!",
+                      "Your username is your unique identifier among other users. Make it stand out!",
                   initialValue: app.currentUser.username ?? "",
                   field: HSUserField.username.name,
                 ),

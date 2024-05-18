@@ -28,7 +28,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
     try {
       final XFile? image = await _picker.pickImage(
           source: ImageSource.gallery, imageQuality: 80);
-      if (image == null) throw "The image is null.";
+      if (image == null) return;
       final File file = File(image.path);
       emit(state.copy(imageChangeState: HSImageChangeState.uploading));
       final String url = await uploadFile(file);

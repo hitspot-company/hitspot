@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -15,9 +16,11 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
     on<HSUserProfileInitialEvent>((event, emit) async {
       await Future.delayed(const Duration(milliseconds: 300));
       await _getUserData(event, emit);
+      isOwnProfile = userData?.uid == currentUser.uid;
     });
   }
 
+  late final bool isOwnProfile;
   final String userID;
   final HSDatabaseRepository databaseRepository;
   late final HSUser? userData;

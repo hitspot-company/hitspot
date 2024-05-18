@@ -23,11 +23,11 @@ class UserProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final textTheme = HSApp.instance.textTheme;
     final controller = ScrollController();
     return BlocBuilder<HSUserProfileBloc, HSUserProfileState>(
       buildWhen: (previous, current) => previous.props != current.props,
       builder: (context, state) {
+        final userProfileBloc = context.read<HSUserProfileBloc>();
         if (state is HSUserProfileInitialLoading) {
           return HSScaffold(
             appBar: HSAppBar(
@@ -89,7 +89,8 @@ class UserProfilePage extends StatelessWidget {
                 const SliverToBoxAdapter(
                   child: Gap(16.0),
                 ),
-                _StatsAppBar.ready(user: user),
+                _StatsAppBar.ready(
+                    user: user, userProfileBloc: userProfileBloc),
                 const _Headline(title: "SPOTS"),
                 const SliverToBoxAdapter(
                   child: Gap(16.0),
@@ -221,10 +222,12 @@ class _StatsAppBar extends StatelessWidget {
   const _StatsAppBar({
     this.user,
     this.loading = false,
+    this.userProfileBloc,
   });
 
   final HSUser? user;
   final bool loading;
+  final HSUserProfileBloc? userProfileBloc;
 
   factory _StatsAppBar.loading() {
     return const _StatsAppBar(
@@ -232,9 +235,11 @@ class _StatsAppBar extends StatelessWidget {
     );
   }
 
-  factory _StatsAppBar.ready({required HSUser user}) {
+  factory _StatsAppBar.ready(
+      {required HSUser user, required HSUserProfileBloc userProfileBloc}) {
     return _StatsAppBar(
       user: user,
+      userProfileBloc: userProfileBloc,
     );
   }
 
@@ -293,12 +298,19 @@ class _StatsAppBar extends StatelessWidget {
         ),
       );
     }
-    return HSSocialLoginButtons.custom(
-      labelText: "EDIT PROFILE",
-      onPressed: () => HSApp.instance.navigation.push(
-        EditProfileProvider.route(),
-      ),
-    );
+    if (userProfileBloc!.isOwnProfile) {
+      return HSSocialLoginButtons.custom(
+        labelText: "EDIT PROFILE",
+        onPressed: () => HSApp.instance.navigation.push(
+          EditProfileProvider.route(),
+        ),
+      );
+    } else {
+      return HSSocialLoginButtons.custom(
+        labelText: "FOLLOW",
+        onPressed: () {},
+      );
+    }
   }
 }
 

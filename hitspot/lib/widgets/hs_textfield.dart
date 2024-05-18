@@ -24,6 +24,7 @@ class HSTextField extends StatelessWidget {
     this.initialValue,
     this.floatingLabelBehavior,
     this.autofocus = false,
+    this.maxLines = 1,
   });
 
   final String? hintText;
@@ -47,6 +48,7 @@ class HSTextField extends StatelessWidget {
   final Color? fillColor;
   final FloatingLabelBehavior? floatingLabelBehavior;
   final String? initialValue;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +59,7 @@ class HSTextField extends StatelessWidget {
       child: AbsorbPointer(
         absorbing: readOnly,
         child: TextFormField(
+          maxLines: maxLines,
           autofocus: autofocus,
           scrollPadding: scrollPadding,
           controller: controller,

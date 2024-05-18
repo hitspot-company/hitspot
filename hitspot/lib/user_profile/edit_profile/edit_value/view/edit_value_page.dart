@@ -21,13 +21,13 @@ class EditValuePage extends StatelessWidget {
           appBar: HSAppBar(
             enableDefaultBackButton: true,
             title: state.fieldName ?? "Edit",
-            // TODO: Add username verificaiton
             right: _DoneButton(editValueCubit),
           ),
           body: Column(
             children: [
               const Gap(16.0),
               HSTextField(
+                maxLines: state.fieldName == "biogram" ? 5 : 1,
                 autofocus: true,
                 onChanged: editValueCubit.changeValue,
                 suffixIcon: const Opacity(
@@ -35,6 +35,7 @@ class EditValuePage extends StatelessWidget {
                   child: Icon(FontAwesomeIcons.pen),
                 ),
                 initialValue: state.value,
+                errorText: state.errorText,
               ),
               const Gap(16.0),
               Text(state.fieldDescription ?? ""),

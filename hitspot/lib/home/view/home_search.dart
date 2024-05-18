@@ -7,6 +7,7 @@ import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_search_repository/hs_search.dart';
 
 class HSHomeSearchDelegate extends SearchDelegate<String> {
@@ -55,74 +56,10 @@ class HSHomeSearchDelegate extends SearchDelegate<String> {
     );
   }
 
-  // TODO: Export widgets
   @override
   Widget buildResults(BuildContext context) {
-    return FutureBuilder(
-      future: _searchRepository.fetchUsers(query),
-      builder: (BuildContext context, AsyncSnapshot<List<HSUser>> snapshot) {
-        if (snapshot.hasError) {
-          return const Center(
-            child: Text("Somethign went wrong"),
-          );
-        }
-
-        final Widget child = snapshot.connectionState == ConnectionState.waiting
-            ? ListView.builder(
-                itemCount: 8,
-                itemBuilder: (BuildContext context, int index) {
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: HSShimmer(
-                      child: HSShimmerSkeleton(
-                        height: 80.0,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              HSUserAvatar(radius: 30, loading: true),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    HSShimmerSkeleton(
-                                      height: 16.0,
-                                    ),
-                                    HSShimmerSkeleton(
-                                      height: 16.0,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              )
-            : Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: ListView.builder(
-                  itemCount: snapshot.data?.length ?? 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    final user = snapshot.data![index];
-                    return ListTile(
-                      title: Text("@${user.username}"),
-                      subtitle: Text(user.fullName ?? ""),
-                      leading: HSUserAvatar(
-                        radius: 30,
-                        imgUrl: user.profilePicture,
-                      ),
-                    );
-                  },
-                ),
-              );
-        return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 1000), child: child);
-      },
+    return Container(
+      color: Colors.green,
     );
   }
 
