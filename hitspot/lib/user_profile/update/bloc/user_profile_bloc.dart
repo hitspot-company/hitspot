@@ -18,6 +18,8 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   final String userID;
   final HSDatabaseRepository _databaseRepository;
 
+  bool get isOwnProfile => userID == currentUser.uid;
+
   bool isUserFollowed(HSUser user) {
     return user.followers != null && user.followers!.contains(currentUser.uid);
   }
@@ -26,7 +28,7 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     try {
       late final bool isFollow;
 
-      emit(const UserProfileUpdating());
+      emit(UserProfileUpdating(event.user));
       if (isUserFollowed(event.user)) {
         await _databaseRepository.unfollowUser(currentUser, event.user);
         isFollow = false;

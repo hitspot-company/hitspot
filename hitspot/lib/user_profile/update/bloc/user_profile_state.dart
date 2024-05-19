@@ -28,8 +28,9 @@ final class UserProfileLoaded extends UserProfileState {
 }
 
 final class UserProfileUpdating extends UserProfileState {
-  const UserProfileUpdating();
+  const UserProfileUpdating(this.user);
+  final HSUser user;
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [user, user.followers];
 }
