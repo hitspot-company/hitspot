@@ -20,13 +20,13 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final hsApp = HSApp.instance;
     return HSScaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       sidePadding: 16.0,
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: BlocProvider<HSRegisterCubit>(
           create: (_) => HSRegisterCubit(HSApp.instance.authRepository),
-          child: Column(
+          child: ListView(
             children: [
               const Gap(32.0),
               const HSAuthPageTitle(

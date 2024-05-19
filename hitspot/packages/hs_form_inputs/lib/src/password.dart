@@ -16,7 +16,7 @@ class Password extends FormzInput<String, PasswordValidationError> {
   /// {@macro password}
   const Password.dirty([super.value = '']) : super.dirty();
 
-  static final _passwordRegExp =
+  static final passwordRegExp =
       RegExp(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$");
 
   @override
@@ -24,7 +24,7 @@ class Password extends FormzInput<String, PasswordValidationError> {
 
   @override
   PasswordValidationError? validator(String? value) {
-    return _passwordRegExp.hasMatch(value ?? '')
+    return passwordRegExp.hasMatch(value ?? '')
         ? null
         : PasswordValidationError.invalid;
   }

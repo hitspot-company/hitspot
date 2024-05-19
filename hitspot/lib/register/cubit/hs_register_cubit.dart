@@ -55,7 +55,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
     final password = Password.dirty(value);
     emit(
       state.copyWith(
-        errorMessage: null,
+        errorMessage: getPasswordErrorText(value),
         password: password,
         isValid: Formz.validate([
           state.email,
@@ -63,6 +63,26 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
         ]),
       ),
     );
+  }
+
+  String? getPasswordErrorText(String value) {
+    String? ret;
+    if (!Password.passwordRegExp.hasMatch(value)) {
+      ret = "The password has to: ";
+      if (value.length < 8) {
+        ret += "\n at least 8 characters long";
+      }
+      if (value.length > 24) {
+        ret += "\n at most 24 characters long";
+      }
+      ret += "\n other cases";
+    }
+    return (ret);
+    // TODO: Others
+//     The string contains at least one letter ((?=.*[A-Za-z])).
+//     The string contains at least one digit ((?=.*\d)).
+//     The string is at least 8 characters long ([A-Za-z\d]{8,}).
+//     The string only contains letters and digits.
   }
 
   Future<void> signUpFormSubmitted() async {
