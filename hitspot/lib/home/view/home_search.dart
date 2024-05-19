@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/user_profile/view/user_profile_provider.dart';
-import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:hs_search_repository/hs_search.dart';
+
+import '../../user_profile/update/view/user_profile_provider.dart';
 
 class HSHomeSearchDelegate extends SearchDelegate<String> {
   List results = [];
