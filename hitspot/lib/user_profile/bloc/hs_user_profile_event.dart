@@ -8,3 +8,5 @@ sealed class HSUserProfileEvent extends Equatable {
 }
 
 final class HSUserProfileInitialEvent extends HSUserProfileEvent {}
+
+final class HSUserProfileFollowUnfollowUserEvent extends HSUserProfileEvent {}

@@ -5,6 +5,12 @@ import 'package:hs_database_repository/src/hs_database_repository_users.dart';
 class HSDatabaseRepository {
   static final _usersRepository = HSUsersRepository();
 
+  Future<void> followUser(HSUser currentUser, HSUser user) async =>
+      await _usersRepository.followUser(currentUser, user);
+
+  Future<void> unfollowUser(HSUser currentUser, HSUser user) async =>
+      await _usersRepository.unfollowUser(currentUser, user);
+
   Future<void> updateField(HSUser user, String field, String newValue) async =>
       _usersRepository.updateField(user, field, newValue);
 

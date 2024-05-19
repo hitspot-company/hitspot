@@ -6,6 +6,32 @@ class HSUsersRepository {
   static final _db = FirebaseFirestore.instance;
   final _usersCollection = _db.collection("users");
 
+  Future<void> followUser(HSUser currentUser, HSUser user) async {
+    try {
+      await _usersCollection.doc(user.uid).update({
+        HSUserField.followers.name: FieldValue.arrayUnion([currentUser.uid])
+      });
+      await _usersCollection.doc(currentUser.uid).update({
+        HSUserField.following.name: FieldValue.arrayUnion([user.uid])
+      });
+    } catch (_) {
+      throw DatabaseConnectionFailure("The user could not be followed.");
+    }
+  }
+
+  Future<void> unfollowUser(HSUser currentUser, HSUser user) async {
+    try {
+      await _usersCollection.doc(user.uid).update({
+        HSUserField.followers.name: FieldValue.arrayRemove([currentUser.uid])
+      });
+      await _usersCollection.doc(currentUser.uid).update({
+        HSUserField.following.name: FieldValue.arrayRemove([user.uid])
+      });
+    } catch (_) {
+      throw DatabaseConnectionFailure("The user could not be unfollowed.");
+    }
+  }
+
   Future<void> updateField(HSUser user, String field, String newValue) async {
     try {
       await _usersCollection.doc(user.uid).update({

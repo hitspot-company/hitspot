@@ -17,6 +17,7 @@ import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_monitor.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -79,9 +80,12 @@ class UserProfilePage extends StatelessWidget {
                     slivers: [
                       const _Headline(title: "BIO"),
                       SliverToBoxAdapter(
-                        child: Text(
-                          user.biogram!,
-                          style: textTheme.titleSmall,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Text(
+                            user.biogram!,
+                            style: textTheme.titleSmall,
+                          ),
                         ),
                       )
                     ],
@@ -256,23 +260,36 @@ class _StatsAppBar extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
           background: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              _StatsChip(
-                label: "Followers",
-                value: user?.followers?.length,
-              ),
-              _StatsChip(
-                label: "Following",
-                value: user?.following?.length,
-              ),
-              _StatsChip(
-                label: "Spots",
-                value: user?.spots?.length,
-              ),
-            ],
+          BlocBuilder<HSUserProfileBloc, HSUserProfileState>(
+            buildWhen: (previous, current) {
+              HSDebugLogger.logInfo("State changed");
+              if (previous is HSUserProfileReady &&
+                  current is HSUserProfileReady) {
+                return previous.user?.followers != current.user?.followers ||
+                    previous.user?.following != current.user?.following;
+              }
+              return false;
+            },
+            builder: (context, state) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  _StatsChip(
+                    label: "Followers",
+                    value: user?.followers?.length,
+                  ),
+                  _StatsChip(
+                    label: "Following",
+                    value: user?.following?.length,
+                  ),
+                  _StatsChip(
+                    label: "Spots",
+                    value: user?.spots?.length,
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(
             height: 24.0,
@@ -290,27 +307,63 @@ class _StatsAppBar extends StatelessWidget {
           borderRadius: 8.0,
           child: Opacity(
             opacity: 0.0,
-            child: HSSocialLoginButtons.custom(
-              labelText: "EDIT PROFILE",
-              onPressed: () {},
-            ),
+            child: _ProfileActionButton.editProfile(true),
           ),
         ),
       );
     }
     if (userProfileBloc!.isOwnProfile) {
-      return HSSocialLoginButtons.custom(
-        labelText: "EDIT PROFILE",
-        onPressed: () => HSApp.instance.navigation.push(
-          EditProfileProvider.route(),
-        ),
-      );
+      return _ProfileActionButton.editProfile(false, userProfileBloc!);
     } else {
-      return HSSocialLoginButtons.custom(
-        labelText: "FOLLOW",
-        onPressed: () {},
-      );
+      if (userProfileBloc!.isUserFollowed()) {
+        return _ProfileActionButton.unfollow(userProfileBloc!);
+      }
+      return _ProfileActionButton.follow(userProfileBloc!);
     }
+  }
+}
+
+class _ProfileActionButton extends StatelessWidget {
+  const _ProfileActionButton(
+      {required this.onPressed, required this.labelText, this.userProfileBloc});
+
+  final String labelText;
+  final VoidCallback onPressed;
+  final HSUserProfileBloc? userProfileBloc;
+
+  @override
+  Widget build(BuildContext context) {
+    return HSSocialLoginButtons.custom(
+      labelText: labelText,
+      onPressed: onPressed,
+    );
+  }
+
+  factory _ProfileActionButton.follow(HSUserProfileBloc userProfileBloc) {
+    return _ProfileActionButton(
+      labelText: "FOLLOW",
+      onPressed: () => userProfileBloc.add(
+        HSUserProfileFollowUnfollowUserEvent(),
+      ),
+    );
+  }
+
+  factory _ProfileActionButton.unfollow(HSUserProfileBloc userProfileBloc) {
+    return _ProfileActionButton(
+      labelText: "UNFOLLOW",
+      onPressed: () => userProfileBloc.add(
+        HSUserProfileFollowUnfollowUserEvent(),
+      ),
+    );
+  }
+
+  factory _ProfileActionButton.editProfile(bool isLoading,
+      [HSUserProfileBloc? userProfileBloc]) {
+    return _ProfileActionButton(
+        labelText: "EDIT PROFILE",
+        onPressed: isLoading
+            ? () {}
+            : () => app.navigation.push(EditProfileProvider.route()));
   }
 }
 
