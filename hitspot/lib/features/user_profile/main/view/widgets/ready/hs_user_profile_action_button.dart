@@ -1,7 +1,7 @@
 import 'package:hitspot/constants/constants.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
-import 'package:hitspot/user_profile/edit_profile/view/edit_profile_provider.dart';
+import 'package:hitspot/features/user_profile/main/bloc/hs_user_profile_bloc.dart';
+import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 
 class HSUserProfileActionButton extends StatelessWidget {

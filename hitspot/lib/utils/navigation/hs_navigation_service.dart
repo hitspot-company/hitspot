@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/home/view/home_page.dart';
-import 'package:hitspot/login/view/login_provider.dart';
-import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
-import 'package:hitspot/register/view/register_page.dart';
+import 'package:hitspot/features/home/view/home_page.dart';
+import 'package:hitspot/features/login/view/login_provider.dart';
+import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
+import 'package:hitspot/features/register/view/register_page.dart';
 
 class HSNavigationService {
   // SINGLETON

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/password_reset/cubit/hs_password_reset_cubit.dart';
-import 'package:hitspot/password_reset/view/password_reset_form.dart';
+import 'package:hitspot/features/password_reset/cubit/hs_password_reset_cubit.dart';
+import 'package:hitspot/features/password_reset/view/password_reset_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 

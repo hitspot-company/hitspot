@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
-import 'package:hitspot/user_profile/view/widgets/ready/hs_user_profile_action_button.dart';
-import 'package:hitspot/user_profile/view/widgets/ready/hs_user_profile_stats_chip_ready.dart';
+import 'package:hitspot/features/user_profile/main/bloc/hs_user_profile_bloc.dart';
+import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_profile_action_button.dart';
+import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_profile_stats_chip_ready.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/user_profile/edit_profile/cubit/edit_profile_cubit.dart';
-import 'package:hitspot/user_profile/edit_profile/view/edit_profile_page.dart';
+import 'package:hitspot/features/user_profile/edit_profile/cubit/edit_profile_cubit.dart';
+import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_page.dart';
 
 class EditProfileProvider extends StatelessWidget {
   const EditProfileProvider({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/login/cubit/login_cubit.dart';
-import 'package:hitspot/login/view/login_page.dart';
+import 'package:hitspot/features/login/cubit/login_cubit.dart';
+import 'package:hitspot/features/login/view/login_page.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 
 class LoginPage extends StatelessWidget {

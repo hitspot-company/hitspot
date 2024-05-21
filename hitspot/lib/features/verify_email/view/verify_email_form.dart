@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
-import 'package:hitspot/verify_email/cubit/hs_verify_email_cubit.dart';
+import 'package:hitspot/features/verify_email/cubit/hs_verify_email_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_text_prompt.dart';

@@ -9,7 +9,7 @@ import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
-import 'package:hitspot/register/cubit/hs_register_cubit.dart';
+import 'package:hitspot/features/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';

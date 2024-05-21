@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
-import 'package:hitspot/user_profile/view/user_profile_page.dart';
+import 'package:hitspot/features/user_profile/main/bloc/hs_user_profile_bloc.dart';
+import 'package:hitspot/features/user_profile/main/view/user_profile_page.dart';
 
 class UserProfileProvider extends StatelessWidget {
   const UserProfileProvider({super.key, required this.userID});

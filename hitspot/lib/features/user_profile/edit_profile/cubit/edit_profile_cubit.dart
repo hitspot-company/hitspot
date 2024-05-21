@@ -2,11 +2,12 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/route_manager.dart';
-import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:path/path.dart' as path;
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -24,12 +25,27 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   final _firebaseStorage = FirebaseStorage.instance;
   final HSDatabaseRepository _databaseRepository;
 
+  Future<CroppedFile?> _getCroppedFile(String sourcePath) async {
+    late final CroppedFile? ret;
+    ret = await ImageCropper().cropImage(
+        cropStyle: CropStyle.circle,
+        sourcePath: sourcePath,
+        uiSettings: [
+          IOSUiSettings(
+            title: 'Your Avatar',
+          ),
+        ]);
+    return ret;
+  }
+
   Future<void> chooseImage() async {
     try {
       final XFile? image = await _picker.pickImage(
           source: ImageSource.gallery, imageQuality: 80);
       if (image == null) return;
-      final File file = File(image.path);
+      final CroppedFile? croppedFile = await _getCroppedFile(image.path);
+      if (croppedFile == null) return;
+      final File file = File(croppedFile.path);
       emit(state.copy(imageChangeState: HSImageChangeState.uploading));
       final String url = await uploadFile(file);
       emit(state.copy(imageChangeState: HSImageChangeState.setting));
