@@ -16,6 +16,10 @@ final class HSUserProfileReady extends HSUserProfileState {
   final HSUser? user;
 }
 
+final class HSUserProfileUpdate extends HSUserProfileReady {
+  const HSUserProfileUpdate(super.user);
+}
+
 final class HSUserProfileError extends HSUserProfileState {
   const HSUserProfileError(this.error);
   final String error;

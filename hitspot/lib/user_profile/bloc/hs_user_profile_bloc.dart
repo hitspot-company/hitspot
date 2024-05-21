@@ -17,7 +17,7 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
     on<HSUserProfileInitialEvent>((event, emit) async {
       await Future.delayed(const Duration(milliseconds: 300));
       await _getUserData(event, emit);
-      isOwnProfile = userData?.uid == currentUser.uid;
+      isOwnProfile = userID == currentUser.uid;
     });
     on<HSUserProfileFollowUnfollowUserEvent>(followUnfollowUser);
   }
@@ -25,7 +25,6 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
   late final bool isOwnProfile;
   final String userID;
   final HSDatabaseRepository databaseRepository;
-  late final HSUser? userData;
   final ScrollController scrollController = ScrollController();
 
   bool isUserFollowed() {
@@ -41,6 +40,7 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
     try {
       if (state is HSUserProfileReady) {
         final HSUserProfileReady readyState = state as HSUserProfileReady;
+        emit(HSUserProfileUpdate(readyState.user));
         if (isUserFollowed()) {
           await databaseRepository.unfollowUser(currentUser, readyState.user!);
           followed = false;
@@ -76,7 +76,11 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
   Future<void> _getUserData(event, emit) async {
     emit(HSUserProfileInitialLoading());
     try {
-      userData = await databaseRepository.getUserFromDatabase(userID);
+      final HSUser? userData =
+          await databaseRepository.getUserFromDatabase(userID);
+      if (userData == null) {
+        throw const HSUserProfileError("User data could not be fetched.");
+      }
       emit(HSUserProfileReady(userData));
     } on DatabaseConnectionFailure catch (e) {
       emit(HSUserProfileError(e.message));

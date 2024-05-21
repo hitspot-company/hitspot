@@ -15,7 +15,7 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   late final AnimationController _controller;
   final HSApp _app = HSApp.instance;
-  final String animation = "assets/splash/splash_1.json";
+  final String animation = "assets/splash/splash_right.json";
 
   @override
   void initState() {

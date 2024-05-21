@@ -8,6 +8,8 @@ import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/user_profile/bloc/hs_user_profile_bloc.dart';
 import 'package:hitspot/user_profile/edit_profile/view/edit_profile_provider.dart';
+import 'package:hitspot/user_profile/view/widgets/skeletons/stats_chip_skeleton.dart';
+import 'package:hitspot/user_profile/view/widgets/skeletons/user_app_bar_skeleton.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -30,81 +32,19 @@ class UserProfilePage extends StatelessWidget {
       builder: (context, state) {
         final userProfileBloc = context.read<HSUserProfileBloc>();
         if (state is HSUserProfileInitialLoading) {
-          return HSScaffold(
-            appBar: HSAppBar(
-              title: "",
-              titleBold: true,
-              enableDefaultBackButton: true,
-            ),
-            body: CustomScrollView(
+          return _LoadingPage(controller: controller);
+        } else if (state is HSUserProfileReady ||
+            state is HSUserProfileUpdate) {
+          late final HSUser user;
+          if (state is HSUserProfileReady) {
+            user = state.user!;
+          } else if (state is HSUserProfileUpdate) {
+            user = state.user!;
+          }
+          return _ReadyPage(
               controller: controller,
-              slivers: [
-                _UserDataAppBar.loading(),
-                const SliverToBoxAdapter(
-                  child: Gap(16.0),
-                ),
-                const SliverToBoxAdapter(
-                  child: Divider(
-                    thickness: .1,
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: Gap(16.0),
-                ),
-                _StatsAppBar.loading(),
-                const _Headline(title: "SPOTS"),
-                const SliverToBoxAdapter(
-                  child: Gap(16.0),
-                ),
-                _SpotsGrid.loading(),
-              ],
-            ),
-          );
-        } else if (state is HSUserProfileReady) {
-          final user = state.user!;
-          return HSScaffold(
-            appBar: HSAppBar(
-              title: "",
-              titleBold: true,
-              enableDefaultBackButton: true,
-            ),
-            body: CustomScrollView(
-              controller: controller,
-              slivers: [
-                _UserDataAppBar.ready(user),
-                const SliverToBoxAdapter(
-                  child: Gap(16.0),
-                ),
-                if (user.biogram != null)
-                  SliverMainAxisGroup(
-                    slivers: [
-                      const _Headline(title: "BIO"),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                          child: Text(
-                            user.biogram!,
-                            style: textTheme.titleSmall,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                const SliverToBoxAdapter(
-                  child: Gap(16.0),
-                ),
-                _StatsAppBar.ready(
-                    user: user, userProfileBloc: userProfileBloc),
-                const _Headline(title: "SPOTS"),
-                const SliverToBoxAdapter(
-                  child: Gap(16.0),
-                ),
-                _SpotsGrid.ready(
-                  spots: user.spots ?? [],
-                ),
-              ],
-            ),
-          );
+              user: user,
+              userProfileBloc: userProfileBloc);
         }
         return HSScaffold(
           appBar: HSAppBar(
@@ -117,6 +57,108 @@ class UserProfilePage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _ReadyPage extends StatelessWidget {
+  const _ReadyPage({
+    super.key,
+    required this.controller,
+    required this.user,
+    required this.userProfileBloc,
+  });
+
+  final ScrollController controller;
+  final HSUser user;
+  final HSUserProfileBloc userProfileBloc;
+
+  @override
+  Widget build(BuildContext context) {
+    return HSScaffold(
+      appBar: HSAppBar(
+        title: "",
+        titleBold: true,
+        enableDefaultBackButton: true,
+      ),
+      body: CustomScrollView(
+        controller: controller,
+        slivers: [
+          _UserDataAppBar.ready(user),
+          const SliverToBoxAdapter(
+            child: Gap(16.0),
+          ),
+          if (user.biogram != null)
+            SliverMainAxisGroup(
+              slivers: [
+                const _Headline(title: "BIO"),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(
+                      user.biogram!,
+                      style: textTheme.titleSmall,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          const SliverToBoxAdapter(
+            child: Gap(16.0),
+          ),
+          _StatsAppBar.ready(user: user, userProfileBloc: userProfileBloc),
+          const _Headline(title: "SPOTS"),
+          const SliverToBoxAdapter(
+            child: Gap(16.0),
+          ),
+          _SpotsGrid.ready(
+            spots: user.spots ?? [],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoadingPage extends StatelessWidget {
+  const _LoadingPage({
+    super.key,
+    required this.controller,
+  });
+
+  final ScrollController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return HSScaffold(
+      appBar: HSAppBar(
+        title: "",
+        titleBold: true,
+        enableDefaultBackButton: true,
+      ),
+      body: CustomScrollView(
+        controller: controller,
+        slivers: [
+          _UserDataAppBar.loading(),
+          const SliverToBoxAdapter(
+            child: Gap(16.0),
+          ),
+          const SliverToBoxAdapter(
+            child: Divider(
+              thickness: .1,
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: Gap(16.0),
+          ),
+          _StatsAppBar.loading(),
+          const _Headline(title: "SPOTS"),
+          const SliverToBoxAdapter(
+            child: Gap(16.0),
+          ),
+          _SpotsGrid.loading(),
+        ],
+      ),
     );
   }
 }
@@ -173,11 +215,7 @@ class _SpotsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _spotsBuilder(loading, spots ?? []);
-  }
-
-  Widget _spotsBuilder(bool isLoading, List spots) {
-    if (isLoading) {
+    if (loading) {
       const int childCount = 8;
       return SliverMasonryGrid.count(
         crossAxisCount: 2,
@@ -190,8 +228,9 @@ class _SpotsGrid extends StatelessWidget {
           ),
         ),
       );
-    } else if (spots.isEmpty) {
+    } else if (spots?.isEmpty ?? true) {
       return SliverFillRemaining(
+        hasScrollBody: false,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -211,7 +250,7 @@ class _SpotsGrid extends StatelessWidget {
       crossAxisCount: 2,
       mainAxisSpacing: 8.0,
       crossAxisSpacing: 8.0,
-      childCount: spots.length,
+      childCount: spots!.length,
       itemBuilder: (context, index) {
         return _SpotTile(
           index: index,
@@ -325,17 +364,22 @@ class _StatsAppBar extends StatelessWidget {
 
 class _ProfileActionButton extends StatelessWidget {
   const _ProfileActionButton(
-      {required this.onPressed, required this.labelText, this.userProfileBloc});
+      {required this.onPressed,
+      required this.labelText,
+      this.userProfileBloc,
+      this.backgroundColor});
 
   final String labelText;
   final VoidCallback onPressed;
   final HSUserProfileBloc? userProfileBloc;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return HSSocialLoginButtons.custom(
       labelText: labelText,
       onPressed: onPressed,
+      backgroundColor: backgroundColor,
     );
   }
 
@@ -354,6 +398,7 @@ class _ProfileActionButton extends StatelessWidget {
       onPressed: () => userProfileBloc.add(
         HSUserProfileFollowUnfollowUserEvent(),
       ),
+      backgroundColor: currentTheme.mainColor,
     );
   }
 
@@ -414,7 +459,7 @@ class _UserDataAppBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   loading
-                      ? const _UserDataAppBarSkeleton()
+                      ? const HSUserProfileAppBarSkeleton()
                       : _UserDataAppBarReady(user: user!),
                 ],
               ),
@@ -445,39 +490,6 @@ class _UserDataAppBarReady extends StatelessWidget {
   }
 }
 
-class _UserDataAppBarSkeleton extends StatelessWidget {
-  const _UserDataAppBarSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return const HSShimmer(
-      child: HSShimmerSkeleton(
-        height: 100,
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: HSShimmerSkeleton(
-                  borderRadius: 4.0,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: HSShimmerSkeleton(
-                  borderRadius: 4.0,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _StatsChip extends StatelessWidget {
   const _StatsChip({
     this.label,
@@ -504,7 +516,7 @@ class _StatsChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: loading
-          ? const _StatsChipSkeleton()
+          ? const StatsChipSkeleton()
           : _StatsChipReady(label: label!, value: value),
     );
   }
@@ -525,31 +537,6 @@ class _StatsChipReady extends StatelessWidget {
           Text(label, style: textTheme.headlineSmall),
           Text('${value ?? 0}', style: textTheme.headlineSmall),
         ],
-      ),
-    );
-  }
-}
-
-class _StatsChipSkeleton extends StatelessWidget {
-  const _StatsChipSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.0),
-      child: HSShimmer(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            HSShimmerSkeleton(
-              height: 20.0,
-            ),
-            Gap(4.0),
-            HSShimmerSkeleton(
-              height: 20.0,
-            ),
-          ],
-        ),
       ),
     );
   }
