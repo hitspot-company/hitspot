@@ -3,8 +3,8 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 
-class StatsChipSkeleton extends StatelessWidget {
-  const StatsChipSkeleton({super.key});
+class HSUserProfileStatsChipSkeleton extends StatelessWidget {
+  const HSUserProfileStatsChipSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {

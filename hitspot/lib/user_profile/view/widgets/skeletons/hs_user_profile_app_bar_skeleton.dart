@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 
-class HSUserProfileAppBarSkeleton extends StatelessWidget {
-  const HSUserProfileAppBarSkeleton({super.key});
+class HSUserProfileUserDataAppBarSkeleton extends StatelessWidget {
+  const HSUserProfileUserDataAppBarSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
