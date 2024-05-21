@@ -12,6 +12,10 @@ import 'package:hitspot/widgets/hs_searchbar.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  static Route<void> route() {
+    return MaterialPageRoute<void>(builder: (_) => const HomePage());
+  }
+
   static Page<void> page() => const MaterialPage<void>(child: HomePage());
 
   @override

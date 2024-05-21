@@ -26,6 +26,9 @@ class HSNavigationService {
   dynamic pop([bool shouldUpdate = false]) {
     return navigatorKey.currentState?.pop(shouldUpdate);
   }
+
+  dynamic logout() =>
+      navigatorKey.currentState?.popUntil((route) => route.isFirst);
 }
 
 class _HSRoutes {
@@ -39,7 +42,7 @@ class _HSRoutes {
       case '/home':
         return MaterialPageRoute(builder: (context) => const HomePage());
       case '/login':
-        return MaterialPageRoute(builder: (context) => const LoginPage());
+        return MaterialPageRoute(builder: (context) => const LoginProvider());
       case '/register':
         return MaterialPageRoute(builder: (context) => const RegisterPage());
       case '/profile_completion':

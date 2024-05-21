@@ -25,7 +25,7 @@ void main() async {
   await FlutterConfig.loadEnvVariables();
   final authenticationRepository = HSAuthenticationRepository();
   final databaseRepository = HSDatabaseRepository();
-  final themeRepository = HSThemeRepository();
+  final themeRepository = HSThemeRepository.instance;
   final mailingRepository = HSMailingRepository();
   final searchRepository = HSSearchRepository();
   Animate.restartOnHotReload = true;
@@ -127,7 +127,7 @@ class _HSFlowBuilder extends StatelessWidget {
         if (appStatus == HSAppStatus.loading)
           SplashPage.page()
         else if (appStatus == HSAppStatus.unauthenticated)
-          LoginPage.page()
+          LoginProvider.page()
         else if (appStatus == HSAppStatus.emailNotVerified)
           VerifyEmailPage.page()
         else if (appStatus == HSAppStatus.profileNotCompleted)

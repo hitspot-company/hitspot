@@ -19,7 +19,7 @@ class PasswordResetForm extends StatelessWidget {
       children: [
         const Gap(24.0),
         Text(
-          "Please provice your email address below. A reset link will be sent to your inbox.",
+          "Please provide your email address below. A reset link will be sent to your inbox.",
           style: hsApp.textTheme.titleMedium,
         ),
         const Gap(24.0),

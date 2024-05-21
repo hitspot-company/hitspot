@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/main/bloc/hs_user_profile_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_pr
 import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_profile_user_data_app_bar_ready.dart';
 import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_user_profile_stats_chip_skeleton.dart';
 import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_user_profile_app_bar_skeleton.dart';
+import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
@@ -58,7 +60,6 @@ class UserProfilePage extends StatelessWidget {
 
 class _ReadyPage extends StatelessWidget {
   const _ReadyPage({
-    super.key,
     required this.controller,
     required this.user,
     required this.userProfileBloc,
@@ -75,6 +76,9 @@ class _ReadyPage extends StatelessWidget {
         title: "",
         titleBold: true,
         enableDefaultBackButton: true,
+        right: IconButton(
+            onPressed: () => navi.push(SettingsProvider.route()),
+            icon: const Icon(FontAwesomeIcons.bars)),
       ),
       body: CustomScrollView(
         controller: controller,
