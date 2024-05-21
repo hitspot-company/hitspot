@@ -59,7 +59,7 @@ class HSUserProfileStatsAppBar extends StatelessWidget {
             },
             builder: (context, state) {
               return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   HSUserProfileStatsChipReady(

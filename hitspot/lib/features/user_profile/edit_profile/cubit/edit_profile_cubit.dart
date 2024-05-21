@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/route_manager.dart';
 import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -24,6 +23,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   final _picker = ImagePicker();
   final _firebaseStorage = FirebaseStorage.instance;
   final HSDatabaseRepository _databaseRepository;
+  bool shouldUpdate = false;
 
   Future<CroppedFile?> _getCroppedFile(String sourcePath) async {
     late final CroppedFile? ret;
@@ -60,6 +60,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
         description: "Your profile picture has been changed!",
         alignment: Alignment.bottomCenter,
       );
+      shouldUpdate = true;
     } catch (_) {
       HSDebugLogger.logError("$_");
       app.showToast(

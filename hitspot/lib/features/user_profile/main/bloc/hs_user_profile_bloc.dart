@@ -16,16 +16,26 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
   }) : super(HSUserProfileInitialLoading()) {
     on<HSUserProfileInitialEvent>((event, emit) async {
       await Future.delayed(const Duration(milliseconds: 300));
-      await _getUserData(event, emit);
+      await _fetchInitial(event, emit);
       isOwnProfile = userID == currentUser.uid;
     });
     on<HSUserProfileFollowUnfollowUserEvent>(followUnfollowUser);
+    on<HSUserProfileRequestUpdateEvent>(_update);
   }
 
   late final bool isOwnProfile;
   final String userID;
   final HSDatabaseRepository databaseRepository;
   final ScrollController scrollController = ScrollController();
+
+  Future<void> _update(event, emit) async {
+    try {
+      await _fetchInitial(event, emit);
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+      emit(const HSUserProfileError("An unknown error occured"));
+    }
+  }
 
   bool isUserFollowed() {
     if (state is HSUserProfileReady) {
@@ -73,7 +83,7 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
     }
   }
 
-  Future<void> _getUserData(event, emit) async {
+  Future<void> _fetchInitial(event, emit) async {
     emit(HSUserProfileInitialLoading());
     try {
       final HSUser? userData =

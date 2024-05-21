@@ -23,8 +23,8 @@ class HSNavigationService {
     return navigatorKey.currentState?.pushNamed(route, arguments: arguments);
   }
 
-  dynamic pop() {
-    return navigatorKey.currentState?.pop();
+  dynamic pop([bool shouldUpdate = false]) {
+    return navigatorKey.currentState?.pop(shouldUpdate);
   }
 }
 
