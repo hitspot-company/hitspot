@@ -54,7 +54,8 @@ class SettingsPage extends StatelessWidget {
                     leading: const Icon(FontAwesomeIcons.moon),
                     title: const Text('Switch Theme'),
                     description: const Text('Press here to toggle theme.'),
-                    onPressed: (context) => settingsCubit.switchTheme(),
+                    onPressed: (context) =>
+                        settingsCubit.switchTheme(), // BUG: Weird Colors
                   )
                 ],
               ),
