@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 
 class HSShimmerSkeleton extends StatelessWidget {
   const HSShimmerSkeleton(
@@ -19,7 +20,7 @@ class HSShimmerSkeleton extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: HSApp.instance.theme.currentTheme.highlightColor,
+        color: currentTheme.highlightColor,
         borderRadius: BorderRadius.all(
           Radius.circular(borderRadius),
         ),
@@ -40,7 +41,7 @@ class HSShimmerCircleSkeleton extends StatelessWidget {
       height: size,
       width: size,
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withOpacity(0.04),
+        color: currentTheme.highlightColor,
         shape: BoxShape.circle,
       ),
     );

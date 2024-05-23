@@ -119,10 +119,7 @@ class _ReadyPage extends StatelessWidget {
 }
 
 class _LoadingPage extends StatelessWidget {
-  const _LoadingPage({
-    super.key,
-    required this.controller,
-  });
+  const _LoadingPage({required this.controller});
 
   final ScrollController controller;
 

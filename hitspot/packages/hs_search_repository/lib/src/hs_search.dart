@@ -1,35 +1,16 @@
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_search_repository/src/exceptions/hs_search_exception.dart';
 
 class HSSearchRepository {
+  static final HSSearchRepository instance = HSSearchRepository();
   final algoliaCredentials = _AlgoliaCredentials.instance;
-  Stream<_AlgoliaSearchMetadata> get usersSearchMetadata =>
-      algoliaCredentials.users.usersSearcher.responses
-          .map(_AlgoliaSearchMetadata.fromResponse);
-
-  Stream<_AlgoliaSearchMetadata> get spotsSearchMetadata =>
-      algoliaCredentials.spots.spotsSearcher.responses
-          .map(_AlgoliaSearchMetadata.fromResponse);
 
   HitsSearcher get usersSearcher => algoliaCredentials.users.usersSearcher;
   HitsSearcher get spotsSearcher => algoliaCredentials.spots.spotsSearcher;
 
   Stream<UsersHitsPage> get usersSearchPage =>
       usersSearcher.responses.map(UsersHitsPage.fromResponse);
-
-  Stream<List<HSUser>> streamUsers(String query) {
-    try {
-      usersSearcher.query(query);
-      print("query: $query");
-      return usersSearcher.responses.map((e) => e.hits
-          .map((e) => HSUser.deserialize(e, uid: e["objectID"]))
-          .toList());
-    } catch (e) {
-      throw HSSearchException.users();
-    }
-  }
 
   void dispose() {
     if (!usersSearcher.isDisposed) usersSearcher.dispose();
@@ -63,14 +44,11 @@ class _SpotsSearcher {
       applicationID: applicationID,
       apiKey: apiKey,
       indexName: indexName,
-      debounce: const Duration(milliseconds: 100),
     ); // TODO: Change spots to dev_spots
   }
 
   final String indexName = "spots";
   late final HitsSearcher spotsSearcher;
-  Stream<_AlgoliaSearchMetadata> get spotsSearchMetadata =>
-      spotsSearcher.responses.map(_AlgoliaSearchMetadata.fromResponse);
 }
 
 class _UsersSearcher {
@@ -79,7 +57,7 @@ class _UsersSearcher {
       applicationID: applicationID,
       apiKey: apiKey,
       indexName: indexName,
-      debounce: const Duration(milliseconds: 100),
+      debounce: const Duration(milliseconds: 200),
     ); // TODO: Change users to dev_users
     filterState.add(FilterGroupID("is_profile_completed"), filterCategory);
     usersSearcher.connectFilterState(filterState);
@@ -94,18 +72,6 @@ class _UsersSearcher {
     name: 'is_profile_completed',
     filters: {Filter.facet('is_profile_completed', true)},
   );
-
-  Stream<_AlgoliaSearchMetadata> get usersSearchMetadata =>
-      usersSearcher.responses.map(_AlgoliaSearchMetadata.fromResponse);
-}
-
-class _AlgoliaSearchMetadata {
-  final int nbHits;
-
-  const _AlgoliaSearchMetadata(this.nbHits);
-
-  factory _AlgoliaSearchMetadata.fromResponse(SearchResponse response) =>
-      _AlgoliaSearchMetadata(response.nbHits);
 }
 
 class UsersHitsPage {
