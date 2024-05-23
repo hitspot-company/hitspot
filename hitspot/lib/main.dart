@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/features/home/view/home_page.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
@@ -68,7 +68,7 @@ class App extends StatelessWidget {
           create: (context) => HSAuthenticationRepository(),
         ),
         RepositoryProvider(
-          create: (context) => HSDatabaseRepository(),
+          create: (context) => const HSDatabaseRepository(),
         ),
         RepositoryProvider(
           create: (context) => HSMailingRepository(),

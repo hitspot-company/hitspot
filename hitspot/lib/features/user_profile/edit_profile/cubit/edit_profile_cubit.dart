@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';

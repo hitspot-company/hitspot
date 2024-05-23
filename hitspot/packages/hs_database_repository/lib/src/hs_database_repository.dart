@@ -3,6 +3,8 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/hs_database_repository_users.dart';
 
 class HSDatabaseRepository {
+  const HSDatabaseRepository();
+
   static final _usersRepository = HSUsersRepository();
 
   Future<void> followUser(HSUser currentUser, HSUser user) async =>

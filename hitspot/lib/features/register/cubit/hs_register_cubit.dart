@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
