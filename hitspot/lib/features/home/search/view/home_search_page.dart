@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
-import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_search_repository/hs_search.dart';
 
 class HSHomeSearchDelegate extends SearchDelegate {
-  final HitsSearcher searcher = HSSearchRepository.instance.usersSearcher;
+  final UsersSearcher usersSearcher = HSSearchRepository.instance.usersSearcher;
+  HitsSearcher get searcher => usersSearcher.searcher;
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -41,7 +41,9 @@ class HSHomeSearchDelegate extends SearchDelegate {
       stream: searcher.responses,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const _Builder();
+          return _UsersBuilder(
+            usersSearcher: usersSearcher,
+          );
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.hits.isEmpty) {
@@ -49,8 +51,7 @@ class HSHomeSearchDelegate extends SearchDelegate {
         }
 
         final hits = snapshot.data!.hits;
-        return _Builder(
-            data: hits, titleField: "username", subtitleField: "full_name");
+        return _UsersBuilder(usersSearcher: usersSearcher);
       },
     );
   }
@@ -63,6 +64,13 @@ class HSHomeSearchDelegate extends SearchDelegate {
 
   @override
   void showResults(BuildContext context) {
+    searcher.applyState(
+      (state) => state.copyWith(
+        query: query,
+        page: 0,
+      ),
+    );
+    usersSearcher.searchPage.listen((event) {});
     searcher.rerun(); // TODO: Verify if not too much
     super.showResults(context);
   }
@@ -74,12 +82,17 @@ class HSHomeSearchDelegate extends SearchDelegate {
   }
 }
 
-class _Builder extends StatelessWidget {
-  const _Builder({this.data, this.titleField, this.subtitleField});
+class _UsersBuilder extends StatelessWidget {
+  const _UsersBuilder(
+      {this.data,
+      this.titleField,
+      this.subtitleField,
+      required this.usersSearcher});
 
   final List? data;
   final String? titleField, subtitleField;
   final double radius = 24.0;
+  final UsersSearcher usersSearcher;
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +102,28 @@ class _Builder extends StatelessWidget {
     } else {
       childCount = data!.length;
     }
+    return PagedListView<int, HSUser>(
+      pagingController: usersSearcher.pagingController,
+      builderDelegate: PagedChildBuilderDelegate<HSUser>(
+        noItemsFoundIndicatorBuilder: (_) => const Center(
+          child: Text('No results found'),
+        ),
+        itemBuilder: (_, item, __) => Container(
+          color: Colors.white,
+          height: 80,
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              SizedBox(
+                  width: 50, child: Image.network(item.profilePicture ?? "")),
+              const SizedBox(width: 20),
+              Expanded(child: Text(item.username!))
+            ],
+          ),
+        ),
+      ),
+    );
+
     return ListView.builder(
       itemCount: childCount,
       itemBuilder: (BuildContext context, int index) {

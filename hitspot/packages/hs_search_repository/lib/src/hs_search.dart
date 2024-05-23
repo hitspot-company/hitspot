@@ -1,21 +1,22 @@
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class HSSearchRepository {
   static final HSSearchRepository instance = HSSearchRepository();
   final algoliaCredentials = _AlgoliaCredentials.instance;
 
-  HitsSearcher get usersSearcher => algoliaCredentials.users.usersSearcher;
-  HitsSearcher get spotsSearcher => algoliaCredentials.spots.spotsSearcher;
+  UsersSearcher get usersSearcher => algoliaCredentials.users;
+  SpotsSearcher get spotsSearcher => algoliaCredentials.spots;
 
   Stream<UsersHitsPage> get usersSearchPage =>
-      usersSearcher.responses.map(UsersHitsPage.fromResponse);
+      usersSearcher.searcher.responses.map(UsersHitsPage.fromResponse);
 
-  void dispose() {
-    if (!usersSearcher.isDisposed) usersSearcher.dispose();
-    if (!spotsSearcher.isDisposed) spotsSearcher.dispose();
-  }
+  // void dispose() {
+  //   if (!usersSearcher.isDisposed) usersSearcher.dispose();
+  //   if (!spotsSearcher.isDisposed) spotsSearcher.dispose();
+  // }
 }
 
 class _AlgoliaCredentials {
@@ -31,15 +32,15 @@ class _AlgoliaCredentials {
   static final _AlgoliaCredentials _instance = _AlgoliaCredentials();
   static _AlgoliaCredentials get instance => _instance;
 
-  _SpotsSearcher get spots => _SpotsSearcher(applicationID!, apiKey!);
-  _UsersSearcher get users => _UsersSearcher(applicationID!, apiKey!);
+  SpotsSearcher get spots => SpotsSearcher(applicationID!, apiKey!);
+  UsersSearcher get users => UsersSearcher(applicationID!, apiKey!);
 
   late final String? apiKey;
   late final String? applicationID;
 }
 
-class _SpotsSearcher {
-  _SpotsSearcher(String applicationID, String apiKey) {
+class SpotsSearcher {
+  SpotsSearcher(String applicationID, String apiKey) {
     spotsSearcher = HitsSearcher(
       applicationID: applicationID,
       apiKey: apiKey,
@@ -51,19 +52,26 @@ class _SpotsSearcher {
   late final HitsSearcher spotsSearcher;
 }
 
-class _UsersSearcher {
-  _UsersSearcher(String applicationID, String apiKey) {
-    usersSearcher = HitsSearcher(
+class UsersSearcher {
+  UsersSearcher(String applicationID, String apiKey) {
+    searcher = HitsSearcher(
       applicationID: applicationID,
       apiKey: apiKey,
       indexName: indexName,
       debounce: const Duration(milliseconds: 200),
-    ); // TODO: Change users to dev_users
+    );
     filterState.add(FilterGroupID("is_profile_completed"), filterCategory);
-    usersSearcher.connectFilterState(filterState);
+    searcher.connectFilterState(filterState);
+    searchPage.listen((page) {
+      print("REACHED END");
+      if (page.pageKey == 0) {
+        pagingController.refresh();
+      }
+      pagingController.appendPage(page.items, page.nextPageKey);
+    }).onError((e) => pagingController.error = e);
   }
 
-  late final HitsSearcher usersSearcher;
+  late final HitsSearcher searcher;
   final String indexName = "users";
 
   // FILTERING
@@ -72,6 +80,17 @@ class _UsersSearcher {
     name: 'is_profile_completed',
     filters: {Filter.facet('is_profile_completed', true)},
   );
+
+  final PagingController<int, HSUser> pagingController =
+      PagingController(firstPageKey: 0);
+  Stream<UsersHitsPage> get searchPage =>
+      searcher.responses.map(UsersHitsPage.fromResponse);
+
+  void dispose() {
+    searcher.dispose();
+    pagingController.dispose();
+    filterState.dispose();
+  }
 }
 
 class UsersHitsPage {
