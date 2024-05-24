@@ -1,0 +1,10 @@
+[{
+	"relation": ["delegate_permission/common.handle_all_urls"],
+	"target": {
+	  "namespace": "android_app",
+	  "package_name": "com.company.hitspot",
+	  "sha256_cert_fingerprints":
+	  ["5e:ab:a9:a4:fc:dd:87:d0:2a:a0:06:68:f2:4d:ef:43:a6:f0:6d:f1:00:80:c4:ec:2d:1c:26:8b:a8:db:86:e1"]
+	}
+  }]
+  
