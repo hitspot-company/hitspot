@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
@@ -24,7 +25,7 @@ void main() async {
   await Firebase.initializeApp(options: HSFirebaseConfigLoader.loadOptions);
   await FlutterConfig.loadEnvVariables();
   final authenticationRepository = HSAuthenticationRepository();
-  final databaseRepository = HSDatabaseRepository();
+  const databaseRepository = HSDatabaseRepository();
   final themeRepository = HSThemeRepository.instance;
   final mailingRepository = HSMailingRepository();
   final searchRepository = HSSearchRepository();
@@ -95,7 +96,8 @@ class App extends StatelessWidget {
             return MaterialApp(
               theme: currentTheme,
               title: "Hitspot",
-              navigatorKey: HSNavigationService.instance.navigatorKey,
+              navigatorKey: navi.navigatorKey,
+              onGenerateRoute: navi.routes.generateRoutes,
               builder: (context, child) => Overlay(
                 initialEntries: [
                   OverlayEntry(

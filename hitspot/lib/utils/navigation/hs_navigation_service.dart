@@ -3,6 +3,7 @@ import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/features/register/view/register_page.dart';
+import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 
 class HSNavigationService {
   // SINGLETON
@@ -48,6 +49,12 @@ class _HSRoutes {
       case '/profile_completion':
         return MaterialPageRoute(
             builder: (context) => const ProfileCompletionPage());
+      case '/spots/:spotID':
+        return MaterialPageRoute(
+          builder: (context) => InfoPage(
+            infoText: settings.name!.split("/").last,
+          ),
+        );
       default:
         return MaterialPageRoute(
           builder: (context) => Scaffold(

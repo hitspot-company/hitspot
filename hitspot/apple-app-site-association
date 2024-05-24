@@ -1,0 +1,28 @@
+{
+  "applinks":{
+    "apps":[
+       
+    ],
+    "details":[
+      {
+        "appIDs":[
+          "49J3PLMADQ.hitspot.hitspot"
+        ],
+        "components":[
+          {
+            "/":"/login",
+            "comment":"Matches URL with a path /login"
+          },
+          {
+            "/":"/spots/*",
+            "comment":"Matches any URL with a path that starts with /spots/."
+          },
+          {
+            "/":"/users/*",
+            "comment":"Matches any URL with a path that starts with /users/."
+          }
+        ]
+      }
+    ]
+  }
+}
