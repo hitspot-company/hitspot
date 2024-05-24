@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
@@ -49,11 +51,8 @@ class HSHomeSearchDelegate extends SearchDelegate {
   @override
   void showResults(BuildContext context) {
     usersSearcher.queryChanged(query);
-    searcher.rerun(); // TODO: Verify if not too much
     super.showResults(context);
   }
-
-  // TODO: Note => maybe adding listeners to the searchers would help
 
   @override
   void showSuggestions(BuildContext context) {
@@ -123,19 +122,11 @@ class _UsersBuilder extends StatelessWidget {
     return PagedListView<int, HSUser>(
       pagingController: usersSearcher.pagingController,
       builderDelegate: PagedChildBuilderDelegate<HSUser>(
-        noItemsFoundIndicatorBuilder: (_) => const Center(
-          child: Text('No results found'),
-        ),
-        itemBuilder: (_, user, __) => ListTile(
-          leading: HSUserAvatar(
-            imgUrl: user.profilePicture,
-            radius: radius,
-          ),
-          title: Text(user.username!),
-          subtitle: Text(user.fullName!),
-          // onTap: () => navi.push(UserProfileProvider.route(hit)),
-        ),
-      ),
+          firstPageProgressIndicatorBuilder: (_) => const HSLoadingIndicator(),
+          noItemsFoundIndicatorBuilder: (_) => const Center(
+                child: Text('No results found'),
+              ),
+          itemBuilder: (_, user, __) => _UserTile(user: user, radius: radius)),
     );
   }
 
@@ -237,7 +228,7 @@ class _UserTile extends StatelessWidget {
       ),
       title: Text(user.username!),
       subtitle: Text(user.fullName!),
-      // onTap: () => navi.push(UserProfileProvider.route(hit)),
+      onTap: () => navi.push(UserProfileProvider.route(user.uid!)),
     );
   }
 }

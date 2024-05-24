@@ -113,12 +113,9 @@ class UsersHitsPage {
   final int? nextPageKey;
 
   factory UsersHitsPage.fromResponse(SearchResponse response) {
-    final items = response.hits.map((e) {
-      for (var element in e.entries) {
-        print("entry: ${element.key} : ${element.value}");
-      }
-      return HSUser.deserialize(e);
-    }).toList();
+    final items = response.hits
+        .map((e) => HSUser.deserialize(e, uid: e['objectID']))
+        .toList();
     final isLastPage = response.page >= response.nbPages;
     final nextPageKey = isLastPage ? null : response.page + 1;
     return UsersHitsPage(items, response.page, nextPageKey);
