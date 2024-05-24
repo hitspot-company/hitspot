@@ -12,15 +12,17 @@ final class HSTheme {
   static const Color _textfieldFillColor = Color.fromARGB(16, 158, 158, 158);
 
   final ThemeData lightTheme = ThemeData(
-          colorSchemeSeed: _mainColor,
-          brightness: Brightness.light,
-          textTheme: _HSTextThemes.lightTextTheme)
-      .copyWith(highlightColor: Colors.black);
+    colorSchemeSeed: _mainColor,
+    brightness: Brightness.light,
+    textTheme: _HSTextThemes.lightTextTheme,
+  ).copyWith(highlightColor: Colors.black);
 
   final ThemeData darkTheme = ThemeData(
     colorSchemeSeed: _mainColor,
     brightness: Brightness.dark,
     textTheme: _HSTextThemes.darkTextTheme,
+    appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
+    scaffoldBackgroundColor: Colors.black,
   ).copyWith(highlightColor: Colors.black.withOpacity(.08));
 
   Color get highlightColor => currentTheme.highlightColor;
@@ -49,77 +51,77 @@ extension TextStyleAltering on TextStyle {
 
 class _HSTextThemes {
   static final TextTheme lightTextTheme = TextTheme(
-    displayLarge: GoogleFonts.lilitaOne(
+    displayLarge: GoogleFonts.poppins(
       fontSize: 48,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    displayMedium: GoogleFonts.lilitaOne(
+    displayMedium: GoogleFonts.poppins(
       fontSize: 36,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    displaySmall: GoogleFonts.lilitaOne(
+    displaySmall: GoogleFonts.poppins(
       fontSize: 24,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    headlineLarge: GoogleFonts.lilitaOne(
+    headlineLarge: GoogleFonts.poppins(
       fontSize: 22,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    headlineMedium: GoogleFonts.lilitaOne(
+    headlineMedium: GoogleFonts.poppins(
       fontSize: 20,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    headlineSmall: GoogleFonts.lilitaOne(
+    headlineSmall: GoogleFonts.poppins(
       fontSize: 18,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    titleLarge: GoogleFonts.lilitaOne(
+    titleLarge: GoogleFonts.poppins(
       fontSize: 16,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    titleMedium: GoogleFonts.roboto(
+    titleMedium: GoogleFonts.poppins(
       fontSize: 16,
       fontWeight: FontWeight.w400,
       color: Colors.black,
     ),
-    titleSmall: GoogleFonts.roboto(
+    titleSmall: GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: FontWeight.w400,
       color: Colors.black,
     ),
-    bodyLarge: GoogleFonts.roboto(
+    bodyLarge: GoogleFonts.poppins(
       fontSize: 16,
       fontWeight: FontWeight.normal,
       color: Colors.black,
     ),
-    bodyMedium: GoogleFonts.roboto(
+    bodyMedium: GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: FontWeight.normal,
       color: Colors.black,
     ),
-    bodySmall: GoogleFonts.roboto(
+    bodySmall: GoogleFonts.poppins(
       fontSize: 12,
       fontWeight: FontWeight.normal,
       color: Colors.black,
     ),
-    labelLarge: GoogleFonts.roboto(
+    labelLarge: GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    labelMedium: GoogleFonts.roboto(
+    labelMedium: GoogleFonts.poppins(
       fontSize: 12,
       fontWeight: FontWeight.normal,
       color: Colors.black,
     ),
-    labelSmall: GoogleFonts.roboto(
+    labelSmall: GoogleFonts.poppins(
       fontSize: 10,
       fontWeight: FontWeight.normal,
       color: Colors.black,
@@ -127,77 +129,77 @@ class _HSTextThemes {
   );
 
   static final TextTheme darkTextTheme = TextTheme(
-    displayLarge: GoogleFonts.lilitaOne(
+    displayLarge: GoogleFonts.poppins(
       fontSize: 48,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    displayMedium: GoogleFonts.lilitaOne(
+    displayMedium: GoogleFonts.poppins(
       fontSize: 36,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    displaySmall: GoogleFonts.lilitaOne(
+    displaySmall: GoogleFonts.poppins(
       fontSize: 24,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    headlineLarge: GoogleFonts.lilitaOne(
+    headlineLarge: GoogleFonts.poppins(
       fontSize: 22,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    headlineMedium: GoogleFonts.lilitaOne(
+    headlineMedium: GoogleFonts.poppins(
       fontSize: 20,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    headlineSmall: GoogleFonts.lilitaOne(
+    headlineSmall: GoogleFonts.poppins(
       fontSize: 18,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    titleLarge: GoogleFonts.lilitaOne(
+    titleLarge: GoogleFonts.poppins(
       fontSize: 16,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    titleMedium: GoogleFonts.roboto(
+    titleMedium: GoogleFonts.poppins(
       fontSize: 16,
       fontWeight: FontWeight.w400,
       color: Colors.white,
     ),
-    titleSmall: GoogleFonts.roboto(
+    titleSmall: GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: FontWeight.w400,
       color: Colors.white,
     ),
-    bodyLarge: GoogleFonts.aBeeZee(
+    bodyLarge: GoogleFonts.poppins(
       fontSize: 16,
       fontWeight: FontWeight.normal,
       color: Colors.white,
     ),
-    bodyMedium: GoogleFonts.aBeeZee(
+    bodyMedium: GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: FontWeight.normal,
       color: Colors.white,
     ),
-    bodySmall: GoogleFonts.aBeeZee(
+    bodySmall: GoogleFonts.poppins(
       fontSize: 12,
       fontWeight: FontWeight.normal,
       color: Colors.white,
     ),
-    labelLarge: GoogleFonts.roboto(
+    labelLarge: GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    labelMedium: GoogleFonts.roboto(
+    labelMedium: GoogleFonts.poppins(
       fontSize: 12,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    labelSmall: GoogleFonts.roboto(
+    labelSmall: GoogleFonts.poppins(
       fontSize: 10,
       fontWeight: FontWeight.normal,
       color: Colors.white,
