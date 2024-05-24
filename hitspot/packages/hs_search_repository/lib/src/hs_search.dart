@@ -62,13 +62,16 @@ class UsersSearcher {
     );
     filterState.add(FilterGroupID("is_profile_completed"), filterCategory);
     searcher.connectFilterState(filterState);
+
+    // Paging
     searchPage.listen((page) {
-      print("REACHED END");
       if (page.pageKey == 0) {
         pagingController.refresh();
       }
       pagingController.appendPage(page.items, page.nextPageKey);
     }).onError((e) => pagingController.error = e);
+    pagingController.addPageRequestListener((pageKey) =>
+        searcher.applyState((state) => state.copyWith(page: pageKey)));
   }
 
   late final HitsSearcher searcher;
@@ -85,6 +88,15 @@ class UsersSearcher {
       PagingController(firstPageKey: 0);
   Stream<UsersHitsPage> get searchPage =>
       searcher.responses.map(UsersHitsPage.fromResponse);
+
+  void queryChanged(String query) {
+    searcher.applyState(
+      (state) => state.copyWith(
+        query: query,
+        page: 0,
+      ),
+    );
+  }
 
   void dispose() {
     searcher.dispose();

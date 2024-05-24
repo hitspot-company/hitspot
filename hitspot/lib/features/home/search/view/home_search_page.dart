@@ -37,70 +37,88 @@ class HSHomeSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return StreamBuilder(
-      stream: searcher.responses,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _UsersBuilder(
-            usersSearcher: usersSearcher,
-          );
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.hits.isEmpty) {
-          return Center(child: Text('No results found.'));
-        }
-
-        final hits = snapshot.data!.hits;
-        return _UsersBuilder(usersSearcher: usersSearcher);
-      },
-    );
+    return _SearchBuilder(usersSearcher, SearchBuilderType.results);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     searcher.query(query);
-    return buildResults(context);
+    return _SearchBuilder(usersSearcher, SearchBuilderType.suggestions);
   }
 
   @override
   void showResults(BuildContext context) {
-    searcher.applyState(
-      (state) => state.copyWith(
-        query: query,
-        page: 0,
-      ),
-    );
-    usersSearcher.searchPage.listen((event) {});
+    usersSearcher.queryChanged(query);
     searcher.rerun(); // TODO: Verify if not too much
     super.showResults(context);
   }
 
+  // TODO: Note => maybe adding listeners to the searchers would help
+
   @override
   void showSuggestions(BuildContext context) {
     searcher.query(query);
+    usersSearcher.queryChanged(query);
     super.showResults(context);
+  }
+
+  @override
+  void dispose() {
+    usersSearcher.dispose();
+    super.dispose();
+  }
+}
+
+enum SearchBuilderType { loading, suggestions, results }
+
+class _SearchBuilder extends StatelessWidget {
+  const _SearchBuilder(this.usersSearcher, this.searchBuilderType);
+
+  final double radius = 24.0;
+  final UsersSearcher usersSearcher;
+  final SearchBuilderType searchBuilderType;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: usersSearcher.searchPage,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _UsersBuilder.loading(usersSearcher);
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData) {
+          return const Center(child: Text('No results found.'));
+        }
+        if (searchBuilderType == SearchBuilderType.suggestions) {
+          return _UsersBuilder.suggestions(usersSearcher);
+        }
+        return _UsersBuilder.results(usersSearcher);
+      },
+    );
   }
 }
 
 class _UsersBuilder extends StatelessWidget {
   const _UsersBuilder(
-      {this.data,
-      this.titleField,
-      this.subtitleField,
-      required this.usersSearcher});
+      {required this.usersSearcher,
+      required this.isLoading,
+      required this.isResults});
 
-  final List? data;
-  final String? titleField, subtitleField;
+  final bool isLoading, isResults;
   final double radius = 24.0;
   final UsersSearcher usersSearcher;
 
   @override
   Widget build(BuildContext context) {
-    late final int childCount;
-    if (data == null) {
-      childCount = 8;
-    } else {
-      childCount = data!.length;
+    if (isLoading) {
+      return _LoadingBuilder(radius);
+    } else if (!isResults) {
+      return _SuggestionsBuilder(
+        usersSearcher: usersSearcher,
+        radius: radius,
+        suggestions: usersSearcher.pagingController.itemList ?? [],
+      );
     }
     return PagedListView<int, HSUser>(
       pagingController: usersSearcher.pagingController,
@@ -108,61 +126,118 @@ class _UsersBuilder extends StatelessWidget {
         noItemsFoundIndicatorBuilder: (_) => const Center(
           child: Text('No results found'),
         ),
-        itemBuilder: (_, item, __) => Container(
-          color: Colors.white,
-          height: 80,
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 50, child: Image.network(item.profilePicture ?? "")),
-              const SizedBox(width: 20),
-              Expanded(child: Text(item.username!))
-            ],
+        itemBuilder: (_, user, __) => ListTile(
+          leading: HSUserAvatar(
+            imgUrl: user.profilePicture,
+            radius: radius,
           ),
+          title: Text(user.username!),
+          subtitle: Text(user.fullName!),
+          // onTap: () => navi.push(UserProfileProvider.route(hit)),
         ),
       ),
     );
+  }
 
+  factory _UsersBuilder.loading(UsersSearcher usersSearcher) {
+    return _UsersBuilder(
+      isLoading: true,
+      isResults: false,
+      usersSearcher: usersSearcher,
+    );
+  }
+
+  factory _UsersBuilder.suggestions(UsersSearcher usersSearcher) {
+    return _UsersBuilder(
+      isLoading: false,
+      isResults: false,
+      usersSearcher: usersSearcher,
+    );
+  }
+
+  factory _UsersBuilder.results(UsersSearcher usersSearcher) {
+    return _UsersBuilder(
+      isLoading: false,
+      isResults: true,
+      usersSearcher: usersSearcher,
+    );
+  }
+}
+
+class _SuggestionsBuilder extends StatelessWidget {
+  const _SuggestionsBuilder(
+      {required this.usersSearcher,
+      required this.radius,
+      required this.suggestions});
+
+  final UsersSearcher usersSearcher;
+  final double radius;
+  final List<HSUser> suggestions;
+
+  @override
+  Widget build(BuildContext context) {
+    final users = suggestions;
+    return ListView.builder(
+        itemCount: users.length,
+        itemBuilder: (BuildContext context, int index) =>
+            _UserTile(user: users[index], radius: radius));
+  }
+}
+
+class _LoadingBuilder extends StatelessWidget {
+  const _LoadingBuilder(this.radius);
+
+  final double radius;
+  final int childCount = 8;
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: childCount,
       itemBuilder: (BuildContext context, int index) {
-        if (data == null) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: HSShimmer(
-              child: ListTile(
-                shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0)),
-                tileColor: currentTheme.textfieldFillColor,
-                leading: HSUserAvatar(
-                  loading: true,
-                  radius: radius,
-                ),
-                title: const HSShimmerSkeleton(
-                  height: 16.0,
-                  width: double.infinity,
-                ),
-                subtitle: const HSShimmerSkeleton(
-                  height: 16.0,
-                  width: double.infinity,
-                ),
-                onTap: () {},
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HSShimmer(
+            child: ListTile(
+              shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              tileColor: currentTheme.textfieldFillColor,
+              leading: HSUserAvatar(
+                loading: true,
+                radius: radius,
+              ),
+              title: const HSShimmerSkeleton(
+                height: 16.0,
+                width: double.infinity,
+              ),
+              subtitle: const HSShimmerSkeleton(
+                height: 16.0,
+                width: double.infinity,
               ),
             ),
-          );
-        }
-        final hit = data![index];
-        return ListTile(
-          leading: HSUserAvatar(
-            imgUrl: hit['profile_picture'],
-            radius: radius,
           ),
-          title: Text(hit[titleField] ?? ""),
-          subtitle: Text(hit[subtitleField] ?? ""),
-          // onTap: () => navi.push(UserProfileProvider.route(hit)),
         );
       },
+    );
+  }
+}
+
+class _UserTile extends StatelessWidget {
+  const _UserTile({required this.user, required this.radius});
+
+  final HSUser user;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: HSUserAvatar(
+        imgUrl: user.profilePicture,
+        radius: radius,
+      ),
+      title: Text(user.username!),
+      subtitle: Text(user.fullName!),
+      // onTap: () => navi.push(UserProfileProvider.route(hit)),
     );
   }
 }
