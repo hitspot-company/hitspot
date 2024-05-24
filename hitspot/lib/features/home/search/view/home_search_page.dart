@@ -39,13 +39,13 @@ class HSHomeSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return _SearchBuilder(usersSearcher, SearchBuilderType.results);
+    return _SearchBuilder(usersSearcher, _SearchBuilderType.results);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     searcher.query(query);
-    return _SearchBuilder(usersSearcher, SearchBuilderType.suggestions);
+    return _SearchBuilder(usersSearcher, _SearchBuilderType.suggestions);
   }
 
   @override
@@ -68,14 +68,14 @@ class HSHomeSearchDelegate extends SearchDelegate {
   }
 }
 
-enum SearchBuilderType { loading, suggestions, results }
+enum _SearchBuilderType { suggestions, results }
 
 class _SearchBuilder extends StatelessWidget {
   const _SearchBuilder(this.usersSearcher, this.searchBuilderType);
 
   final double radius = 24.0;
   final UsersSearcher usersSearcher;
-  final SearchBuilderType searchBuilderType;
+  final _SearchBuilderType searchBuilderType;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +89,7 @@ class _SearchBuilder extends StatelessWidget {
         } else if (!snapshot.hasData) {
           return const Center(child: Text('No results found.'));
         }
-        if (searchBuilderType == SearchBuilderType.suggestions) {
+        if (searchBuilderType == _SearchBuilderType.suggestions) {
           return _UsersBuilder.suggestions(usersSearcher);
         }
         return _UsersBuilder.results(usersSearcher);
