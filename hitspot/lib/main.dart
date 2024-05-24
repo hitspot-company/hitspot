@@ -93,11 +93,10 @@ class App extends StatelessWidget {
         child: BlocSelector<HSThemeBloc, HSThemeState, ThemeData>(
           selector: (state) => state.theme,
           builder: (context, currentTheme) {
-            return MaterialApp(
+            return MaterialApp.router(
               theme: currentTheme,
               title: "Hitspot",
-              navigatorKey: navi.navigatorKey,
-              onGenerateRoute: navi.routes.generateRoutes,
+              routerConfig: navi.router,
               builder: (context, child) => Overlay(
                 initialEntries: [
                   OverlayEntry(
@@ -109,7 +108,7 @@ class App extends StatelessWidget {
                   ),
                 ],
               ),
-              home: const _HSFlowBuilder(),
+              // home: const _HSFlowBuilder(),
             );
           },
         ),
@@ -118,8 +117,8 @@ class App extends StatelessWidget {
   }
 }
 
-class _HSFlowBuilder extends StatelessWidget {
-  const _HSFlowBuilder();
+class HSFlowBuilder extends StatelessWidget {
+  const HSFlowBuilder({super.key});
 
   @override
   Widget build(BuildContext context) {

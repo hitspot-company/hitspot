@@ -38,20 +38,15 @@ class HomePage extends StatelessWidget {
             ),
             actions: <Widget>[
               IconButton(
-                icon: CircleAvatar(
-                  foregroundImage: app.currentUser.profilePicture != null
-                      ? NetworkImage(app.currentUser.profilePicture!)
-                      : null,
-                  child: app.currentUser.profilePicture == null
-                      ? const Icon(FontAwesomeIcons.solidUser)
-                      : null,
-                ),
-                onPressed: () => navi.push(
-                  UserProfileProvider.route(
-                    app.currentUser.uid!,
+                  icon: CircleAvatar(
+                    foregroundImage: app.currentUser.profilePicture != null
+                        ? NetworkImage(app.currentUser.profilePicture!)
+                        : null,
+                    child: app.currentUser.profilePicture == null
+                        ? const Icon(FontAwesomeIcons.solidUser)
+                        : null,
                   ),
-                ),
-              ),
+                  onPressed: () => navi.toUserProfile(currentUser.uid!)),
             ],
             floating: true,
             pinned: true,
