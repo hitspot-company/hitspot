@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hitspot/constants/constants.dart';
 
 class HSScaffold extends StatelessWidget {
   const HSScaffold({
@@ -12,6 +14,8 @@ class HSScaffold extends StatelessWidget {
     this.ignoring = false,
     this.resizeToAvoidBottomInset = true,
     this.backgroundColor,
+    this.bottombar,
+    this.defaultBottombarEnabled = false,
   });
 
   final bool topSafe;
@@ -22,6 +26,8 @@ class HSScaffold extends StatelessWidget {
   final bool ignoring;
   final bool resizeToAvoidBottomInset;
   final Color? backgroundColor;
+  final Widget? bottombar;
+  final bool defaultBottombarEnabled;
 
   static void hideInput() =>
       SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -33,6 +39,8 @@ class HSScaffold extends StatelessWidget {
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(
+          bottomNavigationBar:
+              defaultBottombarEnabled ? const _Bottombar() : const SizedBox(),
           backgroundColor: backgroundColor,
           resizeToAvoidBottomInset: resizeToAvoidBottomInset,
           body: SafeArea(
@@ -49,4 +57,57 @@ class HSScaffold extends StatelessWidget {
       ),
     );
   }
+}
+
+class _Bottombar extends StatelessWidget {
+  const _Bottombar({super.key, this.height = 60.0, this.color});
+
+  final double height;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14.0),
+          child: Container(
+            height: height,
+            color: color ?? currentTheme.textfieldFillColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List<_BottombarItem>.from(
+                  _BottombarItem.defaultList.map((e) => e)).toList(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottombarItem extends StatelessWidget {
+  const _BottombarItem(
+      {required this.onPressed, required this.iconData, this.iconColor});
+
+  final VoidCallback onPressed;
+  final IconData iconData;
+  final Color? iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        onPressed: onPressed, icon: Icon(iconData, color: iconColor));
+  }
+
+  static final List<_BottombarItem> defaultList = [
+    _BottombarItem(
+        iconData: FontAwesomeIcons.house,
+        onPressed: () => print("home"),
+        iconColor: currentTheme.mainColor),
+    _BottombarItem(
+        iconData: FontAwesomeIcons.plus,
+        onPressed: () => navi.newPush("/add_board")),
+  ];
 }

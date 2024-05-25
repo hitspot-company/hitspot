@@ -76,9 +76,11 @@ class _ReadyPage extends StatelessWidget {
         title: "",
         titleBold: true,
         enableDefaultBackButton: true,
-        right: IconButton(
-            onPressed: () => navi.push(SettingsProvider.route()),
-            icon: const Icon(FontAwesomeIcons.bars)),
+        right: userProfileBloc.isOwnProfile
+            ? IconButton(
+                onPressed: () => navi.push(SettingsProvider.route()),
+                icon: const Icon(FontAwesomeIcons.bars))
+            : const SizedBox(),
       ),
       body: CustomScrollView(
         controller: controller,

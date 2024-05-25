@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
@@ -43,7 +44,9 @@ class HSNavigationService {
   dynamic logout() =>
       navigatorKey.currentState?.popUntil((route) => route.isFirst);
 
-  // PREDEFINED ROUTES
+  // UPDATED NAVI
+  dynamic newPush(String location) => router.push(location);
+
   // dynamic toUserProfile(String uid) => router.push("/users/$uid");
   // dynamic toSpot(String sid) => router.push("/spot/$sid");
 }
@@ -82,6 +85,11 @@ class _HSRoutes {
         redirect: (context, state) => '/protected${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/add_board',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
           path: '/protected',
           redirect: (context, state) {
             final authBloc = context.read<HSAuthenticationBloc>();
@@ -118,6 +126,10 @@ class _HSRoutes {
                 GoRoute(
                   path: 'settings',
                   builder: (context, state) => const SettingsProvider(),
+                ),
+                GoRoute(
+                  path: 'add_board',
+                  builder: (context, state) => const AddBoardProvider(),
                 ),
               ],
             ),

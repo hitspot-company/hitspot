@@ -24,6 +24,7 @@ class HomePage extends StatelessWidget {
     final app = HSApp.instance;
     final navi = app.navigation;
     return HSScaffold(
+      defaultBottombarEnabled: true,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -39,18 +40,18 @@ class HomePage extends StatelessWidget {
             ),
             actions: <Widget>[
               IconButton(
-                  icon: CircleAvatar(
-                    foregroundImage: app.currentUser.profilePicture != null
-                        ? NetworkImage(app.currentUser.profilePicture!)
-                        : null,
-                    child: app.currentUser.profilePicture == null
-                        ? const Icon(FontAwesomeIcons.solidUser)
-                        : null,
-                  ),
-                  onPressed: () => navi.navigatorKey.currentState?.push(
-                        UserProfileProvider.route(currentUser.uid!),
-                      ) // navi.toUserProfile(currentUser.uid!),
-                  ),
+                icon: CircleAvatar(
+                  foregroundImage: app.currentUser.profilePicture != null
+                      ? NetworkImage(app.currentUser.profilePicture!)
+                      : null,
+                  child: app.currentUser.profilePicture == null
+                      ? const Icon(FontAwesomeIcons.solidUser)
+                      : null,
+                ),
+                onPressed: () => navi.navigatorKey.currentState?.push(
+                  UserProfileProvider.route(currentUser.uid!),
+                ),
+              ),
             ],
             floating: true,
             pinned: true,
