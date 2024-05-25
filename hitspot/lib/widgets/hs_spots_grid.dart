@@ -62,7 +62,8 @@ class HSSpotsGrid extends StatelessWidget {
               padding: const EdgeInsets.only(top: 16.0),
               child: Text(
                 emptyMessage!,
-                style: textTheme.headlineLarge,
+                style: textTheme.headlineLarge!
+                    .copyWith(fontWeight: FontWeight.normal),
               ),
             ),
           ],

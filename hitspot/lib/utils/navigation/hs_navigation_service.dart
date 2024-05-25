@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/features/register/view/register_page.dart';
 import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/main.dart';
-import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSNavigationService {
@@ -43,7 +40,12 @@ class HSNavigationService {
       navigatorKey.currentState?.popUntil((route) => route.isFirst);
 
   // PREDEFINED ROUTES
-  dynamic toUserProfile(String uid) => router.push("/users/$uid");
+  dynamic toUserProfile(String uid) {
+    final path = "/users/$uid";
+    HSDebugLogger.logInfo("Navigating to: $path");
+    return router.push(path);
+  }
+
   dynamic toSpot(String sid) => router.push("/spot/$sid");
 }
 
@@ -54,46 +56,42 @@ class _HSRoutes {
   static _HSRoutes get instance => _instance;
 
   final GoRouter router = GoRouter(
-    initialLocation: '/',
+    // refreshListenable:
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const HSFlowBuilder()),
       GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomePage(),
+        path: '/',
+        builder: (context, state) => const HSFlowBuilder(),
+        routes: [
+          GoRoute(
+            path: 'home',
+            redirect: (context, state) => "/",
+          ),
+          GoRoute(
+            path: 'settings',
+            builder: (context, state) => const SettingsProvider(),
+          ),
+          GoRoute(
+            path: 'users/:userID',
+            builder: (context, state) {
+              HSDebugLogger.logInfo("Opened: ${state.fullPath}");
+              return UserProfileProvider(
+                  userID: state.pathParameters['userID']!);
+            },
+          ),
+          GoRoute(
+            path: 'spots/:spotID',
+            builder: (context, state) =>
+                InfoPage(infoText: state.pathParameters['spotID']!),
+          ),
+        ],
       ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginProvider(),
       ),
       GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsProvider(),
-      ),
-      GoRoute(
-        path: '/users/:userID',
-        builder: (context, state) =>
-            UserProfileProvider(userID: state.pathParameters['userID']!),
-        redirect: (context, state) {
-          //   final isLoggedIn =
-          //       app.authBloc.state.status == HSAppStatus.authenticated;
-          //   final isLoggingIn = state.matchedLocation == '/login';
-
-          //   final savedLocation = state.matchedLocation == '/'
-          //       ? ''
-          //       : '?from=${state.matchedLocation}';
-
-          //   if (!isLoggedIn) return isLoggingIn ? null : '/login$savedLocation';
-
-          //   if (isLoggingIn) return state.uri.queryParameters['from'] ?? '/';
-
-          //   return null;
-          // TODO: Implement remembering destination
-        },
-      ),
-      GoRoute(
-        path: '/spot/:spotID',
-        builder: (context, state) =>
-            InfoPage(infoText: state.pathParameters['spotID']!),
+        path: '/register',
+        builder: (context, state) => const RegisterPage(),
       ),
     ],
   );
