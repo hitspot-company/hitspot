@@ -97,18 +97,17 @@ class App extends StatelessWidget {
               theme: currentTheme,
               title: "Hitspot",
               routerConfig: navi.router,
-              builder: (context, child) => Overlay(
-                initialEntries: [
-                  OverlayEntry(
-                    builder: (context) =>
-                        child ??
-                        const Center(
-                          child: Text("OVERLAY ERROR"),
-                        ),
-                  ),
-                ],
-              ),
-              // home: const _HSFlowBuilder(),
+              // builder: (context, child) => Overlay(
+              //   initialEntries: [
+              //     OverlayEntry(
+              //       builder: (context) =>
+              //           child ??
+              //           const Center(
+              //             child: Text("OVERLAY ERROR"),
+              //           ),
+              //     ),
+              //   ],
+              // ),
             );
           },
         ),
@@ -122,20 +121,39 @@ class HSFlowBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder<HSAppStatus>(
-      state: context.select((HSAuthenticationBloc bloc) => bloc.state.status),
-      onGeneratePages: (appStatus, pages) => [
-        if (appStatus == HSAppStatus.loading)
-          SplashPage.page()
-        else if (appStatus == HSAppStatus.unauthenticated)
-          LoginProvider.page()
-        else if (appStatus == HSAppStatus.emailNotVerified)
-          VerifyEmailPage.page()
-        else if (appStatus == HSAppStatus.profileNotCompleted)
-          ProfileCompletionPage.page()
-        else if (appStatus == HSAppStatus.authenticated)
-          HomePage.page(),
-      ],
+    return StreamBuilder(
+      stream: app.authBloc.stream,
+      builder: (BuildContext context,
+          AsyncSnapshot<HSAuthenticationState> snapshot) {
+        final appStatus = snapshot.data?.status;
+        if (appStatus == HSAppStatus.loading) {
+          const SplashPage();
+        } else if (appStatus == HSAppStatus.unauthenticated) {
+          const LoginProvider();
+        } else if (appStatus == HSAppStatus.emailNotVerified) {
+          const VerifyEmailPage();
+        } else if (appStatus == HSAppStatus.profileNotCompleted) {
+          const ProfileCompletionPage();
+        } else if (appStatus == HSAppStatus.authenticated) {
+          return HomePage();
+        }
+        return Container();
+      },
     );
+    // FlowBuilder<HSAppStatus>(
+    //   state: context.select((HSAuthenticationBloc bloc) => bloc.state.status),
+    //   onGeneratePages: (appStatus, pages) => [
+    //     if (appStatus == HSAppStatus.loading)
+    //       SplashPage.page()
+    //     else if (appStatus == HSAppStatus.unauthenticated)
+    //       LoginProvider.page()
+    //     else if (appStatus == HSAppStatus.emailNotVerified)
+    //       VerifyEmailPage.page()
+    //     else if (appStatus == HSAppStatus.profileNotCompleted)
+    //       ProfileCompletionPage.page()
+    //     else if (appStatus == HSAppStatus.authenticated)
+    //       HomePage.page(),
+    //   ],
+    // );
   }
 }

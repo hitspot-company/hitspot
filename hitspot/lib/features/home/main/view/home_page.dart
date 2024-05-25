@@ -27,6 +27,7 @@ class HomePage extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            automaticallyImplyLeading: false,
             surfaceTintColor: Colors.transparent,
             title: Align(
               alignment: Alignment.centerLeft,
@@ -52,6 +53,7 @@ class HomePage extends StatelessWidget {
             pinned: true,
           ),
           SliverAppBar(
+            automaticallyImplyLeading: false,
             surfaceTintColor: Colors.transparent,
             centerTitle: false,
             title: Text.rich(
@@ -75,6 +77,7 @@ class HomePage extends StatelessWidget {
             child: Gap(16.0),
           ),
           const SliverAppBar(
+            automaticallyImplyLeading: false,
             surfaceTintColor: Colors.transparent,
             stretch: true,
             title: HSSearchBar(

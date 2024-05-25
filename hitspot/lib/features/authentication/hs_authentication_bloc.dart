@@ -15,6 +15,7 @@ class HSAuthenticationBloc
   final HSAuthenticationRepository _authenticationRepository;
   final HSMailingRepository _mailingRepository;
   late final StreamSubscription<HSUser?> _userSubscription;
+  StreamSubscription<HSUser?> get userSubscription => _userSubscription;
 
   final HSDatabaseRepository _databaseRepository;
 

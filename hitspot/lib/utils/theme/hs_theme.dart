@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 
 final class HSTheme {
@@ -29,8 +30,7 @@ final class HSTheme {
   Color get mainColor => _mainColor;
   Color get textfieldFillColor => _textfieldFillColor;
 
-  BuildContext get context =>
-      HSNavigationService.instance.navigatorKey.currentContext!;
+  BuildContext get context => app.navigation.navigatorKey.currentContext!;
   TextTheme get textTheme => Theme.of(context).textTheme;
   ThemeData get currentTheme => Theme.of(context);
 }
