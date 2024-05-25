@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -44,7 +45,7 @@ class HSNavigationService {
 
   // PREDEFINED ROUTES
   dynamic toUserProfile(String uid) {
-    final path = "/home/users/$uid";
+    final path = "/users/$uid";
     HSDebugLogger.logInfo("Navigating to: $path");
     return router.push(path);
   }
@@ -59,9 +60,10 @@ class _HSRoutes {
   static _HSRoutes get instance => _instance;
 
   final GoRouter router = GoRouter(
+    initialLocation: '/splash',
     routes: [
       GoRoute(
-        path: '/',
+        path: '/splash',
         builder: (context, state) => const SplashPage(),
         redirect: (context, state) {
           final authBloc = context.watch<HSAuthenticationBloc>();
@@ -69,17 +71,18 @@ class _HSRoutes {
         },
       ),
       GoRoute(
-        path: '/users/:userID',
-        builder: (context, state) =>
-            InfoPage(infoText: state.pathParameters["userID"]!),
-      ),
-      GoRoute(
         path: '/login',
-        redirect: (context, state) {
-          final authBloc = context.watch<HSAuthenticationBloc>();
-          return _handleInitialRedirect(authBloc.state.status);
+        builder: (context, state) {
+          HSDebugLogger.logInfo(
+              "Current state (builder): ${state.matchedLocation}");
+          return const LoginProvider();
         },
-        builder: (context, state) => const LoginProvider(),
+        redirect: (context, state) {
+          HSDebugLogger.logInfo("Current state (redirect): ${state.uri}");
+          final authBloc = app.authBloc;
+          final String? from = state.uri.queryParameters['from'];
+          return _handleInitialRedirect(authBloc.state.status, from);
+        },
         routes: [
           GoRoute(
             path: 'register',
@@ -88,14 +91,7 @@ class _HSRoutes {
         ],
       ),
       GoRoute(
-        path: '/home',
-        redirect: (context, state) {
-          final authBloc = context.watch<HSAuthenticationBloc>();
-          if (authBloc.state.status == HSAppStatus.unauthenticated) {
-            return "/login";
-          }
-          return null;
-        },
+        path: '/',
         builder: (context, state) =>
             const PopScope(canPop: false, child: HomePage()),
         routes: [
@@ -104,17 +100,20 @@ class _HSRoutes {
             builder: (context, state) => const SettingsProvider(),
           ),
           GoRoute(
+            path: 'home',
+            redirect: (context, state) => "/",
+          ),
+          GoRoute(
             path: 'users/:userID',
-            builder: (context, state) {
-              HSDebugLogger.logInfo("Opened: ${state.fullPath}");
-              return UserProfileProvider(
-                  userID: state.pathParameters['userID']!);
-            },
+            builder: (context, state) =>
+                UserProfileProvider(userID: state.pathParameters['userID']!),
+            redirect: _authGuardRedirect,
           ),
           GoRoute(
             path: 'spots/:spotID',
             builder: (context, state) =>
                 InfoPage(infoText: state.pathParameters['spotID']!),
+            redirect: _authGuardRedirect,
           ),
         ],
       ),
@@ -122,16 +121,31 @@ class _HSRoutes {
   );
 }
 
-String? _handleInitialRedirect(HSAppStatus appStatus) {
+String? _authGuardRedirect(context, GoRouterState state) {
+  if (app.authBloc.state.status != HSAppStatus.authenticated) {
+    HSDebugLogger.logError("The user is not authenticated");
+    HSDebugLogger.logError("Matched Location: ${state.matchedLocation}");
+    return "/login?from=${state.matchedLocation}";
+  }
+  return null;
+}
+
+String? _handleInitialRedirect(HSAppStatus appStatus, [String? savedLocation]) {
+  final String suffix = savedLocation != null ? "?from=$savedLocation" : "";
   switch (appStatus) {
     case HSAppStatus.unauthenticated:
-      return "/login";
+      return "/login$suffix";
     case HSAppStatus.emailNotVerified:
-      return "/verify_email";
+      return "/verify_email$suffix";
     case HSAppStatus.profileNotCompleted:
-      return "/complete_profile";
+      return "/complete_profile$suffix";
     case HSAppStatus.authenticated:
-      return "/home";
+      if (savedLocation != null) {
+        HSDebugLogger.logInfo("SAVED LOCATION PROVIDED 1: $savedLocation");
+        return savedLocation;
+      }
+      HSDebugLogger.logInfo("SAVED LOCATION NOT PROVIDED");
+      return "/";
     default:
       return null;
   }
