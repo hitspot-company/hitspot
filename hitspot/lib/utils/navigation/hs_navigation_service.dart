@@ -74,7 +74,8 @@ class _HSRoutes {
       ),
       GoRoute(
         path: '/user/:userID',
-        redirect: (context, state) => '/protected${state.matchedLocation}',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
         path: '/spot/:spotID',
@@ -84,47 +85,59 @@ class _HSRoutes {
           path: '/protected',
           redirect: (context, state) {
             final authBloc = context.read<HSAuthenticationBloc>();
-            final String from = state.uri.queryParameters["from"] ?? "";
+            final String from = "?from=${state.uri}";
             final loggedIn = authBloc.state.status == HSAppStatus.authenticated;
-            if (!loggedIn) return "/auth$from";
+            if (!loggedIn) {
+              final String ret = "/auth$from";
+              return ret;
+            }
             return null;
           },
           routes: [
             GoRoute(
-              path: 'settings',
-              builder: (context, state) => const SettingsProvider(),
-            ),
-            GoRoute(
               path: 'home',
               builder: (context, state) => const HomePage(),
-            ),
-            GoRoute(
-              path: 'user/:userID',
-              builder: (context, state) =>
-                  UserProfileProvider(userID: state.pathParameters['userID']!),
-            ),
-            GoRoute(
-              path: 'spot/:spotID',
-              builder: (context, state) =>
-                  InfoPage(infoText: state.pathParameters['spotID']!),
-              // redirect: _authGuardRedirect,
+              redirect: (context, state) {
+                final String? from = state.uri.queryParameters["from"];
+                if (from != null) {
+                  return '/protected/home$from';
+                }
+                return null;
+              },
+              routes: [
+                GoRoute(
+                  path: 'user/:userID',
+                  builder: (context, state) => UserProfileProvider(
+                      userID: state.pathParameters['userID']!),
+                ),
+                GoRoute(
+                  path: 'spot/:spotID',
+                  builder: (context, state) =>
+                      InfoPage(infoText: state.pathParameters['spotID']!),
+                ),
+                GoRoute(
+                  path: 'settings',
+                  builder: (context, state) => const SettingsProvider(),
+                ),
+              ],
             ),
           ]),
       GoRoute(
         path: '/auth',
         redirect: (context, state) {
+          final String from = "?from=${state.uri.queryParameters["from"]}";
           final authBloc = context.read<HSAuthenticationBloc>();
           final appStatus = authBloc.state.status;
           late final String ret;
           switch (appStatus) {
             case HSAppStatus.emailNotVerified:
-              ret = "/auth/verify_email";
+              ret = "/auth/verify_email$from";
             case HSAppStatus.profileNotCompleted:
-              ret = "/auth/complete_profile";
+              ret = "/auth/complete_profile$from";
             case HSAppStatus.authenticated:
-              ret = "/protected/home";
+              ret = state.uri.queryParameters["from"] ?? "/protected/home";
             default:
-              ret = "/auth/login";
+              ret = "/auth/login$from";
           }
           return ret;
         },
@@ -150,33 +163,3 @@ class _HSRoutes {
     ],
   );
 }
-
-// String? _authGuardRedirect(context, GoRouterState state) {
-//   if (app.authBloc.state.status != HSAppStatus.authenticated) {
-//     HSDebugLogger.logError("The user is not authenticated");
-//     HSDebugLogger.logError("Matched Location: ${state.matchedLocation}");
-//     return "/login?from=${state.matchedLocation}";
-//   }
-//   return null;
-// }
-
-// String? _handleInitialRedirect(HSAppStatus appStatus, [String? savedLocation]) {
-//   final String suffix = savedLocation != null ? "?from=$savedLocation" : "";
-//   switch (appStatus) {
-//     case HSAppStatus.unauthenticated:
-//       return "/login$suffix";
-//     case HSAppStatus.emailNotVerified:
-//       return "/verify_email$suffix";
-//     case HSAppStatus.profileNotCompleted:
-//       return "/complete_profile$suffix";
-//     case HSAppStatus.authenticated:
-//       if (savedLocation != null) {
-//         // HSDebugLogger.logInfo("SAVED LOCATION PROVIDED 1: $savedLocation");
-//         return savedLocation;
-//       }
-//       // HSDebugLogger.logInfo("SAVED LOCATION NOT PROVIDED");
-//       return "/";
-//     default:
-//       return null;
-//   }
-// }
