@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -59,76 +60,93 @@ class _HSRoutes {
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashPage(),
+        redirect: (context, state) {
+          final authBloc = context.read<HSAuthenticationBloc>();
+          if (authBloc.state.status != HSAppStatus.loading) {
+            return "/protected/home";
+          }
+          return null;
+        },
       ),
       GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginProvider(),
+        path: '/',
+        redirect: (context, state) => '/protected/home',
+      ),
+      GoRoute(
+          path: '/protected',
+          redirect: (context, state) {
+            final authBloc = context.read<HSAuthenticationBloc>();
+            final String from = state.uri.queryParameters["from"] ?? "";
+            final loggedIn = authBloc.state.status == HSAppStatus.authenticated;
+            if (!loggedIn) return "/auth$from";
+            return null;
+          },
+          routes: [
+            GoRoute(
+              path: 'settings',
+              builder: (context, state) => const SettingsProvider(),
+            ),
+            GoRoute(
+              path: 'home',
+              builder: (context, state) => const HomePage(),
+            ),
+            GoRoute(
+              path: 'user/:userID',
+              builder: (context, state) =>
+                  UserProfileProvider(userID: state.pathParameters['userID']!),
+            ),
+            GoRoute(
+              path: 'spot/:spotID',
+              builder: (context, state) =>
+                  InfoPage(infoText: state.pathParameters['spotID']!),
+              // redirect: _authGuardRedirect,
+            ),
+          ]),
+      GoRoute(
+        path: '/auth',
+        redirect: (context, state) {
+          final authBloc = context.read<HSAuthenticationBloc>();
+          final appStatus = authBloc.state.status;
+          late final String ret;
+          HSDebugLogger.logInfo("REQUEST: ${state.matchedLocation}");
+          switch (appStatus) {
+            case HSAppStatus.emailNotVerified:
+              ret = "/auth/verify_email";
+            case HSAppStatus.profileNotCompleted:
+              ret = "/auth/complete_profile";
+
+            case HSAppStatus.authenticated:
+              ret = "/protected/home";
+            default:
+              ret = "/auth/login";
+          }
+          HSDebugLogger.logInfo("RET: $ret");
+          return ret;
+        },
         routes: [
           GoRoute(
             path: 'register',
             builder: (context, state) => const RegisterPage(),
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/verify_email',
-        builder: (context, state) => const VerifyEmailPage(),
-      ),
-      GoRoute(
-        path: '/complete_profile',
-        builder: (context, state) => const ProfileCompletionPage(),
-      ),
-      GoRoute(
-        path: '/',
-        builder: (context, state) =>
-            const PopScope(canPop: false, child: HomePage()),
-        routes: [
           GoRoute(
-            path: 'settings',
-            builder: (context, state) => const SettingsProvider(),
+            path: 'login',
+            builder: (context, state) => const LoginProvider(),
           ),
           GoRoute(
-            path: 'home',
-            redirect: (context, state) => "/",
+            path: 'verify_email',
+            builder: (context, state) => const VerifyEmailPage(),
           ),
           GoRoute(
-            path: 'user/:userID',
-            builder: (context, state) =>
-                UserProfileProvider(userID: state.pathParameters['userID']!),
+            path: 'complete_profile',
+            builder: (context, state) => const ProfileCompletionPage(),
           ),
           GoRoute(
-            path: 'spot/:spotID',
-            builder: (context, state) =>
-                InfoPage(infoText: state.pathParameters['spotID']!),
-            // redirect: _authGuardRedirect,
+            path: 'complete_profile',
+            builder: (context, state) => const ProfileCompletionPage(),
           ),
         ],
       ),
     ],
-    redirect: (context, state) {
-      final isLoggedIn = context.read<HSAuthenticationBloc>().state.status ==
-          HSAppStatus.authenticated;
-      final isLoggingIn = state.matchedLocation == '/login';
-
-      final appStatus = context.read<HSAuthenticationBloc>().state.status;
-      late final String ret;
-      HSDebugLogger.logInfo("REQUEST: ${state.matchedLocation}");
-      switch (appStatus) {
-        case HSAppStatus.loading || HSAppStatus.splash:
-          ret = "/splash";
-        case HSAppStatus.unauthenticated:
-          ret = "/login";
-        case HSAppStatus.emailNotVerified:
-          ret = "/verify_email";
-        case HSAppStatus.profileNotCompleted:
-          ret = "/complete_profile";
-        case HSAppStatus.authenticated:
-          if (state.matchedLocation != '/' &&
-              state.matchedLocation != '/splash') return state.matchedLocation;
-          ret = '/';
-      }
-      return ret;
-    },
   );
 }
 
