@@ -73,6 +73,14 @@ class _HSRoutes {
         redirect: (context, state) => '/protected/home',
       ),
       GoRoute(
+        path: '/user/:userID',
+        redirect: (context, state) => '/protected${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/spot/:spotID',
+        redirect: (context, state) => '/protected${state.matchedLocation}',
+      ),
+      GoRoute(
           path: '/protected',
           redirect: (context, state) {
             final authBloc = context.read<HSAuthenticationBloc>();
@@ -108,19 +116,16 @@ class _HSRoutes {
           final authBloc = context.read<HSAuthenticationBloc>();
           final appStatus = authBloc.state.status;
           late final String ret;
-          HSDebugLogger.logInfo("REQUEST: ${state.matchedLocation}");
           switch (appStatus) {
             case HSAppStatus.emailNotVerified:
               ret = "/auth/verify_email";
             case HSAppStatus.profileNotCompleted:
               ret = "/auth/complete_profile";
-
             case HSAppStatus.authenticated:
               ret = "/protected/home";
             default:
               ret = "/auth/login";
           }
-          HSDebugLogger.logInfo("RET: $ret");
           return ret;
         },
         routes: [
@@ -135,10 +140,6 @@ class _HSRoutes {
           GoRoute(
             path: 'verify_email',
             builder: (context, state) => const VerifyEmailPage(),
-          ),
-          GoRoute(
-            path: 'complete_profile',
-            builder: (context, state) => const ProfileCompletionPage(),
           ),
           GoRoute(
             path: 'complete_profile',
