@@ -47,7 +47,10 @@ class HomePage extends StatelessWidget {
                         ? const Icon(FontAwesomeIcons.solidUser)
                         : null,
                   ),
-                  onPressed: () => navi.toUserProfile(currentUser.uid!)),
+                  onPressed: () => navi.navigatorKey.currentState?.push(
+                        UserProfileProvider.route(currentUser.uid!),
+                      ) // navi.toUserProfile(currentUser.uid!),
+                  ),
             ],
             floating: true,
             pinned: true,

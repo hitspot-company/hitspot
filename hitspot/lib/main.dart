@@ -15,6 +15,7 @@ import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
 import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 import 'package:hs_search_repository/hs_search.dart';
@@ -93,21 +94,26 @@ class App extends StatelessWidget {
         child: BlocSelector<HSThemeBloc, HSThemeState, ThemeData>(
           selector: (state) => state.theme,
           builder: (context, currentTheme) {
-            return MaterialApp.router(
-              theme: currentTheme,
-              title: "Hitspot",
-              routerConfig: navi.router,
-              // builder: (context, child) => Overlay(
-              //   initialEntries: [
-              //     OverlayEntry(
-              //       builder: (context) =>
-              //           child ??
-              //           const Center(
-              //             child: Text("OVERLAY ERROR"),
-              //           ),
-              //     ),
-              //   ],
-              // ),
+            return BlocListener<HSAuthenticationBloc, HSAuthenticationState>(
+              listener: (context, state) {
+                navi.router.refresh();
+              },
+              child: MaterialApp.router(
+                theme: currentTheme,
+                title: "Hitspot",
+                routerConfig: navi.router,
+                builder: (context, child) => Overlay(
+                  initialEntries: [
+                    OverlayEntry(
+                      builder: (context) =>
+                          child ??
+                          const Center(
+                            child: Text("OVERLAY ERROR"),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
             );
           },
         ),

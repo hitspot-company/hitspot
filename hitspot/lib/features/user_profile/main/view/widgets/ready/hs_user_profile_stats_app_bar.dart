@@ -49,7 +49,6 @@ class HSUserProfileStatsAppBar extends StatelessWidget {
         children: [
           BlocBuilder<HSUserProfileBloc, HSUserProfileState>(
             buildWhen: (previous, current) {
-              HSDebugLogger.logInfo("State changed");
               if (previous is HSUserProfileReady &&
                   current is HSUserProfileReady) {
                 return previous.user?.followers != current.user?.followers ||
