@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/boards/add_board/cubit/hs_add_board_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class AddBoardPage extends StatelessWidget {
   const AddBoardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final addBoardCubit = context.read<HSAddBoardCubit>();
     return HSScaffold(
         appBar: HSAppBar(
           enableDefaultBackButton: true,
@@ -21,14 +23,22 @@ class AddBoardPage extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.only(top: 32.0),
           child: PageView(
-            children: const [_FirstPage()],
+            physics: const NeverScrollableScrollPhysics(),
+            controller: addBoardCubit.state.pageController,
+            children: [
+              _FirstPage(addBoardCubit),
+              Container(
+                color: Colors.orange,
+              )
+            ],
           ),
         ));
   }
 }
 
 class _FirstPage extends StatelessWidget {
-  const _FirstPage({super.key});
+  const _FirstPage(this._addBoardCubit);
+  final HSAddBoardCubit _addBoardCubit;
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +55,16 @@ class _FirstPage extends StatelessWidget {
         const SizedBox(
           height: 32.0,
         ),
-        const HSTextField(
-          suffixIcon: Icon(FontAwesomeIcons.a, color: Colors.transparent),
+        HSTextField(
+          onChanged: _addBoardCubit.updateTitle,
+          suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
           hintText: "Title",
         ),
         const Gap(32.0),
-        const HSTextField(
+        HSTextField(
           maxLines: 5,
-          suffixIcon: Icon(FontAwesomeIcons.a, color: Colors.transparent),
+          onChanged: _addBoardCubit.updateDescription,
+          suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
           hintText: "Description",
         ),
         const Gap(32.0),
@@ -60,7 +72,7 @@ class _FirstPage extends StatelessWidget {
           alignment: Alignment.topRight,
           child: HSButton.icon(
             label: const Text("Customize"),
-            onPressed: () => HSDebugLogger.logInfo("customize"),
+            onPressed: _addBoardCubit.nextPage,
             icon: const Icon(FontAwesomeIcons.arrowRight),
           ),
         )

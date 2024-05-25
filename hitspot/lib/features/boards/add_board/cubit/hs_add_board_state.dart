@@ -1,10 +1,53 @@
 part of 'hs_add_board_cubit.dart';
 
-sealed class HsAddBoardState extends Equatable {
-  const HsAddBoardState();
+final class HSAddBoardState extends Equatable {
+  HSAddBoardState(
+      {this.title = "",
+      this.description = "",
+      this.tripBudget = 0.0,
+      this.tripDate = "",
+      this.color = "",
+      this.image = "",
+      this.page = 0});
+
+  final int page;
+  final String title;
+  final String description;
+  final double tripBudget;
+  final String tripDate;
+  final String color;
+  final String image;
+  final PageController pageController = PageController();
 
   @override
-  List<Object> get props => [];
-}
+  List<Object> get props => [
+        page,
+        page,
+        title,
+        description,
+        tripBudget,
+        tripDate,
+        color,
+        image,
+      ];
 
-final class HsAddBoardInitial extends HsAddBoardState {}
+  HSAddBoardState copyWith({
+    int? page,
+    String? title,
+    String? description,
+    double? tripBudget,
+    String? tripDate,
+    String? color,
+    String? image,
+  }) {
+    return HSAddBoardState(
+      page: page ?? this.page,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      tripBudget: tripBudget ?? this.tripBudget,
+      tripDate: tripDate ?? this.tripDate,
+      color: color ?? this.color,
+      image: image ?? this.image,
+    );
+  }
+}

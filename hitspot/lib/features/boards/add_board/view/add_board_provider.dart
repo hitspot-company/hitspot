@@ -9,6 +9,6 @@ class AddBoardProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (context) => HsAddBoardCubit(), child: const AddBoardPage());
+        create: (context) => HSAddBoardCubit(), child: const AddBoardPage());
   }
 }

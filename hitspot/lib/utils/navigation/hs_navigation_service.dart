@@ -82,7 +82,8 @@ class _HSRoutes {
       ),
       GoRoute(
         path: '/spot/:spotID',
-        redirect: (context, state) => '/protected${state.matchedLocation}',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
         path: '/add_board',
