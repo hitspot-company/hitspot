@@ -8,6 +8,7 @@ import 'package:hs_database_repository/src/hs_database_repository_boards.dart';
 import 'package:hs_database_repository/src/hs_database_repository_trips.dart';
 import 'package:hs_database_repository/src/hs_database_repository_users.dart';
 import 'package:hs_database_repository/src/hs_database_repository_spots.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HSDatabaseRepository {
   const HSDatabaseRepository();
@@ -51,8 +52,9 @@ class HSDatabaseRepository {
     }
   }
 
-  Future<void> createSpot({required String title}) async =>
-      await _spotsRepository.createSpot(title);
+  Future<void> createSpot(
+          {required String title, required List<XFile> images}) async =>
+      await _spotsRepository.createSpot(title, images);
 
   Future<bool> userIsUsernameAvailable(String username) async =>
       await _usersRepository.isUsernameAvailable(username);

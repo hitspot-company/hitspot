@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/add_spot/cubit/hs_add_spot_cubit_cubit.dart';
 import 'package:hitspot/add_spot/view/add_spot_form.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 
 class AddSpotPage extends StatelessWidget {
@@ -18,10 +19,13 @@ class AddSpotPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       resizeToAvoidBottomInset: false,
-      sidePadding: 24.0,
+      sidePadding: 0.0,
       body: BlocProvider(
-        create: (_) => HSAddSpotCubit(HSApp.instance.databaseRepository),
-        child: const AddSpotForm(),
+        create: (_) => HSAddSpotCubit(
+            HSApp.instance.databaseRepository,
+            HSApp.instance.locationRepository,
+            HSApp.instance.networkRepository),
+        child: AddSpotForm(),
       ),
     );
   }

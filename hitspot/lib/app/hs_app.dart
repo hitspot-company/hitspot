@@ -9,10 +9,8 @@ import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_search_repository/hs_search.dart';
-import 'package:hs_theme_repository/hs_theme.dart';
-import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
+import 'package:location/location.dart';
 
 class HSApp {
   // SINGLETON
@@ -88,4 +86,8 @@ class HSApp {
   // Full Text Search
   HSSearchRepository get searchRepository =>
       context!.read<HSSearchRepository>();
+
+  // LOCATION
+  HSLocationRepository get locationRepository =>
+      context!.read<HSLocationRepository>();
 }

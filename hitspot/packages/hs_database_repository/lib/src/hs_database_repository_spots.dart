@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,6 +9,7 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hs_database_repository/src/models/hs_spot.dart';
@@ -25,7 +25,7 @@ class HSSpotsRepository {
 
   final int _THUMBNAIL_SIZE = 100;
 
-  Future<void> createSpot(String title) async {
+  Future<void> createSpot(String title, List<XFile> images) async {
     // Get data and create HSSpot based on that data
 
     // Create geo hash based on latitude & longitude
