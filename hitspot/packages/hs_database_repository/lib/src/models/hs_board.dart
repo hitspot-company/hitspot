@@ -108,6 +108,38 @@ class HSBoard {
     );
   }
 
+  HSBoard copyWith({
+    String? bid,
+    String? authorID,
+    List? editors,
+    List? participants,
+    Color? color,
+    String? image,
+    List? spots,
+    String? description,
+    String? title,
+    Timestamp? tripDate,
+    double? tripBudget,
+    HSBoardVisibility? boardVisibility,
+    Timestamp? createdAt,
+  }) {
+    return HSBoard(
+      bid: bid ?? this.bid,
+      authorID: authorID ?? this.authorID,
+      editors: editors ?? this.editors,
+      participants: participants ?? this.participants,
+      color: color ?? this.color,
+      image: image ?? this.image,
+      spots: spots ?? this.spots,
+      description: description ?? this.description,
+      title: title ?? this.title,
+      tripDate: tripDate ?? this.tripDate,
+      tripBudget: tripBudget ?? this.tripBudget,
+      boardVisibility: boardVisibility ?? this.boardVisibility,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   const HSBoard({
     this.bid,
     this.authorID,

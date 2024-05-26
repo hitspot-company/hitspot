@@ -25,18 +25,29 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
   void updateDescription(String value) =>
       emit(state.copyWith(description: value));
 
-  void nextPage() => pageController.nextPage(
-      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  void nextPage() {
+    if (pageController.page == 0 &&
+        (state.title.isEmpty || state.description.isEmpty)) {
+      emit(state.copyWith(
+          errorText: "The title and description cannot be empty."));
+      return;
+    }
+    pageController.nextPage(
+        duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  }
+
   void prevPage() => pageController.previousPage(
       duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
 
   final HSDatabaseRepository _databaseRepository = app.databaseRepository;
 
-  Future<bool> colorPickerDialog() async {
+  Future<bool> pickColor(bool value) async {
+    if (!value) {
+      emit(state.copyWith(color: Colors.transparent));
+      return false;
+    }
     return ColorPicker(
-      // Use the dialogPickerColor as start and active color.
       color: state.color ?? currentTheme.mainColor.withOpacity(.6),
-      // Update the dialogPickerColor using the callback.
       onColorChanged: (Color color) => emit(state.copyWith(color: color)),
       width: 40,
       height: 40,
@@ -93,8 +104,12 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
     );
   }
 
-  Future<void> chooseImage() async {
+  Future<void> chooseImage(bool value) async {
     try {
+      if (!value) {
+        emit(state.copyWith(image: ""));
+        return;
+      }
       final picker = ImagePicker();
       final XFile? image =
           await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
@@ -123,10 +138,12 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
     return ret;
   }
 
-  Future<String> uploadFile(File imageFile) async {
+  Future<String> uploadFile(File imageFile, String docID) async {
     try {
-      final Reference ref =
-          FirebaseStorage.instance.ref("boards").child(currentUser.uid!);
+      final Reference ref = FirebaseStorage.instance
+          .ref("boards")
+          .child(currentUser.uid!)
+          .child(docID);
       final UploadTask uploadTask = ref.putFile(imageFile);
       final TaskSnapshot downloadUrl = await uploadTask;
       final String url = await downloadUrl.ref.getDownloadURL();
@@ -140,23 +157,21 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
   Future<void> createBoard() async {
     emit(state.copyWith(uploadState: HSAddBoardUploadState.uploading));
     try {
-      late final String? uploadedFileUrl;
-      if (state.image != null) {
-        uploadedFileUrl = await uploadFile(File(state.image!));
-      } else {
-        uploadedFileUrl = null;
-      }
       final HSBoard board = HSBoard(
         authorID: currentUser.uid,
         color: state.color,
-        image: uploadedFileUrl,
         description: state.description,
         title: state.title,
         boardVisibility: state.boardVisibility,
         createdAt: Timestamp.now(),
       );
       final String boardID = await _databaseRepository.createBoard(board);
-      HSDebugLogger.logSuccess("Board Created: $boardID");
+      if (state.image != null) {
+        final String uploadedFileUrl =
+            await uploadFile(File(state.image!), boardID);
+        await _databaseRepository
+            .updateBoard(board.copyWith(bid: boardID, image: uploadedFileUrl));
+      }
       await Future.delayed(const Duration(seconds: 1));
       navi.router.go("/board/$boardID");
     } on DatabaseConnectionFailure catch (_) {

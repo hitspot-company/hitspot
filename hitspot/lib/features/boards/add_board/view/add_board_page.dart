@@ -73,6 +73,7 @@ class _FirstPage extends StatelessWidget {
           onChanged: _addBoardCubit.updateTitle,
           suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
           hintText: "Title",
+          initialValue: _addBoardCubit.state.title,
           textInputAction: TextInputAction.next,
         ),
         const Gap(32.0),
@@ -85,8 +86,19 @@ class _FirstPage extends StatelessWidget {
           textInputAction: TextInputAction.done,
           maxLines: 5,
           onChanged: _addBoardCubit.updateDescription,
+          initialValue: _addBoardCubit.state.description,
           suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
           hintText: "Description",
+        ),
+        const Gap(8.0),
+        BlocSelector<HSAddBoardCubit, HSAddBoardState, String?>(
+          selector: (state) => state.errorText,
+          builder: (context, errorText) {
+            if (errorText != null) {
+              return Text(errorText, style: const TextStyle(color: Colors.red));
+            }
+            return const SizedBox();
+          },
         ),
         const Gap(32.0),
         _ButtonsRow(
@@ -124,60 +136,111 @@ class _SecondPage extends StatelessWidget {
         ),
         const Gap(32.0),
         Text("Color", style: textTheme.titleLarge!.boldify),
-        const Text("Tap on the rectangle to change color."),
-        const Gap(8.0),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: GestureDetector(
-            onTap: _addBoardCubit.colorPickerDialog,
-            child: BlocSelector<HSAddBoardCubit, HSAddBoardState, Color?>(
-              selector: (state) => state.color,
-              builder: (context, state) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    height: 60,
-                    width: 60,
-                    color: _addBoardCubit.state.color ??
-                        currentTheme.mainColor.withOpacity(.6),
+        const AutoSizeText("Do you want to choose a color?", maxLines: 1),
+        BlocSelector<HSAddBoardCubit, HSAddBoardState, bool>(
+          selector: (state) => state.color != null,
+          builder: (context, isColorSelected) {
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Radio<bool>(
+                      value: true,
+                      groupValue: isColorSelected,
+                      onChanged: (value) => _addBoardCubit.pickColor(true),
+                      visualDensity: const VisualDensity(
+                        horizontal: VisualDensity.minimumDensity,
+                        vertical: VisualDensity.maximumDensity,
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    const Text("Yes"),
+                    const Gap(16.0),
+                    Radio<bool>(
+                      value: false,
+                      groupValue: isColorSelected,
+                      onChanged: (value) => _addBoardCubit.pickColor(false),
+                      visualDensity: const VisualDensity(
+                          horizontal: VisualDensity.minimumDensity,
+                          vertical: VisualDensity.minimumDensity),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    const Text("No"),
+                  ],
+                ),
+                if (isColorSelected)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        color: _addBoardCubit.state.color ??
+                            currentTheme.mainColor.withOpacity(.6),
+                      ),
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
+              ],
+            );
+          },
         ),
         const Gap(32.0),
         Text("Image", style: textTheme.titleLarge!.boldify),
-        const Text("Tap on the rectangle to change your board image."),
-        const Gap(8.0),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: GestureDetector(
-            onTap: _addBoardCubit.chooseImage,
-            child: BlocSelector<HSAddBoardCubit, HSAddBoardState, String?>(
-              selector: (state) => state.image,
-              builder: (context, imagePath) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    height: 120,
-                    width: screenWidth,
-                    decoration: BoxDecoration(
-                      image: imagePath != null
-                          ? DecorationImage(
-                              image: AssetImage(imagePath),
+        const AutoSizeText("Do you want to choose an image?", maxLines: 1),
+        BlocSelector<HSAddBoardCubit, HSAddBoardState, bool>(
+          selector: (state) => state.image.isNotEmpty,
+          builder: (context, isImageSelected) {
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Radio<bool>(
+                      value: true,
+                      groupValue: isImageSelected,
+                      onChanged: (value) => _addBoardCubit.chooseImage(true),
+                      visualDensity: const VisualDensity(
+                        horizontal: VisualDensity.minimumDensity,
+                        vertical: VisualDensity.maximumDensity,
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    const Text("Yes"),
+                    const Gap(16.0),
+                    Radio<bool>(
+                      value: false,
+                      groupValue: isImageSelected,
+                      onChanged: (value) => _addBoardCubit.chooseImage(false),
+                      visualDensity: const VisualDensity(
+                          horizontal: VisualDensity.minimumDensity,
+                          vertical: VisualDensity.minimumDensity),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    const Text("No"),
+                  ],
+                ),
+                if (isImageSelected)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        height: 120,
+                        width: screenWidth,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage(_addBoardCubit.state.image),
                               fit: BoxFit.cover,
-                              opacity: .6)
-                          : null,
-                      color: imagePath == null
-                          ? currentTheme.mainColor.withOpacity(.6)
-                          : null,
+                              opacity: .6),
+                        ),
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
+              ],
+            );
+          },
         ),
         const Gap(32.0),
         _ButtonsRow(
