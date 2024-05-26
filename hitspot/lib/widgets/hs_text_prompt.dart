@@ -27,13 +27,13 @@ class HSTextPrompt extends StatelessWidget {
       child: Text.rich(
         TextSpan(
           text: prompt,
-          style: app.textTheme.bodySmall!.hintify(),
+          style: app.textTheme.bodySmall!.hintify,
           children: [
             TextSpan(
               text: pressableText,
               style: app.textTheme.bodySmall!
                   .colorify(HSTheme.instance.mainColor)
-                  .boldify(),
+                  .boldify,
               recognizer: TapGestureRecognizer()..onTap = () => onTap(),
             ),
           ],

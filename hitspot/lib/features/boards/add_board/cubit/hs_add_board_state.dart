@@ -1,31 +1,38 @@
 part of 'hs_add_board_cubit.dart';
 
+enum HSAddBoardUploadState { initial, uploading, error }
+
 final class HSAddBoardState extends Equatable {
-  HSAddBoardState({
+  const HSAddBoardState({
     this.title = "",
     this.description = "",
     this.tripBudget = 0.0,
     this.tripDate = "",
-    this.color = "",
-    this.image = "",
+    this.color,
+    this.image,
+    this.boardVisibility = HSBoardVisibility.private,
+    this.uploadState = HSAddBoardUploadState.initial,
   });
 
   final String title;
   final String description;
   final double tripBudget;
   final String tripDate;
-  final String color;
-  final String image;
-  final PageController pageController = PageController();
+  final Color? color;
+  final String? image;
+  final HSBoardVisibility boardVisibility;
+  final HSAddBoardUploadState uploadState;
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         title,
         description,
         tripBudget,
         tripDate,
         color,
         image,
+        boardVisibility,
+        uploadState,
       ];
 
   HSAddBoardState copyWith({
@@ -34,8 +41,10 @@ final class HSAddBoardState extends Equatable {
     String? description,
     double? tripBudget,
     String? tripDate,
-    String? color,
+    Color? color,
     String? image,
+    HSBoardVisibility? boardVisibility,
+    HSAddBoardUploadState? uploadState,
   }) {
     return HSAddBoardState(
       title: title ?? this.title,
@@ -44,6 +53,8 @@ final class HSAddBoardState extends Equatable {
       tripDate: tripDate ?? this.tripDate,
       color: color ?? this.color,
       image: image ?? this.image,
+      boardVisibility: boardVisibility ?? this.boardVisibility,
+      uploadState: uploadState ?? this.uploadState,
     );
   }
 }

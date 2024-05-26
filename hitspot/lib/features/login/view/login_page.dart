@@ -120,13 +120,13 @@ class _ForgotPassword extends StatelessWidget {
       child: Text.rich(
         TextSpan(
           text: prompt,
-          style: hsApp.textTheme.bodySmall!.hintify(),
+          style: hsApp.textTheme.bodySmall!.hintify,
           children: [
             TextSpan(
               text: pressableText,
               style: hsApp.textTheme.bodySmall!
                   .colorify(HSTheme.instance.mainColor)
-                  .boldify(),
+                  .boldify,
               recognizer: TapGestureRecognizer()
                 ..onTap = () => hsNavigation.push(PasswordResetPage.route()),
             ),

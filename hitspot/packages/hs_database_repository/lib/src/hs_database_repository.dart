@@ -1,11 +1,14 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/hs_database_repository_boards.dart';
 import 'package:hs_database_repository/src/hs_database_repository_users.dart';
 
 class HSDatabaseRepository {
   const HSDatabaseRepository();
 
   static final _usersRepository = HSUsersRepository();
+  static final _boardsRepository = HSBoardsRepository();
+  static final boardsCollection = _boardsRepository.collection;
 
   Future<void> followUser(HSUser currentUser, HSUser user) async =>
       await _usersRepository.followUser(currentUser, user);
@@ -34,4 +37,7 @@ class HSDatabaseRepository {
 
   Future<bool> isUsernameAvailable(String username) async =>
       await _usersRepository.isUsernameAvailable(username);
+
+  Future<String> createBoard(HSBoard board) async =>
+      await _boardsRepository.createBoard(board);
 }

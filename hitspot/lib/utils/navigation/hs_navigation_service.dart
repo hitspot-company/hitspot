@@ -86,55 +86,66 @@ class _HSRoutes {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/board/:boardID',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
         path: '/add_board',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
-          path: '/protected',
-          redirect: (context, state) {
-            final authBloc = context.read<HSAuthenticationBloc>();
-            final String from = "?from=${state.uri}";
-            final loggedIn = authBloc.state.status == HSAppStatus.authenticated;
-            if (!loggedIn) {
-              final String ret = "/auth$from";
-              return ret;
-            }
-            return null;
-          },
-          routes: [
-            GoRoute(
-              path: 'home',
-              builder: (context, state) => const HomePage(),
-              redirect: (context, state) {
-                final String? from = state.uri.queryParameters["from"];
-                if (from != null) {
-                  return '/protected/home$from';
-                }
-                return null;
-              },
-              routes: [
-                GoRoute(
-                  path: 'user/:userID',
-                  builder: (context, state) => UserProfileProvider(
-                      userID: state.pathParameters['userID']!),
-                ),
-                GoRoute(
-                  path: 'spot/:spotID',
-                  builder: (context, state) =>
-                      InfoPage(infoText: state.pathParameters['spotID']!),
-                ),
-                GoRoute(
-                  path: 'settings',
-                  builder: (context, state) => const SettingsProvider(),
-                ),
-                GoRoute(
-                  path: 'add_board',
-                  builder: (context, state) => const AddBoardProvider(),
-                ),
-              ],
-            ),
-          ]),
+        path: '/protected',
+        redirect: (context, state) {
+          final authBloc = context.read<HSAuthenticationBloc>();
+          final String from = "?from=${state.uri}";
+          final loggedIn = authBloc.state.status == HSAppStatus.authenticated;
+          if (!loggedIn) {
+            final String ret = "/auth$from";
+            return ret;
+          }
+          return null;
+        },
+        routes: [
+          GoRoute(
+            path: 'home',
+            builder: (context, state) => const HomePage(),
+            redirect: (context, state) {
+              final String? from = state.uri.queryParameters["from"];
+              if (from != null) {
+                return '/protected/home$from';
+              }
+              return null;
+            },
+            routes: [
+              GoRoute(
+                path: 'user/:userID',
+                builder: (context, state) => UserProfileProvider(
+                    userID: state.pathParameters['userID']!),
+              ),
+              GoRoute(
+                path: 'board/:boardID',
+                builder: (context, state) =>
+                    InfoPage(infoText: state.pathParameters['boardID']!),
+              ),
+              GoRoute(
+                path: 'spot/:spotID',
+                builder: (context, state) =>
+                    InfoPage(infoText: state.pathParameters['spotID']!),
+              ),
+              GoRoute(
+                path: 'settings',
+                builder: (context, state) => const SettingsProvider(),
+              ),
+              GoRoute(
+                path: 'add_board',
+                builder: (context, state) => const AddBoardProvider(),
+              ),
+            ],
+          ),
+        ],
+      ),
       GoRoute(
         path: '/auth',
         redirect: (context, state) {

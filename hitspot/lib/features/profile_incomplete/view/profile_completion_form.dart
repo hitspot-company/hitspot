@@ -206,21 +206,21 @@ class _UsernameGuidelines extends StatelessWidget {
         children: [
           TextSpan(
             text: "unique, ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "between ",
           ),
           TextSpan(
             text: "5 ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "and ",
           ),
           TextSpan(
             text: "16 ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "characters long, ",
@@ -230,14 +230,14 @@ class _UsernameGuidelines extends StatelessWidget {
           ),
           TextSpan(
             text: "alphanumeric ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "characters plus the ",
           ),
           TextSpan(
             text: "'_'",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
         ],
       ),

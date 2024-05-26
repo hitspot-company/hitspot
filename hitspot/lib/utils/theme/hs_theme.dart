@@ -36,11 +36,11 @@ final class HSTheme {
 }
 
 extension TextStyleAltering on TextStyle {
-  TextStyle boldify() {
+  TextStyle get boldify {
     return copyWith(fontWeight: FontWeight.bold);
   }
 
-  TextStyle hintify() {
+  TextStyle get hintify {
     return copyWith(color: color!.withOpacity(.7));
   }
 

@@ -17,6 +17,39 @@ enum HSBoardVisibility {
         return HSBoardVisibility.private;
     }
   }
+
+  int get code {
+    switch (this) {
+      case HSBoardVisibility.private:
+        return 0;
+      case HSBoardVisibility.invite:
+        return 1;
+      case HSBoardVisibility.public:
+        return 2;
+    }
+  }
+
+  String get name {
+    switch (this) {
+      case HSBoardVisibility.private:
+        return "private";
+      case HSBoardVisibility.invite:
+        return "invite";
+      case HSBoardVisibility.public:
+        return "public";
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case HSBoardVisibility.private:
+        return "Only you can see the board.";
+      case HSBoardVisibility.invite:
+        return "You and the people you give access can see the board.";
+      case HSBoardVisibility.public:
+        return "Everyone can see the board.";
+    }
+  }
 }
 
 class HSBoard {
@@ -52,7 +85,7 @@ class HSBoard {
       "title": title,
       "trip_date": tripDate,
       "trip_budget": tripBudget,
-      "board_visibility": boardVisibility,
+      "board_visibility": boardVisibility?.code,
       "created_at": createdAt,
     };
   }
@@ -63,14 +96,14 @@ class HSBoard {
       bid: data["author_id"],
       editors: data["editors"],
       participants: data["participants"],
-      color: data["color"],
+      color: data["color"].toString().toColor,
       image: data["image"],
       spots: data["spots"],
       description: data["description"],
       title: data["title"],
       tripDate: data["trip_date"],
       tripBudget: data["trip_budget"],
-      boardVisibility: data["board_visibility"],
+      boardVisibility: HSBoardVisibility.fromCode(data["board_visibility"]),
       createdAt: data["created_at"],
     );
   }
@@ -90,6 +123,24 @@ class HSBoard {
     this.boardVisibility,
     this.createdAt,
   });
+
+  @override
+  String toString() => """
+HSBoard data:
+bid: $bid
+authorID: $authorID
+editors: $editors
+participants: $participants
+color: $color
+image: $image
+spots: $spots
+description: $description
+title: $title
+tripDate: $tripDate
+tripBudget: $tripBudget
+boardVisibility: $boardVisibility
+createdAt: $createdAt
+""";
 }
 
 extension HSBoardColorExtensions on Color {

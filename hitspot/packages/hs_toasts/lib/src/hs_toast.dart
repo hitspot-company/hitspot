@@ -52,8 +52,16 @@ class HSToasts {
       type: chosenType,
       style: ToastificationStyle.fillColored,
       autoCloseDuration: Duration(seconds: autoCloseDurationTime),
-      title: Text(title),
-      description: description ?? Text(descriptionText ?? ""),
+      title: Text(
+        title,
+        style: Theme.of(context)
+            .textTheme
+            .titleMedium
+            ?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      description: description ??
+          Text(descriptionText ?? "",
+              style: Theme.of(context).textTheme.titleSmall),
       alignment: alignment ?? Alignment.topRight,
       animationDuration: Duration(milliseconds: animationDuration ?? 300),
       animationBuilder: (context, animation, alignment, child) {

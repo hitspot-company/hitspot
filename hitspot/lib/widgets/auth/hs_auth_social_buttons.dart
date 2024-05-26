@@ -72,7 +72,7 @@ class _SocialLoginButton extends StatelessWidget {
                 labelText,
                 style: textTheme.headlineSmall!
                     .colorify(theme.colorScheme.secondary)
-                    .boldify(),
+                    .boldify,
               ),
             ),
           ],

@@ -69,11 +69,10 @@ class HomePage extends StatelessWidget {
                         style: textTheme.headlineMedium),
                     TextSpan(
                         text: " ,\nWhere would you like to go?",
-                        style:
-                            HSApp.instance.textTheme.headlineLarge!.hintify()),
+                        style: HSApp.instance.textTheme.headlineLarge!.hintify),
                   ],
                 ),
-                style: HSApp.instance.textTheme.headlineMedium!.hintify()),
+                style: HSApp.instance.textTheme.headlineMedium!.hintify),
             floating: true,
             pinned: true,
           ),
