@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -27,43 +28,44 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 
 class AddSpotForm extends StatelessWidget {
-  AddSpotForm({super.key});
+  const AddSpotForm({super.key});
 
   @override
   Widget build(BuildContext context) {
     final hsApp = HSApp.instance;
     final hsNavigation = hsApp.navigation;
     final addSpotCubit = context.read<HSAddSpotCubit>();
+    final pageController = PageController();
 
-    return BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
-        builder: (context, state) {
-      switch (state.step) {
-        case 0:
-          return _LocationSelection();
-        default:
-          return Container();
-      }
-    });
+    return PageView(
+      controller: pageController,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        _LocationSelection(
+          pageController: pageController,
+        ),
+        const _ImageSelection(),
+      ],
+    );
+  }
+}
+
+class _ImageSelection extends StatelessWidget {
+  const _ImageSelection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }
 
 class _LocationSelection extends StatelessWidget {
-  _LocationSelection({super.key});
+  const _LocationSelection({super.key, required this.pageController});
+  final PageController pageController;
 
   @override
   Widget build(BuildContext context) {
     final addSpotCubit = context.read<HSAddSpotCubit>();
-
-    final TextEditingController _searchBarController = TextEditingController();
-    late GoogleMapController mapController;
-
-    void _onMapCreated(GoogleMapController controller) {
-      mapController = controller;
-    }
-
-    void _placeSelected(LatLng place) async {
-      addSpotCubit.locationChanged(location: place);
-    }
 
     return BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
       builder: (context, state) {
@@ -72,187 +74,232 @@ class _LocationSelection extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         return Stack(children: [
-          GoogleMap(
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-
-            onMapCreated: (GoogleMapController controller) async {
-              mapController = controller;
-            },
-            // onTap: (LatLng place) => _placeSelected(place),
-            initialCameraPosition: CameraPosition(
-              target: state.location,
-              zoom: 16.0,
-            ),
-            onCameraMove: (position) {
-              if (state.location !=
-                  LatLng(position.target.latitude, position.target.longitude)) {
-                addSpotCubit.locationChanged(location: position.target);
-              }
-            },
-            onCameraIdle: () async {
-              addSpotCubit.setLocationChanged(location: state.location);
-            },
-            mapType: MapType.normal,
+          _MapAndSearchBar(),
+          _SelectedSpotTile(
+            pageController: pageController,
           ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              margin: const EdgeInsets.all(16.0),
-              child: GooglePlaceAutoCompleteTextField(
-                googleAPIKey: "AIzaSyDxNpYTqwsJOoeXdOJ4yN3e4VPU1xwNZlU",
-                textEditingController: _searchBarController,
-                textStyle: TextStyle(color: Colors.grey[800]),
-                inputDecoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Search your location...",
-                    hintStyle: const TextStyle(
-                      color: Colors.grey,
-                    ),
-                    prefixIcon: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12.0),
-                      child: Icon(
-                        Icons.location_pin,
-                        color: Colors.grey[800],
-                      ),
-                    )),
-                isLatLngRequired: true,
-                getPlaceDetailWithLatLng: (Prediction prediction) {
-                  if (prediction.lat == null || prediction.lng == null) return;
-
-                  double? lat = double.tryParse(prediction.lat!);
-                  double? lng = double.tryParse(prediction.lng!);
-
-                  if (lat == null || lng == null) return;
-
-                  LatLng latLng = LatLng(lat, lng);
-
-                  addSpotCubit.locationChanged(location: latLng);
-                  mapController
-                      .animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
-                },
-                itemClick: (Prediction prediction) {
-                  _searchBarController.text = prediction.description ?? "";
-                  _searchBarController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: prediction.description!.length));
-                },
-                boxDecoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 3,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                itemBuilder: (context, index, Prediction prediction) {
-                  return Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: index == 4
-                        ? const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.vertical(
-                                bottom: Radius.circular(20)),
-                          )
-                        : const BoxDecoration(color: Colors.white),
-                    child: Text(prediction.description!,
-                        style: TextStyle(color: Colors.grey[800])),
-                  );
-                },
-                isCrossBtnShown: true,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 5,
-            left: 35,
-            right: 35,
-            child: Align(
-              child: Container(
-                  alignment: Alignment.bottomCenter,
-                  margin: EdgeInsets.all(20.0),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-                  decoration: BoxDecoration(
-                    color:
-                        HSApp.instance.theme.currentTheme(context).primaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(24.0)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.location_pin),
-                              Text(
-                                "Address",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(state.selectedLocationStreetName,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.right),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.arrow_forward_ios),
-                              Text("Distance",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text("${state.selectedLocationDistance}",
-                                overflow: TextOverflow.clip,
-                                textAlign: TextAlign.right),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )),
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 35.0),
-              child: Icon(
-                state.location == state.selectedLocation
-                    ? Icons.location_pin
-                    : Icons.pin_drop,
-                color: Colors.grey[800],
-                size: 36,
-              ),
-            ),
-          ),
+          const _Pin(),
         ]);
       },
     );
+  }
+}
+
+class _MapAndSearchBar extends StatelessWidget {
+  _MapAndSearchBar({super.key});
+
+  final TextEditingController _searchBarController = TextEditingController();
+  late GoogleMapController _mapController;
+
+  @override
+  Widget build(BuildContext context) {
+    final addSpotCubit = context.read<HSAddSpotCubit>();
+
+    return BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
+      builder: (context, state) {
+        return Stack(
+          children: [
+            GoogleMap(
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              onMapCreated: (GoogleMapController controller) async {
+                _mapController = controller;
+              },
+              initialCameraPosition: CameraPosition(
+                target: state.usersLocation,
+                zoom: 16.0,
+              ),
+              onCameraMove: (position) {
+                addSpotCubit.locationChanged(location: position.target);
+              },
+              onCameraIdle: () {
+                addSpotCubit.setLocationChanged(location: state.location);
+              },
+              onTap: (LatLng location) {
+                _searchBarController.text = "";
+              },
+              mapType: MapType.normal,
+            ),
+            Positioned(
+              top: 13,
+              left: 0,
+              right: 0,
+              child: Container(
+                margin: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: GooglePlaceAutoCompleteTextField(
+                  googleAPIKey: FlutterConfig.get('GOOGLE_MAPS_API_KEY') ?? "",
+                  textEditingController: _searchBarController,
+                  textStyle: const TextStyle(color: Colors.white),
+                  inputDecoration: const InputDecoration(
+                    contentPadding: EdgeInsets.all(11),
+                    border: InputBorder.none,
+                    hintText: "Search your location...",
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.location_pin,
+                      color: Colors.white,
+                    ),
+                  ),
+                  isLatLngRequired: true,
+                  getPlaceDetailWithLatLng: (Prediction prediction) {
+                    if (prediction.lat == null || prediction.lng == null) {
+                      return;
+                    }
+
+                    double? lat = double.tryParse(prediction.lat!);
+                    double? lng = double.tryParse(prediction.lng!);
+
+                    if (lat == null || lng == null) {
+                      return;
+                    }
+
+                    LatLng latLng = LatLng(lat, lng);
+
+                    addSpotCubit.locationChanged(location: latLng);
+                    _mapController
+                        .animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
+                  },
+                  itemClick: (Prediction prediction) {
+                    _searchBarController.text = prediction.description ?? "";
+                    _searchBarController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: prediction.description!.length));
+                  },
+                  itemBuilder: (context, index, Prediction prediction) {
+                    return Container(
+                      color: Colors.grey[850],
+                      child: ListTile(
+                        title: Text(
+                          prediction.description ?? "",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
+                  isCrossBtnShown: true,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _SelectedSpotTile extends StatelessWidget {
+  const _SelectedSpotTile({super.key, required this.pageController});
+
+  final PageController pageController;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
+      builder: (context, state) {
+        return Positioned(
+          bottom: 30,
+          left: 20,
+          right: 20,
+          child: Card(
+            color: Colors.grey[900],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Address',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        state.selectedLocationStreetName,
+                        style: const TextStyle(fontSize: 15),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(color: Colors.white),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time),
+                      const SizedBox(width: 5),
+                      const Text(
+                          'DUMMY'), // I think we could add something here, what do you think?
+                      const Spacer(),
+                      const Icon(Icons.location_on),
+                      const SizedBox(width: 5),
+                      Text(state.selectedLocationDistance),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        pageController.nextPage(
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        'SELECT',
+                        style:
+                            TextStyle(color: Colors.black, letterSpacing: 0.5),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Pin extends StatelessWidget {
+  const _Pin({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
+        builder: (context, state) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 35.0),
+          child: Icon(
+            state.location == state.selectedLocation
+                ? Icons.location_pin
+                : Icons.pin_drop,
+            color: Colors.grey[800],
+            size: 36,
+          ),
+        ),
+      );
+    });
   }
 }

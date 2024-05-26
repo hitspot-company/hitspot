@@ -3,6 +3,7 @@ part of 'hs_add_spot_cubit_cubit.dart';
 final class HSAddSpotCubitState extends Equatable {
   HSAddSpotCubitState(
       {this.isLoading = true,
+      this.usersLocation = const LatLng(0, 0),
       this.location = const LatLng(0, 0),
       this.selectedLocation = const LatLng(0, 0),
       this.selectedLocationStreetName = "",
@@ -11,6 +12,7 @@ final class HSAddSpotCubitState extends Equatable {
       this.title = "",
       this.images = const []});
   final bool isLoading;
+  final LatLng usersLocation;
   final LatLng location;
   final LatLng selectedLocation;
   final String selectedLocationStreetName;
@@ -22,6 +24,7 @@ final class HSAddSpotCubitState extends Equatable {
   @override
   List<Object> get props => [
         isLoading,
+        usersLocation,
         location,
         selectedLocation,
         selectedLocationStreetName,
@@ -33,6 +36,7 @@ final class HSAddSpotCubitState extends Equatable {
 
   HSAddSpotCubitState copyWith(
       {bool? isLoading,
+      LatLng? usersLocation,
       LatLng? location,
       LatLng? selectedLocation,
       String? selectedLocationStreetName,
@@ -42,6 +46,7 @@ final class HSAddSpotCubitState extends Equatable {
       List<XFile>? images}) {
     return HSAddSpotCubitState(
         isLoading: isLoading ?? this.isLoading,
+        usersLocation: usersLocation ?? this.usersLocation,
         location: location ?? this.location,
         selectedLocation: selectedLocation ?? this.selectedLocation,
         selectedLocationStreetName:

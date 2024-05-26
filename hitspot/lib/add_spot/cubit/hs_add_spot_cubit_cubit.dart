@@ -8,7 +8,6 @@ import 'package:hitspot/app/hs_app.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:hs_network_repository/hs_network_repository.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:geocoding/geocoding.dart';
@@ -18,11 +17,11 @@ part 'hs_add_spot_cubit_state.dart';
 class HSAddSpotCubit extends Cubit<HSAddSpotCubitState> {
   final HSDatabaseRepository _hsDatabaseRepository;
   final HSLocationRepository _hsLocationRepository;
-  final HSNetworkRepository _hsNetworkRepository;
 
-  HSAddSpotCubit(this._hsDatabaseRepository, this._hsLocationRepository,
-      this._hsNetworkRepository)
-      : super(HsAddSpotCubitInitial());
+  HSAddSpotCubit(
+    this._hsDatabaseRepository,
+    this._hsLocationRepository,
+  ) : super(HsAddSpotCubitInitial());
 
   Future<void> createSpot() async {
     HSDebugLogger.logInfo("Creating spot");
@@ -38,11 +37,9 @@ class HSAddSpotCubit extends Cubit<HSAddSpotCubitState> {
 
     emit(state.copyWith(
         isLoading: false,
+        usersLocation:
+            LatLng(location?.latitude ?? 0, location?.longitude ?? 0),
         location: LatLng(location?.latitude ?? 0, location?.longitude ?? 0)));
-  }
-
-  Future<List<String>?> makeLocationQuery(String query) async {
-    return await _hsNetworkRepository.makeLocationQuery(query);
   }
 
   void isLoadingChanged({required bool isLoading}) {
@@ -57,19 +54,9 @@ class HSAddSpotCubit extends Cubit<HSAddSpotCubitState> {
     List<Placemark> placemarks =
         await placemarkFromCoordinates(location.latitude, location.longitude);
 
-    LocationData? userLocation =
-        await _hsLocationRepository.getCurrentLocation();
+    double distance = Geolocator.distanceBetween(state.usersLocation.latitude,
+        state.usersLocation.longitude, location.latitude, location.longitude);
 
-    if (userLocation == null ||
-        userLocation.latitude == null ||
-        userLocation.longitude == null) {
-      return;
-    }
-
-    double distance = Geolocator.distanceBetween(userLocation.latitude!,
-        userLocation.longitude!, location.latitude, location.longitude);
-
-    // format distance
     String formattedDistance;
 
     if (distance >= 1000) {
@@ -78,7 +65,6 @@ class HSAddSpotCubit extends Cubit<HSAddSpotCubitState> {
     } else {
       formattedDistance = "${distance.toStringAsFixed(0)} meters";
     }
-
     emit(state.copyWith(
         selectedLocation: location,
         selectedLocationStreetName: placemarks[0].street,

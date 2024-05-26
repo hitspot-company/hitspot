@@ -21,10 +21,8 @@ class AddSpotPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       sidePadding: 0.0,
       body: BlocProvider(
-        create: (_) => HSAddSpotCubit(
-            HSApp.instance.databaseRepository,
-            HSApp.instance.locationRepository,
-            HSApp.instance.networkRepository),
+        create: (_) => HSAddSpotCubit(HSApp.instance.databaseRepository,
+            HSApp.instance.locationRepository),
         child: AddSpotForm(),
       ),
     );

@@ -24,6 +24,7 @@ if (flutterVersionName == null) {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply from: project(':flutter_config').projectDir.getPath() + "/dotenv.gradle"
 
 android {
     namespace "com.company.hitspot"

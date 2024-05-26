@@ -33,6 +33,8 @@ void main() async {
   final locationRepostiory = HSLocationRepository();
   final networkRepository = HSNetworkRepository();
 
+  await FlutterConfig.loadEnvVariables();
+
   // Bind Firebase authentication stream to our HSUser
   await authenticationRepository.user.first;
   runApp(App(
@@ -88,7 +90,6 @@ class App extends StatelessWidget {
           create: (context) => HSSearchRepository(),
         ),
         RepositoryProvider(create: (context) => HSLocationRepository()),
-        RepositoryProvider(create: (context) => HSNetworkRepository()),
       ],
       child: MultiBlocProvider(
         providers: [

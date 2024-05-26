@@ -1,0 +1,76 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "hitspot",
+            "cwd": "hitspot",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hitspot (profile mode)",
+            "cwd": "hitspot",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "hitspot (release mode)",
+            "cwd": "hitspot",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "hs_authentication_repository",
+            "cwd": "hitspot/packages/hs_authentication_repository",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hs_database_repository",
+            "cwd": "hitspot/packages/hs_database_repository",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hs_debug_logger",
+            "cwd": "hitspot/packages/hs_debug_logger",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hs_firebase_config",
+            "cwd": "hitspot/packages/hs_firebase_config",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hs_form_inputs",
+            "cwd": "hitspot/packages/hs_form_inputs",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hs_mailing_repository",
+            "cwd": "hitspot/packages/hs_mailing_repository",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hs_theme_repository",
+            "cwd": "hitspot/packages/hs_theme_repository",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "hs_toasts",
+            "cwd": "hitspot/packages/hs_toasts",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}
