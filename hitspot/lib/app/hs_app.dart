@@ -5,7 +5,7 @@ import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
-import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
+import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_search_repository/hs_search.dart';
@@ -19,7 +19,7 @@ class HSApp {
   static HSApp get instance => _instance;
 
   // NAVIGATION
-  HSNavigationService get navigation => HSNavigationService.instance;
+  HSNavigation get navigation => HSNavigation.instance;
   GlobalKey<NavigatorState> get navigatorKey => navigation.navigatorKey;
   BuildContext? get context => navigatorKey.currentContext;
 
@@ -58,6 +58,7 @@ class HSApp {
       context!.read<HSAuthenticationRepository>();
   HSAuthenticationBloc get authBloc =>
       BlocProvider.of<HSAuthenticationBloc>(context!);
+
   void logout() {
     authBloc.add(const HSAppLogoutRequested());
     navi.logout();

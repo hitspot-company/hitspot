@@ -16,6 +16,7 @@ class HSScaffold extends StatelessWidget {
     this.backgroundColor,
     this.bottombar,
     this.defaultBottombarEnabled = false,
+    this.floatingActionButton,
   });
 
   final bool topSafe;
@@ -27,6 +28,7 @@ class HSScaffold extends StatelessWidget {
   final bool resizeToAvoidBottomInset;
   final Color? backgroundColor;
   final Widget? bottombar;
+  final Widget? floatingActionButton;
   final bool defaultBottombarEnabled;
 
   static void hideInput() =>
@@ -39,6 +41,9 @@ class HSScaffold extends StatelessWidget {
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(
+          floatingActionButton: floatingActionButton,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar:
               defaultBottombarEnabled ? const _Bottombar() : const SizedBox(),
           backgroundColor: backgroundColor,

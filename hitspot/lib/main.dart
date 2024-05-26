@@ -11,7 +11,7 @@ import 'package:hitspot/features/profile_incomplete/view/profile_completion_page
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
+import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';

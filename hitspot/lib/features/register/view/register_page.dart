@@ -33,7 +33,7 @@ class RegisterPage extends StatelessWidget {
                 leftTitle: "Create a ",
                 rightTitle: "free account",
               ),
-              const Expanded(child: RegisterForm()),
+              const RegisterForm(),
               Text.rich(
                 TextSpan(
                   text: "By creating an account you agree to our",

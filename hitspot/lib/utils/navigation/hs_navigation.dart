@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
@@ -15,14 +14,13 @@ import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
-class HSNavigationService {
+class HSNavigation {
   // SINGLETON
-  HSNavigationService._internal();
-  static final HSNavigationService _instance = HSNavigationService._internal();
-  static HSNavigationService get instance => _instance;
-  static final routes = _HSRoutes.instance;
+  HSNavigation._internal();
+  static final HSNavigation _instance = HSNavigation._internal();
+  static HSNavigation get instance => _instance;
+  static final routes = HSRouting.instance;
 
   GlobalKey<NavigatorState> get navigatorKey =>
       routes.router.routerDelegate.navigatorKey;
@@ -52,11 +50,11 @@ class HSNavigationService {
   // dynamic toSpot(String sid) => router.push("/spot/$sid");
 }
 
-class _HSRoutes {
+class HSRouting {
   // SINGLETON
-  _HSRoutes._internal();
-  static final _HSRoutes _instance = _HSRoutes._internal();
-  static _HSRoutes get instance => _instance;
+  HSRouting._internal();
+  static final HSRouting _instance = HSRouting._internal();
+  static HSRouting get instance => _instance;
 
   final GoRouter router = GoRouter(
     initialLocation: '/splash',

@@ -16,13 +16,9 @@ class LoginProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HSScaffold(
-      resizeToAvoidBottomInset: false,
-      sidePadding: 24.0,
-      body: BlocProvider(
-        create: (_) => HSLoginCubit(HSApp.instance.authRepository),
-        child: const LoginForm(),
-      ),
+    return BlocProvider(
+      create: (_) => HSLoginCubit(HSApp.instance.authRepository),
+      child: const LoginForm(),
     );
   }
 }

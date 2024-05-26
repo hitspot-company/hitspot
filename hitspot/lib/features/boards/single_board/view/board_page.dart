@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/boards/single_board/bloc/hs_board_bloc.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class BoardPage extends StatelessWidget {
   const BoardPage({super.key});
@@ -39,6 +43,15 @@ class BoardPage extends StatelessWidget {
               enableDefaultBackButton: true,
               titleText: board.title,
             ),
+            floatingActionButton: HSButton.icon(
+                label: Text(
+                  "CREATE TRIP",
+                  style: textTheme.headlineMedium!
+                      .colorify(currentTheme.mainColor),
+                ),
+                icon: const Icon(FontAwesomeIcons.mapPin),
+                onPressed: () => HSDebugLogger.logInfo(
+                    "Create Trip")), // TODO: Navigate a create trip page from the bottom
             body: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
@@ -50,9 +63,13 @@ class BoardPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            HSUserAvatar(
-                              radius: 40.0,
-                              imgUrl: author.profilePicture,
+                            GestureDetector(
+                              onTap: () =>
+                                  navi.router.push("/user/${author.uid}"),
+                              child: HSUserAvatar(
+                                radius: 40.0,
+                                imgUrl: author.profilePicture,
+                              ),
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
