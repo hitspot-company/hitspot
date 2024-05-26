@@ -6,10 +6,21 @@ class HSBoardsRepository {
   final CollectionReference _boards;
   final CollectionReference _users;
 
+  Future<HSBoard> getBoard(String boardID) async {
+    try {
+      DocumentSnapshot snap = await _boards.doc(boardID).get();
+      if (!snap.exists)
+        throw DatabaseConnectionFailure("The board does not exist.");
+      return HSBoard.deserialize(snap.data() as Map<String, dynamic>, snap.id);
+    } catch (_) {
+      throw DatabaseConnectionFailure();
+    }
+  }
+
   Future<String> createBoard(HSBoard board) async {
     try {
       DocumentReference ref = await _boards.add(board.serialize());
-      await _assignBoardToUser(board);
+      await _assignBoardToUser(board.copyWith(bid: ref.id));
       return (ref.id);
     } catch (_) {
       throw DatabaseConnectionFailure("An error occured creating board: $_");

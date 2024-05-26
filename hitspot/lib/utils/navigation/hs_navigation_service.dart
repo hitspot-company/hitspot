@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
+import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
@@ -127,7 +128,7 @@ class _HSRoutes {
               GoRoute(
                 path: 'board/:boardID',
                 builder: (context, state) =>
-                    InfoPage(infoText: state.pathParameters['boardID']!),
+                    BoardProvider(boardID: state.pathParameters['boardID']!),
               ),
               GoRoute(
                 path: 'spot/:spotID',

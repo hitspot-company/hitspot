@@ -24,7 +24,7 @@ class ProfileCompletionPage extends StatelessWidget {
     final app = HSApp.instance;
     return HSScaffold(
       appBar: HSAppBar(
-        title: "Complete Profile",
+        titleText: "Complete Profile",
         enableDefaultBackButton: true,
         defaultBackButtonCallback: app.logout,
       ),

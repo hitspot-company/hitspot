@@ -25,7 +25,7 @@ class AddBoardPage extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       appBar: HSAppBar(
         enableDefaultBackButton: true,
-        title: "New Board",
+        titleText: "New Board",
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 32.0),

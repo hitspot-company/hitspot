@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 
-class InfoPage extends StatelessWidget {
-  const InfoPage({super.key, required this.infoText});
-
-  final String infoText;
+class BoardsPage extends StatelessWidget {
+  const BoardsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        titleText: "",
         enableDefaultBackButton: true,
+        titleText: "Single Board",
       ),
-      body: Center(
-        child: Text(infoText, style: textTheme.displayLarge),
+      body: Container(
+        color: Colors.teal,
       ),
     );
   }

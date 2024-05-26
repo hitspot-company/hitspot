@@ -90,10 +90,10 @@ class HSBoard {
     };
   }
 
-  factory HSBoard.deserialize(Map<String, dynamic> data, [String? authorID]) {
+  factory HSBoard.deserialize(Map<String, dynamic> data, [String? bid]) {
     return HSBoard(
-      authorID: authorID,
-      bid: data["author_id"],
+      authorID: data["author_id"],
+      bid: bid,
       editors: data["editors"],
       participants: data["participants"],
       color: data["color"].toString().toColor,

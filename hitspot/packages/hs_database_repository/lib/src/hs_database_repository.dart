@@ -42,6 +42,9 @@ class HSDatabaseRepository {
   Future<bool> isUsernameAvailable(String username) async =>
       await _usersRepository.isUsernameAvailable(username);
 
+  Future<HSBoard> getBoard(String boardID) async =>
+      await _boardsRepository.getBoard(boardID);
+
   Future<String> createBoard(HSBoard board) async =>
       await _boardsRepository.createBoard(board);
 

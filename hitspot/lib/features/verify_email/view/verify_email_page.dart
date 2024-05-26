@@ -21,7 +21,7 @@ class VerifyEmailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        title: "Verify Email",
+        titleText: "Verify Email",
         enableDefaultBackButton: true,
         defaultBackButtonCallback: () =>
             HSApp.instance.authBloc.add(const HSAppLogoutRequested()),

@@ -97,9 +97,9 @@ class HomePage extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: CupertinoButton(
-              onPressed: HSApp.instance.changeTheme,
+              onPressed: () => navi.router.push("/board/9oYktYNCM3z9oW1mIqFL"),
               color: HSApp.instance.theme.mainColor,
-              child: const Text("CHANGE THEME"),
+              child: const Text("BOARD"),
             ),
           ),
           const SliverToBoxAdapter(

@@ -23,7 +23,7 @@ class EditProfilePage extends StatelessWidget {
     final editProfileCubit = context.read<EditProfileCubit>();
     return HSScaffold(
       appBar: HSAppBar(
-        title: "EDIT PROFILE",
+        titleText: "EDIT PROFILE",
         fontSize: 16.0,
         titleBold: true,
         enableDefaultBackButton: true,

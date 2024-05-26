@@ -17,7 +17,7 @@ class SettingsPage extends StatelessWidget {
     final settingsCubit = context.read<HsSettingsBloc>();
     return HSScaffold(
       appBar: HSAppBar(
-        title: "",
+        titleText: "",
         enableDefaultBackButton: true,
       ),
       body: BlocBuilder<HsSettingsBloc, HsSettingsState>(

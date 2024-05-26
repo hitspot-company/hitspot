@@ -20,7 +20,7 @@ class PasswordResetPage extends StatelessWidget {
       sidePadding: 16.0,
       appBar: HSAppBar(
         enableDefaultBackButton: true,
-        title: "Reset Password",
+        titleText: "Reset Password",
         titleBold: true,
       ),
       body: BlocProvider(

@@ -166,9 +166,9 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
         createdAt: Timestamp.now(),
       );
       final String boardID = await _databaseRepository.createBoard(board);
-      if (state.image != null) {
+      if (state.image.isNotEmpty) {
         final String uploadedFileUrl =
-            await uploadFile(File(state.image!), boardID);
+            await uploadFile(File(state.image), boardID);
         await _databaseRepository
             .updateBoard(board.copyWith(bid: boardID, image: uploadedFileUrl));
       }

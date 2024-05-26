@@ -46,7 +46,7 @@ class UserProfilePage extends StatelessWidget {
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
-            title: "",
+            titleText: "",
           ),
           body: const Center(
             child: Text(
@@ -73,7 +73,7 @@ class _ReadyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        title: "",
+        titleText: "",
         titleBold: true,
         enableDefaultBackButton: true,
         right: userProfileBloc.isOwnProfile
@@ -129,7 +129,7 @@ class _LoadingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        title: "",
+        titleText: "",
         titleBold: true,
         enableDefaultBackButton: true,
       ),
