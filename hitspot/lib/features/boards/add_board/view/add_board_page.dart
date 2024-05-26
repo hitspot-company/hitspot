@@ -16,23 +16,21 @@ class AddBoardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final addBoardCubit = context.read<HSAddBoardCubit>();
     return HSScaffold(
-        appBar: HSAppBar(
-          enableDefaultBackButton: true,
-          title: "New Board",
+      appBar: HSAppBar(
+        enableDefaultBackButton: true,
+        title: "New Board",
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 32.0),
+        child: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: addBoardCubit.state.pageController,
+          children: [
+            _FirstPage(addBoardCubit),
+          ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.only(top: 32.0),
-          child: PageView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: addBoardCubit.state.pageController,
-            children: [
-              _FirstPage(addBoardCubit),
-              Container(
-                color: Colors.orange,
-              )
-            ],
-          ),
-        ));
+      ),
+    );
   }
 }
 
@@ -50,6 +48,51 @@ class _FirstPage extends StatelessWidget {
         ),
         Text(
           "Tell us more about your board.",
+          style: textTheme.titleMedium,
+        ),
+        const SizedBox(
+          height: 32.0,
+        ),
+        HSTextField(
+          onChanged: _addBoardCubit.updateTitle,
+          suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
+          hintText: "Title",
+        ),
+        const Gap(32.0),
+        HSTextField(
+          maxLines: 5,
+          onChanged: _addBoardCubit.updateDescription,
+          suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
+          hintText: "Description",
+        ),
+        const Gap(32.0),
+        Align(
+          alignment: Alignment.topRight,
+          child: HSButton.icon(
+            label: const Text("Customize"),
+            onPressed: _addBoardCubit.nextPage,
+            icon: const Icon(FontAwesomeIcons.arrowRight),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class _SecondPage extends StatelessWidget {
+  const _SecondPage(this._addBoardCubit);
+  final HSAddBoardCubit _addBoardCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        Text(
+          "Step 2/5: customization",
+          style: textTheme.headlineMedium,
+        ),
+        Text(
+          "What's the character of your board?",
           style: textTheme.titleMedium,
         ),
         const SizedBox(

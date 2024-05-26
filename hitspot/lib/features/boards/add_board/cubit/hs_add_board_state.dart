@@ -1,16 +1,15 @@
 part of 'hs_add_board_cubit.dart';
 
 final class HSAddBoardState extends Equatable {
-  HSAddBoardState(
-      {this.title = "",
-      this.description = "",
-      this.tripBudget = 0.0,
-      this.tripDate = "",
-      this.color = "",
-      this.image = "",
-      this.page = 0});
+  HSAddBoardState({
+    this.title = "",
+    this.description = "",
+    this.tripBudget = 0.0,
+    this.tripDate = "",
+    this.color = "",
+    this.image = "",
+  });
 
-  final int page;
   final String title;
   final String description;
   final double tripBudget;
@@ -21,8 +20,6 @@ final class HSAddBoardState extends Equatable {
 
   @override
   List<Object> get props => [
-        page,
-        page,
         title,
         description,
         tripBudget,
@@ -41,7 +38,6 @@ final class HSAddBoardState extends Equatable {
     String? image,
   }) {
     return HSAddBoardState(
-      page: page ?? this.page,
       title: title ?? this.title,
       description: description ?? this.description,
       tripBudget: tripBudget ?? this.tripBudget,
