@@ -86,6 +86,7 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
       },
     ).showPickerDialog(
       app.context!,
+      surfaceTintColor: Colors.transparent,
       transitionBuilder: (BuildContext context, Animation<double> a1,
           Animation<double> a2, Widget widget) {
         final double curvedValue =

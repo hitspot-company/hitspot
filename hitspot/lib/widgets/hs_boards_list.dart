@@ -19,6 +19,7 @@ class HSBoardsList extends StatelessWidget {
             style: textTheme.headlineMedium),
       );
     }
+    boards!.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
     return ListView.separated(
       shrinkWrap: true,
       itemCount: boards!.length,
@@ -38,7 +39,7 @@ class HSBoardsList extends StatelessWidget {
               width: screenWidth,
               height: 80.0,
               decoration: BoxDecoration(
-                color: boardColor,
+                color: board.image != null ? null : boardColor,
                 image: boardImage != null
                     ? DecorationImage(
                         image: CachedNetworkImageProvider(boardImage),

@@ -251,7 +251,7 @@ class _SecondPage extends StatelessWidget {
           right: _Button(
             onPressed: _addBoardCubit.nextPage,
             icon: const Icon(FontAwesomeIcons.arrowRight),
-            child: const Text("Participants"),
+            child: const Text("Visibility"),
           ),
         ),
       ],

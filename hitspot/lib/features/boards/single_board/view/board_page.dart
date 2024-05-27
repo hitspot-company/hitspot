@@ -10,6 +10,7 @@ import 'package:hitspot/features/boards/single_board/bloc/hs_board_bloc.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
@@ -46,6 +47,7 @@ class BoardPage extends StatelessWidget {
           final HSBoard board = state.board;
           final HSUser author = state.author;
           final HSBoardSaveState boardSaveState = state.boardSaveState;
+          final Color? accentColor = board.color;
           return HSScaffold(
             appBar: HSAppBar(
               enableDefaultBackButton: true,
@@ -58,11 +60,11 @@ class BoardPage extends StatelessWidget {
             ),
             floatingActionButton: HSButton.icon(
                 label: Text(
-                  "CREATE TRIP",
+                  "Create Trip",
                   style: textTheme.headlineMedium!
-                      .colorify(currentTheme.mainColor),
+                      .colorify(accentColor ?? currentTheme.mainColor),
                 ),
-                icon: const Icon(FontAwesomeIcons.mapPin),
+                icon: Icon(FontAwesomeIcons.mapPin, color: accentColor),
                 onPressed: () => HSDebugLogger.logInfo(
                     "Create Trip")), // TODO: Navigate a create trip page from the bottom
             body: CustomScrollView(
@@ -73,14 +75,10 @@ class BoardPage extends StatelessWidget {
                     surfaceTintColor: Colors.transparent,
                     expandedHeight: 200,
                     flexibleSpace: FlexibleSpaceBar(
-                      background: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(board.image!),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+                      background: HSImage(
+                          imageUrl: board.image!,
+                          fit: BoxFit.cover,
+                          opacity: .6),
                     ),
                   ),
                 SliverToBoxAdapter(
@@ -104,7 +102,8 @@ class BoardPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("@${author.username}",
-                                    style: textTheme.headlineMedium),
+                                    style: textTheme.headlineMedium!
+                                        .copyWith(color: accentColor)),
                                 Text(author.fullName!),
                               ],
                             ),
@@ -124,23 +123,23 @@ class BoardPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Visibility", style: textTheme.headlineSmall),
+                      _Headline(
+                        text: "Visibility",
+                        accentColor: accentColor,
+                      ),
                       Text(
                         board.boardVisibility!.name.capitalize,
                       ),
                       const Gap(16.0),
-                      Text(
-                        "About",
-                        style: textTheme.headlineSmall,
+                      _Headline(
+                        text: "About",
+                        accentColor: accentColor,
                       ),
                       Text(
                         board.description!,
                       ),
                       const Gap(16.0),
-                      Text(
-                        "Saves",
-                        style: textTheme.headlineSmall,
-                      ),
+                      _Headline(text: "Saves", accentColor: accentColor),
                       Text(
                         "${board.saves?.length ?? 0}",
                       ),
@@ -150,17 +149,19 @@ class BoardPage extends StatelessWidget {
                         children: [
                           IconButton(
                             onPressed: () => HSDebugLogger.logInfo("start"),
-                            icon: const Icon(FontAwesomeIcons.play),
+                            icon:
+                                Icon(FontAwesomeIcons.play, color: accentColor),
                           ),
                           IconButton(
                             onPressed: boardBloc.share,
-                            icon: const Icon(
-                                FontAwesomeIcons.arrowUpRightFromSquare),
+                            icon: Icon(FontAwesomeIcons.arrowUpRightFromSquare,
+                                color: accentColor),
                           ),
                           _SaveActionButton(
                               isEditor: board.isEditor(currentUser),
                               state: state,
                               boardBloc: boardBloc,
+                              accentColor: accentColor,
                               boardSaveState: boardSaveState),
                         ],
                       )
@@ -192,6 +193,22 @@ class BoardPage extends StatelessWidget {
   }
 }
 
+class _Headline extends StatelessWidget {
+  const _Headline({
+    required this.text,
+    this.accentColor,
+  });
+
+  final String text;
+  final Color? accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text,
+        style: textTheme.headlineSmall!.copyWith(color: accentColor));
+  }
+}
+
 extension SliverGap on Gap {
   SliverToBoxAdapter get sliver {
     return SliverToBoxAdapter(
@@ -213,12 +230,14 @@ class _SaveActionButton extends StatelessWidget {
       {required this.isEditor,
       required this.state,
       required this.boardBloc,
-      required this.boardSaveState});
+      required this.boardSaveState,
+      this.accentColor});
 
   final bool isEditor;
   final HSBoardReadyState state;
   final HSBoardBloc boardBloc;
   final HSBoardSaveState boardSaveState;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -226,18 +245,18 @@ class _SaveActionButton extends StatelessWidget {
     late final Widget icon;
     if (isEditor) {
       onPressed = () => HSDebugLogger.logInfo("Edit");
-      icon = const Icon(FontAwesomeIcons.pen);
+      icon = Icon(FontAwesomeIcons.pen, color: accentColor);
     } else {
       switch (boardSaveState) {
         case HSBoardSaveState.saved:
           onPressed = boardBloc.saveUnsaveBoard;
-          icon = const Icon(FontAwesomeIcons.solidBookmark);
+          icon = Icon(FontAwesomeIcons.solidBookmark, color: accentColor);
         case HSBoardSaveState.unsaved:
           onPressed = boardBloc.saveUnsaveBoard;
-          icon = const Icon(FontAwesomeIcons.bookmark);
+          icon = Icon(FontAwesomeIcons.bookmark, color: accentColor);
         case HSBoardSaveState.updating:
           onPressed = null;
-          icon = const HSLoadingIndicator(size: 24);
+          icon = HSLoadingIndicator(size: 24, color: accentColor);
       }
     }
     return IconButton(

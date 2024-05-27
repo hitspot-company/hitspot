@@ -9,6 +9,7 @@ import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_searchbar.dart';
+import 'package:hitspot/widgets/hs_spots_grid.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -95,25 +96,7 @@ class HomePage extends StatelessWidget {
               height: 32.0,
             ),
           ),
-          SliverToBoxAdapter(
-            child: CupertinoButton(
-              onPressed: () => navi.router.push("/board/9oYktYNCM3z9oW1mIqFL"),
-              color: HSApp.instance.theme.mainColor,
-              child: const Text("BOARD"),
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(
-              height: 32.0,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: CupertinoButton(
-              onPressed: HSApp.instance.logout,
-              color: Colors.amber,
-              child: const Text("SIGN OUT"),
-            ),
-          )
+          HSSpotsGrid.loading(isSliver: true)
         ],
       ),
     );
