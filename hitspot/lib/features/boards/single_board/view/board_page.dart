@@ -47,7 +47,7 @@ class BoardPage extends StatelessWidget {
               titleText: board.title,
               right: board.isOwner(currentUser)
                   ? IconButton(
-                      onPressed: () => HSDebugLogger.logInfo("Board Bars"),
+                      onPressed: boardBloc.showModalSheet,
                       icon: const Icon(FontAwesomeIcons.bars))
                   : null,
             ),
@@ -213,5 +213,85 @@ class _SaveActionButton extends StatelessWidget {
         return const HSButton(
             onPressed: null, child: HSLoadingIndicator(size: 24));
     }
+  }
+}
+
+class HSBoardModalBottonSheet extends StatelessWidget {
+  const HSBoardModalBottonSheet({super.key, this.items});
+
+  final List<Widget>? items;
+
+  @override
+  Widget build(BuildContext context) {
+    final children = items ?? defaultItems;
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: ListView.separated(
+        itemCount: children.length,
+        shrinkWrap: true,
+        padding: const EdgeInsets.only(top: 8.0),
+        separatorBuilder: (BuildContext context, int index) =>
+            const Divider(thickness: .3),
+        itemBuilder: (BuildContext context, int index) => children[index],
+      ),
+    );
+  }
+
+  static final List<ModalBottomSheetItem> defaultItems = [
+    const ModalBottomSheetItem(text: "Item 1"),
+    const ModalBottomSheetItem(text: "Item 2"),
+    const ModalBottomSheetItem(text: "Item 3"),
+  ];
+}
+
+class ModalBottomSheetItem extends StatelessWidget {
+  const ModalBottomSheetItem(
+      {super.key, this.child, this.text, this.onPressed, this.icon});
+
+  final Widget? child;
+  final String? text;
+  final VoidCallback? onPressed;
+  final Icon? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    late final Widget label;
+    assert(!(child != null && text != null),
+        "Text and child cannot be provided at the same time");
+    if (child == null) {
+      assert((text != null), "Either a child or a text should be provided.");
+      if (icon != null) {
+        label = Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: icon,
+              ),
+              Center(
+                child: Text(text!, style: textTheme.headlineSmall),
+              )
+            ],
+          ),
+        );
+      } else {
+        label = Text(text!, style: textTheme.headlineSmall);
+      }
+    } else {
+      assert(!(child != null && icon != null),
+          "Icon and child cannot be provided at the same time.");
+      assert((child != null), "Either a child or a text should be provided.");
+      label = child!;
+    }
+    return InkWell(
+      onTap: onPressed ?? () => HSDebugLogger.logInfo("No callback specified"),
+      child: SizedBox(
+        height: 60,
+        width: screenWidth,
+        child: Center(child: label),
+      ),
+    );
   }
 }

@@ -1,9 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/boards/single_board/view/board_page.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:share_plus/share_plus.dart';
 
 part 'hs_board_event.dart';
 part 'hs_board_state.dart';
@@ -99,6 +104,43 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
           board: currentState.board.copyWith(saves: saves)));
     } catch (_) {
       rethrow;
+    }
+  }
+
+  void showModalSheet() => showMaterialModalBottomSheet(
+        shape: ContinuousRectangleBorder(
+          borderRadius: BorderRadius.circular(14.0),
+        ),
+        context: app.context!,
+        builder: (context) => HSBoardModalBottonSheet(
+          items: [
+            ModalBottomSheetItem(
+              text: "Share",
+              icon: const Icon(FontAwesomeIcons.arrowUpRightFromSquare),
+              onPressed: _share,
+            ),
+          ],
+        ),
+      );
+
+  Future<void> _share() async {
+    const website = "https://hitspot.app";
+    const path = "/board";
+    final subpath = "/$boardID";
+    final url = "$website$path$subpath";
+    try {
+      if (state is! HSBoardReadyState) {
+        throw "Wrong state";
+      }
+      final HSUser author = (state as HSBoardReadyState).author;
+      final HSBoard board = (state as HSBoardReadyState).board;
+      await Share.share("""
+Check out the awesome ${board.title} board!📍
+by @${author.username}
+$url
+""");
+    } catch (_) {
+      HSDebugLogger.logError("Error sharing board: $_");
     }
   }
 
