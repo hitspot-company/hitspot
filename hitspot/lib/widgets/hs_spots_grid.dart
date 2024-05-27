@@ -12,24 +12,27 @@ class HSSpotsGrid extends StatelessWidget {
       this.spots,
       this.loading = false,
       this.emptyMessage,
-      this.emptyIcon});
+      this.emptyIcon,
+      required this.isSliver});
 
   final List? spots;
   final bool loading;
   final String? emptyMessage;
   final Icon? emptyIcon;
+  final bool isSliver;
 
-  factory HSSpotsGrid.loading() {
-    return const HSSpotsGrid(loading: true);
+  factory HSSpotsGrid.loading({bool isSliver = false}) {
+    return HSSpotsGrid(loading: true, isSliver: isSliver);
   }
 
-  factory HSSpotsGrid.ready({required List spots}) {
+  factory HSSpotsGrid.ready({required List? spots, bool isSliver = false}) {
     return HSSpotsGrid(
       spots: spots,
+      isSliver: isSliver,
       emptyMessage: "THERE ARE NO SPOTS HERE",
       emptyIcon: const Icon(
         FontAwesomeIcons.mapLocation,
-        size: 80.0,
+        size: 64.0,
       ),
     );
   }
@@ -38,11 +41,24 @@ class HSSpotsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     if (loading) {
       const int childCount = 8;
-      return SliverMasonryGrid.count(
+      if (isSliver) {
+        return SliverMasonryGrid.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
+          childCount: childCount,
+          itemBuilder: (context, index) => HSShimmer(
+            child: HSShimmerSkeleton(
+              height: (index % 3 + 2) * 100,
+            ),
+          ),
+        );
+      }
+      return MasonryGridView.count(
         crossAxisCount: 2,
         mainAxisSpacing: 8.0,
         crossAxisSpacing: 8.0,
-        childCount: childCount,
+        itemCount: childCount,
         itemBuilder: (context, index) => HSShimmer(
           child: HSShimmerSkeleton(
             height: (index % 3 + 2) * 100,
@@ -52,35 +68,65 @@ class HSSpotsGrid extends StatelessWidget {
     } else if (spots?.isEmpty ?? true) {
       assert(!(spots == null && (emptyMessage == null || emptyIcon == null)),
           "If spots are null the empty message and icon must be provided.");
-      return SliverFillRemaining(
-        hasScrollBody: false,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            emptyIcon!,
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Text(
-                emptyMessage!,
-                style: textTheme.headlineLarge!
-                    .copyWith(fontWeight: FontWeight.normal),
-              ),
-            ),
-          ],
-        ),
+
+      if (isSliver) {
+        return SliverToBoxAdapter(
+          child: _EmptyMessage(emptyIcon!, emptyMessage!),
+        );
+      }
+      return _EmptyMessage(emptyIcon!, emptyMessage!);
+    }
+    if (isSliver) {
+      return SliverMasonryGrid.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8.0,
+        crossAxisSpacing: 8.0,
+        childCount: spots!.length,
+        itemBuilder: (context, index) {
+          return HSSpotTile(
+            index: index,
+            extent: (index % 3 + 2) * 100,
+          );
+        },
       );
     }
-    return SliverMasonryGrid.count(
+    return MasonryGridView.count(
       crossAxisCount: 2,
       mainAxisSpacing: 8.0,
       crossAxisSpacing: 8.0,
-      childCount: spots!.length,
+      itemCount: spots!.length,
       itemBuilder: (context, index) {
         return HSSpotTile(
           index: index,
           extent: (index % 3 + 2) * 100,
         );
       },
+    );
+  }
+}
+
+class _EmptyMessage extends StatelessWidget {
+  const _EmptyMessage(this.emptyIcon, this.emptyMessage);
+  final Icon emptyIcon;
+  final String emptyMessage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          emptyIcon,
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: Text(
+              emptyMessage,
+              style: textTheme.headlineSmall!
+                  .copyWith(fontWeight: FontWeight.normal),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

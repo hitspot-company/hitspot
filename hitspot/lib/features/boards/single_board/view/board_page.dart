@@ -139,8 +139,9 @@ class BoardPage extends StatelessWidget {
                   ),
                 ),
                 const Gap(8.0).sliver,
-                HSSpotsGrid
-                    .loading(), // TODO: Change when wojtek is done with adding spots
+                HSSpotsGrid.loading(
+                    isSliver:
+                        true), // TODO: Change when wojtek is done with adding spots
               ],
             ),
           );
@@ -157,6 +158,14 @@ class BoardPage extends StatelessWidget {
 }
 
 extension SliverGap on Gap {
+  SliverToBoxAdapter get sliver {
+    return SliverToBoxAdapter(
+      child: this,
+    );
+  }
+}
+
+extension SliverExt on StatelessWidget {
   SliverToBoxAdapter get sliver {
     return SliverToBoxAdapter(
       child: this,

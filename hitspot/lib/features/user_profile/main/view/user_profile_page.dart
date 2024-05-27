@@ -85,55 +85,56 @@ class _ReadyPage extends StatelessWidget {
       ),
       body: DefaultTabController(
         length: 2,
-        child: CustomScrollView(
-          controller: controller,
-          slivers: [
-            _UserDataAppBar.ready(user),
-            const SliverToBoxAdapter(
-              child: Gap(16.0),
-            ),
-            if (user.biogram != null)
-              SliverMainAxisGroup(
-                slivers: [
-                  const HSUserProfileHeadline(title: "BIO"),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Text(
-                        user.biogram!,
-                        style: textTheme.titleSmall,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              _UserDataAppBar.ready(user),
+              const SliverToBoxAdapter(
+                child: Gap(16.0),
+              ),
+              if (user.biogram != null)
+                SliverMainAxisGroup(
+                  slivers: [
+                    const HSUserProfileHeadline(title: "BIO"),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Text(
+                          user.biogram!,
+                          style: textTheme.titleSmall,
+                        ),
                       ),
+                    )
+                  ],
+                ),
+              const SliverToBoxAdapter(
+                child: Gap(16.0),
+              ),
+              HSUserProfileStatsAppBar.ready(
+                  user: user, userProfileBloc: userProfileBloc),
+              const SliverToBoxAdapter(
+                child: TabBar(
+                  tabs: [
+                    Tab(
+                      text: "Spots",
                     ),
-                  )
-                ],
+                    Tab(
+                      text: "Boards",
+                    ),
+                  ],
+                ),
               ),
-            const SliverToBoxAdapter(
-              child: Gap(16.0),
-            ),
-            HSUserProfileStatsAppBar.ready(
-                user: user, userProfileBloc: userProfileBloc),
-            const HSUserProfileHeadline(title: "SPOTS"),
-            const SliverToBoxAdapter(
-              child: Gap(16.0),
-            ),
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: TabBarView(
-                children: [
-                  Container(
-                    color: Colors.red,
-                    height: 120,
-                  ),
-                  // SliverMainAxisGroup(
-                  //   slivers: [
-                  //     HSSpotsGrid.ready(spots: user.spots ?? []),
-                  //   ],
-                  // ),
-                  HSBoardsList(boards: [], user: user),
-                ],
+              const SliverToBoxAdapter(
+                child: Gap(16.0),
               ),
-            ),
-          ],
+            ];
+          },
+          body: TabBarView(
+            children: [
+              HSSpotsGrid.ready(spots: user.spots),
+              HSBoardsList(boards: null, user: user),
+            ],
+          ),
         ),
       ),
     );
@@ -173,7 +174,7 @@ class _LoadingPage extends StatelessWidget {
           const SliverToBoxAdapter(
             child: Gap(16.0),
           ),
-          HSSpotsGrid.loading(),
+          HSSpotsGrid.loading(isSliver: true),
         ],
       ),
     );
