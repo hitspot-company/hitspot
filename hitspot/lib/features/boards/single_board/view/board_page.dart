@@ -45,6 +45,11 @@ class BoardPage extends StatelessWidget {
             appBar: HSAppBar(
               enableDefaultBackButton: true,
               titleText: board.title,
+              right: board.isOwner(currentUser)
+                  ? IconButton(
+                      onPressed: () => HSDebugLogger.logInfo("Board Bars"),
+                      icon: const Icon(FontAwesomeIcons.bars))
+                  : null,
             ),
             floatingActionButton: HSButton.icon(
                 label: Text(

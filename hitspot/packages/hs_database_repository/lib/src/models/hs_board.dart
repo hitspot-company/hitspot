@@ -141,9 +141,12 @@ class HSBoard {
     );
   }
 
+  bool isOwner(HSUser user) {
+    return authorID == user.uid;
+  }
+
   bool isEditor(HSUser user) {
-    return authorID == user.uid ||
-        (editors != null && editors!.contains(user.uid));
+    return isOwner(user) || (editors != null && editors!.contains(user.uid));
   }
 
   bool isSaved(HSUser user) {
