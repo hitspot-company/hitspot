@@ -9,4 +9,6 @@ sealed class HSBoardEvent extends Equatable {
 
 final class HSBoardInitialEvent extends HSBoardEvent {}
 
-final class HSBoardInitialLoading extends HSBoardEvent {}
+final class HSBoardInitialLoadingEvent extends HSBoardEvent {}
+
+final class HSBoardSaveUnsaveEvent extends HSBoardEvent {}

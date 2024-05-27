@@ -1,3 +1,4 @@
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +22,7 @@ class BoardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final boardBloc = context.read<HSBoardBloc>();
     return BlocBuilder<HSBoardBloc, HSBoardState>(
       builder: (context, state) {
         if (state is HSBoardErrorState) {
@@ -38,6 +40,7 @@ class BoardPage extends StatelessWidget {
         } else if (state is HSBoardReadyState) {
           final HSBoard board = state.board;
           final HSUser author = state.author;
+          final HSBoardSaveState boardSaveState = state.boardSaveState;
           return HSScaffold(
             appBar: HSAppBar(
               enableDefaultBackButton: true,
@@ -95,12 +98,36 @@ class BoardPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text("Visibility", style: textTheme.headlineSmall),
+                      Text(
+                        board.boardVisibility!.name.capitalize,
+                      ),
+                      const Gap(16.0),
                       Text(
                         "About",
-                        style: textTheme.headlineMedium,
+                        style: textTheme.headlineSmall,
                       ),
                       Text(
                         board.description!,
+                      ),
+                      const Gap(16.0),
+                      Text(
+                        "Saves",
+                        style: textTheme.headlineSmall,
+                      ),
+                      Text(
+                        "${board.saves?.length ?? 0}",
+                      ),
+                      const Gap(16.0),
+                      SizedBox(
+                        width: screenWidth,
+                        height: 50.0,
+                        child: _SaveActionButton(
+                          isEditor: board.isEditor(currentUser),
+                          state: state,
+                          boardBloc: boardBloc,
+                          boardSaveState: boardSaveState,
+                        ),
                       ),
                     ],
                   ),
@@ -134,5 +161,43 @@ extension SliverGap on Gap {
     return SliverToBoxAdapter(
       child: this,
     );
+  }
+}
+
+class _SaveActionButton extends StatelessWidget {
+  const _SaveActionButton(
+      {required this.isEditor,
+      required this.state,
+      required this.boardBloc,
+      required this.boardSaveState});
+
+  final bool isEditor;
+  final HSBoardReadyState state;
+  final HSBoardBloc boardBloc;
+  final HSBoardSaveState boardSaveState;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isEditor) {
+      return HSButton.icon(
+          label: const Text("EDIT"),
+          onPressed: () => HSDebugLogger.logInfo("Edit"),
+          icon: const Icon(FontAwesomeIcons.pen));
+    }
+    switch (boardSaveState) {
+      case HSBoardSaveState.saved:
+        return HSButton.icon(
+            label: const Text("UNSAVE BOARD"),
+            icon: const Icon(FontAwesomeIcons.solidBookmark),
+            onPressed: boardBloc.saveUnsaveBoard);
+      case HSBoardSaveState.unsaved:
+        return HSButton.icon(
+            label: const Text("SAVE BOARD"),
+            icon: const Icon(FontAwesomeIcons.bookmark),
+            onPressed: boardBloc.saveUnsaveBoard);
+      case HSBoardSaveState.updating:
+        return const HSButton(
+            onPressed: null, child: HSLoadingIndicator(size: 24));
+    }
   }
 }

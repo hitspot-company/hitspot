@@ -12,6 +12,7 @@ import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_use
 import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_user_profile_app_bar_skeleton.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_boards_list.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
@@ -82,39 +83,58 @@ class _ReadyPage extends StatelessWidget {
                 icon: const Icon(FontAwesomeIcons.bars))
             : const SizedBox(),
       ),
-      body: CustomScrollView(
-        controller: controller,
-        slivers: [
-          _UserDataAppBar.ready(user),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          if (user.biogram != null)
-            SliverMainAxisGroup(
-              slivers: [
-                const HSUserProfileHeadline(title: "BIO"),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Text(
-                      user.biogram!,
-                      style: textTheme.titleSmall,
-                    ),
-                  ),
-                )
-              ],
+      body: DefaultTabController(
+        length: 2,
+        child: CustomScrollView(
+          controller: controller,
+          slivers: [
+            _UserDataAppBar.ready(user),
+            const SliverToBoxAdapter(
+              child: Gap(16.0),
             ),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          HSUserProfileStatsAppBar.ready(
-              user: user, userProfileBloc: userProfileBloc),
-          const HSUserProfileHeadline(title: "SPOTS"),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          HSSpotsGrid.ready(spots: user.spots ?? []),
-        ],
+            if (user.biogram != null)
+              SliverMainAxisGroup(
+                slivers: [
+                  const HSUserProfileHeadline(title: "BIO"),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Text(
+                        user.biogram!,
+                        style: textTheme.titleSmall,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            const SliverToBoxAdapter(
+              child: Gap(16.0),
+            ),
+            HSUserProfileStatsAppBar.ready(
+                user: user, userProfileBloc: userProfileBloc),
+            const HSUserProfileHeadline(title: "SPOTS"),
+            const SliverToBoxAdapter(
+              child: Gap(16.0),
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: TabBarView(
+                children: [
+                  Container(
+                    color: Colors.red,
+                    height: 120,
+                  ),
+                  // SliverMainAxisGroup(
+                  //   slivers: [
+                  //     HSSpotsGrid.ready(spots: user.spots ?? []),
+                  //   ],
+                  // ),
+                  HSBoardsList(boards: [], user: user),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -186,7 +206,7 @@ class _UserDataAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!loading) user!;
     return SliverAppBar(
-      surfaceTintColor: Colors.transparent,
+      surfaceTintColor: const Color.fromARGB(0, 97, 51, 51),
       expandedHeight: 140.0,
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(

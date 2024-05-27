@@ -50,4 +50,12 @@ class HSDatabaseRepository {
 
   Future<void> updateBoard(HSBoard board) async =>
       await _boardsRepository.updateBoard(board);
+
+  Future<void> saveBoard(
+          {required HSBoard board, required HSUser user}) async =>
+      await _boardsRepository.saveBoard(board, user);
+
+  Future<void> unsaveBoard(
+          {required HSBoard board, required HSUser user}) async =>
+      await _boardsRepository.unsaveBoard(board, user);
 }

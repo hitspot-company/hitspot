@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 enum HSBoardVisibility {
   private,
@@ -56,7 +57,7 @@ class HSBoard {
   final String? bid;
   final String? authorID;
   final List? editors;
-  final List? participants;
+  final List? saves;
 
   /// [color] The background color of the board
   final Color? color;
@@ -77,7 +78,7 @@ class HSBoard {
     return {
       "author_id": authorID,
       "editors": editors,
-      "participants": participants,
+      "saves": saves,
       "color": color?.toHex,
       "image": image,
       "spots": spots,
@@ -95,7 +96,7 @@ class HSBoard {
       authorID: data["author_id"],
       bid: bid,
       editors: data["editors"],
-      participants: data["participants"],
+      saves: data["saves"],
       color: data["color"].toString().toColor,
       image: data["image"],
       spots: data["spots"],
@@ -112,7 +113,7 @@ class HSBoard {
     String? bid,
     String? authorID,
     List? editors,
-    List? participants,
+    List? saves,
     Color? color,
     String? image,
     List? spots,
@@ -127,7 +128,7 @@ class HSBoard {
       bid: bid ?? this.bid,
       authorID: authorID ?? this.authorID,
       editors: editors ?? this.editors,
-      participants: participants ?? this.participants,
+      saves: saves ?? this.saves,
       color: color ?? this.color,
       image: image ?? this.image,
       spots: spots ?? this.spots,
@@ -140,11 +141,20 @@ class HSBoard {
     );
   }
 
+  bool isEditor(HSUser user) {
+    return authorID == user.uid ||
+        (editors != null && editors!.contains(user.uid));
+  }
+
+  bool isSaved(HSUser user) {
+    return saves != null && saves!.contains(user.uid);
+  }
+
   const HSBoard({
     this.bid,
     this.authorID,
     this.editors,
-    this.participants,
+    this.saves,
     this.color,
     this.image,
     this.spots,
@@ -162,7 +172,7 @@ HSBoard data:
 bid: $bid
 authorID: $authorID
 editors: $editors
-participants: $participants
+saves: $saves
 color: $color
 image: $image
 spots: $spots
