@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -22,6 +23,22 @@ class HSBoardsRepository {
           final String uid = editors[i];
           await _users.doc(uid).update({
             "boards": FieldValue.arrayRemove([board.bid])
+          });
+        }
+      }
+      // 4. If the board had an image, remove the image
+      if (board.image != null) {
+        final Reference imageRef =
+            FirebaseStorage.instance.refFromURL(board.image!);
+        await imageRef.delete();
+      }
+      // 5. Remove from saved
+      final List? saves = board.saves;
+      if (saves != null) {
+        for (var i = 0; i < saves.length; i++) {
+          final String uid = saves[i];
+          await _users.doc(uid).update({
+            "saves": FieldValue.arrayRemove([board.bid])
           });
         }
       }

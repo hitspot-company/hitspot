@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -19,6 +20,10 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class BoardPage extends StatelessWidget {
   const BoardPage({super.key});
+
+  static Route<void> route() {
+    return MaterialPageRoute<void>(builder: (_) => const BoardPage());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +67,22 @@ class BoardPage extends StatelessWidget {
                     "Create Trip")), // TODO: Navigate a create trip page from the bottom
             body: CustomScrollView(
               slivers: [
+                if (board.image != null)
+                  SliverAppBar(
+                    automaticallyImplyLeading: false,
+                    surfaceTintColor: Colors.transparent,
+                    expandedHeight: 200,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: CachedNetworkImageProvider(board.image!),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
@@ -124,16 +145,25 @@ class BoardPage extends StatelessWidget {
                         "${board.saves?.length ?? 0}",
                       ),
                       const Gap(16.0),
-                      SizedBox(
-                        width: screenWidth,
-                        height: 50.0,
-                        child: _SaveActionButton(
-                          isEditor: board.isEditor(currentUser),
-                          state: state,
-                          boardBloc: boardBloc,
-                          boardSaveState: boardSaveState,
-                        ),
-                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                            onPressed: () => HSDebugLogger.logInfo("start"),
+                            icon: const Icon(FontAwesomeIcons.play),
+                          ),
+                          IconButton(
+                            onPressed: boardBloc.share,
+                            icon: const Icon(
+                                FontAwesomeIcons.arrowUpRightFromSquare),
+                          ),
+                          _SaveActionButton(
+                              isEditor: board.isEditor(currentUser),
+                              state: state,
+                              boardBloc: boardBloc,
+                              boardSaveState: boardSaveState),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -192,27 +222,28 @@ class _SaveActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    late final VoidCallback? onPressed;
+    late final Widget icon;
     if (isEditor) {
-      return HSButton.icon(
-          label: const Text("EDIT"),
-          onPressed: () => HSDebugLogger.logInfo("Edit"),
-          icon: const Icon(FontAwesomeIcons.pen));
+      onPressed = () => HSDebugLogger.logInfo("Edit");
+      icon = const Icon(FontAwesomeIcons.pen);
+    } else {
+      switch (boardSaveState) {
+        case HSBoardSaveState.saved:
+          onPressed = boardBloc.saveUnsaveBoard;
+          icon = const Icon(FontAwesomeIcons.solidBookmark);
+        case HSBoardSaveState.unsaved:
+          onPressed = boardBloc.saveUnsaveBoard;
+          icon = const Icon(FontAwesomeIcons.bookmark);
+        case HSBoardSaveState.updating:
+          onPressed = null;
+          icon = const HSLoadingIndicator(size: 24);
+      }
     }
-    switch (boardSaveState) {
-      case HSBoardSaveState.saved:
-        return HSButton.icon(
-            label: const Text("UNSAVE BOARD"),
-            icon: const Icon(FontAwesomeIcons.solidBookmark),
-            onPressed: boardBloc.saveUnsaveBoard);
-      case HSBoardSaveState.unsaved:
-        return HSButton.icon(
-            label: const Text("SAVE BOARD"),
-            icon: const Icon(FontAwesomeIcons.bookmark),
-            onPressed: boardBloc.saveUnsaveBoard);
-      case HSBoardSaveState.updating:
-        return const HSButton(
-            onPressed: null, child: HSLoadingIndicator(size: 24));
-    }
+    return IconButton(
+      onPressed: onPressed,
+      icon: icon,
+    );
   }
 }
 

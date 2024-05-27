@@ -61,4 +61,7 @@ class HSDatabaseRepository {
 
   Future<List<HSBoard>> getUserBoards({required HSUser user}) async =>
       await _boardsRepository.getUserBoards(user);
+
+  Future<void> deleteBoard({required HSBoard board}) async =>
+      await _boardsRepository.deleteBoard(board: board);
 }

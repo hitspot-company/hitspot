@@ -20,6 +20,7 @@ class HSBoardsList extends StatelessWidget {
       );
     }
     return ListView.separated(
+      shrinkWrap: true,
       itemCount: boards!.length,
       separatorBuilder: (BuildContext context, int index) {
         return const Gap(16.0);

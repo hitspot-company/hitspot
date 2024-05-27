@@ -1,9 +1,12 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/boards/single_board/view/board_page.dart';
+import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -17,6 +20,7 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
   HSBoardBloc({required this.boardID}) : super(HSBoardInitialState()) {
     on<HSBoardInitialEvent>(_fetchInitialData);
     on<HSBoardSaveUnsaveEvent>(_saveUnsaveBoard);
+    on<HSBoardDeleteBoardEvent>(_deleteBoard);
   }
 
   final HSDatabaseRepository _databaseRepository = app.databaseRepository;
@@ -115,15 +119,71 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
         builder: (context) => HSBoardModalBottonSheet(
           items: [
             ModalBottomSheetItem(
-              text: "Share",
-              icon: const Icon(FontAwesomeIcons.arrowUpRightFromSquare),
-              onPressed: _share,
+              text: "Delete",
+              icon: const Icon(FontAwesomeIcons.trash),
+              onPressed: _showDeleteConfirmationDialog,
             ),
           ],
         ),
       );
 
-  Future<void> _share() async {
+  Future<void> _showDeleteConfirmationDialog() {
+    final HSBoard board = (state as HSBoardReadyState).board;
+    return showDialog<bool>(
+      context: app.context!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          surfaceTintColor: Colors.transparent,
+          shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.circular(14.0)),
+          title: const Text('Confirm Deletion'),
+          content: Text.rich(
+            TextSpan(
+              text: "Are you sure you want to delete the ",
+              children: [
+                TextSpan(
+                  text: board.title,
+                  style: TextStyle(color: currentTheme.mainColor).boldify,
+                ),
+                const TextSpan(text: " board?"),
+              ],
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User pressed No
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => add(HSBoardDeleteBoardEvent()),
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteBoard(event, emit) async {
+    try {
+      final HSBoard board = (state as HSBoardReadyState).board;
+      navi.pop();
+      navi.pop();
+      ScaffoldMessenger.of(app.context!).clearSnackBars();
+      emit(HSBoardInitialState());
+      await Future.delayed(const Duration(seconds: 1));
+      await _databaseRepository.deleteBoard(board: board);
+      navi.router.go("/");
+    } catch (_) {
+      HSDebugLogger.logError("Error deleting board: $_");
+      emit(const HSBoardErrorState("Error deleting board"));
+    }
+  }
+
+  Future<void> share() async {
     const website = "https://hitspot.app";
     const path = "/board";
     final subpath = "/$boardID";

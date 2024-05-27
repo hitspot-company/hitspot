@@ -12,3 +12,5 @@ final class HSBoardInitialEvent extends HSBoardEvent {}
 final class HSBoardInitialLoadingEvent extends HSBoardEvent {}
 
 final class HSBoardSaveUnsaveEvent extends HSBoardEvent {}
+
+final class HSBoardDeleteBoardEvent extends HSBoardEvent {}
