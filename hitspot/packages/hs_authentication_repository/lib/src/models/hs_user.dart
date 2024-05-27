@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum HSUserField {
   username("username"),
+  boards("boards"),
   profilePicture("profile_picture"),
   likedSpots("liked_spots"),
   followers("followers"),
@@ -29,6 +30,7 @@ class HSUser {
       following,
       likedSpots,
       previouslySearchedUsers,
+      boards,
       spots;
   final String? uid, biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
@@ -52,7 +54,8 @@ class HSUser {
       HSUserField.createdAt.name: createdAt,
       HSUserField.emailHidden.name: emailHidden,
       HSUserField.isProfileCompleted.name: isProfileCompleted ?? false,
-      HSUserField.isEmailVerified.name: isEmailVerified ?? false
+      HSUserField.isEmailVerified.name: isEmailVerified ?? false,
+      HSUserField.boards.name: boards ?? false
     };
   }
 
@@ -65,6 +68,7 @@ class HSUser {
       likedSpots: data[HSUserField.likedSpots.name],
       previouslySearchedUsers: data[HSUserField.previouslySearchedUsers.name],
       spots: data[HSUserField.spots.name],
+      boards: data[HSUserField.boards.name],
       biogram: data[HSUserField.biogram.name],
       email: data[HSUserField.email.name],
       fullName: data[HSUserField.fullName.name],
@@ -85,6 +89,7 @@ class HSUser {
     List? likedSpots,
     List? previouslySearchedUsers,
     List? spots,
+    List? boards,
     String? uid,
     String? biogram,
     String? email,
@@ -105,6 +110,7 @@ class HSUser {
       previouslySearchedUsers:
           previouslySearchedUsers ?? this.previouslySearchedUsers,
       spots: spots ?? this.spots,
+      boards: boards ?? this.boards,
       uid: uid ?? this.uid,
       biogram: biogram ?? this.biogram,
       email: email ?? this.email,
@@ -127,6 +133,7 @@ class HSUser {
     this.likedSpots,
     this.previouslySearchedUsers,
     this.spots,
+    this.boards,
     this.biogram,
     this.email,
     this.fullName,

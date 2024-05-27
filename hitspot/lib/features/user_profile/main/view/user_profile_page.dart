@@ -18,6 +18,7 @@ import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_monitor.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -34,14 +35,18 @@ class UserProfilePage extends StatelessWidget {
         } else if (state is HSUserProfileReady ||
             state is HSUserProfileUpdate) {
           late final HSUser user;
+          late final List<HSBoard>? boards;
           if (state is HSUserProfileReady) {
             user = state.user!;
+            boards = state.boards;
           } else if (state is HSUserProfileUpdate) {
             user = state.user!;
+            boards = state.boards;
           }
           return _ReadyPage(
               controller: controller,
               user: user,
+              boards: boards,
               userProfileBloc: userProfileBloc);
         }
         return HSScaffold(
@@ -62,13 +67,15 @@ class UserProfilePage extends StatelessWidget {
 class _ReadyPage extends StatelessWidget {
   const _ReadyPage({
     required this.controller,
-    required this.user,
     required this.userProfileBloc,
+    required this.user,
+    this.boards,
   });
 
   final ScrollController controller;
-  final HSUser user;
   final HSUserProfileBloc userProfileBloc;
+  final HSUser user;
+  final List<HSBoard>? boards;
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +139,7 @@ class _ReadyPage extends StatelessWidget {
           body: TabBarView(
             children: [
               HSSpotsGrid.ready(spots: user.spots),
-              HSBoardsList(boards: null, user: user),
+              HSBoardsList(boards: boards, user: user),
             ],
           ),
         ),

@@ -50,7 +50,7 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
     try {
       if (state is HSUserProfileReady) {
         final HSUserProfileReady readyState = state as HSUserProfileReady;
-        emit(HSUserProfileUpdate(readyState.user));
+        emit(HSUserProfileUpdate(readyState.user, readyState.boards));
         if (isUserFollowed()) {
           await databaseRepository.unfollowUser(currentUser, readyState.user!);
           followed = false;
@@ -91,7 +91,9 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
       if (userData == null) {
         throw const HSUserProfileError("User data could not be fetched.");
       }
-      emit(HSUserProfileReady(userData));
+      final List<HSBoard> boards =
+          await databaseRepository.getUserBoards(user: userData);
+      emit(HSUserProfileReady(userData, boards));
     } on DatabaseConnectionFailure catch (e) {
       emit(HSUserProfileError(e.message));
     } catch (e) {
