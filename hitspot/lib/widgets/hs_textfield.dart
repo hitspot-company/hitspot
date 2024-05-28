@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HSTextField extends StatelessWidget {
@@ -27,6 +28,7 @@ class HSTextField extends StatelessWidget {
     this.autofocus = false,
     this.maxLines = 1,
     this.maxLength,
+    this.inputFormatters,
   });
 
   final String? hintText;
@@ -52,6 +54,7 @@ class HSTextField extends StatelessWidget {
   final String? initialValue;
   final int maxLines;
   final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +66,7 @@ class HSTextField extends StatelessWidget {
         absorbing: readOnly,
         child: TextFormField(
           maxLength: maxLength,
+          inputFormatters: inputFormatters,
           maxLines: maxLines,
           autofocus: autofocus,
           scrollPadding: scrollPadding,

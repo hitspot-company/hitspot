@@ -1,4 +1,7 @@
+import 'package:currency_picker/currency_picker.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -8,10 +11,8 @@ import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/form/hs_form_button.dart';
 import 'package:hitspot/widgets/form/hs_form_buttons_row.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
-import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class CreateTripPage extends StatelessWidget {
   const CreateTripPage({super.key});
@@ -110,6 +111,32 @@ class _SecondPage extends StatelessWidget {
       children: [
         const _Headline(text: "2/4: Planning"),
         const _Caption(text: "This section is optional. You can skip it."),
+        const Gap(32.0),
+        BlocSelector<HSCreateTripCubit, HSCreateTripState, Currency?>(
+          selector: (state) => state.currency,
+          builder: (context, state) {
+            return Row(
+              children: [
+                GestureDetector(
+                    onTap: _createTripCubit.changeCurrency,
+                    child: Text(_createTripCubit.state.currency?.flag ?? "",
+                        style: textTheme.displayMedium)),
+                const Gap(16.0),
+                Expanded(
+                  child: HSTextField(
+                    suffixIcon: const Icon(FontAwesomeIcons.dollarSign,
+                        color: Colors.transparent),
+                    onTapPrefix: _createTripCubit.changeCurrency,
+                    inputFormatters: [
+                      CurrencyTextInputFormatter.simpleCurrency(name: "eur ")
+                    ],
+                    keyboardType: TextInputType.number,
+                  ),
+                )
+              ],
+            );
+          },
+        ),
         const Gap(32.0),
         HSFormButtonsRow(
             right: const HSFormButton(child: Text("Next")),

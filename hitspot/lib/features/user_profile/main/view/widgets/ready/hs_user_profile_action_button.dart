@@ -33,6 +33,7 @@ class HSUserProfileActionButton extends StatelessWidget {
       onPressed: () => userProfileBloc.add(
         HSUserProfileFollowUnfollowUserEvent(),
       ),
+      backgroundColor: currentTheme.mainColor,
     );
   }
 
@@ -43,7 +44,6 @@ class HSUserProfileActionButton extends StatelessWidget {
       onPressed: () => userProfileBloc.add(
         HSUserProfileFollowUnfollowUserEvent(),
       ),
-      backgroundColor: currentTheme.mainColor,
     );
   }
 

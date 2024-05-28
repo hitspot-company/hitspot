@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/utils/navigation/hs_navigation.dart';
 
 final class HSTheme {
   // SINGLETON
@@ -22,8 +21,8 @@ final class HSTheme {
     colorSchemeSeed: _mainColor,
     brightness: Brightness.dark,
     textTheme: _HSTextThemes.darkTextTheme,
-    appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
-    scaffoldBackgroundColor: Colors.black,
+    // appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
+    // scaffoldBackgroundColor: Colors.black,
   ).copyWith(highlightColor: Colors.black.withOpacity(.08));
 
   Color get highlightColor => currentTheme.highlightColor;
@@ -117,17 +116,14 @@ class _HSTextThemes {
     displayLarge: GoogleFonts.poppins(
       fontSize: 48,
       fontWeight: FontWeight.bold,
-      color: Colors.white,
     ),
     displayMedium: GoogleFonts.poppins(
       fontSize: 36,
       fontWeight: FontWeight.bold,
-      color: Colors.white,
     ),
     displaySmall: GoogleFonts.poppins(
       fontSize: 24,
       fontWeight: FontWeight.bold,
-      color: Colors.white,
     ),
     headlineLarge: GoogleFonts.poppins(
       fontSize: 22,
