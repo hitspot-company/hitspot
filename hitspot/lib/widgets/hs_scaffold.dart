@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSScaffold extends StatelessWidget {
   const HSScaffold({
@@ -114,5 +115,9 @@ class _BottombarItem extends StatelessWidget {
     _BottombarItem(
         iconData: FontAwesomeIcons.plus,
         onPressed: () => navi.newPush("/add_board")),
+    _BottombarItem(
+        iconData: FontAwesomeIcons.bookmark,
+        onPressed: () =>
+            navi.newPush("/info/123")), // HSDebugLogger.logInfo("saved")),
   ];
 }

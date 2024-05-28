@@ -29,7 +29,6 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
   Future<void> _fetchInitialData(event, emit) async {
     try {
       final HSBoard board = await _databaseRepository.getBoard(boardID);
-      HSDebugLogger.logInfo("Author ID: ${board.authorID}");
       final HSUser? author =
           await _databaseRepository.getUserFromDatabase(board.authorID!);
       if (author == null) throw "The author could not be fetched";
@@ -39,15 +38,17 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
           boardSaveState: board.isSaved(currentUser)
               ? HSBoardSaveState.saved
               : HSBoardSaveState.unsaved));
+    } on DatabaseConnectionFailure catch (_) {
+      navi.toError("404: Not Found", _.message);
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       emit(const HSBoardErrorState("An error occured"));
+      navi.toError("404: Not Found", _.toString());
     }
   }
 
   Future<List> _fetchSpots(event, emit) async {
     try {
-      // await _databaseRepository.
       return [];
     } catch (_) {
       HSDebugLogger.logError(_.toString());

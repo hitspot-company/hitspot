@@ -89,15 +89,20 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
       final HSUser? userData =
           await databaseRepository.getUserFromDatabase(userID);
       if (userData == null) {
-        throw const HSUserProfileError("User data could not be fetched.");
+        navi.toError("404: Not found",
+            "The user account does not exist or has been removed.");
+        return;
       }
       final List<HSBoard> boards =
           await databaseRepository.getUserBoards(user: userData);
       emit(HSUserProfileReady(userData, boards));
     } on DatabaseConnectionFailure catch (e) {
       emit(HSUserProfileError(e.message));
+      navi.toError("Error", e.message);
     } catch (e) {
       emit(const HSUserProfileError("An unknown error occured"));
+      navi.toError("404: Not found",
+          "The user account does not exist or has been removed.");
     }
   }
 }

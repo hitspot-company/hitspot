@@ -136,6 +136,8 @@ class HSBoardsRepository {
       if (!snap.exists)
         throw DatabaseConnectionFailure("The board does not exist.");
       return HSBoard.deserialize(snap.data() as Map<String, dynamic>, snap.id);
+    } on DatabaseConnectionFailure catch (_) {
+      rethrow;
     } catch (_) {
       throw DatabaseConnectionFailure();
     }

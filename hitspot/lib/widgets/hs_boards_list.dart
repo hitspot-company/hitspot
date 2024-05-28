@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -29,24 +29,19 @@ class HSBoardsList extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         final board = boards![index];
         final Color? boardColor =
-            board.image != null ? board.color : board.color?.withOpacity(.7);
+            board.image != null ? null : board.color?.withOpacity(.7);
         final String? boardImage = board.image;
         return GestureDetector(
           onTap: () => navi.router.push("/board/${board.bid}"),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14.0),
-            child: Container(
+            child: HSImage(
+              imageUrl: boardImage,
               width: screenWidth,
               height: 80.0,
-              decoration: BoxDecoration(
-                color: board.image != null ? null : boardColor,
-                image: boardImage != null
-                    ? DecorationImage(
-                        image: CachedNetworkImageProvider(boardImage),
-                        fit: BoxFit.cover,
-                        opacity: .4)
-                    : null,
-              ),
+              color: boardColor,
+              fit: BoxFit.cover,
+              opacity: .6,
               child: Center(
                 child: Text(board.title!, style: textTheme.headlineSmall),
               ),

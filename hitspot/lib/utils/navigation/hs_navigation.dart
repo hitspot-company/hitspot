@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
+import 'package:hitspot/features/error/view/error_page.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
@@ -14,17 +16,19 @@ import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSNavigation {
   // SINGLETON
   HSNavigation._internal();
   static final HSNavigation _instance = HSNavigation._internal();
   static HSNavigation get instance => _instance;
-  static final routes = HSRouting.instance;
+  static final routing = HSRouting.instance;
+  static final routes = _HSRoutes();
 
   GlobalKey<NavigatorState> get navigatorKey =>
-      routes.router.routerDelegate.navigatorKey;
-  GoRouter get router => routes.router;
+      routing.router.routerDelegate.navigatorKey;
+  GoRouter get router => routing.router;
 
   dynamic push(Route<void> route, {dynamic arguments}) =>
       navigatorKey.currentState?.push(route);
@@ -45,9 +49,10 @@ class HSNavigation {
 
   // UPDATED NAVI
   dynamic newPush(String location) => router.push(location);
-
-  // dynamic toUserProfile(String uid) => router.push("/users/$uid");
-  // dynamic toSpot(String sid) => router.push("/spot/$sid");
+  dynamic toUserProfile(String userID) => routes.toUserProfile(userID);
+  dynamic toError(String headingText, String bodyText) =>
+      routes.toError(headingText, bodyText);
+  dynamic toBoard(String boardID) => routes.toBoard(boardID);
 }
 
 class HSRouting {
@@ -85,6 +90,11 @@ class HSRouting {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/info/:text',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
         path: '/board/:boardID',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
@@ -94,6 +104,17 @@ class HSRouting {
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
+      GoRoute(
+          path: '/error',
+          redirect: (context, state) {
+            final headingText = state.uri.queryParameters["headingText"];
+            final bodyText = state.uri.queryParameters["bodyText"];
+            if (headingText == null || bodyText == null) {
+              HSDebugLogger.logError(
+                  "No headingText and bodyText provided, redirecting to /");
+            }
+            return '/protected/home/error?headingText=$headingText&bodyText=$bodyText';
+          }),
       GoRoute(
         path: '/protected',
         redirect: (context, state) {
@@ -141,6 +162,20 @@ class HSRouting {
                 path: 'add_board',
                 builder: (context, state) => const AddBoardProvider(),
               ),
+              GoRoute(
+                  path: 'info/:text',
+                  builder: (context, state) =>
+                      InfoPage(infoText: state.pathParameters['text']!)),
+              GoRoute(
+                  path: 'error',
+                  builder: (context, state) {
+                    final headingText =
+                        state.uri.queryParameters["headingText"] ?? "";
+                    final bodyText =
+                        state.uri.queryParameters["bodyText"] ?? "";
+                    return ErrorPage(
+                        headingText: headingText, bodyText: bodyText);
+                  }),
             ],
           ),
         ],
@@ -185,4 +220,11 @@ class HSRouting {
       ),
     ],
   );
+}
+
+class _HSRoutes {
+  dynamic toError(String headingText, String bodyText) =>
+      navi.router.go("/error?headingText=$headingText&bodyText=$bodyText");
+  dynamic toUserProfile(String userID) => navi.router.push("/user/$userID");
+  dynamic toBoard(String boardID) => navi.router.push("/board/$boardID");
 }
