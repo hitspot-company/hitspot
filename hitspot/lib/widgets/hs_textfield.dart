@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HSTextField extends StatelessWidget {
   const HSTextField({
@@ -25,6 +26,7 @@ class HSTextField extends StatelessWidget {
     this.floatingLabelBehavior,
     this.autofocus = false,
     this.maxLines = 1,
+    this.maxLength,
   });
 
   final String? hintText;
@@ -49,6 +51,7 @@ class HSTextField extends StatelessWidget {
   final FloatingLabelBehavior? floatingLabelBehavior;
   final String? initialValue;
   final int maxLines;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +62,7 @@ class HSTextField extends StatelessWidget {
       child: AbsorbPointer(
         absorbing: readOnly,
         child: TextFormField(
+          maxLength: maxLength,
           maxLines: maxLines,
           autofocus: autofocus,
           scrollPadding: scrollPadding,
@@ -78,9 +82,13 @@ class HSTextField extends StatelessWidget {
             prefixIcon: suffixIcon != null
                 ? null
                 : GestureDetector(onTap: onTapPrefix, child: prefixIcon),
-            suffixIcon: prefixIcon != null
-                ? null
-                : GestureDetector(onTap: onTapSuffix, child: suffixIcon),
+            suffixIcon: suffixIcon == null && prefixIcon == null
+                ? GestureDetector(
+                    child: const Icon(FontAwesomeIcons.a,
+                        color: Colors.transparent))
+                : prefixIcon != null
+                    ? null
+                    : GestureDetector(onTap: onTapSuffix, child: suffixIcon),
             hintText: hintText,
             labelText: labelText,
             border: OutlineInputBorder(

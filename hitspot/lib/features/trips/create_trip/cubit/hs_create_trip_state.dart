@@ -32,4 +32,20 @@ final class HSCreateTripState extends Equatable {
       tripDate: prototype.date.toString(),
     );
   }
+
+  HSCreateTripState copyWith({
+    String? tripTitle,
+    String? tripDescription,
+    List<HSUser>? participants,
+    List<HSUser>? editors,
+    String? tripDate,
+  }) {
+    return HSCreateTripState(
+      tripTitle: tripTitle ?? this.tripTitle,
+      tripDescription: tripDescription ?? this.tripDescription,
+      participants: participants ?? this.participants,
+      editors: editors ?? this.editors,
+      tripDate: tripDate ?? this.tripDate,
+    );
+  }
 }

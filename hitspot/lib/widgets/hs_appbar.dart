@@ -18,6 +18,7 @@ class HSAppBar extends StatelessWidget {
     this.titleBold = false,
     this.defaultBackButtonCallback,
     this.sidePadding,
+    this.defaultButtonBackIcon,
   }) {
     assert(title != null || titleText != null,
         "Either a title widget or titleText should be provided.");
@@ -25,6 +26,8 @@ class HSAppBar extends StatelessWidget {
         "enableDefaultBackButton and left cannot be used at the same time.");
     assert(!(!enableDefaultBackButton && defaultBackButtonCallback != null),
         "In order to use the default defaultBackButtonCallback you need to enable the defaultBackButton.");
+    assert(!(!enableDefaultBackButton && defaultButtonBackIcon != null),
+        "In order to set the default defaultBackButtonIcon you need to enable the defaultBackButton.");
   }
 
   final double height;
@@ -38,6 +41,7 @@ class HSAppBar extends StatelessWidget {
   final bool titleBold;
   final VoidCallback? defaultBackButtonCallback;
   final double? sidePadding;
+  final IconData? defaultButtonBackIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +57,8 @@ class HSAppBar extends StatelessWidget {
                 child: IconButton(
                   onPressed: defaultBackButtonCallback ??
                       HSApp.instance.navigation.pop,
-                  icon: const Icon(FontAwesomeIcons.arrowLeft),
+                  icon:
+                      Icon(defaultButtonBackIcon ?? FontAwesomeIcons.arrowLeft),
                 ),
               ),
             if (left != null)

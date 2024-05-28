@@ -46,9 +46,7 @@ class HSButton extends StatelessWidget {
   }
 
   factory HSButton.icon(
-      {required Widget label,
-      required VoidCallback onPressed,
-      required Icon icon}) {
+      {required Widget label, VoidCallback? onPressed, required Icon icon}) {
     return HSButton(
       onPressed: onPressed,
       icon: icon,

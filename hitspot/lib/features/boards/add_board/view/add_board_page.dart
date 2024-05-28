@@ -7,6 +7,8 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/boards/add_board/cubit/hs_add_board_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
+import 'package:hitspot/widgets/form/hs_form_button.dart';
+import 'package:hitspot/widgets/form/hs_form_buttons_row.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
@@ -104,8 +106,8 @@ class _FirstPage extends StatelessWidget {
           },
         ),
         const Gap(32.0),
-        _ButtonsRow(
-            right: _Button(
+        HSFormButtonsRow(
+            right: HSFormButton(
           icon: const Icon(FontAwesomeIcons.arrowRight),
           onPressed: _addBoardCubit.nextPage,
           child: const Text("Customize"),
@@ -242,12 +244,12 @@ class _SecondPage extends StatelessWidget {
           },
         ),
         const Gap(32.0),
-        _ButtonsRow(
-          left: _Button(
+        HSFormButtonsRow(
+          left: HSFormButton(
             onPressed: _addBoardCubit.prevPage,
             child: const Text("Back"),
           ),
-          right: _Button(
+          right: HSFormButton(
             onPressed: _addBoardCubit.nextPage,
             icon: const Icon(FontAwesomeIcons.arrowRight),
             child: const Text("Visibility"),
@@ -322,8 +324,8 @@ class _ThirdPage extends StatelessWidget {
           ),
         ),
         const Gap(32.0),
-        _ButtonsRow(
-          left: _Button(
+        HSFormButtonsRow(
+          left: HSFormButton(
             onPressed: _addBoardCubit.prevPage,
             child: const Text("Back"),
           ),
@@ -356,55 +358,6 @@ class _ThirdPage extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-}
-
-class _ButtonsRow extends StatelessWidget {
-  const _ButtonsRow({this.left, required this.right});
-
-  final _Button? left;
-  final Widget right;
-
-  @override
-  Widget build(BuildContext context) {
-    if (left != null) {
-      return Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Expanded(child: left!),
-          const Gap(16.0),
-          Expanded(child: right),
-        ],
-      );
-    }
-    return Align(
-      alignment: Alignment.centerRight,
-      child: right,
-    );
-  }
-}
-
-class _Button extends StatelessWidget {
-  const _Button({this.icon, required this.child, this.onPressed});
-
-  final Icon? icon;
-  final Widget child;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    if (icon != null) {
-      return HSButton.icon(
-        label: child,
-        onPressed: onPressed!,
-        icon: icon!,
-      );
-    }
-    return HSButton(
-      onPressed: onPressed,
-      child: child,
     );
   }
 }
