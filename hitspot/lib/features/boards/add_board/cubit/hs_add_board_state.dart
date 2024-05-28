@@ -52,4 +52,14 @@ final class HSAddBoardState extends Equatable {
       errorText: errorText,
     );
   }
+
+  factory HSAddBoardState.update(HSBoard board) {
+    return HSAddBoardState(
+      title: board.title!,
+      description: board.description!,
+      color: board.color,
+      image: board.image ?? "",
+      boardVisibility: board.boardVisibility!,
+    );
+  }
 }

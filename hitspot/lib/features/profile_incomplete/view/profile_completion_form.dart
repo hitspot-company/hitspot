@@ -15,14 +15,7 @@ class ProfileCompletionForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<HSProfileCompletionCubit, HSProfileCompletionState>(
-      listener: (context, state) {
-        if (state.pageComplete) {
-          final authBloc = context.read<HSAuthenticationBloc>();
-          final currentUser = authBloc.state.user;
-          authBloc.add(HSAppUserChanged(currentUser));
-        }
-      },
+    return BlocBuilder<HSProfileCompletionCubit, HSProfileCompletionState>(
       buildWhen: (previous, current) =>
           previous.step != current.step ||
           previous.usernameValidationState != current.usernameValidationState ||

@@ -39,6 +39,8 @@ class HSAuthenticationBloc
     HSDebugLogger.logInfo("Initialized");
   }
 
+  void updateCurrentUser(HSUser user) => add(HSAppUserChanged(user));
+
   void _onUserChanged(
       HSAppUserChanged event, Emitter<HSAuthenticationState> emit) async {
     HSAuthenticationState state = const HSAuthenticationState.unauthenticated();
@@ -48,6 +50,7 @@ class HSAuthenticationBloc
       try {
         newUser =
             await _databaseRepository.getUserFromDatabase(event.user!.uid!);
+        HSDebugLogger.logInfo("Fetching: ${event.user!.uid!}");
         // If user's document does not exist in database, create it
         if (newUser == null) {
           await _databaseRepository.updateUserInfoInDatabase(event.user!);

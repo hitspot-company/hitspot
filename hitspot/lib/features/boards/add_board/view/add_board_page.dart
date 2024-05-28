@@ -9,6 +9,7 @@ import 'package:hitspot/features/boards/add_board/cubit/hs_add_board_cubit.dart'
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
@@ -25,7 +26,9 @@ class AddBoardPage extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       appBar: HSAppBar(
         enableDefaultBackButton: true,
-        titleText: "New Board",
+        titleText: addBoardCubit.prototype != null
+            ? "Update: ${addBoardCubit.prototype!.title}"
+            : "New Board",
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 32.0),
@@ -226,16 +229,12 @@ class _SecondPage extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(14),
-                      child: Container(
-                        height: 120,
-                        width: screenWidth,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage(_addBoardCubit.state.image),
-                              fit: BoxFit.cover,
-                              opacity: .6),
-                        ),
-                      ),
+                      child: HSImage(
+                          height: 120.0,
+                          width: screenWidth,
+                          imageProvider: _imageProvider,
+                          fit: BoxFit.cover,
+                          opacity: .6),
                     ),
                   ),
               ],
@@ -256,6 +255,22 @@ class _SecondPage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  bool get isImageSelected {
+    final String image = _addBoardCubit.state.image;
+    return (image.isNotEmpty && _addBoardCubit.prototype?.image != image);
+  }
+
+  ImageProvider<Object>? get _imageProvider {
+    if (_addBoardCubit.state.image.isNotEmpty &&
+        _addBoardCubit.prototype?.image != null &&
+        _addBoardCubit.state.image == _addBoardCubit.prototype?.image) {
+      return NetworkImage(_addBoardCubit.prototype!.image!);
+    } else if (_addBoardCubit.state.image.isNotEmpty) {
+      return AssetImage(_addBoardCubit.state.image);
+    }
+    return null;
   }
 }
 
@@ -320,7 +335,7 @@ class _ThirdPage extends StatelessWidget {
                 case HSAddBoardUploadState.initial:
                   return HSButton.icon(
                     label: const Text("Submit"),
-                    onPressed: _addBoardCubit.createBoard,
+                    onPressed: _addBoardCubit.submit,
                     icon: const Icon(FontAwesomeIcons.check),
                   );
 

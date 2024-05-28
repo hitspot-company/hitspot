@@ -67,6 +67,7 @@ class HSApp {
   // CURRENT USER
   HSUser get currentUser => authBloc.state.user;
   String? get username => currentUser.username;
+  void updateCurrentUser(HSUser user) => authBloc.updateCurrentUser(user);
 
   // DATABASE
   HSDatabaseRepository get databaseRepository =>

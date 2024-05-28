@@ -69,8 +69,6 @@ class HSBoard {
   final List? spots;
   final String? description;
   final String? title;
-  final Timestamp? tripDate;
-  final double? tripBudget;
   final HSBoardVisibility? boardVisibility;
   final Timestamp? createdAt;
 
@@ -84,8 +82,6 @@ class HSBoard {
       "spots": spots,
       "description": description,
       "title": title,
-      "trip_date": tripDate,
-      "trip_budget": tripBudget,
       "board_visibility": boardVisibility?.code,
       "created_at": createdAt,
     };
@@ -102,8 +98,6 @@ class HSBoard {
       spots: data["spots"],
       description: data["description"],
       title: data["title"],
-      tripDate: data["trip_date"],
-      tripBudget: data["trip_budget"],
       boardVisibility: HSBoardVisibility.fromCode(data["board_visibility"]),
       createdAt: data["created_at"],
     );
@@ -134,8 +128,6 @@ class HSBoard {
       spots: spots ?? this.spots,
       description: description ?? this.description,
       title: title ?? this.title,
-      tripDate: tripDate ?? this.tripDate,
-      tripBudget: tripBudget ?? this.tripBudget,
       boardVisibility: boardVisibility ?? this.boardVisibility,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -163,8 +155,6 @@ class HSBoard {
     this.spots,
     this.description,
     this.title,
-    this.tripDate,
-    this.tripBudget,
     this.boardVisibility,
     this.createdAt,
   });
@@ -181,8 +171,6 @@ image: $image
 spots: $spots
 description: $description
 title: $title
-tripDate: $tripDate
-tripBudget: $tripBudget
 boardVisibility: $boardVisibility
 createdAt: $createdAt
 """;

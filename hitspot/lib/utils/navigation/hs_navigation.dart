@@ -11,11 +11,15 @@ import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/features/register/view/register_page.dart';
+import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
+import 'package:hitspot/features/trips/create_trip/view/create_trip_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
+import 'package:hitspot/utils/navigation/transitions/bottom_to_top.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSNavigation {
@@ -53,6 +57,7 @@ class HSNavigation {
   dynamic toError(String headingText, String bodyText) =>
       routes.toError(headingText, bodyText);
   dynamic toBoard(String boardID) => routes.toBoard(boardID);
+  dynamic toCreateTrip({HSBoard? board}) => routes.toCreateTrip(board: board);
 }
 
 class HSRouting {
@@ -81,6 +86,11 @@ class HSRouting {
       ),
       GoRoute(
         path: '/user/:userID',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/saved',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
@@ -163,6 +173,10 @@ class HSRouting {
                 builder: (context, state) => const AddBoardProvider(),
               ),
               GoRoute(
+                path: 'saved',
+                builder: (context, state) => const SavedProvider(),
+              ),
+              GoRoute(
                   path: 'info/:text',
                   builder: (context, state) =>
                       InfoPage(infoText: state.pathParameters['text']!)),
@@ -227,4 +241,7 @@ class _HSRoutes {
       navi.router.go("/error?headingText=$headingText&bodyText=$bodyText");
   dynamic toUserProfile(String userID) => navi.router.push("/user/$userID");
   dynamic toBoard(String boardID) => navi.router.push("/board/$boardID");
+  dynamic toCreateTrip({HSBoard? board}) =>
+      navi.push(BottomToTopPage(child: const CreateTripProvider())
+          .createRoute(app.context!));
 }

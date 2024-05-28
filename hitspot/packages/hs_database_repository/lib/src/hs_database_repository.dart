@@ -31,11 +31,10 @@ class HSDatabaseRepository {
 
   Future<HSUser?> getUserFromDatabase(String uid) async {
     try {
-      HSUser? user = await _usersRepository.getUserFromDatabase(uid);
-      if (user == null) throw DatabaseConnectionFailure("The user is null");
+      final HSUser? user = await _usersRepository.getUserFromDatabase(uid);
       return (user);
     } catch (e) {
-      return null;
+      throw DatabaseConnectionFailure("The user could not be fetched");
     }
   }
 
@@ -62,6 +61,12 @@ class HSDatabaseRepository {
   Future<List<HSBoard>> getUserBoards({required HSUser user}) async =>
       await _boardsRepository.getUserBoards(user);
 
+  Future<List<HSBoard>> getSavedBoards({required HSUser user}) async =>
+      await _boardsRepository.getSavedBoards(user);
+
   Future<void> deleteBoard({required HSBoard board}) async =>
       await _boardsRepository.deleteBoard(board: board);
+
+  Future<void> deleteBoardImage({required HSBoard board}) async =>
+      await _boardsRepository.deleteBoardImage(board);
 }

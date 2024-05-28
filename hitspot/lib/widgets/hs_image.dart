@@ -6,15 +6,19 @@ import 'package:hitspot/widgets/shimmer_skeleton.dart';
 class HSImage extends StatelessWidget {
   const HSImage(
       {super.key,
-      required this.imageUrl,
+      this.imageUrl,
       this.height,
       this.width,
       this.fit,
       this.opacity,
       this.color,
       this.child,
-      this.childAlignment = Alignment.center});
+      this.childAlignment = Alignment.center,
+      this.isNetworkImage = true,
+      this.imageProvider,
+      this.borderRadius});
 
+  final bool isNetworkImage;
   final String? imageUrl;
   final double? height;
   final double? width;
@@ -23,18 +27,33 @@ class HSImage extends StatelessWidget {
   final Color? color;
   final Widget? child;
   final Alignment childAlignment;
+  final ImageProvider<Object>? imageProvider;
+  final BorderRadius? borderRadius;
 
   @override
   Widget build(BuildContext context) {
-    if (imageUrl == null) {
+    if (imageUrl == null && imageProvider == null) {
       return _Container(
         color: color,
         height: height,
         width: width,
+        borderRadius: borderRadius,
         childAlignment: childAlignment,
         child: child,
       );
+    } else if (imageProvider != null) {
+      return _Container(
+          image: imageProvider,
+          height: height,
+          width: width,
+          borderRadius: borderRadius,
+          opacity: opacity,
+          color: color,
+          childAlignment: childAlignment,
+          fit: fit,
+          child: child);
     }
+
     return CachedNetworkImage(
       imageUrl: imageUrl!,
       imageBuilder: (context, imageProvider) => _Container(
@@ -42,6 +61,7 @@ class HSImage extends StatelessWidget {
           height: height,
           width: width,
           opacity: opacity,
+          borderRadius: borderRadius,
           color: color,
           childAlignment: childAlignment,
           fit: fit,
@@ -62,7 +82,8 @@ class _Container extends StatelessWidget {
       this.opacity,
       this.child,
       this.color,
-      this.childAlignment = Alignment.center});
+      this.childAlignment = Alignment.center,
+      this.borderRadius});
 
   final ImageProvider<Object>? image;
   final double? height;
@@ -72,6 +93,7 @@ class _Container extends StatelessWidget {
   final Widget? child;
   final Color? color;
   final Alignment childAlignment;
+  final BorderRadius? borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +101,7 @@ class _Container extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
+        borderRadius: borderRadius,
         color: color,
         image: image != null
             ? DecorationImage(image: image!, fit: fit, opacity: opacity ?? 1.0)

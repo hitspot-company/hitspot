@@ -5,7 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/bloc/hs_board_bloc.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -49,7 +51,9 @@ class BoardPage extends StatelessWidget {
           final HSBoardSaveState boardSaveState = state.boardSaveState;
           final Color? accentColor = board.color;
           return HSScaffold(
+            sidePadding: 0.0,
             appBar: HSAppBar(
+              sidePadding: 16.0,
               enableDefaultBackButton: true,
               titleText: board.title,
               right: board.isOwner(currentUser)
@@ -65,8 +69,7 @@ class BoardPage extends StatelessWidget {
                       .colorify(accentColor ?? currentTheme.mainColor),
                 ),
                 icon: Icon(FontAwesomeIcons.mapPin, color: accentColor),
-                onPressed: () => HSDebugLogger.logInfo(
-                    "Create Trip")), // TODO: Navigate a create trip page from the bottom
+                onPressed: () => navi.toCreateTrip()),
             body: CustomScrollView(
               slivers: [
                 if (board.image != null)
@@ -81,103 +84,117 @@ class BoardPage extends StatelessWidget {
                           opacity: .6),
                     ),
                   ),
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 120,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  sliver: SliverMainAxisGroup(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Column(
                           children: [
-                            GestureDetector(
-                              onTap: () =>
-                                  navi.router.push("/user/${author.uid}"),
-                              child: HSUserAvatar(
-                                radius: 40.0,
-                                imgUrl: author.profilePicture,
+                            SizedBox(
+                              height: 120,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () =>
+                                        navi.router.push("/user/${author.uid}"),
+                                    child: HSUserAvatar(
+                                      radius: 40.0,
+                                      imgUrl: author.profilePicture,
+                                    ),
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("@${author.username}",
+                                          style: textTheme.headlineMedium!
+                                              .copyWith(color: accentColor)),
+                                      Text(author.fullName!),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("@${author.username}",
-                                    style: textTheme.headlineMedium!
-                                        .copyWith(color: accentColor)),
-                                Text(author.fullName!),
-                              ],
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SliverToBoxAdapter(
-                  child: Divider(
-                    thickness: .3,
-                  ),
-                ),
-                const Gap(8.0).sliver,
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _Headline(
-                        text: "Visibility",
-                        accentColor: accentColor,
+                      const SliverToBoxAdapter(
+                        child: Divider(
+                          thickness: .3,
+                        ),
                       ),
-                      Text(
-                        board.boardVisibility!.name.capitalize,
-                      ),
-                      const Gap(16.0),
-                      _Headline(
-                        text: "About",
-                        accentColor: accentColor,
-                      ),
-                      Text(
-                        board.description!,
-                      ),
-                      const Gap(16.0),
-                      _Headline(text: "Saves", accentColor: accentColor),
-                      Text(
-                        "${board.saves?.length ?? 0}",
-                      ),
-                      const Gap(16.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          IconButton(
-                            onPressed: () => HSDebugLogger.logInfo("start"),
-                            icon:
-                                Icon(FontAwesomeIcons.play, color: accentColor),
-                          ),
-                          IconButton(
-                            onPressed: boardBloc.share,
-                            icon: Icon(FontAwesomeIcons.arrowUpRightFromSquare,
-                                color: accentColor),
-                          ),
-                          _SaveActionButton(
-                              isEditor: board.isEditor(currentUser),
-                              state: state,
-                              boardBloc: boardBloc,
+                      const Gap(8.0).sliver,
+                      SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _Headline(
+                              text: "Visibility",
                               accentColor: accentColor,
-                              boardSaveState: boardSaveState),
-                        ],
-                      )
+                            ),
+                            Text(
+                              board.boardVisibility!.name.capitalize,
+                            ),
+                            Text(
+                              board.boardVisibility!.description,
+                              style: textTheme.bodyMedium!.hintify,
+                            ),
+                            const Gap(16.0),
+                            _Headline(
+                              text: "About",
+                              accentColor: accentColor,
+                            ),
+                            Text(
+                              board.description!,
+                            ),
+                            const Gap(16.0),
+                            _Headline(text: "Saves", accentColor: accentColor),
+                            Text(
+                              "${board.saves?.length ?? 0}",
+                            ),
+                            const Gap(16.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                IconButton(
+                                  onPressed: () =>
+                                      HSDebugLogger.logInfo("start"),
+                                  icon: Icon(FontAwesomeIcons.play,
+                                      color: accentColor),
+                                ),
+                                IconButton(
+                                  onPressed: boardBloc.share,
+                                  icon: Icon(
+                                      FontAwesomeIcons.arrowUpRightFromSquare,
+                                      color: accentColor),
+                                ),
+                                _SaveActionButton(
+                                    isEditor: board.isEditor(currentUser),
+                                    state: state,
+                                    boardBloc: boardBloc,
+                                    accentColor: accentColor,
+                                    boardSaveState: boardSaveState),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                      const Gap(16.0).sliver,
+                      const SliverToBoxAdapter(
+                        child: Divider(
+                          thickness: .3,
+                        ),
+                      ),
+                      const Gap(8.0).sliver,
+                      HSSpotsGrid.loading(
+                          isSliver:
+                              true), // TODO: Change when wojtek is done with adding spots
                     ],
                   ),
                 ),
-                const Gap(16.0).sliver,
-                const SliverToBoxAdapter(
-                  child: Divider(
-                    thickness: .3,
-                  ),
-                ),
-                const Gap(8.0).sliver,
-                HSSpotsGrid.loading(
-                    isSliver:
-                        true), // TODO: Change when wojtek is done with adding spots
               ],
             ),
           );
@@ -244,7 +261,8 @@ class _SaveActionButton extends StatelessWidget {
     late final VoidCallback? onPressed;
     late final Widget icon;
     if (isEditor) {
-      onPressed = () => HSDebugLogger.logInfo("Edit");
+      onPressed = () => navi.push(MaterialPageRoute(
+          builder: (_) => AddBoardProvider(prototype: state.board)));
       icon = Icon(FontAwesomeIcons.pen, color: accentColor);
     } else {
       switch (boardSaveState) {

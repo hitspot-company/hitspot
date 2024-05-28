@@ -17,6 +17,7 @@ class HSAppBar extends StatelessWidget {
     this.enableDefaultBackButton = false,
     this.titleBold = false,
     this.defaultBackButtonCallback,
+    this.sidePadding,
   }) {
     assert(title != null || titleText != null,
         "Either a title widget or titleText should be provided.");
@@ -36,42 +37,47 @@ class HSAppBar extends StatelessWidget {
   final bool enableDefaultBackButton;
   final bool titleBold;
   final VoidCallback? defaultBackButtonCallback;
+  final double? sidePadding;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: Stack(
-        children: [
-          if (enableDefaultBackButton)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                onPressed:
-                    defaultBackButtonCallback ?? HSApp.instance.navigation.pop,
-                icon: const Icon(FontAwesomeIcons.arrowLeft),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: sidePadding ?? 0.0),
+      child: SizedBox(
+        height: height,
+        child: Stack(
+          children: [
+            if (enableDefaultBackButton)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  onPressed: defaultBackButtonCallback ??
+                      HSApp.instance.navigation.pop,
+                  icon: const Icon(FontAwesomeIcons.arrowLeft),
+                ),
               ),
-            ),
-          if (left != null)
-            Align(alignment: Alignment.centerLeft, child: left!),
-          if (title != null)
-            Align(alignment: Alignment.center, child: title!)
-          else
-            Align(
-              alignment: Alignment.center,
-              child: AutoSizeText(
-                titleText!,
-                textAlign: TextAlign.center,
-                style: textTheme.headlineMedium!.copyWith(
-                    color: Colors.white,
-                    fontWeight: titleBold ? FontWeight.bold : FontWeight.normal,
-                    fontSize: fontSize),
-                maxLines: maxLines,
+            if (left != null)
+              Align(alignment: Alignment.centerLeft, child: left!),
+            if (title != null)
+              Align(alignment: Alignment.center, child: title!)
+            else
+              Align(
+                alignment: Alignment.center,
+                child: AutoSizeText(
+                  titleText!,
+                  textAlign: TextAlign.center,
+                  style: textTheme.headlineMedium!.copyWith(
+                      color: Colors.white,
+                      fontWeight:
+                          titleBold ? FontWeight.bold : FontWeight.normal,
+                      fontSize: fontSize),
+                  maxLines: maxLines,
+                ),
               ),
-            ),
-          if (right != null)
-            Align(alignment: Alignment.centerRight, child: right!)
-        ],
+            if (right != null)
+              Align(alignment: Alignment.centerRight, child: right!)
+          ],
+        ),
       ),
     );
   }

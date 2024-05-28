@@ -130,6 +130,20 @@ class HSBoardsRepository {
     }
   }
 
+  Future<List<HSBoard>> getSavedBoards(HSUser user) async {
+    try {
+      final List boardsIDs = user.saves ?? [];
+      final List<HSBoard> boards = [];
+      for (var i = 0; i < boardsIDs.length; i++) {
+        boards.add(await getBoard(boardsIDs[i]));
+      }
+      return boards;
+    } catch (_) {
+      throw DatabaseConnectionFailure(
+          "Could not get user's: ${user.uid} saved boards");
+    }
+  }
+
   Future<HSBoard> getBoard(String boardID) async {
     try {
       DocumentSnapshot snap = await _boards.doc(boardID).get();
@@ -178,6 +192,19 @@ class HSBoardsRepository {
       });
     } catch (_) {
       throw DatabaseConnectionFailure("Error unassigning board to user: $_");
+    }
+  }
+
+  Future<void> deleteBoardImage(HSBoard board) async {
+    try {
+      await _boards.doc(board.bid!).update({"image": null});
+      if (board.image != null) {
+        final Reference imageRef =
+            FirebaseStorage.instance.refFromURL(board.image!);
+        await imageRef.delete();
+      }
+    } catch (_) {
+      throw DatabaseConnectionFailure("The board image could not be deleted.");
     }
   }
 }

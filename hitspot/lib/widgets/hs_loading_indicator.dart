@@ -14,11 +14,11 @@ class HSLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     if (enableCenter) {
       return Center(
-        child: LoadingAnimationWidget.waveDots(
+        child: LoadingAnimationWidget.staggeredDotsWave(
             color: color ?? HSTheme.instance.mainColor, size: size),
       );
     } else {
-      return LoadingAnimationWidget.waveDots(
+      return LoadingAnimationWidget.staggeredDotsWave(
           color: color ?? HSTheme.instance.mainColor, size: size);
     }
   }

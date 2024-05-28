@@ -41,7 +41,7 @@ class HSBoardsList extends StatelessWidget {
               height: 80.0,
               color: boardColor,
               fit: BoxFit.cover,
-              opacity: .6,
+              opacity: .4,
               child: Center(
                 child: Text(board.title!, style: textTheme.headlineSmall),
               ),

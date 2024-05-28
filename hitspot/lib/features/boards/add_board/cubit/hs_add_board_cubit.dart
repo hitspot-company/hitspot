@@ -16,8 +16,13 @@ import 'package:image_picker/image_picker.dart';
 part 'hs_add_board_state.dart';
 
 class HSAddBoardCubit extends Cubit<HSAddBoardState> {
-  HSAddBoardCubit() : super(const HSAddBoardState());
+  HSAddBoardCubit({this.prototype})
+      : super(prototype != null
+            ? HSAddBoardState.update(prototype)
+            : const HSAddBoardState());
+
   final PageController pageController = PageController();
+  final HSBoard? prototype;
 
   void updateTitle(String value) => emit(state.copyWith(title: value));
   void updateVisibility(HSBoardVisibility? value) =>
@@ -155,8 +160,7 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
     }
   }
 
-  Future<void> createBoard() async {
-    emit(state.copyWith(uploadState: HSAddBoardUploadState.uploading));
+  Future<void> _createBoard() async {
     try {
       final HSBoard board = HSBoard(
         authorID: currentUser.uid,
@@ -184,6 +188,48 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
       emit(state.copyWith(uploadState: HSAddBoardUploadState.error));
       _showError;
     }
+  }
+
+  Future<void> _updateBoard() async {
+    try {
+      late final String? uploadedFileUrl;
+      if (state.image != prototype?.image) {
+        uploadedFileUrl = await uploadFile(File(state.image), prototype!.bid!);
+      } else {
+        uploadedFileUrl = null;
+      }
+      final HSBoard board = prototype!.copyWith(
+        color: state.color,
+        description: state.description,
+        title: state.title,
+        boardVisibility: state.boardVisibility,
+        image: uploadedFileUrl,
+      );
+      await _databaseRepository.updateBoard(board);
+      navi.router.go("/board/${board.bid}");
+    } on DatabaseConnectionFailure catch (_) {
+      HSDebugLogger.logError("Error creating board: ${_.message}");
+      emit(state.copyWith(uploadState: HSAddBoardUploadState.error));
+      _showError;
+    } catch (_) {
+      HSDebugLogger.logError("Unknown error: $_");
+      emit(state.copyWith(uploadState: HSAddBoardUploadState.error));
+      _showError;
+    }
+  }
+
+  Future<void> submit() async {
+    emit(state.copyWith(uploadState: HSAddBoardUploadState.uploading));
+    try {
+      if (prototype == null) {
+        await _createBoard();
+        HSDebugLogger.logSuccess("Board Created");
+      } else {
+        await _updateBoard();
+        HSDebugLogger.logSuccess("Board Updated");
+      }
+    } on DatabaseConnectionFailure catch (_) {
+    } catch (_) {}
   }
 
   void get _showError => app.showToast(

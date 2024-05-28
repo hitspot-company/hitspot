@@ -11,6 +11,7 @@ enum HSUserField {
   fcmTokens("fcm_tokens"),
   previouslySearchedUsers("previously_searched_users"),
   email("email"),
+  saves("saves"),
   fullName("full_name"),
   biogram("biogram"),
   emailHidden("email_hidden"),
@@ -31,6 +32,7 @@ class HSUser {
       likedSpots,
       previouslySearchedUsers,
       boards,
+      saves,
       spots;
   final String? uid, biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
@@ -45,6 +47,7 @@ class HSUser {
       HSUserField.likedSpots.name: likedSpots,
       HSUserField.previouslySearchedUsers.name: previouslySearchedUsers,
       HSUserField.spots.name: spots,
+      HSUserField.saves.name: saves,
       HSUserField.biogram.name: biogram,
       HSUserField.email.name: email,
       HSUserField.fullName.name: fullName,
@@ -55,7 +58,7 @@ class HSUser {
       HSUserField.emailHidden.name: emailHidden,
       HSUserField.isProfileCompleted.name: isProfileCompleted ?? false,
       HSUserField.isEmailVerified.name: isEmailVerified ?? false,
-      HSUserField.boards.name: boards ?? false
+      HSUserField.boards.name: boards,
     };
   }
 
@@ -68,6 +71,7 @@ class HSUser {
       likedSpots: data[HSUserField.likedSpots.name],
       previouslySearchedUsers: data[HSUserField.previouslySearchedUsers.name],
       spots: data[HSUserField.spots.name],
+      saves: data[HSUserField.saves.name],
       boards: data[HSUserField.boards.name],
       biogram: data[HSUserField.biogram.name],
       email: data[HSUserField.email.name],
@@ -89,6 +93,7 @@ class HSUser {
     List? likedSpots,
     List? previouslySearchedUsers,
     List? spots,
+    List? saves,
     List? boards,
     String? uid,
     String? biogram,
@@ -110,6 +115,7 @@ class HSUser {
       previouslySearchedUsers:
           previouslySearchedUsers ?? this.previouslySearchedUsers,
       spots: spots ?? this.spots,
+      saves: saves ?? this.saves,
       boards: boards ?? this.boards,
       uid: uid ?? this.uid,
       biogram: biogram ?? this.biogram,
@@ -133,6 +139,7 @@ class HSUser {
     this.likedSpots,
     this.previouslySearchedUsers,
     this.spots,
+    this.saves,
     this.boards,
     this.biogram,
     this.email,
