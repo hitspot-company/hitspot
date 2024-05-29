@@ -101,7 +101,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
 
   Future<void> setProfilePicture(String url) async {
     try {
-      await _databaseRepository.updateField(
+      await _databaseRepository.userUpdateField(
           currentUser, HSUserField.profilePicture.name, url);
       HSDebugLogger.logSuccess("Profile picture changed!");
     } catch (_) {

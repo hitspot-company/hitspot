@@ -59,7 +59,7 @@ class HSTrip {
   final Timestamp? createdAt;
   final HSTripVisibility? tripVisibility;
 
-  Map<String, dynamic> get serialize {
+  Map<String, dynamic> get serialized {
     return {
       "author_id": authorID,
       "title": title,
@@ -69,7 +69,7 @@ class HSTrip {
       "trip_budget": tripBudget,
       "trip_date": date,
       "created_at": createdAt,
-      "trip_visibility": tripVisibility,
+      "trip_visibility": tripVisibility!.code,
     };
   }
 
@@ -84,7 +84,7 @@ class HSTrip {
       tripBudget: data["trip_budget"],
       date: data["trip_date"],
       createdAt: data["created_at"],
-      tripVisibility: data["trip_visibility"],
+      tripVisibility: HSTripVisibility.fromCode(data["trip_visibility"]),
     );
   }
 
@@ -101,16 +101,16 @@ class HSTrip {
     HSTripVisibility? tripVisibility,
   }) {
     return HSTrip(
-      authorID: authorID,
-      tid: tid,
-      title: title,
-      description: description,
-      participants: participants,
-      editors: editors,
-      tripBudget: tripBudget,
-      date: tripDate,
-      createdAt: createdAt,
-      tripVisibility: tripVisibility,
+      authorID: authorID ?? this.authorID,
+      tid: tid ?? this.tid,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      participants: participants ?? this.participants,
+      editors: editors ?? this.editors,
+      tripBudget: tripBudget ?? this.tripBudget,
+      date: tripDate ?? this.date,
+      createdAt: createdAt ?? this.createdAt,
+      tripVisibility: tripVisibility ?? this.tripVisibility,
     );
   }
 

@@ -39,7 +39,7 @@ class HSEditValueCubit extends Cubit<HSEditValueState> {
         if (!Username.usernameRegExp.hasMatch(value)) {
           throw Username.validateUsername(value);
         }
-        if (!await _databaseRepository.isUsernameAvailable(value)) {
+        if (!await _databaseRepository.userIsUsernameAvailable(value)) {
           throw "The username is not available.";
         }
       case "full_name":
@@ -61,7 +61,7 @@ class HSEditValueCubit extends Cubit<HSEditValueState> {
     emit(state.copyWith(status: HSEditValueStatus.loading));
     try {
       await validateInput(state.value, field);
-      _databaseRepository.updateField(user, field, state.value);
+      _databaseRepository.userUpdateField(user, field, state.value);
       await Future.delayed(const Duration(seconds: 1));
       _app.showToast(
         toastType: HSToastType.success,
@@ -69,8 +69,8 @@ class HSEditValueCubit extends Cubit<HSEditValueState> {
         description: "The ${fieldName?.toLowerCase()} has been updated",
         alignment: Alignment.bottomCenter,
       );
-      _app.authBloc.add(HSAppUserChanged(
-          await _databaseRepository.getUserFromDatabase(user.uid!)));
+      _app.authBloc
+          .add(HSAppUserChanged(await _databaseRepository.userGet(user.uid!)));
       emit(state.copyWith(status: HSEditValueStatus.updated));
       HSScaffold.hideInput();
       return;

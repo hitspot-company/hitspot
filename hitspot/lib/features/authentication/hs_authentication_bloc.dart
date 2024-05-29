@@ -48,12 +48,11 @@ class HSAuthenticationBloc
     if (event.user != null) {
       HSUser? newUser;
       try {
-        newUser =
-            await _databaseRepository.getUserFromDatabase(event.user!.uid!);
+        newUser = await _databaseRepository.userGet(event.user!.uid!);
         HSDebugLogger.logInfo("Fetching: ${event.user!.uid!}");
         // If user's document does not exist in database, create it
         if (newUser == null) {
-          await _databaseRepository.updateUserInfoInDatabase(event.user!);
+          await _databaseRepository.userUpdate(event.user!);
           await _sendGreetingEmail(event.user);
           newUser = event.user!;
           HSDebugLogger.logSuccess("Added user info to database!");

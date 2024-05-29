@@ -88,7 +88,7 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
       return;
     }
     if (!(await _hsDatabaseRepository
-        .isUsernameAvailable(state.username.value))) {
+        .userIsUsernameAvailable(state.username.value))) {
       emit(state.copyWith(
           usernameValidationState: UsernameValidationState.unavailable));
       return;
@@ -131,7 +131,7 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
         fullName: state.fullname.value,
         isProfileCompleted: true,
       );
-      await _hsDatabaseRepository.completeUserProfile(updatedUser);
+      await _hsDatabaseRepository.userProfileComplete(updatedUser);
       app.authBloc.add(HSAppUserChanged(updatedUser));
       emit(state.copyWith(pageComplete: true));
     } catch (_) {

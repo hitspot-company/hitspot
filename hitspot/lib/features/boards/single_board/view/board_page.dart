@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/bloc/hs_board_bloc.dart';
+import 'package:hitspot/features/trips/create_trip/view/create_trip_provider.dart';
+import 'package:hitspot/utils/navigation/transitions/ripple.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -63,13 +65,14 @@ class BoardPage extends StatelessWidget {
                   : null,
             ),
             floatingActionButton: HSButton.icon(
-                label: Text(
-                  "Create Trip",
-                  style: textTheme.headlineMedium!
-                      .colorify(accentColor ?? currentTheme.mainColor),
-                ),
-                icon: Icon(FontAwesomeIcons.mapPin, color: accentColor),
-                onPressed: () => navi.toCreateTrip()),
+              label: Text(
+                "Create Trip",
+                style: textTheme.headlineMedium!
+                    .colorify(accentColor ?? currentTheme.mainColor),
+              ),
+              icon: Icon(FontAwesomeIcons.mapPin, color: accentColor),
+              onPressed: () => navi.toCreateTrip(board: board),
+            ),
             body: CustomScrollView(
               slivers: [
                 if (board.image != null)

@@ -4,4 +4,7 @@ class DatabaseConnectionFailure implements Exception {
   const DatabaseConnectionFailure([
     this.message = 'An unknown exception occurred.',
   ]);
+
+  @override
+  String toString() => this.message;
 }

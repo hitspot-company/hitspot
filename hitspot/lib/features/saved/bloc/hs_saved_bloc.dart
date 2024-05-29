@@ -15,13 +15,12 @@ class HSSavedBloc extends Bloc<HSSavedEvent, HSSavedState> {
 
   Future<void> _fetchInitial(event, emit) async {
     try {
-      final user =
-          await _databaseRepository.getUserFromDatabase(currentUser.uid!);
+      final user = await _databaseRepository.userGet(currentUser.uid!);
       if (user == null) throw "Error";
       final List<HSBoard> userBoards =
-          await _databaseRepository.getUserBoards(user: user);
+          await _databaseRepository.boardGetUserBoards(user: user);
       final List<HSBoard> savedBoards =
-          await _databaseRepository.getSavedBoards(user: user);
+          await _databaseRepository.boardGetSaved(user: user);
       emit(HSSavedReadyState(savedBoards: savedBoards, userBoards: userBoards));
     } catch (_) {
       navi.toError("Error", "Could not fetch saved boards");

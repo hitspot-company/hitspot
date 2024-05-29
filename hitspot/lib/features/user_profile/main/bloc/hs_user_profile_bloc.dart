@@ -52,10 +52,10 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
         final HSUserProfileReady readyState = state as HSUserProfileReady;
         emit(HSUserProfileUpdate(readyState.user, readyState.boards));
         if (isUserFollowed()) {
-          await databaseRepository.unfollowUser(currentUser, readyState.user!);
+          await databaseRepository.userUnfollow(currentUser, readyState.user!);
           followed = false;
         } else {
-          await databaseRepository.followUser(currentUser, readyState.user!);
+          await databaseRepository.userFollow(currentUser, readyState.user!);
           followed = true;
         }
         emitChanged(event, emit, followed: followed, user: readyState.user!);
@@ -86,15 +86,14 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
   Future<void> _fetchInitial(event, emit) async {
     emit(HSUserProfileInitialLoading());
     try {
-      final HSUser? userData =
-          await databaseRepository.getUserFromDatabase(userID);
+      final HSUser? userData = await databaseRepository.userGet(userID);
       if (userData == null) {
         navi.toError("404: Not found",
             "The user account does not exist or has been removed.");
         return;
       }
       final List<HSBoard> boards =
-          await databaseRepository.getUserBoards(user: userData);
+          await databaseRepository.boardGetUserBoards(user: userData);
       emit(HSUserProfileReady(userData, boards));
     } on DatabaseConnectionFailure catch (e) {
       emit(HSUserProfileError(e.message));

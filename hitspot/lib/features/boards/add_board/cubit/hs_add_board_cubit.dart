@@ -24,11 +24,11 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
   final PageController pageController = PageController();
   final HSBoard? prototype;
 
-  void updateTitle(String value) => emit(state.copyWith(title: value));
+  void updateTitle(String value) => emit(state.copyWith(title: value.trim()));
   void updateVisibility(HSBoardVisibility? value) =>
       emit(state.copyWith(boardVisibility: value));
   void updateDescription(String value) =>
-      emit(state.copyWith(description: value));
+      emit(state.copyWith(description: value.trim()));
 
   void nextPage() {
     if (pageController.page == 0 &&
@@ -170,12 +170,12 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
         boardVisibility: state.boardVisibility,
         createdAt: Timestamp.now(),
       );
-      final String boardID = await _databaseRepository.createBoard(board);
+      final String boardID = await _databaseRepository.boardCreate(board);
       if (state.image.isNotEmpty) {
         final String uploadedFileUrl =
             await uploadFile(File(state.image), boardID);
         await _databaseRepository
-            .updateBoard(board.copyWith(bid: boardID, image: uploadedFileUrl));
+            .boardUpdate(board.copyWith(bid: boardID, image: uploadedFileUrl));
       }
       await Future.delayed(const Duration(seconds: 1));
       navi.router.go("/board/$boardID");
@@ -205,7 +205,7 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
         boardVisibility: state.boardVisibility,
         image: uploadedFileUrl,
       );
-      await _databaseRepository.updateBoard(board);
+      await _databaseRepository.boardUpdate(board);
       navi.router.go("/board/${board.bid}");
     } on DatabaseConnectionFailure catch (_) {
       HSDebugLogger.logError("Error creating board: ${_.message}");

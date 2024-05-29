@@ -28,9 +28,8 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
   final String boardID;
   Future<void> _fetchInitialData(event, emit) async {
     try {
-      final HSBoard board = await _databaseRepository.getBoard(boardID);
-      final HSUser? author =
-          await _databaseRepository.getUserFromDatabase(board.authorID!);
+      final HSBoard board = await _databaseRepository.boardGet(boardID);
+      final HSUser? author = await _databaseRepository.userGet(board.authorID!);
       if (author == null) throw "The author could not be fetched";
       emit(HSBoardReadyState(
           author: author,
@@ -83,7 +82,7 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
   Future<void> _saveAndEmit(
       HSBoardReadyState currentState, List saves, event, emit) async {
     try {
-      await _databaseRepository.saveBoard(
+      await _databaseRepository.boardSave(
           board: currentState.board, user: currentUser);
       saves.add(currentUser.uid);
       HSDebugLogger.logSuccess("The board has been saved");
@@ -99,7 +98,7 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
   Future<void> _unsaveAndEmit(
       HSBoardReadyState currentState, List saves, event, emit) async {
     try {
-      await _databaseRepository.unsaveBoard(
+      await _databaseRepository.boardUnsave(
           board: currentState.board, user: currentUser);
       saves.remove(currentUser.uid);
       HSDebugLogger.logSuccess("The board has been unsaved");
@@ -176,7 +175,7 @@ class HSBoardBloc extends Bloc<HSBoardEvent, HSBoardState> {
       ScaffoldMessenger.of(app.context!).clearSnackBars();
       emit(HSBoardInitialState());
       await Future.delayed(const Duration(seconds: 1));
-      await _databaseRepository.deleteBoard(board: board);
+      await _databaseRepository.boardDelete(board: board);
       navi.router.go("/");
     } catch (_) {
       HSDebugLogger.logError("Error deleting board: $_");

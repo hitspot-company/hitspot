@@ -12,11 +12,6 @@ class HSSearchRepository {
 
   Stream<UsersHitsPage> get usersSearchPage =>
       usersSearcher.searcher.responses.map(UsersHitsPage.fromResponse);
-
-  // void dispose() {
-  //   if (!usersSearcher.isDisposed) usersSearcher.dispose();
-  //   if (!spotsSearcher.isDisposed) spotsSearcher.dispose();
-  // }
 }
 
 class _AlgoliaCredentials {
@@ -76,6 +71,9 @@ class UsersSearcher {
 
   late final HitsSearcher searcher;
   final String indexName = "users";
+  int? hitsPerPage;
+
+  void setHitsPerPage(int hitsPerPage) => this.hitsPerPage = hitsPerPage;
 
   // FILTERING
   final filterState = FilterState();
@@ -94,6 +92,7 @@ class UsersSearcher {
       (state) => state.copyWith(
         query: query,
         page: 0,
+        hitsPerPage: hitsPerPage,
       ),
     );
   }

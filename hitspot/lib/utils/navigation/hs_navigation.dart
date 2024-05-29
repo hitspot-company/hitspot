@@ -6,6 +6,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
+import 'package:hitspot/features/choose_users/view/choose_users_provider.dart';
 import 'package:hitspot/features/error/view/error_page.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -58,6 +59,8 @@ class HSNavigation {
       routes.toError(headingText, bodyText);
   dynamic toBoard(String boardID) => routes.toBoard(boardID);
   dynamic toCreateTrip({HSBoard? board}) => routes.toCreateTrip(board: board);
+  dynamic toChooseUsers({required String title, required String description}) =>
+      routes.toChooseUsers(title: title, description: description);
 }
 
 class HSRouting {
@@ -86,6 +89,11 @@ class HSRouting {
       ),
       GoRoute(
         path: '/user/:userID',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/trip/:tripID',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
@@ -165,6 +173,11 @@ class HSRouting {
                     InfoPage(infoText: state.pathParameters['spotID']!),
               ),
               GoRoute(
+                path: 'trip/:tripID',
+                builder: (context, state) =>
+                    InfoPage(infoText: state.pathParameters['tripID']!),
+              ),
+              GoRoute(
                 path: 'settings',
                 builder: (context, state) => const SettingsProvider(),
               ),
@@ -241,6 +254,10 @@ class _HSRoutes {
       navi.router.go("/error?headingText=$headingText&bodyText=$bodyText");
   dynamic toUserProfile(String userID) => navi.router.push("/user/$userID");
   dynamic toBoard(String boardID) => navi.router.push("/board/$boardID");
+  dynamic toChooseUsers({required String title, required String description}) =>
+      navi.push(MaterialPageRoute(
+          builder: (_) =>
+              ChooseUsersProvider(description: description, title: title)));
   dynamic toCreateTrip({HSBoard? board}) =>
       navi.push(BottomToTopPage(child: const CreateTripProvider())
           .createRoute(app.context!));

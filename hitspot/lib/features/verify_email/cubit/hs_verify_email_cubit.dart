@@ -23,7 +23,7 @@ class HSVerifyEmailCubit extends Cubit<HSVerifyEmailState> {
       if (emailVerified) {
         final HSUser updatedUser =
             _app.currentUser.copyWith(isEmailVerified: true);
-        await _app.databaseRepository.updateUserInfoInDatabase(updatedUser);
+        await _app.databaseRepository.userUpdate(updatedUser);
         emit(state.copyWith(
             emailVerificationState: HSEmailVerificationState.verified));
         _app.authBloc.add(HSAppUserChanged(_app.currentUser));

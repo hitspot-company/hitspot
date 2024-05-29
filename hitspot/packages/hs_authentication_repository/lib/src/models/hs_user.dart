@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 enum HSUserField {
   username("username"),
   boards("boards"),
+  trips("trips"),
   profilePicture("profile_picture"),
   likedSpots("liked_spots"),
   followers("followers"),
@@ -32,6 +33,7 @@ class HSUser {
       likedSpots,
       previouslySearchedUsers,
       boards,
+      trips,
       saves,
       spots;
   final String? uid, biogram, email, fullName, profilePicture, username;
@@ -43,6 +45,7 @@ class HSUser {
     return {
       HSUserField.fcmTokens.name: fcmTokens,
       HSUserField.followers.name: followers,
+      HSUserField.trips.name: trips,
       HSUserField.following.name: following,
       HSUserField.likedSpots.name: likedSpots,
       HSUserField.previouslySearchedUsers.name: previouslySearchedUsers,
@@ -71,6 +74,7 @@ class HSUser {
       likedSpots: data[HSUserField.likedSpots.name],
       previouslySearchedUsers: data[HSUserField.previouslySearchedUsers.name],
       spots: data[HSUserField.spots.name],
+      trips: data[HSUserField.trips.name],
       saves: data[HSUserField.saves.name],
       boards: data[HSUserField.boards.name],
       biogram: data[HSUserField.biogram.name],
@@ -93,6 +97,7 @@ class HSUser {
     List? likedSpots,
     List? previouslySearchedUsers,
     List? spots,
+    List? trips,
     List? saves,
     List? boards,
     String? uid,
@@ -115,6 +120,7 @@ class HSUser {
       previouslySearchedUsers:
           previouslySearchedUsers ?? this.previouslySearchedUsers,
       spots: spots ?? this.spots,
+      trips: trips ?? this.trips,
       saves: saves ?? this.saves,
       boards: boards ?? this.boards,
       uid: uid ?? this.uid,
@@ -139,6 +145,7 @@ class HSUser {
     this.likedSpots,
     this.previouslySearchedUsers,
     this.spots,
+    this.trips,
     this.saves,
     this.boards,
     this.biogram,
