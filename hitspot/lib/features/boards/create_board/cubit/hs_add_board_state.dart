@@ -2,8 +2,8 @@ part of 'hs_add_board_cubit.dart';
 
 enum HSAddBoardUploadState { initial, uploading, error }
 
-final class HSAddBoardState extends Equatable {
-  const HSAddBoardState({
+final class HSCreateBoardState extends Equatable {
+  const HSCreateBoardState({
     this.title = "",
     this.description = "",
     this.color,
@@ -32,7 +32,7 @@ final class HSAddBoardState extends Equatable {
         errorText,
       ];
 
-  HSAddBoardState copyWith({
+  HSCreateBoardState copyWith({
     int? page,
     String? title,
     String? description,
@@ -42,7 +42,7 @@ final class HSAddBoardState extends Equatable {
     HSAddBoardUploadState? uploadState,
     String? errorText,
   }) {
-    return HSAddBoardState(
+    return HSCreateBoardState(
       title: title ?? this.title,
       description: description ?? this.description,
       color: color == Colors.transparent ? null : color ?? this.color,
@@ -53,8 +53,8 @@ final class HSAddBoardState extends Equatable {
     );
   }
 
-  factory HSAddBoardState.update(HSBoard board) {
-    return HSAddBoardState(
+  factory HSCreateBoardState.update(HSBoard board) {
+    return HSCreateBoardState(
       title: board.title!,
       description: board.description!,
       color: board.color,

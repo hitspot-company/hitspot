@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
+import 'package:hitspot/features/boards/create_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/bloc/hs_board_bloc.dart';
 import 'package:hitspot/features/trips/create_trip/view/create_trip_provider.dart';
 import 'package:hitspot/utils/navigation/transitions/ripple.dart';
@@ -265,7 +265,7 @@ class _SaveActionButton extends StatelessWidget {
     late final Widget icon;
     if (isEditor) {
       onPressed = () => navi.push(MaterialPageRoute(
-          builder: (_) => AddBoardProvider(prototype: state.board)));
+          builder: (_) => CreateBoardProvider(prototype: state.board)));
       icon = Icon(FontAwesomeIcons.pen, color: accentColor);
     } else {
       switch (boardSaveState) {

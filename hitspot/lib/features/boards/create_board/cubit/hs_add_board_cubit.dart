@@ -15,14 +15,21 @@ import 'package:image_picker/image_picker.dart';
 
 part 'hs_add_board_state.dart';
 
-class HSAddBoardCubit extends Cubit<HSAddBoardState> {
-  HSAddBoardCubit({this.prototype})
+class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
+  HSCreateBoardCubit({this.prototype})
       : super(prototype != null
-            ? HSAddBoardState.update(prototype)
-            : const HSAddBoardState());
+            ? HSCreateBoardState.update(prototype)
+            : const HSCreateBoardState()) {
+    if (prototype != null) {
+      pageTitle = "Update: ${prototype!.title}";
+    } else {
+      pageTitle = "New Board";
+    }
+  }
 
   final PageController pageController = PageController();
   final HSBoard? prototype;
+  late final String pageTitle;
 
   void updateTitle(String value) => emit(state.copyWith(title: value.trim()));
   void updateVisibility(HSBoardVisibility? value) =>
@@ -30,16 +37,8 @@ class HSAddBoardCubit extends Cubit<HSAddBoardState> {
   void updateDescription(String value) =>
       emit(state.copyWith(description: value.trim()));
 
-  void nextPage() {
-    if (pageController.page == 0 &&
-        (state.title.isEmpty || state.description.isEmpty)) {
-      emit(state.copyWith(
-          errorText: "The title and description cannot be empty."));
-      return;
-    }
-    pageController.nextPage(
-        duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
-  }
+  void nextPage() => pageController.nextPage(
+      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
 
   void prevPage() => pageController.previousPage(
       duration: const Duration(milliseconds: 200), curve: Curves.easeIn);

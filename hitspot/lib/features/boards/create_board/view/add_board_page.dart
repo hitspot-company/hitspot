@@ -5,10 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/boards/add_board/cubit/hs_add_board_cubit.dart';
+import 'package:hitspot/features/boards/create_board/cubit/hs_add_board_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
-import 'package:hitspot/widgets/form/hs_form_button.dart';
-import 'package:hitspot/widgets/form/hs_form_buttons_row.dart';
+import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
@@ -18,19 +17,17 @@ import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
-class AddBoardPage extends StatelessWidget {
-  const AddBoardPage({super.key});
+class CreateBoardPage extends StatelessWidget {
+  const CreateBoardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final addBoardCubit = context.read<HSAddBoardCubit>();
+    final addBoardCubit = context.read<HSCreateBoardCubit>();
     return HSScaffold(
       resizeToAvoidBottomInset: true,
       appBar: HSAppBar(
         enableDefaultBackButton: true,
-        titleText: addBoardCubit.prototype != null
-            ? "Update: ${addBoardCubit.prototype!.title}"
-            : "New Board",
+        titleText: addBoardCubit.pageTitle,
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 32.0),
@@ -50,7 +47,7 @@ class AddBoardPage extends StatelessWidget {
 
 class _FirstPage extends StatelessWidget {
   _FirstPage(this._addBoardCubit);
-  final HSAddBoardCubit _addBoardCubit;
+  final HSCreateBoardCubit _addBoardCubit;
 
   final FocusNode descriptionNode = FocusNode();
 
@@ -58,20 +55,18 @@ class _FirstPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Text(
-          "Step 1/3: basic information",
-          style: textTheme.headlineMedium!.boldify,
+        const HSFormHeadline(
+          text: "Step 1/3: basic information",
+          headlineType: HSFormHeadlineType.display,
         ),
-        Text(
-          "Tell us more about your board.",
-          style: textTheme.titleMedium,
+        const HSFormCaption(
+          text: "Tell us more about your board.",
         ),
         const SizedBox(
           height: 32.0,
         ),
-        Text(
-          "What will you call your board?",
-          style: textTheme.titleMedium!.boldify,
+        const HSFormHeadline(
+          text: "What will you call your board?",
         ),
         const Gap(8.0),
         HSTextField(
@@ -82,9 +77,8 @@ class _FirstPage extends StatelessWidget {
           textInputAction: TextInputAction.next,
         ),
         const Gap(32.0),
-        Text(
-          "Give us some details about the board.",
-          style: textTheme.titleMedium!.boldify,
+        const HSFormCaption(
+          text: "Give us some details about the board.",
         ),
         const Gap(8.0),
         HSTextField(
@@ -96,7 +90,7 @@ class _FirstPage extends StatelessWidget {
           hintText: "Description",
         ),
         const Gap(8.0),
-        BlocSelector<HSAddBoardCubit, HSAddBoardState, String?>(
+        BlocSelector<HSCreateBoardCubit, HSCreateBoardState, String?>(
           selector: (state) => state.errorText,
           builder: (context, errorText) {
             if (errorText != null) {
@@ -119,30 +113,27 @@ class _FirstPage extends StatelessWidget {
 
 class _SecondPage extends StatelessWidget {
   const _SecondPage(this._addBoardCubit);
-  final HSAddBoardCubit _addBoardCubit;
+  final HSCreateBoardCubit _addBoardCubit;
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Text(
-          "Step 2/3: customization",
-          style: textTheme.headlineMedium!.boldify,
-        ),
-        Text(
-          "Define the character of your board.",
-          style: textTheme.titleMedium,
-        ),
-        const Gap(8.0),
+        const HSFormHeadline(
+            text: "Step 2/3: customization",
+            headlineType: HSFormHeadlineType.display),
+        const HSFormCaption(text: "Define the character of your board."),
         AutoSizeText(
           "This section is completely optional. You can skip it.",
           maxLines: 1,
           style: const TextStyle(color: Colors.grey).hintify,
         ),
         const Gap(32.0),
-        Text("Color", style: textTheme.titleLarge!.boldify),
-        const AutoSizeText("Do you want to choose a color?", maxLines: 1),
-        BlocSelector<HSAddBoardCubit, HSAddBoardState, bool>(
+        const HSFormHeadline(
+          text: "Color",
+        ),
+        const HSFormCaption(text: "Do you want to choose a color?"),
+        BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
           selector: (state) => state.color != null,
           builder: (context, isColorSelected) {
             return Column(
@@ -192,9 +183,9 @@ class _SecondPage extends StatelessWidget {
           },
         ),
         const Gap(32.0),
-        Text("Image", style: textTheme.titleLarge!.boldify),
-        const AutoSizeText("Do you want to choose an image?", maxLines: 1),
-        BlocSelector<HSAddBoardCubit, HSAddBoardState, bool>(
+        const HSFormHeadline(text: "Image"),
+        const HSFormCaption(text: "Do you want to choose an image?"),
+        BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
           selector: (state) => state.image.isNotEmpty,
           builder: (context, isImageSelected) {
             return Column(
@@ -278,29 +269,22 @@ class _SecondPage extends StatelessWidget {
 
 class _ThirdPage extends StatelessWidget {
   const _ThirdPage(this._addBoardCubit);
-  final HSAddBoardCubit _addBoardCubit;
+  final HSCreateBoardCubit _addBoardCubit;
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Text(
-          "Step 3/3: visibility",
-          style: textTheme.headlineMedium!.boldify,
-        ),
-        Text(
-          "Who should be able to see your board.",
-          style: textTheme.titleMedium,
-        ),
-        const Gap(32.0),
-        Text("Type of Visibility", style: textTheme.titleLarge!.boldify),
-        const Text("Decide who should be able to see your board."),
+        const HSFormHeadline(
+            text: "Step 3/3: Visibility",
+            headlineType: HSFormHeadlineType.display),
+        const HSFormCaption(text: "Who should be able to see your board."),
         const Gap(8.0),
         SizedBox(
           width: screenWidth,
           child: GestureDetector(
             onTap: () => HSDebugLogger.logInfo("Change visibility"),
-            child: BlocSelector<HSAddBoardCubit, HSAddBoardState,
+            child: BlocSelector<HSCreateBoardCubit, HSCreateBoardState,
                 HSBoardVisibility>(
               selector: (state) => state.boardVisibility,
               builder: (context, boardVisibility) {
@@ -329,7 +313,7 @@ class _ThirdPage extends StatelessWidget {
             onPressed: _addBoardCubit.prevPage,
             child: const Text("Back"),
           ),
-          right: BlocSelector<HSAddBoardCubit, HSAddBoardState,
+          right: BlocSelector<HSCreateBoardCubit, HSCreateBoardState,
               HSAddBoardUploadState>(
             selector: (state) => state.uploadState,
             builder: (context, uploadState) {

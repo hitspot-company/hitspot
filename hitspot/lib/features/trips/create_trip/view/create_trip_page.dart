@@ -9,9 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/trips/create_trip/cubit/hs_create_trip_cubit.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
-import 'package:hitspot/widgets/form/hs_form_button.dart';
-import 'package:hitspot/widgets/form/hs_form_buttons_row.dart';
+import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -71,13 +69,13 @@ class _FirstPage extends StatelessWidget {
     return ListView(
       shrinkWrap: true,
       children: [
-        const _Headline(
+        const HSFormHeadline(
           text: "1/4: Basics",
-          headlineType: _HeadlineType.display,
+          headlineType: HSFormHeadlineType.display,
         ),
-        const _Caption(text: "Tell us more about your trip."),
+        const HSFormCaption(text: "Tell us more about your trip."),
         const Gap(16.0),
-        const _Headline(text: "Trip Title"),
+        const HSFormHeadline(text: "Trip Title"),
         const Gap(16.0),
         HSTextField(
           maxLength: 64,
@@ -86,7 +84,7 @@ class _FirstPage extends StatelessWidget {
           suffixIcon: const Icon(Icons.dangerous, color: Colors.transparent),
         ),
         const Gap(32.0),
-        const _Headline(text: "Trip Description"),
+        const HSFormHeadline(text: "Trip Description"),
         const Gap(16.0),
         HSTextField(
           maxLength: 512,
@@ -124,12 +122,12 @@ class _SecondPage extends StatelessWidget {
     return ListView(
       shrinkWrap: true,
       children: [
-        const _Headline(
-            text: "2/4: Planning", headlineType: _HeadlineType.display),
-        const _Caption(text: "This section is optional. You can skip it."),
+        const HSFormHeadline(
+            text: "2/4: Planning", headlineType: HSFormHeadlineType.display),
+        const HSFormCaption(text: "This section is optional. You can skip it."),
         const Gap(32.0),
-        const _Headline(text: "Budget"),
-        const _Caption(text: "What's the trip's budget?"),
+        const HSFormHeadline(text: "Budget"),
+        const HSFormCaption(text: "What's the trip's budget?"),
         const Gap(8.0),
         BlocSelector<HSCreateTripCubit, HSCreateTripState, Currency?>(
           selector: (state) => state.currency,
@@ -163,10 +161,10 @@ class _SecondPage extends StatelessWidget {
           },
         ),
         const Gap(16.0),
-        const _Caption(text: "Press the currency symbol to change it."),
+        const HSFormCaption(text: "Press the currency symbol to change it."),
         const Gap(32.0),
-        const _Headline(text: "Date"),
-        const _Caption(text: "When is the trip taking place?"),
+        const HSFormHeadline(text: "Date"),
+        const HSFormCaption(text: "When is the trip taking place?"),
         const Gap(8.0),
         BlocSelector<HSCreateTripCubit, HSCreateTripState, String?>(
           selector: (state) => state.tripDate.isEmpty ? null : state.tripDate,
@@ -207,21 +205,22 @@ class _ThirdPage extends StatelessWidget {
     return ListView(
       shrinkWrap: true,
       children: [
-        const _Headline(
+        const HSFormHeadline(
           text: "3/4: Company",
-          headlineType: _HeadlineType.display,
+          headlineType: HSFormHeadlineType.display,
         ),
-        const _Caption(text: "Add editors and participants of your trip."),
+        const HSFormCaption(text: "Add editors and participants of your trip."),
         const Gap(32.0),
-        const _Headline(text: "Editors"),
-        const _Caption(text: "Press the button below to add up to 5 editors."),
+        const HSFormHeadline(text: "Editors"),
+        const HSFormCaption(
+            text: "Press the button below to add up to 5 editors."),
         const Gap(16.0),
         const HSFormButton(
           child: Icon(FontAwesomeIcons.plus),
         ),
         const Gap(32.0),
-        const _Headline(text: "Participants"),
-        const _Caption(
+        const HSFormHeadline(text: "Participants"),
+        const HSFormCaption(
             text: "Press the button below to add up to 30 participants."),
         const Gap(16.0),
         const HSFormButton(
@@ -252,11 +251,11 @@ class _FourthPage extends StatelessWidget {
     return ListView(
       shrinkWrap: true,
       children: [
-        const _Headline(
+        const HSFormHeadline(
           text: "4/4: Visibility",
-          headlineType: _HeadlineType.display,
+          headlineType: HSFormHeadlineType.display,
         ),
-        const _Caption(text: "Who should be able to see your trip."),
+        const HSFormCaption(text: "Who should be able to see your trip."),
         const Gap(16.0),
         SizedBox(
           width: screenWidth,
@@ -296,7 +295,7 @@ class _FourthPage extends StatelessWidget {
             selector: (state) => state.createTripStatus,
             builder: (context, uploadState) {
               switch (uploadState) {
-                case HSCreateTripStatus.idle || HSCreateTripStatus.error:
+                case HSCreateTripStatus.idle:
                   return HSFormButton(
                       icon: const Icon(FontAwesomeIcons.check),
                       onPressed: _createTripCubit.submit,
@@ -317,42 +316,5 @@ class _FourthPage extends StatelessWidget {
         )
       ],
     );
-  }
-}
-
-enum _HeadlineType { display, normal, small }
-
-class _Caption extends StatelessWidget {
-  const _Caption({required this.text, this.color});
-
-  final String text;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(text,
-        style: textTheme.bodyLarge!.hintify.copyWith(color: color));
-  }
-}
-
-class _Headline extends StatelessWidget {
-  const _Headline(
-      {required this.text, this.headlineType = _HeadlineType.small});
-
-  final _HeadlineType headlineType;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    late final TextStyle? textStyle;
-    switch (headlineType) {
-      case _HeadlineType.display:
-        textStyle = textTheme.headlineLarge;
-      case _HeadlineType.normal:
-        textStyle = textTheme.headlineMedium;
-      case _HeadlineType.small:
-        textStyle = textTheme.headlineSmall;
-    }
-    return Text(text, style: textStyle);
   }
 }

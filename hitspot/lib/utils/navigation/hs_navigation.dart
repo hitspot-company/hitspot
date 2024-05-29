@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
-import 'package:hitspot/features/boards/add_board/view/add_board_provider.dart';
+import 'package:hitspot/features/boards/create_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
 import 'package:hitspot/features/choose_users/view/choose_users_provider.dart';
 import 'package:hitspot/features/error/view/error_page.dart';
@@ -183,7 +182,7 @@ class HSRouting {
               ),
               GoRoute(
                 path: 'add_board',
-                builder: (context, state) => const AddBoardProvider(),
+                builder: (context, state) => const CreateBoardProvider(),
               ),
               GoRoute(
                 path: 'saved',
