@@ -4,7 +4,6 @@ import 'package:currency_picker/currency_picker.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/user_profile/edit_value/cubit/hs_edit_value_cubit.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -121,5 +120,11 @@ class HSCreateTripCubit extends Cubit<HSCreateTripState> {
       }
     } on DatabaseConnectionFailure catch (_) {
     } catch (_) {}
+  }
+
+  @override
+  Future<void> close() {
+    pageController.dispose();
+    return super.close();
   }
 }

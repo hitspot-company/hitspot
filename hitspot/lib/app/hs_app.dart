@@ -4,6 +4,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/utils/pickers/hs_pickers.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -17,6 +18,9 @@ class HSApp {
   HSApp._internal();
   static final HSApp _instance = HSApp._internal();
   static HSApp get instance => _instance;
+
+  // Pickers
+  HSPickers get pickers => HSPickers.instance;
 
   // NAVIGATION
   HSNavigation get navigation => HSNavigation.instance;

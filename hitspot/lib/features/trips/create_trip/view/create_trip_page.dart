@@ -147,7 +147,7 @@ class _SecondPage extends StatelessWidget {
                 Expanded(
                   child: HSTextField(
                     onChanged: (String? val) => _createTripCubit
-                        .updateBudget(double.parse(val ?? "0.0")),
+                        .updateBudget(double.tryParse(val ?? "0.0") ?? 0.0),
                     autofocus: false,
                     hintText: _createTripCubit.state.tripBudget.toString(),
                     suffixIcon: const Icon(FontAwesomeIcons.dollarSign,

@@ -1,4 +1,4 @@
-part of 'hs_add_board_cubit.dart';
+part of 'hs_create_board_cubit.dart';
 
 enum HSAddBoardUploadState { initial, uploading, error }
 

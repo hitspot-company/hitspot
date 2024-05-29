@@ -1,6 +1,9 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HSPickers {
   // SINGLETON
@@ -8,11 +11,15 @@ class HSPickers {
   static final HSPickers _instance = HSPickers._internal();
   static HSPickers get instance => _instance;
 
+  DateTime get now => DateTime.now();
+  DateTime get minAge => DateTime(now.year - 16, now.month, now.day);
+  DateTime get maxAge => DateTime(now.year - 100, now.month, now.day);
+
   Future<DateTime?> date(
-      [DateTime? initialDate,
+      {DateTime? initialDate,
       DateTime? currentDate,
       DateTime? firstDate,
-      DateTime? lastDate]) async {
+      DateTime? lastDate}) async {
     DateTime? pickedDate;
     DateTime now = DateTime.now();
     pickedDate = await showDatePicker(
@@ -23,7 +30,7 @@ class HSPickers {
     return (pickedDate);
   }
 
-  Future<Color?> pickColor([Color? previousColor]) async {
+  Future<Color?> color([Color? previousColor]) async {
     Color? pickedColor;
 
     await ColorPicker(
@@ -85,5 +92,47 @@ class HSPickers {
     );
 
     return (pickedColor);
+  }
+
+  Future<CroppedFile?> image(
+      {bool crop = true,
+      bool value = true,
+      CropAspectRatio? cropAspectRatio}) async {
+    try {
+      late final CroppedFile? file;
+      if (!value) return null;
+      final picker = ImagePicker();
+      final XFile? image =
+          await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      if (image == null) return null;
+      if (!crop) {
+        file = CroppedFile(image.path);
+        return file;
+      }
+      file =
+          await _getCroppedFile(image.path, cropAspectRatio: cropAspectRatio);
+      if (file == null) return null;
+      return file;
+    } catch (e) {
+      HSDebugLogger.logError(e.toString());
+      return null;
+    }
+  }
+
+  Future<CroppedFile?> _getCroppedFile(String sourcePath,
+      {CropAspectRatio? cropAspectRatio}) async {
+    late final CroppedFile? ret;
+    final ImageCropper cropper = ImageCropper();
+    ret = await cropper.cropImage(
+      aspectRatio: cropAspectRatio,
+      sourcePath: sourcePath,
+      uiSettings: [
+        IOSUiSettings(
+          title: 'Board Image',
+          aspectRatioLockEnabled: true,
+        ),
+      ],
+    );
+    return ret;
   }
 }

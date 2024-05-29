@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/features/boards/create_board/cubit/hs_add_board_cubit.dart';
+import 'package:hitspot/features/boards/create_board/cubit/hs_create_board_cubit.dart';
 import 'package:hitspot/features/boards/create_board/view/add_board_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 

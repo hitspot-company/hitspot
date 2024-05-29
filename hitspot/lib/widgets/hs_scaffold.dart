@@ -94,16 +94,21 @@ class _Bottombar extends StatelessWidget {
 
 class _BottombarItem extends StatelessWidget {
   const _BottombarItem(
-      {required this.onPressed, required this.iconData, this.iconColor});
+      {required this.onPressed,
+      required this.iconData,
+      this.iconColor,
+      this.iconSize});
 
   final VoidCallback onPressed;
   final IconData iconData;
   final Color? iconColor;
+  final double? iconSize;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        onPressed: onPressed, icon: Icon(iconData, color: iconColor));
+        onPressed: onPressed,
+        icon: Icon(iconData, color: iconColor, size: iconSize));
   }
 
   static final List<_BottombarItem> defaultList = [
@@ -112,8 +117,12 @@ class _BottombarItem extends StatelessWidget {
         onPressed: () => print("home"),
         iconColor: currentTheme.mainColor),
     _BottombarItem(
+        iconData: FontAwesomeIcons.plane, onPressed: () => print("trips")),
+    _BottombarItem(
         iconData: FontAwesomeIcons.plus,
+        iconSize: 36.0,
         onPressed: () => navi.newPush("/add_board")),
+    _BottombarItem(iconData: FontAwesomeIcons.a, onPressed: () => print("idk")),
     _BottombarItem(
       iconData: FontAwesomeIcons.bookmark,
       onPressed: () => navi.newPush("/saved"),

@@ -116,8 +116,6 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
   Future<void> _completeRegistration() async {
     app.authBloc
         .add(HSAppUserChanged(currentUser.copyWith(isEmailVerified: false)));
-    await Future.delayed(const Duration(seconds: 1));
-    emit(state.copyWith(status: FormzSubmissionStatus.success));
   }
 
   Future<void> logInWithGoogle() async {

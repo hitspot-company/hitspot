@@ -6,6 +6,7 @@ import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
 import 'package:hitspot/features/choose_users/view/choose_users_provider.dart';
+import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/error/view/error_page.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -240,7 +241,7 @@ class HSRouting {
           ),
           GoRoute(
             path: 'complete_profile',
-            builder: (context, state) => const ProfileCompletionPage(),
+            builder: (context, state) => const CompleteProfileProvider(),
           ),
         ],
       ),
