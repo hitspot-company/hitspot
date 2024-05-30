@@ -91,3 +91,21 @@ class HSFormButton extends StatelessWidget {
     );
   }
 }
+
+class HSFormPageBody extends StatelessWidget {
+  const HSFormPageBody(
+      {super.key, this.heading, this.caption, required this.children});
+
+  final String? heading;
+  final String? caption;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(shrinkWrap: true, children: [
+      if (heading != null) HSFormHeadline(text: heading!),
+      if (caption != null) HSFormCaption(text: caption!),
+      Column(children: children),
+    ]);
+  }
+}

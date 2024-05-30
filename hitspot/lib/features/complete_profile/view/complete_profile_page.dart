@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/complete_profile/cubit/hs_complete_profile_cubit.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
@@ -26,12 +25,6 @@ class CompleteProfilePage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const HSFormHeadline(
-              text: "Welcome to Hitspot!",
-              headlineType: HSFormHeadlineType.display),
-          HSFormCaption(
-              text: "Hi ${currentUser.email}!\nPlease complete your profile."),
-          const Gap(16.0),
           Expanded(
             child: PageView(
               physics: const NeverScrollableScrollPhysics(),
@@ -40,6 +33,8 @@ class CompleteProfilePage extends StatelessWidget {
                 _FirstPage(completeProfileCubit),
                 _SecondPage(completeProfileCubit),
                 _ThirdPage(completeProfileCubit),
+                _FourthPage(completeProfileCubit),
+                _FifthPage(completeProfileCubit),
               ],
             ),
           ),
@@ -59,6 +54,12 @@ class _FirstPage extends StatelessWidget {
     return ListView(
       shrinkWrap: true,
       children: [
+        const HSFormHeadline(
+            text: "Welcome to Hitspot!",
+            headlineType: HSFormHeadlineType.display),
+        HSFormCaption(
+            text: "Hi ${currentUser.email}!\nPlease complete your profile."),
+        const Gap(16.0),
         const HSFormHeadline(text: "Birthday"),
         const HSFormCaption(text: "You have to be at least 16 to use Hitspot"),
         const Gap(8.0),
@@ -98,6 +99,7 @@ class _SecondPage extends StatelessWidget {
             text: "Make it easier for your friends to find you in the app."),
         const Gap(8.0),
         HSTextField(
+          autofocus: true,
           onChanged: _completeProfileCubit.updateName,
           fillColor: currentTheme.textfieldFillColor,
           suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
@@ -105,8 +107,8 @@ class _SecondPage extends StatelessWidget {
         ),
         const Gap(16.0),
         BlocSelector<HSCompleteProfileCubit, HSCompleteProfileState, bool>(
-          selector: (state) => true,
-          // state.fullname.error == null && state.fullname.isValid,
+          selector: (state) =>
+              state.fullname.error == null && state.fullname.isValid,
           builder: (context, isValid) => HSFormButtonsRow(
             right: HSFormButton(
               icon: nextIcon,
@@ -148,6 +150,70 @@ class _ThirdPage extends StatelessWidget {
   }
 }
 
+class _FourthPage extends StatelessWidget {
+  const _FourthPage(this._completeProfileCubit);
+  final HSCompleteProfileCubit _completeProfileCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        const HSFormHeadline(text: "Biogram"),
+        const HSFormCaption(text: "Tell the world more about yourself!"),
+        const Gap(8.0),
+        HSTextField(
+          autofocus: true,
+          onChanged: _completeProfileCubit.updateBiogram,
+          maxLines: 6,
+          maxLength: 256,
+          fillColor: currentTheme.textfieldFillColor,
+          suffixIcon: const Icon(
+            FontAwesomeIcons.a,
+            color: Colors.transparent,
+          ),
+        ),
+        const Gap(8.0),
+        const HSFormCaption(
+            text:
+                "This section is completely optional. You can leave it empty."),
+        const Gap(16.0),
+        HSFormButtonsRow(
+          left: HSFormButton(
+              onPressed: _completeProfileCubit.prevPage,
+              child: const Text("Back")),
+          right: HSFormButton(
+            icon: nextIcon,
+            onPressed: _completeProfileCubit.nextPage,
+            child: const Text("Next"),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FifthPage extends StatelessWidget {
+  const _FifthPage(this._completeProfileCubit);
+
+  final HSCompleteProfileCubit _completeProfileCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return HSFormPageBody(
+      heading: "Avatar",
+      caption: "Choose your avatar",
+      children: [
+        Container(
+          height: 100,
+          width: 100,
+          color: Colors.teal,
+        ),
+      ],
+    );
+  }
+}
+
 class _UsernameInput extends StatelessWidget {
   const _UsernameInput(this._completeProfileCubit);
   final HSCompleteProfileCubit _completeProfileCubit;
@@ -159,6 +225,7 @@ class _UsernameInput extends StatelessWidget {
           previous.username != current.username ||
           previous.usernameValidationState != current.usernameValidationState,
       builder: (context, state) => HSTextField(
+        autofocus: true,
         textInputAction: TextInputAction.next,
         scrollPadding: const EdgeInsets.all(84.0),
         onChanged: _completeProfileCubit.updateUsername,
@@ -222,8 +289,7 @@ class _UsernameNextButton extends StatelessWidget {
         selector: (state) => state.usernameValidationState,
         builder: (context, usernameValidationState) {
           switch (usernameValidationState) {
-            case UsernameValidationState.unknown ||
-                  UsernameValidationState.empty:
+            case UsernameValidationState.unknown:
               return HSFormButton(
                 onPressed: _completeProfileCubit.isUsernameValid,
                 child: const Text('VERIFY'),
@@ -235,7 +301,8 @@ class _UsernameNextButton extends StatelessWidget {
                   size: 32.0,
                 ),
               );
-            case UsernameValidationState.unavailable:
+            case UsernameValidationState.unavailable ||
+                  UsernameValidationState.empty:
               return const HSFormButton(
                 onPressed: null,
                 child: Text("NEXT"),

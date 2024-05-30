@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
 
 part 'hs_complete_profile_state.dart';
@@ -14,11 +14,19 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
   final PageController pageController = PageController();
   final HSDatabaseRepository _databaseRepository = app.databaseRepository;
 
-  void nextPage() => pageController.nextPage(
-      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  void nextPage() {
+    HSScaffold.hideInput();
+    pageController.nextPage(
+        duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  }
 
-  void prevPage() => pageController.previousPage(
-      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  void prevPage() {
+    HSScaffold.hideInput();
+    pageController.previousPage(
+        duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  }
+
+  void updateBiogram(String value) => emit(state.copyWith(biogram: value));
 
   void updateBirthday() async {
     final DateTime? dateTime = await app.pickers.date(
@@ -37,11 +45,13 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
   }
 
   void updateName(String value) =>
-      state.copyWith(fullname: Fullname.dirty(value));
+      emit(state.copyWith(fullname: Fullname.dirty(value)));
 
   void updateUsername(String value) => emit(state.copyWith(
       username: Username.dirty(value),
-      usernameValidationState: UsernameValidationState.unknown));
+      usernameValidationState: Username.dirty(value).isValid
+          ? UsernameValidationState.unknown
+          : UsernameValidationState.empty));
 
   Future<void> isUsernameValid() async {
     if (state.username.value.isEmpty) {
