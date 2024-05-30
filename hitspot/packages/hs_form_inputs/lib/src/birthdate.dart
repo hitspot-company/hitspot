@@ -20,6 +20,7 @@ class Birthdate extends FormzInput<String, BirthdateValidationError> {
 
   @override
   BirthdateValidationError? validator(String? value) {
+    if (value?.isEmpty ?? true) return BirthdateValidationError.empty;
     return null;
   }
 }

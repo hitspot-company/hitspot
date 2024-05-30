@@ -16,6 +16,7 @@ class Fullname extends FormzInput<String, FullnameValidationError> {
   /// The value is never null [pure state is '']
   @override
   FullnameValidationError? validator(String? value) {
-    return !value!.isEmpty ? null : FullnameValidationError.invalid;
+    if (value?.isEmpty ?? true) return FullnameValidationError.invalid;
+    return null;
   }
 }
