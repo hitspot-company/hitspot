@@ -159,4 +159,31 @@ class HSUser {
     this.isProfileCompleted,
     this.isEmailVerified,
   });
+
+  @override
+  String toString() {
+    return """
+User $uid data:
+uid: $uid
+fcmTokens: $fcmTokens
+followers: $followers
+following: $following
+likedSpots: $likedSpots
+previouslySearchedUsers: $previouslySearchedUsers
+spots: $spots
+trips: $trips
+saves: $saves
+boards: $boards
+biogram: $biogram
+email: $email
+fullName: $fullName
+profilePicture: $profilePicture
+username: $username
+birthday: $birthday
+createdAt: $createdAt
+emailHidden: $emailHidden
+isProfileCompleted: $isProfileCompleted
+isEmailVerified: $isEmailVerified
+""";
+  }
 }

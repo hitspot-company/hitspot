@@ -10,6 +10,7 @@ class HSUserAvatar extends StatelessWidget {
     required this.radius,
     this.iconSize,
     this.loading = false,
+    this.isAsset = false,
     this.child,
   });
 
@@ -17,6 +18,7 @@ class HSUserAvatar extends StatelessWidget {
   final double radius;
   final double? iconSize;
   final bool loading;
+  final bool isAsset;
   final Widget? child;
 
   @override
@@ -46,10 +48,16 @@ class HSUserAvatar extends StatelessWidget {
         ),
       );
     } else {
+      late final ImageProvider<Object> image;
+      if (isAsset) {
+        image = AssetImage(imgUrl!);
+      } else {
+        image = NetworkImage(imgUrl!);
+      }
       return CircleAvatar(
         radius: radius,
         backgroundColor: app.theme.highlightColor,
-        backgroundImage: NetworkImage(imgUrl!),
+        backgroundImage: image,
       );
     }
   }

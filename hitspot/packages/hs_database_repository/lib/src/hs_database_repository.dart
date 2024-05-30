@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/hs_database_repository_boards.dart';
@@ -95,4 +98,15 @@ class HSDatabaseRepository {
   Future<String> tripCreate(HSTrip trip) async => _tripsRepository.create(trip);
 
   Future<void> tripUpdate(HSTrip trip) async => _tripsRepository.update(trip);
+
+  Future<String> uploadFile(File file, Reference reference) async {
+    try {
+      final UploadTask uploadTask = reference.putFile(file);
+      final TaskSnapshot downloadUrl = await uploadTask;
+      final String url = await downloadUrl.ref.getDownloadURL();
+      return url;
+    } catch (_) {
+      rethrow;
+    }
+  }
 }

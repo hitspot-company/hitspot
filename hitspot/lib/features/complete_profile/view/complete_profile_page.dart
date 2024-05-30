@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -9,6 +10,8 @@ import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
 
 class CompleteProfilePage extends StatelessWidget {
@@ -104,6 +107,7 @@ class _SecondPage extends StatelessWidget {
           fillColor: currentTheme.textfieldFillColor,
           suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
           hintText: "Your name",
+          initialValue: _completeProfileCubit.state.fullnameVal,
         ),
         const Gap(16.0),
         BlocSelector<HSCompleteProfileCubit, HSCompleteProfileState, bool>(
@@ -163,10 +167,10 @@ class _FourthPage extends StatelessWidget {
         const HSFormCaption(text: "Tell the world more about yourself!"),
         const Gap(8.0),
         HSTextField(
-          autofocus: true,
           onChanged: _completeProfileCubit.updateBiogram,
           maxLines: 6,
           maxLength: 256,
+          initialValue: _completeProfileCubit.state.biogramVal,
           fillColor: currentTheme.textfieldFillColor,
           suffixIcon: const Icon(
             FontAwesomeIcons.a,
@@ -202,12 +206,60 @@ class _FifthPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSFormPageBody(
       heading: "Avatar",
-      caption: "Choose your avatar",
+      caption: "Choose your avatar.\nThis section is also optional.",
       children: [
-        Container(
-          height: 100,
-          width: 100,
-          color: Colors.teal,
+        const Gap(16.0),
+        GestureDetector(
+          onTap: _completeProfileCubit.changeAvatar,
+          child: BlocSelector<HSCompleteProfileCubit, HSCompleteProfileState,
+              String?>(
+            selector: (state) => state.avatar.isNotEmpty ? state.avatar : null,
+            builder: (context, avatar) => HSUserAvatar(
+                radius: 64.0, iconSize: 64.0, isAsset: true, imgUrl: avatar),
+          ),
+        ),
+        const Gap(8.0),
+        TextButton(
+          onPressed: _completeProfileCubit.changeAvatar,
+          child: Text(
+            "Choose Avatar",
+            style: TextStyle(color: currentTheme.mainColor),
+          ),
+        ),
+        const Gap(32.0),
+        const HSFormCaption(
+            text:
+                "Once you are done cusomizing your profile, submit changes using the button below"),
+        const Gap(8.0),
+        HSFormButtonsRow(
+          left: HSFormButton(
+            onPressed: _completeProfileCubit.prevPage,
+            child: const Text("Back"),
+          ),
+          right: BlocSelector<HSCompleteProfileCubit, HSCompleteProfileState,
+              HSCompleteProfileStatus>(
+            selector: (state) => state.completeProfileStatus,
+            builder: (context, status) {
+              switch (status) {
+                case HSCompleteProfileStatus.idle:
+                  return HSFormButton(
+                    onPressed: _completeProfileCubit.submit,
+                    icon: const Icon(FontAwesomeIcons.check),
+                    child: const Text("Submit"),
+                  );
+                case HSCompleteProfileStatus.error:
+                  return const HSFormButton(
+                    icon: Icon(FontAwesomeIcons.xmark),
+                    child: Text("Error"),
+                  );
+                case HSCompleteProfileStatus.loading:
+                  return const HSFormButton(
+                      child: HSLoadingIndicator(
+                    size: 24.0,
+                  ));
+              }
+            },
+          ),
         ),
       ],
     );
@@ -231,6 +283,7 @@ class _UsernameInput extends StatelessWidget {
         onChanged: _completeProfileCubit.updateUsername,
         fillColor: currentTheme.textfieldFillColor,
         hintText: "Your username",
+        initialValue: state.usernameVal,
         prefixIcon: _getPrefixIcon,
         errorText: _errorText,
       ),

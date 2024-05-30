@@ -97,7 +97,8 @@ class HSPickers {
   Future<CroppedFile?> image(
       {bool crop = true,
       bool value = true,
-      CropAspectRatio? cropAspectRatio}) async {
+      CropAspectRatio? cropAspectRatio,
+      CropStyle? cropStyle}) async {
     try {
       late final CroppedFile? file;
       if (!value) return null;
@@ -109,8 +110,8 @@ class HSPickers {
         file = CroppedFile(image.path);
         return file;
       }
-      file =
-          await _getCroppedFile(image.path, cropAspectRatio: cropAspectRatio);
+      file = await _getCroppedFile(image.path,
+          cropAspectRatio: cropAspectRatio, cropStyle: cropStyle);
       if (file == null) return null;
       return file;
     } catch (e) {
@@ -120,11 +121,12 @@ class HSPickers {
   }
 
   Future<CroppedFile?> _getCroppedFile(String sourcePath,
-      {CropAspectRatio? cropAspectRatio}) async {
+      {CropAspectRatio? cropAspectRatio, CropStyle? cropStyle}) async {
     late final CroppedFile? ret;
     final ImageCropper cropper = ImageCropper();
     ret = await cropper.cropImage(
       aspectRatio: cropAspectRatio,
+      cropStyle: cropStyle ?? CropStyle.rectangle,
       sourcePath: sourcePath,
       uiSettings: [
         IOSUiSettings(
