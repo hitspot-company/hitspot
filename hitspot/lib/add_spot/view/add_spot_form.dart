@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -44,18 +45,153 @@ class AddSpotForm extends StatelessWidget {
         _LocationSelection(
           pageController: pageController,
         ),
-        const _ImageSelection(),
+        _ImageSelection(
+          pageController: pageController,
+        ),
+        _TextInput(
+          pageController: pageController,
+        )
+      ],
+    );
+  }
+}
+
+class _TextInput extends StatelessWidget {
+  _TextInput({super.key, required this.pageController});
+  final PageController pageController;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  hintText: 'Title',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  hintText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 5,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: () {
+              pageController.nextPage(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: const Text(
+              'SAVE SPOT',
+              style: TextStyle(color: Colors.black, letterSpacing: 0.5),
+            ),
+          ),
+        )
       ],
     );
   }
 }
 
 class _ImageSelection extends StatelessWidget {
-  const _ImageSelection({super.key});
+  _ImageSelection({super.key, required this.pageController});
+  final PageController pageController;
+  final picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    final addSpotCubit = context.read<HSAddSpotCubit>();
+
+    return BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
+        builder: (context, state) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () async {
+                final pickedImages = await picker.pickMultiImage(limit: 5);
+                addSpotCubit.imagesChanged(images: pickedImages);
+              },
+              child: state.images.isEmpty
+                  ? Container(
+                      width: double.infinity,
+                      height: 300,
+                      color: Colors.grey[300],
+                      child: const Center(
+                        child: Text(
+                          'Click to select images',
+                          style: TextStyle(fontSize: 18, color: Colors.black54),
+                        ),
+                      ),
+                    )
+                  : CarouselSlider(
+                      options: CarouselOptions(
+                        height: 300,
+                        enlargeCenterPage: true,
+                        enableInfiniteScroll: false,
+                        initialPage: 0,
+                      ),
+                      items: state.images.map((image) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return Image.file(
+                              File(image.path),
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                pageController.nextPage(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: const Text(
+                'NEXT',
+                style: TextStyle(color: Colors.black, letterSpacing: 0.5),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
   }
 }
 

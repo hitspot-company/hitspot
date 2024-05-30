@@ -17,7 +17,6 @@ import 'package:hs_firebase_config/hs_firebase_config.dart';
 import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 import 'package:hs_search_repository/hs_search.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:hs_network_repository/hs_network_repository.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 
 void main() async {
@@ -31,7 +30,6 @@ void main() async {
   final searchRepository = HSSearchRepository();
   Animate.restartOnHotReload = true;
   final locationRepostiory = HSLocationRepository();
-  final networkRepository = HSNetworkRepository();
 
   await FlutterConfig.loadEnvVariables();
 
@@ -44,7 +42,6 @@ void main() async {
     authenticationRepository: authenticationRepository,
     databaseRepository: databaseRepository,
     locationRepository: locationRepostiory,
-    networkRepository: networkRepository,
   ));
 }
 
@@ -55,7 +52,6 @@ class App extends StatelessWidget {
   final HSMailingRepository _mailingRepository;
   final HSSearchRepository _searchRepository;
   final HSLocationRepository _locationRepository;
-  final HSNetworkRepository _networkRepository;
 
   const App(
       {required HSThemeRepository themeRepository,
@@ -64,15 +60,13 @@ class App extends StatelessWidget {
       required HSMailingRepository mailingRepository,
       required HSSearchRepository searchRepository,
       required HSLocationRepository locationRepository,
-      required HSNetworkRepository networkRepository,
       super.key})
       : _themeRepository = themeRepository,
         _authenticationRepository = authenticationRepository,
         _mailingRepository = mailingRepository,
         _searchRepository = searchRepository,
         _databaseRepository = databaseRepository,
-        _locationRepository = locationRepository,
-        _networkRepository = networkRepository;
+        _locationRepository = locationRepository;
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
