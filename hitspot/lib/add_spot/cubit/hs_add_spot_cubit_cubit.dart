@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
@@ -28,7 +29,10 @@ class HSAddSpotCubit extends Cubit<HSAddSpotCubitState> {
   Future<void> createSpot() async {
     HSDebugLogger.logInfo("Creating spot");
     await _hsDatabaseRepository.createSpot(
+      userID: HSApp.instance.authRepository.currentUser?.uid ?? "",
+      location: state.selectedLocation,
       title: state.title,
+      description: state.description,
       images: state.images,
     );
   }
@@ -76,6 +80,12 @@ class HSAddSpotCubit extends Cubit<HSAddSpotCubitState> {
   void titleChanged({required String title}) {
     emit(
       state.copyWith(title: title),
+    );
+  }
+
+  void descriptionChanged({required String description}) {
+    emit(
+      state.copyWith(description: description),
     );
   }
 

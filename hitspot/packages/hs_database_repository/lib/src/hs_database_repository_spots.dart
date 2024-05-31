@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hs_database_repository/src/models/hs_spot.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HSSpotsRepository {
   final db = FirebaseFirestore.instance;
@@ -25,12 +26,23 @@ class HSSpotsRepository {
 
   final int _THUMBNAIL_SIZE = 100;
 
-  Future<void> createSpot(String title, List<XFile> images) async {
+  Future<void> createSpot(String userID, LatLng location, String title,
+      String description, List<XFile> images) async {
     // Get data and create HSSpot based on that data
+    HSSpot newSpot = HSSpot(
+        ownersId: userID,
+        name: title,
+        description: description,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        numberOfImagesUploaded: images.length);
 
     // Create geo hash based on latitude & longitude
 
     // Save HSSpot to database
+    final _convertedImages =
+        images.map<File>((xfile) => File(xfile.path)).toList();
+    addSpotToDatabase(newSpot, _convertedImages);
   }
 
   Future<void> addSpotToDatabase(HSSpot spot, List<File> images) async {

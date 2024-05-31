@@ -8,8 +8,8 @@ final class HSAddSpotCubitState extends Equatable {
       this.selectedLocation = const LatLng(0, 0),
       this.selectedLocationStreetName = "",
       this.selectedLocationDistance = "0",
-      this.step = 0,
       this.title = "",
+      this.description = "",
       this.images = const []});
   final bool isLoading;
   final LatLng usersLocation;
@@ -17,9 +17,9 @@ final class HSAddSpotCubitState extends Equatable {
   final LatLng selectedLocation;
   final String selectedLocationStreetName;
   final String selectedLocationDistance;
-  final int step;
-  final String title;
   final List<XFile> images;
+  final String title;
+  final String description;
 
   @override
   List<Object> get props => [
@@ -29,9 +29,9 @@ final class HSAddSpotCubitState extends Equatable {
         selectedLocation,
         selectedLocationStreetName,
         selectedLocationDistance,
-        step,
-        title,
         images,
+        title,
+        description
       ];
 
   HSAddSpotCubitState copyWith(
@@ -41,9 +41,9 @@ final class HSAddSpotCubitState extends Equatable {
       LatLng? selectedLocation,
       String? selectedLocationStreetName,
       String? selectedLocationDistance,
-      int? step,
+      List<XFile>? images,
       String? title,
-      List<XFile>? images}) {
+      String? description}) {
     return HSAddSpotCubitState(
         isLoading: isLoading ?? this.isLoading,
         usersLocation: usersLocation ?? this.usersLocation,
@@ -53,9 +53,9 @@ final class HSAddSpotCubitState extends Equatable {
             selectedLocationStreetName ?? this.selectedLocationStreetName,
         selectedLocationDistance:
             selectedLocationDistance ?? this.selectedLocationDistance,
-        step: step ?? this.step,
+        images: images ?? this.images,
         title: title ?? this.title,
-        images: images ?? this.images);
+        description: description ?? this.description);
   }
 }
 

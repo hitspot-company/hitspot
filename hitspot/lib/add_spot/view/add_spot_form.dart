@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -64,27 +65,38 @@ class _TextInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _addSpotCubit = context.read<HSAddSpotCubit>();
+
     return Column(
       children: [
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  hintText: 'Title',
-                  border: OutlineInputBorder(),
+              Container(
+                margin: EdgeInsets.all(8.0),
+                child: TextField(
+                  onChanged: (value) =>
+                      _addSpotCubit.titleChanged(title: _titleController.text),
+                  controller: _titleController,
+                  decoration: const InputDecoration(
+                    hintText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
               ),
-              SizedBox(height: 16.0),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  hintText: 'Description',
-                  border: OutlineInputBorder(),
+              Container(
+                margin: EdgeInsets.all(8.0),
+                child: TextField(
+                  onChanged: (value) => _addSpotCubit.descriptionChanged(
+                      description: _descriptionController.text),
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    hintText: 'Description',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 5,
                 ),
-                maxLines: 5,
               ),
             ],
           ),
@@ -93,10 +105,7 @@ class _TextInput extends StatelessWidget {
           margin: const EdgeInsets.all(8.0),
           child: ElevatedButton(
             onPressed: () {
-              pageController.nextPage(
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOut,
-              );
+              _addSpotCubit.createSpot();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
@@ -109,6 +118,9 @@ class _TextInput extends StatelessWidget {
               style: TextStyle(color: Colors.black, letterSpacing: 0.5),
             ),
           ),
+        ),
+        const SizedBox(
+          height: 40,
         )
       ],
     );
@@ -169,7 +181,8 @@ class _ImageSelection extends StatelessWidget {
             ),
           ),
           Container(
-            margin: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.only(
+                top: 16.0, bottom: 8.0, left: 8.0, right: 8.0),
             child: ElevatedButton(
               onPressed: () {
                 pageController.nextPage(
@@ -189,6 +202,7 @@ class _ImageSelection extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 40)
         ],
       );
     });
@@ -221,11 +235,13 @@ class _LocationSelection extends StatelessWidget {
   }
 }
 
+final Completer<GoogleMapController> _mapController =
+    Completer<GoogleMapController>();
+
 class _MapAndSearchBar extends StatelessWidget {
   _MapAndSearchBar({super.key});
 
   final TextEditingController _searchBarController = TextEditingController();
-  late GoogleMapController _mapController;
 
   @override
   Widget build(BuildContext context) {
@@ -238,8 +254,8 @@ class _MapAndSearchBar extends StatelessWidget {
             GoogleMap(
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
-              onMapCreated: (GoogleMapController controller) async {
-                _mapController = controller;
+              onMapCreated: (GoogleMapController controller) {
+                _mapController.complete(controller);
               },
               initialCameraPosition: CameraPosition(
                 target: state.usersLocation,
@@ -283,7 +299,7 @@ class _MapAndSearchBar extends StatelessWidget {
                     ),
                   ),
                   isLatLngRequired: true,
-                  getPlaceDetailWithLatLng: (Prediction prediction) {
+                  getPlaceDetailWithLatLng: (Prediction prediction) async {
                     if (prediction.lat == null || prediction.lng == null) {
                       return;
                     }
@@ -298,8 +314,7 @@ class _MapAndSearchBar extends StatelessWidget {
                     LatLng latLng = LatLng(lat, lng);
 
                     addSpotCubit.locationChanged(location: latLng);
-                    _mapController
-                        .animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
+                    animateCameraToNewLatLng(latLng);
                   },
                   itemClick: (Prediction prediction) {
                     _searchBarController.text = prediction.description ?? "";
@@ -325,6 +340,11 @@ class _MapAndSearchBar extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> animateCameraToNewLatLng(LatLng location) async {
+    final GoogleMapController controller = await _mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(location, 14));
   }
 }
 

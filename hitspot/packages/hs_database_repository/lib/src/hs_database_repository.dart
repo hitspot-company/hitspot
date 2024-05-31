@@ -11,6 +11,7 @@ import 'package:hs_database_repository/src/hs_database_repository_trips.dart';
 import 'package:hs_database_repository/src/hs_database_repository_users.dart';
 import 'package:hs_database_repository/src/hs_database_repository_spots.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HSDatabaseRepository {
   const HSDatabaseRepository();
@@ -55,8 +56,13 @@ class HSDatabaseRepository {
   }
 
   Future<void> createSpot(
-          {required String title, required List<XFile> images}) async =>
-      await _spotsRepository.createSpot(title, images);
+          {required String userID,
+          required LatLng location,
+          required String title,
+          required String description,
+          required List<XFile> images}) async =>
+      await _spotsRepository.createSpot(
+          userID, location, title, description, images);
 
   Future<bool> userIsUsernameAvailable(String username) async =>
       await _usersRepository.isUsernameAvailable(username);
