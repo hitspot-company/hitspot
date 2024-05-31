@@ -29,7 +29,7 @@ class HSAddSpotCubit extends Cubit<HSAddSpotCubitState> {
   Future<void> createSpot() async {
     HSDebugLogger.logInfo("Creating spot");
     await _hsDatabaseRepository.createSpot(
-      userID: HSApp.instance.authRepository.currentUser?.uid ?? "",
+      userID: HSApp.instance.currentUser.uid ?? "",
       location: state.selectedLocation,
       title: state.title,
       description: state.description,

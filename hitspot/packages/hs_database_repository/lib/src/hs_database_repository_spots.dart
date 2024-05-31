@@ -38,6 +38,8 @@ class HSSpotsRepository {
         numberOfImagesUploaded: images.length);
 
     // Create geo hash based on latitude & longitude
+    GeoFirePoint geoLocation = geoHashManager.point(
+        latitude: location.latitude, longitude: location.longitude);
 
     // Save HSSpot to database
     final _convertedImages =
@@ -58,18 +60,13 @@ class HSSpotsRepository {
       spot.uid = docRef.id;
 
       // Save images & their thumbnails to Firebase storage
-      final storageRef = spotImagesStorage.ref();
+      final storageRef = spotImagesStorage.ref().child(spot.ownersId);
       final spotStorageRef = storageRef.child(spot.uid);
 
       for (int i = 0; i < spot.numberOfImagesUploaded; i++) {
-        final imageSpotStorageRef = spotStorageRef.child("${i.toString()}.jpg");
+        final imageSpotStorageRef = spotStorageRef.child("${i.toString()}/");
         final imageThumbnailSpotStorageRef =
-            spotStorageRef.child("thumbnail_${i.toString()}.jpg");
-
-        // Save images & thumbnails URLs to spot
-        spot.fullImages.add(await imageSpotStorageRef.getDownloadURL());
-        spot.imageThumbnails
-            .add(await imageThumbnailSpotStorageRef.getDownloadURL());
+            spotStorageRef.child("thumbnail_${i.toString()}/");
 
         try {
           await imageSpotStorageRef.putFile(images[i]);
@@ -78,6 +75,10 @@ class HSSpotsRepository {
           throw DatabaseRepositoryFailure(
               "There was an error in adding spot's images to database!");
         }
+        // Save images & thumbnails URLs to spot
+        spot.fullImages.add(await imageSpotStorageRef.getDownloadURL());
+        spot.imageThumbnails
+            .add(await imageThumbnailSpotStorageRef.getDownloadURL());
       }
 
       // Update current data with image URLs saved
@@ -148,8 +149,7 @@ class HSSpotsRepository {
           width: _THUMBNAIL_SIZE, height: _THUMBNAIL_SIZE);
 
       final Directory temp = await getTemporaryDirectory();
-      File thumbnailAsFile =
-          File('${temp.path}/images_thumbnails/${basename(input.path)}.jpg');
+      File thumbnailAsFile = File('${temp.path}/${basename(input.path)}');
 
       await thumbnailAsFile.writeAsBytes(img.encodeJpg(thumbnail));
 
