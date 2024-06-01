@@ -23,10 +23,13 @@ class HSScaffold extends StatelessWidget {
   final bool resizeToAvoidBottomInset;
   final Color? backgroundColor;
 
+  static void hideInput() =>
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => SystemChannels.textInput.invokeMethod('TextInput.hide'),
+      onTap: hideInput,
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(

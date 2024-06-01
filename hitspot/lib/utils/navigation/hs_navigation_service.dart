@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/home/view/home_page.dart';
-import 'package:hitspot/login/view/login_page.dart';
-import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
-import 'package:hitspot/register/view/register_page.dart';
+import 'package:hitspot/features/home/view/home_page.dart';
+import 'package:hitspot/features/login/view/login_provider.dart';
+import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
+import 'package:hitspot/features/register/view/register_page.dart';
 
 class HSNavigationService {
   // SINGLETON
@@ -23,9 +23,12 @@ class HSNavigationService {
     return navigatorKey.currentState?.pushNamed(route, arguments: arguments);
   }
 
-  dynamic pop() {
-    return navigatorKey.currentState?.pop();
+  dynamic pop([bool shouldUpdate = false]) {
+    return navigatorKey.currentState?.pop(shouldUpdate);
   }
+
+  dynamic logout() =>
+      navigatorKey.currentState?.popUntil((route) => route.isFirst);
 }
 
 class _HSRoutes {
@@ -39,7 +42,7 @@ class _HSRoutes {
       case '/home':
         return MaterialPageRoute(builder: (context) => const HomePage());
       case '/login':
-        return MaterialPageRoute(builder: (context) => const LoginPage());
+        return MaterialPageRoute(builder: (context) => const LoginProvider());
       case '/register':
         return MaterialPageRoute(builder: (context) => const RegisterPage());
       case '/profile_completion':

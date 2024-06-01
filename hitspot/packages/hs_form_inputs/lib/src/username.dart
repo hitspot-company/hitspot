@@ -29,13 +29,13 @@ class Username extends FormzInput<String, UsernameValidationError> {
   /// {@macro username}
   const Username.dirty([super.value = '']) : super.dirty();
 
-  static final RegExp _usernameRegExp = RegExp(
+  static final RegExp usernameRegExp = RegExp(
     r'^[a-z0-9_]{5,16}$',
   );
 
   @override
   UsernameValidationError? validator(String? value) {
-    if (_usernameRegExp.hasMatch(value ?? ''))
+    if (usernameRegExp.hasMatch(value ?? ''))
       return null;
     else if (value!.length < 5)
       return UsernameValidationError.short;
@@ -45,5 +45,14 @@ class Username extends FormzInput<String, UsernameValidationError> {
       return UsernameValidationError.notLowerCase;
     else
       return UsernameValidationError.invalid;
+  }
+
+  static String validateUsername(String value) {
+    String ret = "Username should be:";
+    if (value.length < 5) ret += "\n· at least 5 characters long";
+    if (value.length > 16)
+      ret += "\n· at most 16 characters long";
+    else if (value.contains(RegExp(r'[A-Z]'))) ret += "\n· lowercase";
+    return ret;
   }
 }

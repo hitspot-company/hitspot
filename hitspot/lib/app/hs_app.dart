@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_search_repository/hs_search.dart';
+import 'package:hs_theme_repository/hs_theme.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 class HSApp {
@@ -23,11 +26,14 @@ class HSApp {
   // THEMING
   HSThemeBloc get themeBloc => BlocProvider.of<HSThemeBloc>(context!);
   HSTheme get theme => HSTheme.instance;
-  ThemeData get currentTheme => theme.currentTheme(context);
-  TextTheme get textTheme => theme.textTheme(context);
+  ThemeData get currentTheme => theme.currentTheme;
+  TextTheme get textTheme => theme.textTheme;
   TextStyle? get headlineMedium => textTheme.headlineMedium;
   Color? get textFieldFillColor => theme.textfieldFillColor;
   void changeTheme() => themeBloc.add(HSThemeSwitchEvent());
+  double get screenWidth => MediaQuery.of(context!).size.width;
+  double get screenHeight => MediaQuery.of(context!).size.height;
+  HSThemeRepository get themeRepository => HSThemeRepository.instance;
 
   // POPUPS
   HSToasts get toasts => HSToasts.instance;
@@ -52,7 +58,10 @@ class HSApp {
       context!.read<HSAuthenticationRepository>();
   HSAuthenticationBloc get authBloc =>
       BlocProvider.of<HSAuthenticationBloc>(context!);
-  void logout() => authBloc.add(const HSAppLogoutRequested());
+  void logout() {
+    authBloc.add(const HSAppLogoutRequested());
+    navi.logout();
+  }
 
   // CURRENT USER
   HSUser get currentUser => authBloc.state.user;
@@ -61,4 +70,8 @@ class HSApp {
   // DATABASE
   HSDatabaseRepository get databaseRepository =>
       context!.read<HSDatabaseRepository>();
+
+  // Full Text Search
+  HSSearchRepository get searchRepository =>
+      context!.read<HSSearchRepository>();
 }

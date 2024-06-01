@@ -6,11 +6,48 @@ class HSUsersRepository {
   static final _db = FirebaseFirestore.instance;
   final _usersCollection = _db.collection("users");
 
+  Future<void> followUser(HSUser currentUser, HSUser user) async {
+    try {
+      await _usersCollection.doc(user.uid).update({
+        HSUserField.followers.name: FieldValue.arrayUnion([currentUser.uid])
+      });
+      await _usersCollection.doc(currentUser.uid).update({
+        HSUserField.following.name: FieldValue.arrayUnion([user.uid])
+      });
+    } catch (_) {
+      throw DatabaseConnectionFailure("The user could not be followed.");
+    }
+  }
+
+  Future<void> unfollowUser(HSUser currentUser, HSUser user) async {
+    try {
+      await _usersCollection.doc(user.uid).update({
+        HSUserField.followers.name: FieldValue.arrayRemove([currentUser.uid])
+      });
+      await _usersCollection.doc(currentUser.uid).update({
+        HSUserField.following.name: FieldValue.arrayRemove([user.uid])
+      });
+    } catch (_) {
+      throw DatabaseConnectionFailure("The user could not be unfollowed.");
+    }
+  }
+
+  Future<void> updateField(HSUser user, String field, String newValue) async {
+    try {
+      await _usersCollection.doc(user.uid).update({
+        field: newValue,
+      }).timeout(const Duration(seconds: 3));
+    } catch (_) {
+      throw DatabaseConnectionFailure("The field $field could not be updated.");
+    }
+  }
+
   Future<void> completeUserProfile(HSUser user) async {
+    final now = Timestamp.now();
     try {
       await _usersCollection
           .doc(user.uid)
-          .update(user.serialize())
+          .update(user.copyWith(createdAt: now).serialize())
           .timeout(const Duration(seconds: 3));
     } catch (_) {
       throw const DatabaseConnectionFailure('An unknown exception occured');
@@ -34,7 +71,7 @@ class HSUsersRepository {
       DocumentSnapshot snapshot = await _usersCollection
           .doc(uid)
           .get()
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 5));
 
       // If user is not in database return null
       if (!snapshot.exists) {
@@ -46,7 +83,7 @@ class HSUsersRepository {
 
       return HSUser.deserialize(snapshotInJson, uid: snapshot.id);
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      return null;
     }
   }
 

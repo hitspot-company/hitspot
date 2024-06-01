@@ -4,18 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/home/view/home_page.dart';
-import 'package:hitspot/profile_incomplete/view/profile_completion_page.dart';
-import 'package:hitspot/splash/view/splash_page.dart';
+import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/home/view/home_page.dart';
+import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
+import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
-import 'package:hitspot/login/view/login_page.dart';
+import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
-import 'package:hitspot/verify_email/view/verify_email_page.dart';
+import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
 import 'package:hs_mailing_repository/hs_mailing_repository.dart';
+import 'package:hs_search_repository/hs_search.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 
 void main() async {
@@ -24,14 +25,16 @@ void main() async {
   await FlutterConfig.loadEnvVariables();
   final authenticationRepository = HSAuthenticationRepository();
   final databaseRepository = HSDatabaseRepository();
-  final themeRepository = HSThemeRepository();
+  final themeRepository = HSThemeRepository.instance;
   final mailingRepository = HSMailingRepository();
+  final searchRepository = HSSearchRepository();
   Animate.restartOnHotReload = true;
 
   // Bind Firebase authentication stream to our HSUser
   await authenticationRepository.user.first;
   runApp(App(
     mailingRepository: mailingRepository,
+    searchRepository: searchRepository,
     themeRepository: themeRepository,
     authenticationRepository: authenticationRepository,
     databaseRepository: databaseRepository,
@@ -43,16 +46,19 @@ class App extends StatelessWidget {
   final HSDatabaseRepository _databaseRepository;
   final HSThemeRepository _themeRepository;
   final HSMailingRepository _mailingRepository;
+  final HSSearchRepository _searchRepository;
 
   const App(
       {required HSThemeRepository themeRepository,
       required HSAuthenticationRepository authenticationRepository,
       required HSDatabaseRepository databaseRepository,
       required HSMailingRepository mailingRepository,
+      required HSSearchRepository searchRepository,
       super.key})
       : _themeRepository = themeRepository,
         _authenticationRepository = authenticationRepository,
         _mailingRepository = mailingRepository,
+        _searchRepository = searchRepository,
         _databaseRepository = databaseRepository;
   @override
   Widget build(BuildContext context) {
@@ -66,6 +72,9 @@ class App extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => HSMailingRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => HSSearchRepository(),
         ),
       ],
       child: MultiBlocProvider(
@@ -118,7 +127,7 @@ class _HSFlowBuilder extends StatelessWidget {
         if (appStatus == HSAppStatus.loading)
           SplashPage.page()
         else if (appStatus == HSAppStatus.unauthenticated)
-          LoginPage.page()
+          LoginProvider.page()
         else if (appStatus == HSAppStatus.emailNotVerified)
           VerifyEmailPage.page()
         else if (appStatus == HSAppStatus.profileNotCompleted)
