@@ -147,7 +147,7 @@ class HSSpotsRepository {
 
   Future<File> createThumbnailFromImage(File input) async {
     try {
-      List<int> inputImageInBytes = input.readAsBytesSync();
+      Uint8List inputImageInBytes = input.readAsBytesSync();
       img.Image? inputImage = img.decodeImage(inputImageInBytes);
 
       if (inputImage == null) {

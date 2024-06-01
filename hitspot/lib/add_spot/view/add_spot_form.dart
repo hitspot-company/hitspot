@@ -16,7 +16,6 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hitspot/add_spot/cubit/hs_add_spot_cubit_cubit.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
 import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_searchbar.dart';
@@ -25,8 +24,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:location/location.dart';
 import 'package:path/path.dart';
-import 'package:search_map_location/search_map_location.dart';
-import 'package:search_map_location/utils/google_search/place.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 
@@ -78,6 +75,7 @@ class _TextInput extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.all(8.0),
                   child: TextField(
+                    enabled: !_addSpotCubit.state.isLoading,
                     onChanged: (value) => _addSpotCubit.titleChanged(
                         title: _titleController.text),
                     controller: _titleController,
@@ -90,6 +88,7 @@ class _TextInput extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.all(8.0),
                   child: TextField(
+                    enabled: !_addSpotCubit.state.isLoading,
                     onChanged: (value) => _addSpotCubit.descriptionChanged(
                         description: _descriptionController.text),
                     controller: _descriptionController,

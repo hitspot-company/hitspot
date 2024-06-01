@@ -61,7 +61,7 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
         emitChanged(event, emit, followed: followed, user: readyState.user!);
         HSDebugLogger.logSuccess(followed ? "Followed" : "Unfollowed");
       }
-    } on DatabaseConnectionFailure catch (_) {
+    } on DatabaseRepositoryFailure catch (_) {
       HSDebugLogger.logWarning(_.message);
     } catch (_) {
       HSDebugLogger.logWarning(_.toString());

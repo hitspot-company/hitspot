@@ -1,64 +1,48 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/add_spot/view/add_spot_page.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
+import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_searchbar.dart';
-import 'package:hitspot/widgets/hs_spots_grid.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  static Page<void> page() => const MaterialPage<void>(child: HomePage());
   static Route<void> route() {
     return MaterialPageRoute<void>(builder: (_) => const HomePage());
   }
 
-  static Page<void> page() => const MaterialPage<void>(child: HomePage());
-
   @override
   Widget build(BuildContext context) {
-    final app = HSApp.instance;
-    final navi = app.navigation;
+    final hsApp = HSApp.instance;
+    final hsNavigation = hsApp.navigation;
+
     return HSScaffold(
-      defaultBottombarEnabled: true,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            automaticallyImplyLeading: false,
             surfaceTintColor: Colors.transparent,
-            title: Align(
-              alignment: Alignment.centerLeft,
-              child: Image.asset(
-                HSAssets.instance.textLogo,
-                height: 30,
-                alignment: Alignment.centerLeft,
-              ),
+            title: Image.asset(
+              HSAssets.instance.textLogo,
+              height: 30,
             ),
             actions: <Widget>[
               IconButton(
-                icon: CircleAvatar(
-                  foregroundImage: app.currentUser.profilePicture != null
-                      ? NetworkImage(app.currentUser.profilePicture!)
-                      : null,
-                  child: app.currentUser.profilePicture == null
-                      ? const Icon(FontAwesomeIcons.solidUser)
-                      : null,
-                ),
-                onPressed: () => navi.navigatorKey.currentState?.push(
-                  UserProfileProvider.route(currentUser.uid!),
-                ),
-              ),
+                icon: const Icon(FontAwesomeIcons.bell),
+                onPressed: HSApp.instance.logout,
+              ), // HSDebugLogger.logInfo("Notification"),
             ],
             floating: true,
             pinned: true,
           ),
           SliverAppBar(
-            automaticallyImplyLeading: false,
             surfaceTintColor: Colors.transparent,
             centerTitle: false,
             title: Text.rich(
@@ -67,13 +51,14 @@ class HomePage extends StatelessWidget {
                   children: [
                     TextSpan(
                         text: HSApp.instance.username,
-                        style: textTheme.headlineMedium),
+                        style: HSApp.instance.textTheme.headlineSmall),
                     TextSpan(
                         text: " ,\nWhere would you like to go?",
-                        style: HSApp.instance.textTheme.headlineLarge!.hintify),
+                        style:
+                            HSApp.instance.textTheme.headlineSmall!.hintify()),
                   ],
                 ),
-                style: HSApp.instance.textTheme.headlineMedium!.hintify),
+                style: HSApp.instance.textTheme.headlineSmall!.hintify()),
             floating: true,
             pinned: true,
           ),
@@ -81,7 +66,6 @@ class HomePage extends StatelessWidget {
             child: Gap(16.0),
           ),
           const SliverAppBar(
-            automaticallyImplyLeading: false,
             surfaceTintColor: Colors.transparent,
             stretch: true,
             title: HSSearchBar(
@@ -96,7 +80,13 @@ class HomePage extends StatelessWidget {
               height: 32.0,
             ),
           ),
-          HSSpotsGrid.loading(isSliver: true)
+          SliverToBoxAdapter(
+            child: CupertinoButton(
+              onPressed: HSApp.instance.changeTheme,
+              color: HSApp.instance.theme.mainColor,
+              child: const Text("Change theme!"),
+            ),
+          )
         ],
       ),
       bottomAppBar: BottomAppBar(
@@ -107,7 +97,7 @@ class HomePage extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () {
-                  navi.push(AddSpotPage.route());
+                  hsNavigation.push(AddSpotPage.route());
                 },
               ),
             ],

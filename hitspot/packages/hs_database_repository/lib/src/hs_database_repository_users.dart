@@ -15,7 +15,7 @@ class HSUsersRepository {
         HSUserField.following.name: FieldValue.arrayUnion([user.uid])
       });
     } catch (_) {
-      throw DatabaseConnectionFailure("The user could not be followed.");
+      throw DatabaseRepositoryFailure("The user could not be followed.");
     }
   }
 
@@ -28,7 +28,7 @@ class HSUsersRepository {
         HSUserField.following.name: FieldValue.arrayRemove([user.uid])
       });
     } catch (_) {
-      throw DatabaseConnectionFailure("The user could not be unfollowed.");
+      throw DatabaseRepositoryFailure("The user could not be unfollowed.");
     }
   }
 
@@ -38,7 +38,7 @@ class HSUsersRepository {
         field: newValue,
       }).timeout(const Duration(seconds: 3));
     } catch (_) {
-      throw DatabaseConnectionFailure("The field $field could not be updated.");
+      throw DatabaseRepositoryFailure("The field $field could not be updated.");
     }
   }
 
@@ -78,7 +78,6 @@ class HSUsersRepository {
       return HSUser.deserialize(snapshotInJson, uid: snapshot.id);
     } catch (_) {
       throw DatabaseRepositoryFailure('An unknown exception occured');
-      return null;
     }
   }
 

@@ -48,7 +48,8 @@ class HSDatabaseRepository {
 
   Future<HSUser?> userGet(String uid) async {
     try {
-      final HSUser? user = await _usersRepository.getUserFromDatabase(uid);
+      HSUser? user = await _usersRepository.getUserFromDatabase(uid);
+      if (user == null) throw DatabaseRepositoryFailure("The user is null");
       return (user);
     } catch (e) {
       throw DatabaseConnectionFailure("The user could not be fetched");
