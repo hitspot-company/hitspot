@@ -46,7 +46,7 @@ class HSSpotsRepository {
     // Save HSSpot to database
     final _convertedImages =
         images.map<File>((xfile) => File(xfile.path)).toList();
-    addSpotToDatabase(newSpot, _convertedImages);
+    await addSpotToDatabase(newSpot, _convertedImages);
   }
 
   Future<void> addSpotToDatabase(HSSpot spot, List<File> images) async {

@@ -17,6 +17,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hitspot/add_spot/cubit/hs_add_spot_cubit_cubit.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/authentication/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_searchbar.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
@@ -67,63 +68,76 @@ class _TextInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final _addSpotCubit = context.read<HSAddSpotCubit>();
 
-    return Column(
-      children: [
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                margin: EdgeInsets.all(8.0),
-                child: TextField(
-                  onChanged: (value) =>
-                      _addSpotCubit.titleChanged(title: _titleController.text),
-                  controller: _titleController,
-                  decoration: const InputDecoration(
-                    hintText: 'Title',
-                    border: OutlineInputBorder(),
+    return Stack(children: [
+      Column(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.all(8.0),
+                  child: TextField(
+                    onChanged: (value) => _addSpotCubit.titleChanged(
+                        title: _titleController.text),
+                    controller: _titleController,
+                    decoration: const InputDecoration(
+                      hintText: 'Title',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.all(8.0),
-                child: TextField(
-                  onChanged: (value) => _addSpotCubit.descriptionChanged(
-                      description: _descriptionController.text),
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    hintText: 'Description',
-                    border: OutlineInputBorder(),
+                Container(
+                  margin: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    onChanged: (value) => _addSpotCubit.descriptionChanged(
+                        description: _descriptionController.text),
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(
+                      hintText: 'Description',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 5,
                   ),
-                  maxLines: 5,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                _addSpotCubit.isLoadingChanged(isLoading: true);
+                await _addSpotCubit.createSpot();
+                _addSpotCubit.isLoadingChanged(isLoading: false);
+                HSApp.instance.navigation.pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
                 ),
               ),
-            ],
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () {
-              _addSpotCubit.createSpot();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+              child: const Text(
+                'SAVE SPOT',
+                style: TextStyle(color: Colors.black, letterSpacing: 0.5),
               ),
             ),
-            child: const Text(
-              'SAVE SPOT',
-              style: TextStyle(color: Colors.black, letterSpacing: 0.5),
-            ),
           ),
-        ),
-        const SizedBox(
-          height: 40,
-        )
-      ],
-    );
+          const SizedBox(
+            height: 40,
+          )
+        ],
+      ),
+      BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
+          builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return const SizedBox.shrink();
+        }
+      })
+    ]);
   }
 }
 
@@ -255,6 +269,9 @@ class _MapAndSearchBar extends StatelessWidget {
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               onMapCreated: (GoogleMapController controller) {
+                if (_mapController.isCompleted) {
+                  return;
+                }
                 _mapController.complete(controller);
               },
               initialCameraPosition: CameraPosition(
