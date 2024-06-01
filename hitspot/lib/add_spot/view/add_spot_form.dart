@@ -303,7 +303,7 @@ class _LocationSelection extends StatelessWidget {
   }
 }
 
-final Completer<GoogleMapController> _mapController =
+Completer<GoogleMapController> _mapController =
     Completer<GoogleMapController>();
 
 class _MapAndSearchBar extends StatelessWidget {
@@ -324,7 +324,7 @@ class _MapAndSearchBar extends StatelessWidget {
               myLocationButtonEnabled: true,
               onMapCreated: (GoogleMapController controller) {
                 if (_mapController.isCompleted) {
-                  return;
+                  _mapController = Completer<GoogleMapController>();
                 }
                 _mapController.complete(controller);
               },
