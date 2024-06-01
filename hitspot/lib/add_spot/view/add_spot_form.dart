@@ -131,7 +131,17 @@ class _TextInput extends StatelessWidget {
       BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
           builder: (context, state) {
         if (state.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Stack(
+            children: [
+              Opacity(
+                opacity: 0.8,
+                child: ModalBarrier(dismissible: false, color: Colors.black),
+              ),
+              Center(
+                child: CircularProgressIndicator(),
+              )
+            ],
+          );
         } else {
           return const SizedBox.shrink();
         }
