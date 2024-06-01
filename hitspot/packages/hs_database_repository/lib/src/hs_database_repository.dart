@@ -27,6 +27,9 @@ class HSDatabaseRepository {
   Future<void> userUnfollow(HSUser currentUser, HSUser user) async =>
       await _usersRepository.unfollowUser(currentUser, user);
 
+  Future<void> userDelete({required HSUser user}) async =>
+      _usersRepository.delete(user);
+
   Future<void> userUpdateField(
           HSUser user, String field, String newValue) async =>
       _usersRepository.updateField(user, field, newValue);

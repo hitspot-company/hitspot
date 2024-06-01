@@ -112,16 +112,18 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
         birthday: state.birthdayVal,
         profilePicture: avatarUrl,
         createdAt: Timestamp.now(),
+        isProfileCompleted: true,
       );
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 1));
       HSDebugLogger.logInfo(user.toString());
-      // app.updateCurrentUser(user);
-      emit(state.copyWith(completeProfileStatus: HSCompleteProfileStatus.idle));
+      await _databaseRepository.userUpdate(user);
+      app.updateCurrentUser(user);
     } catch (_) {
       HSDebugLogger.logError("Error submiting: $_");
       app.showToast(
           toastType: HSToastType.error,
           title: "Error",
+          alignment: Alignment.bottomCenter,
           description: "Error submitting your data. Please try again later.");
       emit(
           state.copyWith(completeProfileStatus: HSCompleteProfileStatus.error));

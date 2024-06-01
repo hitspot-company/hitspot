@@ -8,6 +8,12 @@ final class HSAppLogoutRequested extends HSAuthenticationEvent {
   const HSAppLogoutRequested();
 }
 
+final class HSAuthenticationDeleteAccountEvent extends HSAuthenticationEvent {
+  const HSAuthenticationDeleteAccountEvent({required this.user});
+
+  final HSUser user;
+}
+
 final class HSAppUserChanged extends HSAuthenticationEvent {
   final HSUser? user;
 

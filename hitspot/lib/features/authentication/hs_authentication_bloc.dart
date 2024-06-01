@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -28,6 +29,7 @@ class HSAuthenticationBloc
         _mailingRepository = mailingRepository,
         super(const HSAuthenticationState.loading()) {
     on<HSAppUserChanged>(_onUserChanged);
+    on<HSAuthenticationDeleteAccountEvent>(_deleteRequested);
     on<HSAppLogoutRequested>(_onLogoutRequested);
   }
 
@@ -39,7 +41,7 @@ class HSAuthenticationBloc
     HSDebugLogger.logInfo("Initialized");
   }
 
-  void updateCurrentUser(HSUser user) => add(HSAppUserChanged(user));
+  void updateCurrentUser(HSUser? user) => add(HSAppUserChanged(user));
 
   void _onUserChanged(
       HSAppUserChanged event, Emitter<HSAuthenticationState> emit) async {
@@ -95,9 +97,27 @@ class HSAuthenticationBloc
     }
   }
 
+  void requestDelete({required HSUser user}) =>
+      add(HSAuthenticationDeleteAccountEvent(user: user));
+
   void _onLogoutRequested(
       HSAppLogoutRequested event, Emitter<HSAuthenticationState> emit) {
     unawaited(_authenticationRepository.logOut());
+  }
+
+//00008101-00084D0A0A21001E
+
+  void _deleteRequested(HSAuthenticationDeleteAccountEvent event,
+      Emitter<HSAuthenticationState> emit) async {
+    try {
+      HSDebugLogger.logInfo("Delete request of account ${event.user.uid}");
+      // await _authenticationRepository.deleteAccount(); // TODO: Reauthenticate to remove firebase_auth account
+      await _databaseRepository.userDelete(user: event.user);
+      app.logout();
+      updateCurrentUser(null);
+    } catch (_) {
+      HSDebugLogger.logError("Error deleting account: $_");
+    }
   }
 
   @override

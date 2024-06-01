@@ -24,6 +24,7 @@ class CompleteProfilePage extends StatelessWidget {
     return HSScaffold(
       appBar: HSAppBar(
         enableDefaultBackButton: true,
+        defaultBackButtonCallback: app.logout,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,9 +255,10 @@ class _FifthPage extends StatelessWidget {
                   );
                 case HSCompleteProfileStatus.loading:
                   return const HSFormButton(
-                      child: HSLoadingIndicator(
-                    size: 24.0,
-                  ));
+                    child: HSLoadingIndicator(
+                      size: 24.0,
+                    ),
+                  );
               }
             },
           ),

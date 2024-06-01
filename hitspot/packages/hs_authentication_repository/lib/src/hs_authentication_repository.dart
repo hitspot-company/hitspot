@@ -144,6 +144,14 @@ class HSAuthenticationRepository {
       throw LogOutFailure();
     }
   }
+
+  Future<void> deleteAccount() async {
+    try {
+      await _firebaseAuth.currentUser?.delete();
+    } catch (_) {
+      rethrow;
+    }
+  }
 }
 
 extension on firebase_auth.User {

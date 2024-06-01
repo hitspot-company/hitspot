@@ -98,4 +98,58 @@ class HSUsersRepository {
       throw const DatabaseConnectionFailure('An unknown exception occured');
     }
   }
+
+  Future<void> _removeProperty(
+      {required List? ids, required CollectionReference collection}) async {
+    try {
+      if (ids == null || ids.length == 0) return;
+      for (var i = 0; i < ids.length; i++) {
+        await collection.doc(ids[i]).delete();
+      }
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> _removeLinked({
+    required List? ids,
+    required CollectionReference collection,
+    required String fieldName,
+    required String userID,
+  }) async {
+    try {
+      if (ids == null || ids.isEmpty) return;
+      for (var i = 0; i < ids.length; i++) {
+        await collection.doc(ids[i]).update({
+          fieldName: FieldValue.arrayRemove([userID])
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> delete(HSUser user) async {
+    try {
+      final HSUser? updatedUser = await getUserFromDatabase(user.uid!);
+      if (updatedUser == null) return;
+      await _removeProperty(
+          ids: updatedUser.trips, collection: _db.collection("trips"));
+      await _removeProperty(
+          ids: updatedUser.boards, collection: _db.collection("boards"));
+      await _removeProperty(
+          ids: updatedUser.spots, collection: _db.collection("spots"));
+      await _removeLinked(
+          ids: updatedUser.followers,
+          collection: _usersCollection,
+          fieldName: "following",
+          userID: updatedUser.uid!);
+      await _removeLinked(
+          ids: updatedUser.following,
+          collection: _usersCollection,
+          fieldName: "followers",
+          userID: updatedUser.uid!);
+      await _usersCollection.doc(updatedUser.uid!).delete();
+    } catch (_) {
+      throw DatabaseConnectionFailure("The user could not be deleted: $_");
+    }
+  }
 }
