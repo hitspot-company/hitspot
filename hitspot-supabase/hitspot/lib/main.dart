@@ -6,6 +6,7 @@ import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_storage_repository/hs_storage_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -38,6 +39,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => HSDatabaseRepsitory(supabase),
+        ),
+        RepositoryProvider(
+          create: (context) => HSStorageRepository(supabase),
         )
       ],
       child: MultiBlocProvider(

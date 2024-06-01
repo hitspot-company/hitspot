@@ -11,8 +11,10 @@ import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hs_storage_repository/hs_storage_repository.dart';
 // import 'package:hs_toasts/hs_toasts.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'hs_complete_profile_state.dart';
 
@@ -21,6 +23,7 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
 
   final PageController pageController = PageController();
   final HSDatabaseRepsitory _databaseRepository = app.databaseRepository;
+  final HSStorageRepository _storageRepository = app.storageRepository;
 
   void nextPage() {
     HSScaffold.hideInput();
@@ -95,40 +98,39 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
   void submit() async {
     emit(
         state.copyWith(completeProfileStatus: HSCompleteProfileStatus.loading));
-    await Future.delayed(const Duration(seconds: 3));
-    emit(state.copyWith(completeProfileStatus: HSCompleteProfileStatus.idle));
-    // try {
-    //   String? avatarUrl;
-    //   if (state.avatarVal != null) {
-    //     final Reference ref = FirebaseStorage.instance
-    //         .ref("users")
-    //         .child(currentUser.uid!)
-    //         .child("avatar");
-    //     avatarUrl =
-    //         await _databaseRepository.uploadFile(File(state.avatar), ref);
-    //   }
-    //   final HSUser user = currentUser.copyWith(
-    //     username: state.usernameVal,
-    //     fullName: state.fullnameVal,
-    //     biogram: state.biogramVal,
-    //     birthday: state.birthdayVal,
-    //     profilePicture: avatarUrl,
-    //     createdAt: Timestamp.now(),
-    //     isProfileCompleted: true,
-    //   );
-    //   await Future.delayed(const Duration(seconds: 1));
-    //   HSDebugLogger.logInfo(user.toString());
-    //   await _databaseRepository.userUpdate(user);
-    //   app.updateCurrentUser(user);
-    // } catch (_) {
-    //   HSDebugLogger.logError("Error submiting: $_");
-    //   app.showToast(
-    //       toastType: HSToastType.error,
-    //       title: "Error",
-    //       alignment: Alignment.bottomCenter,
-    //       description: "Error submitting your data. Please try again later.");
-    //   emit(
-    //       state.copyWith(completeProfileStatus: HSCompleteProfileStatus.error));
-    // }
+    try {
+      String? avatarUrl;
+      if (state.avatarVal != null) {
+        final File file = File(state.avatarVal!);
+        avatarUrl = await _storageRepository.fileUploadAndFetchPublicUrl(
+            file: file,
+            bucketName: _storageRepository.avatarsBucket,
+            uploadPath:
+                _storageRepository.userAvatarUploadPath(uid: currentUser!.uid!),
+            fileOptions: const FileOptions(upsert: true));
+      }
+
+      final HSUser user = currentUser!.copyWith(
+        username: state.usernameVal,
+        fullName: state.fullnameVal,
+        biogram: state.biogramVal,
+        birthday: state.birthdayVal,
+        profilePicture: avatarUrl,
+        createdAt: DateTime.now(),
+        isProfileCompleted: true,
+      );
+      await Future.delayed(const Duration(seconds: 3));
+      await _databaseRepository.userUpdate(user: user);
+      app.authenticationBloc.userChangedEvent(user: user);
+      return;
+    } on HSFileException catch (_) {
+      HSDebugLogger.logError(_.toString());
+      emit(
+          state.copyWith(completeProfileStatus: HSCompleteProfileStatus.error));
+    } catch (_) {
+      HSDebugLogger.logError("Error submitting: $_");
+      emit(
+          state.copyWith(completeProfileStatus: HSCompleteProfileStatus.error));
+    }
   }
 }

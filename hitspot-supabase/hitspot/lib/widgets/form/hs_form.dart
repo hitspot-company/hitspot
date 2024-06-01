@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 
 enum HSFormHeadlineType { display, normal, small }
@@ -12,10 +14,8 @@ class HSFormCaption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      // style: textTheme.bodyLarge!.hintify.copyWith(color: color)
-    );
+    return Text(text,
+        style: textTheme.bodyLarge!.hintify.copyWith(color: color));
   }
 }
 
@@ -31,18 +31,15 @@ class HSFormHeadline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     late final TextStyle? textStyle;
-    // switch (headlineType) {
-    //   case HSFormHeadlineType.display:
-    //     textStyle = textTheme.headlineLarge;
-    //   case HSFormHeadlineType.normal:
-    //     textStyle = textTheme.headlineMedium;
-    //   case HSFormHeadlineType.small:
-    //     textStyle = textTheme.headlineSmall;
-    // }
-    return Text(
-      text,
-      //  style: textStyle
-    );
+    switch (headlineType) {
+      case HSFormHeadlineType.display:
+        textStyle = textTheme.headlineLarge;
+      case HSFormHeadlineType.normal:
+        textStyle = textTheme.headlineMedium;
+      case HSFormHeadlineType.small:
+        textStyle = textTheme.headlineSmall;
+    }
+    return Text(text, style: textStyle);
   }
 }
 
@@ -73,7 +70,8 @@ class HSFormButtonsRow extends StatelessWidget {
 }
 
 class HSFormButton extends StatelessWidget {
-  const HSFormButton({this.icon, required this.child, this.onPressed});
+  const HSFormButton(
+      {super.key, this.icon, required this.child, this.onPressed});
 
   final Icon? icon;
   final Widget child;

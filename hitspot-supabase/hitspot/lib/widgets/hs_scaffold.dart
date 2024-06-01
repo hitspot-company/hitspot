@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/constants/constants.dart';
 
 class HSScaffold extends StatelessWidget {
   const HSScaffold({
@@ -79,7 +79,7 @@ class _Bottombar extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.0),
           child: Container(
             height: height,
-            // color: color ?? currentTheme.textfieldFillColor, // TODOL Change
+            color: color ?? appTheme.textfieldFillColor,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List<_BottombarItem>.from(

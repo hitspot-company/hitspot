@@ -1,6 +1,7 @@
 import 'package:hs_authentication_repository/src/models/hs_user.dart';
 import 'package:hs_database_repository/src/users/exceptions/hs_create_user_failure.dart';
 import 'package:hs_database_repository/src/users/exceptions/hs_read_user_failure.dart';
+import 'package:hs_database_repository/src/users/exceptions/hs_update_user_failure.dart';
 import 'package:hs_database_repository/src/users/exceptions/hs_user_exception.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -35,7 +36,16 @@ class HSUsersRepository {
       throw HSReadUserFailure(customDetails: _.toString());
     }
   }
+
   // UPDATE
+  Future<void> update(HSUser user) async {
+    try {
+      await _supabase.from(_users).update(user.serialize()).eq("id", user.uid!);
+      HSDebugLogger.logSuccess("User (${user.uid}) data updated!");
+    } catch (_) {
+      throw HSUpdateUserFailure(customDetails: _.toString());
+    }
+  }
   // DELETE
 
   Future<bool> isUsernameAvailable(String username) async {

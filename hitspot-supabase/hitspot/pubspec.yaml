@@ -45,6 +45,8 @@ dependencies:
     path: packages/hs_authentication_repository
   hs_database_repository:
     path: packages/hs_database_repository
+  hs_storage_repository:
+    path: packages/hs_storage_repository
   hs_debug_logger:
     path: packages/hs_debug_logger
   formz: ^0.7.0
@@ -54,6 +56,9 @@ dependencies:
   image_picker: ^1.1.2
   image_cropper: ^6.0.0
   flex_color_picker: ^3.4.1
+  shimmer: ^3.0.0
+  loading_animation_widget: ^1.2.1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

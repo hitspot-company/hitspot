@@ -25,6 +25,10 @@ class HSAuthenticationBloc
         // 2. The user is signed in
         final HSUser fetchedUser =
             await app.databaseRepository.userRead(user: user);
+        final String publicUrl = await app.storageRepository.fileFetchPublicUrl(
+            bucketName: "avatars",
+            uploadPath: "${fetchedUser.uid}/user_avatar");
+        HSDebugLogger.logSuccess("Public Url: $publicUrl");
         HSDebugLogger.logInfo("Fetched user data: ${fetchedUser.toString()}");
         if (fetchedUser.isProfileCompleted == true) {
           emit(HSAuthenticationAuthenticatedState(currentUser: fetchedUser));
@@ -40,7 +44,7 @@ class HSAuthenticationBloc
     });
     on<HSAuthenticationLogoutEvent>((event, emit) async {
       try {
-        await app.authenticationRepository.logOut();
+        await app.authenticationRepository.signOut();
       } catch (_) {
         HSDebugLogger.logError(_.toString());
       }

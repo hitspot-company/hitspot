@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/widgets/hs_user_avatar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -7,7 +9,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.orange,
+        child: Center(
+          child:
+              HSUserAvatar(radius: 64, imageUrl: currentUser?.profilePicture!),
+        ),
       ),
     );
   }

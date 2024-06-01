@@ -57,9 +57,7 @@ class HSAppBar extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  onPressed: app.navigation.router.pop, // TODO: Change
-                  // defaultBackButtonCallback ??
-                  //     HSApp.instance.navigation.pop,
+                  onPressed: defaultBackButtonCallback ?? app.navigation.pop,
                   icon:
                       Icon(defaultButtonBackIcon ?? FontAwesomeIcons.arrowLeft),
                 ),

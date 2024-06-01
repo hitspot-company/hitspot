@@ -16,6 +16,9 @@ class HSDatabaseRepsitory {
   Future<HSUser> userRead({required HSUser user}) async =>
       await _usersRepository.read(user);
 
+  Future<void> userUpdate({required HSUser user}) async =>
+      await _usersRepository.update(user);
+
   Future<bool> isUsernameAvailable({required String username}) async =>
       await _usersRepository.isUsernameAvailable(username);
 }

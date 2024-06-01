@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/home/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -17,6 +18,7 @@ class HSNavigation {
   }
 
   BuildContext get context => router.configuration.navigatorKey.currentContext!;
+  dynamic pop() => router.pop;
 
   final GoRouter router = GoRouter(
     initialLocation: "/splash",
@@ -29,7 +31,9 @@ class HSNavigation {
               BlocProvider.of<HSAuthenticationBloc>(context)
                   .state
                   .authenticationStatus;
-          if (status != HSAuthenticationStatus.unknown) return "/";
+          if (status != HSAuthenticationStatus.unknown) {
+            return "/protected/home";
+          }
           return null;
         },
       ),
@@ -43,14 +47,15 @@ class HSNavigation {
       ),
       GoRoute(
         path: "/auth",
-        redirect: (context, state) {
-          return "/auth/login";
-        },
+        redirect: _authRedirect,
         routes: [
           GoRoute(
             path: "login",
             builder: (context, state) => const LoginProvider(),
           ),
+          GoRoute(
+              path: "complete_profile",
+              builder: (context, state) => const CompleteProfileProvider()),
         ],
       ),
     ],
@@ -62,9 +67,16 @@ class HSNavigation {
         BlocProvider.of<HSAuthenticationBloc>(_).state.authenticationStatus;
     final String? path = state.uri.queryParameters['from'];
     final String from = path != null ? "?from=$path" : "";
+    if (status != HSAuthenticationStatus.authenticated) return "/auth$from";
+    return null;
+  }
+
+  static FutureOr<String?>? _authRedirect(BuildContext _, GoRouterState state) {
+    final HSAuthenticationStatus status =
+        BlocProvider.of<HSAuthenticationBloc>(_).state.authenticationStatus;
+    final String? path = state.uri.queryParameters['from'];
+    final String from = path != null ? "?from=$path" : "";
     switch (status) {
-      case HSAuthenticationStatus.unknown:
-        return "/auth/splash$from";
       case HSAuthenticationStatus.unauthenitcated:
         return "/auth/login$from";
       case HSAuthenticationStatus.emailNotVerified:
@@ -73,6 +85,8 @@ class HSNavigation {
         return "/auth/complete_profile$from";
       case HSAuthenticationStatus.authenticated:
         return "/protected/home$from";
+      default:
+        return "/auth/login$from";
     }
   }
 }

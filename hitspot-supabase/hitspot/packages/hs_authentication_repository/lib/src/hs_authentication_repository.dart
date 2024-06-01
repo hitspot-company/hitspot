@@ -22,7 +22,7 @@ class HSAuthenticationRepository {
   /// [User.empty] from the [user] Stream.
   ///
   /// Throws a [LogOutFailure] if an exception occurs.
-  Future<void> logOut() async {
+  Future<void> signOut() async {
     try {
       await _supabaseClient.auth.signOut();
     } catch (_) {
