@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 part 'hs_authentication_event.dart';
@@ -12,7 +13,7 @@ part 'hs_authentication_state.dart';
 class HSAuthenticationBloc
     extends Bloc<HSAuthenticationEvent, HSAuthenticationState> {
   HSAuthenticationBloc() : super(const HSAuthenticationInitial()) {
-    on<HSAuthenticationUserChangedEvent>((event, emit) {
+    on<HSAuthenticationUserChangedEvent>((event, emit) async {
       try {
         final HSUser? user = event.user;
         HSDebugLogger.logInfo("initial user: $user");
@@ -22,6 +23,17 @@ class HSAuthenticationBloc
           return;
         }
         // 2. The user is signed in
+        final HSUser fetchedUser =
+            await app.databaseRepository.userRead(user: user);
+        HSDebugLogger.logInfo("Fetched user data: ${fetchedUser.toString()}");
+        if (fetchedUser.isProfileCompleted == true) {
+          emit(HSAuthenticationAuthenticatedState(currentUser: fetchedUser));
+        } else {
+          emit(
+              HSAuthenticationProfileIncompleteState(currentUser: fetchedUser));
+        }
+      } on HSReadUserFailure catch (_) {
+        HSDebugLogger.logError("Failed to read user: $_");
       } catch (_) {
         HSDebugLogger.logError(_.toString());
       }

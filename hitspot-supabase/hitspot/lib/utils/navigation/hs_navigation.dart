@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/home/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
@@ -33,14 +33,26 @@ class HSNavigation {
           return null;
         },
       ),
-      GoRoute(
-          path: "/login", builder: (context, state) => const LoginProvider()),
       GoRoute(path: "/", redirect: (context, state) => "/protected/home"),
       GoRoute(
         path: "/protected",
         redirect: _protectedRedirect,
+        routes: [
+          GoRoute(path: "home", builder: (context, state) => const HomePage())
+        ],
       ),
-      GoRoute(path: "/home", builder: (context, state) => const LoginPage())
+      GoRoute(
+        path: "/auth",
+        redirect: (context, state) {
+          return "/auth/login";
+        },
+        routes: [
+          GoRoute(
+            path: "login",
+            builder: (context, state) => const LoginProvider(),
+          ),
+        ],
+      ),
     ],
   );
 
@@ -49,7 +61,7 @@ class HSNavigation {
     final HSAuthenticationStatus status =
         BlocProvider.of<HSAuthenticationBloc>(_).state.authenticationStatus;
     final String? path = state.uri.queryParameters['from'];
-    final String from = path != null ? "?from=$path" : "null";
+    final String from = path != null ? "?from=$path" : "";
     switch (status) {
       case HSAuthenticationStatus.unknown:
         return "/auth/splash$from";
