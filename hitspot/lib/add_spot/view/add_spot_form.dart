@@ -16,8 +16,11 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hitspot/add_spot/cubit/hs_add_spot_cubit_cubit.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/home/view/home_page.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
+import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_searchbar.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:image_picker/image_picker.dart';
@@ -65,88 +68,103 @@ class _TextInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final _addSpotCubit = context.read<HSAddSpotCubit>();
 
-    return Stack(children: [
-      Column(
-        children: [
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  margin: EdgeInsets.all(8.0),
-                  child: TextField(
-                    enabled: !_addSpotCubit.state.isLoading,
-                    onChanged: (value) => _addSpotCubit.titleChanged(
-                        title: _titleController.text),
-                    controller: _titleController,
-                    decoration: const InputDecoration(
-                      hintText: 'Title',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    enabled: !_addSpotCubit.state.isLoading,
-                    onChanged: (value) => _addSpotCubit.descriptionChanged(
-                        description: _descriptionController.text),
-                    controller: _descriptionController,
-                    decoration: const InputDecoration(
-                      hintText: 'Description',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 5,
-                  ),
-                ),
-              ],
+    return HSScaffold(
+        sidePadding: 0,
+        appBar: HSAppBar(
+            title: "PROVIDE SPOT DETAILS",
+            right: IconButton(
+              icon: const Icon(Icons.close, size: 28),
+              onPressed: () => navi.pop(),
             ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                _addSpotCubit.isLoadingChanged(isLoading: true);
-                await _addSpotCubit.createSpot();
-                _addSpotCubit.isLoadingChanged(isLoading: false);
-                HSApp.instance.navigation.pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: const Text(
-                'SAVE SPOT',
-                style: TextStyle(color: Colors.black, letterSpacing: 0.5),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 40,
-          )
-        ],
-      ),
-      BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
-          builder: (context, state) {
-        if (state.isLoading) {
-          return const Stack(
+            fontSize: 16.0,
+            titleBold: true,
+            enableDefaultBackButton: true,
+            defaultBackButtonCallback: () => pageController.previousPage(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut)),
+        body: Stack(children: [
+          Column(
             children: [
-              Opacity(
-                opacity: 0.8,
-                child: ModalBarrier(dismissible: false, color: Colors.black),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.all(8.0),
+                      child: TextField(
+                        enabled: !_addSpotCubit.state.isLoading,
+                        onChanged: (value) => _addSpotCubit.titleChanged(
+                            title: _titleController.text),
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          hintText: 'Title',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        enabled: !_addSpotCubit.state.isLoading,
+                        onChanged: (value) => _addSpotCubit.descriptionChanged(
+                            description: _descriptionController.text),
+                        controller: _descriptionController,
+                        decoration: const InputDecoration(
+                          hintText: 'Description',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              Center(
-                child: CircularProgressIndicator(),
+              Container(
+                margin: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    _addSpotCubit.isLoadingChanged(isLoading: true);
+                    await _addSpotCubit.createSpot();
+                    _addSpotCubit.isLoadingChanged(isLoading: false);
+                    HSApp.instance.navigation.pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'SAVE SPOT',
+                    style: TextStyle(color: Colors.black, letterSpacing: 0.5),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 40,
               )
             ],
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      })
-    ]);
+          ),
+          BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
+              builder: (context, state) {
+            if (state.isLoading) {
+              return const Stack(
+                children: [
+                  Opacity(
+                    opacity: 0.8,
+                    child:
+                        ModalBarrier(dismissible: false, color: Colors.black),
+                  ),
+                  Center(
+                    child: CircularProgressIndicator(),
+                  )
+                ],
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          })
+        ]));
   }
 }
 
@@ -161,73 +179,88 @@ class _ImageSelection extends StatelessWidget {
 
     return BlocBuilder<HSAddSpotCubit, HSAddSpotCubitState>(
         builder: (context, state) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () async {
-                final pickedImages = await picker.pickMultiImage(limit: 5);
-                addSpotCubit.imagesChanged(images: pickedImages);
-              },
-              child: state.images.isEmpty
-                  ? Container(
-                      width: double.infinity,
-                      height: 300,
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Text(
-                          'Click to select images',
-                          style: TextStyle(fontSize: 18, color: Colors.black54),
-                        ),
-                      ),
-                    )
-                  : CarouselSlider(
-                      options: CarouselOptions(
-                        height: 300,
-                        enlargeCenterPage: true,
-                        enableInfiniteScroll: false,
-                        initialPage: 0,
-                      ),
-                      items: state.images.map((image) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Image.file(
-                              File(image.path),
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        );
-                      }).toList(),
-                    ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(
-                top: 16.0, bottom: 8.0, left: 8.0, right: 8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                pageController.nextPage(
+      return HSScaffold(
+          sidePadding: 0,
+          appBar: HSAppBar(
+              title: "SELECT SPOT IMAGES",
+              right: IconButton(
+                icon: const Icon(Icons.close, size: 28),
+                onPressed: () => navi.pop(),
+              ),
+              fontSize: 16.0,
+              titleBold: true,
+              enableDefaultBackButton: true,
+              defaultBackButtonCallback: () => pageController.previousPage(
                   duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  curve: Curves.easeInOut)),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () async {
+                    final pickedImages = await picker.pickMultiImage(limit: 5);
+                    addSpotCubit.imagesChanged(images: pickedImages);
+                  },
+                  child: state.images.isEmpty
+                      ? Container(
+                          width: double.infinity,
+                          height: 300,
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: Text(
+                              'Click to select images',
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.black54),
+                            ),
+                          ),
+                        )
+                      : CarouselSlider(
+                          options: CarouselOptions(
+                            height: 300,
+                            enlargeCenterPage: true,
+                            enableInfiniteScroll: false,
+                            initialPage: 0,
+                          ),
+                          items: state.images.map((image) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return Image.file(
+                                  File(image.path),
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
                 ),
               ),
-              child: const Text(
-                'NEXT',
-                style: TextStyle(color: Colors.black, letterSpacing: 0.5),
+              Container(
+                margin: const EdgeInsets.only(
+                    top: 16.0, bottom: 8.0, left: 8.0, right: 8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    pageController.nextPage(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'NEXT',
+                    style: TextStyle(color: Colors.black, letterSpacing: 0.5),
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 40)
-        ],
-      );
+              const SizedBox(height: 40)
+            ],
+          ));
     });
   }
 }
@@ -246,13 +279,25 @@ class _LocationSelection extends StatelessWidget {
           addSpotCubit.getCurrentLocation();
           return const Center(child: CircularProgressIndicator());
         }
-        return Stack(children: [
-          _MapAndSearchBar(),
-          _SelectedSpotTile(
-            pageController: pageController,
-          ),
-          const _Pin(),
-        ]);
+        return HSScaffold(
+            sidePadding: 0,
+            appBar: HSAppBar(
+                title: "SELECT LOCATION OF YOUR SPOT",
+                right: IconButton(
+                  icon: const Icon(Icons.close, size: 28),
+                  onPressed: () => navi.pop(),
+                ),
+                fontSize: 16.0,
+                titleBold: true,
+                enableDefaultBackButton: true,
+                defaultBackButtonCallback: () => navi.pop()),
+            body: Stack(children: [
+              _MapAndSearchBar(),
+              _SelectedSpotTile(
+                pageController: pageController,
+              ),
+              const _Pin(),
+            ]));
       },
     );
   }
