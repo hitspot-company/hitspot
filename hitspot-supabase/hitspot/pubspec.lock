@@ -356,6 +356,13 @@ packages:
       relative: true
     source: path
     version: "1.0.0+1"
+  hs_theme_repository:
+    dependency: "direct main"
+    description:
+      path: "packages/hs_theme_repository"
+      relative: true
+    source: path
+    version: "1.0.0+1"
   http:
     dependency: transitive
     description:

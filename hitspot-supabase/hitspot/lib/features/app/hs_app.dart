@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/main.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/utils/pickers/hs_pickers.dart';
@@ -8,6 +9,7 @@ import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_storage_repository/hs_storage_repository.dart';
+import 'package:hs_theme_repository/hs_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSApp {
@@ -50,16 +52,17 @@ class HSApp {
       RepositoryProvider.of<HSDatabaseRepsitory>(context);
 
   // Theme
-  // HSThemeBloc get themeBloc => BlocProvider.of<HSThemeBloc>(context!);
+  HSThemeBloc get themeBloc => BlocProvider.of<HSThemeBloc>(context);
   HSTheme get theme => HSTheme.instance;
   ThemeData get currentTheme => theme.currentTheme;
   TextTheme get textTheme => theme.textTheme;
   TextStyle get headlineMedium => textTheme.headlineMedium!;
   Color get textFieldFillColor => theme.textfieldFillColor;
-  // void changeTheme() => themeBloc.add(HSThemeSwitchEvent());
+  void switchTheme() => themeBloc.add(HSThemeSwitchEvent());
   double get screenWidth => MediaQuery.of(context).size.width;
   double get screenHeight => MediaQuery.of(context).size.height;
-  // HSThemeRepository get themeRepository => HSThemeRepository.instance;
+  HSThemeRepository get themeRepository =>
+      RepositoryProvider.of<HSThemeRepository>(context);
 
   // Storage
   HSStorageRepository get storageRepository =>

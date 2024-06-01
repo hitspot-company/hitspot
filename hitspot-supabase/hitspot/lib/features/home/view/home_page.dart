@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 
 class HomePage extends StatelessWidget {
@@ -8,12 +10,18 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: Center(
-          child:
-              HSUserAvatar(radius: 64, imageUrl: currentUser?.profilePicture!),
-        ),
-      ),
+      body: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: screenWidth,
+            ),
+            HSUserAvatar(radius: 64, imageUrl: currentUser?.profilePicture!),
+            Gap(16.0),
+            HSButton(child: Text("SWITCH"), onPressed: app.switchTheme)
+          ]),
     );
   }
 }

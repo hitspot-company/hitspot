@@ -47,6 +47,8 @@ dependencies:
     path: packages/hs_database_repository
   hs_storage_repository:
     path: packages/hs_storage_repository
+  hs_theme_repository:
+    path: packages/hs_theme_repository
   hs_debug_logger:
     path: packages/hs_debug_logger
   formz: ^0.7.0
