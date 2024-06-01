@@ -31,12 +31,12 @@ class HSSpot {
   double latitude;
   double longitude;
   late int numberOfImagesUploaded;
-  List<ImageUrl> fullImages = [];
-  List<ImageUrl> imageThumbnails = [];
+  List<ImageUrl>? fullImages = List<ImageUrl>.empty(growable: true);
+  List<ImageUrl>? imageThumbnails = List<ImageUrl>.empty(growable: true);
   GeoFirePoint? geoHash;
-  List<UserID> likes = [];
-  List<UserID> saves = [];
-  List<UserID> reposts = [];
+  List<UserID>? likes = List<UserID>.empty(growable: true);
+  List<UserID>? saves = List<UserID>.empty(growable: true);
+  List<UserID>? reposts = List<UserID>.empty(growable: true);
 
   HSSpot(
       {this.uid = "",
@@ -46,12 +46,19 @@ class HSSpot {
       required this.latitude,
       required this.longitude,
       required this.numberOfImagesUploaded,
-      this.fullImages = const [],
-      this.imageThumbnails = const [],
+      this.fullImages,
+      this.imageThumbnails,
       this.geoHash,
-      this.likes = const [],
-      this.saves = const [],
-      this.reposts = const []});
+      this.likes,
+      this.saves,
+      this.reposts}) {
+    this.fullImages = fullImages ?? List<ImageUrl>.empty(growable: true);
+    this.imageThumbnails =
+        imageThumbnails ?? List<ImageUrl>.empty(growable: true);
+    this.likes = likes ?? List<UserID>.empty(growable: true);
+    this.saves = saves ?? List<UserID>.empty(growable: true);
+    this.reposts = reposts ?? List<UserID>.empty(growable: true);
+  }
 
   Map<String, dynamic> serialize() {
     return {
@@ -61,21 +68,13 @@ class HSSpot {
       HSSpotField.latitude.field: latitude,
       HSSpotField.longitude.field: longitude,
       HSSpotField.numberOfImagesUploaded.field: numberOfImagesUploaded,
-      HSSpotField.fullImages.field: description,
+      HSSpotField.description.field: description,
       HSSpotField.fullImages.field: fullImages,
       HSSpotField.imageThumbnails.field: imageThumbnails,
       HSSpotField.geoHash.field: geoHash,
       HSSpotField.likes.field: likes,
       HSSpotField.saves.field: saves,
       HSSpotField.reposts.field: reposts
-    };
-  }
-
-  Map<String, dynamic> serializeImages() {
-    return {
-      HSSpotField.numberOfImagesUploaded.field: numberOfImagesUploaded,
-      HSSpotField.fullImages.field: description,
-      HSSpotField.fullImages.field: fullImages,
     };
   }
 

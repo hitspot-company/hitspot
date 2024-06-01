@@ -20,7 +20,9 @@ class HSSpotsRepository {
   late final spotsCollection = db.collection("spots");
 
   final spotImagesStorage =
-      FirebaseStorage.instanceFor(bucket: "gs://spots_images");
+      FirebaseStorage.instanceFor(bucket: "gs://hitspot-2092c.appspot.com")
+          .ref()
+          .child("spots_images/");
 
   static final GeoFlutterFire geoHashManager = GeoFlutterFire();
 
@@ -60,29 +62,37 @@ class HSSpotsRepository {
       spot.uid = docRef.id;
 
       // Save images & their thumbnails to Firebase storage
-      final storageRef = spotImagesStorage.ref().child(spot.ownersId);
+      final storageRef = spotImagesStorage.child(spot.ownersId);
       final spotStorageRef = storageRef.child(spot.uid);
 
       for (int i = 0; i < spot.numberOfImagesUploaded; i++) {
-        final imageSpotStorageRef = spotStorageRef.child("${i.toString()}/");
+        final imageSpotStorageRef = spotStorageRef.child("${i.toString()}.jpg");
         final imageThumbnailSpotStorageRef =
-            spotStorageRef.child("thumbnail_${i.toString()}/");
+            spotStorageRef.child("thumbnail_${i.toString()}.jpg");
 
         try {
           await imageSpotStorageRef.putFile(images[i]);
           await imageThumbnailSpotStorageRef.putFile(imageThumbnails[i]);
         } catch (e) {
+          HSDebugLogger.logError(e.toString());
           throw DatabaseRepositoryFailure(
               "There was an error in adding spot's images to database!");
         }
+
         // Save images & thumbnails URLs to spot
-        spot.fullImages.add(await imageSpotStorageRef.getDownloadURL());
-        spot.imageThumbnails
-            .add(await imageThumbnailSpotStorageRef.getDownloadURL());
+        try {
+          spot.fullImages?.add(await imageSpotStorageRef.getDownloadURL());
+          spot.imageThumbnails
+              ?.add(await imageThumbnailSpotStorageRef.getDownloadURL());
+        } catch (e) {
+          HSDebugLogger.logError(e.toString());
+          throw DatabaseRepositoryFailure(
+              "There was an error in saving spot's images URLs to database!");
+        }
       }
 
       // Update current data with image URLs saved
-      await spotsCollection.doc(spot.uid).update(spot.serializeImages());
+      await spotsCollection.doc(spot.uid).update(spot.serialize());
     } catch (_) {
       throw DatabaseRepositoryFailure(
           "There was an error in saving spot to database!");
@@ -93,8 +103,7 @@ class HSSpotsRepository {
     List<File> downloadedThumbnails = [];
 
     try {
-      final storageRef = spotImagesStorage.ref();
-      final spotStorageRef = storageRef.child(spot.uid);
+      final spotStorageRef = spotImagesStorage.child(spot.uid);
 
       for (int i = 0; i < spot.numberOfImagesUploaded; i++) {
         final imageThumbnailSpotStorageRef =
