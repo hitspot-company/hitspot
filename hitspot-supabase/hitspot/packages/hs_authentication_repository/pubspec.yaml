@@ -1,0 +1,15 @@
+name: hs_authentication_repository
+description: Hitspot package to manage authentication utilities
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.0
+  supabase_flutter: ^2.5.4
+  hs_debug_logger:
+    path: ../hs_debug_logger
+
