@@ -207,11 +207,12 @@ class _ImageSelection extends StatelessWidget {
                           width: double.infinity,
                           height: 300,
                           color: Colors.grey[300],
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               'Click to select images',
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.black54),
+                              style: textTheme.headlineMedium!.copyWith(
+                                color: Colors.black54,
+                              ),
                             ),
                           ),
                         )
@@ -357,14 +358,13 @@ class _MapAndSearchBar extends StatelessWidget {
                   googleAPIKey: FlutterConfig.get('GOOGLE_MAPS_API_KEY') ?? "",
                   textEditingController: _searchBarController,
                   textStyle: const TextStyle(color: Colors.white),
-                  inputDecoration: const InputDecoration(
+                  inputDecoration: InputDecoration(
                     contentPadding: EdgeInsets.all(11),
                     border: InputBorder.none,
                     hintText: "Search your location...",
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
-                    prefixIcon: Icon(
+                    hintStyle: textTheme.headlineSmall!.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                    prefixIcon: const Icon(
                       Icons.location_pin,
                       color: Colors.white,
                     ),
@@ -446,11 +446,10 @@ class _SelectedSpotTile extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Address',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                        style: textTheme.headlineMedium!.copyWith(
+                          color: Colors.white,
                         ),
                       ),
                       const Spacer(),
