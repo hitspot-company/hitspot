@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/main.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -25,11 +26,7 @@ class HSAuthenticationBloc
         // 2. The user is signed in
         final HSUser fetchedUser =
             await app.databaseRepository.userRead(user: user);
-        final String publicUrl = await app.storageRepository.fileFetchPublicUrl(
-            bucketName: "avatars",
-            uploadPath: "${fetchedUser.uid}/user_avatar");
-        HSDebugLogger.logSuccess("Public Url: $publicUrl");
-        HSDebugLogger.logInfo("Fetched user data: ${fetchedUser.toString()}");
+        HSDebugLogger.logSuccess("Fetched: \n$fetchedUser");
         if (fetchedUser.isProfileCompleted == true) {
           emit(HSAuthenticationAuthenticatedState(currentUser: fetchedUser));
         } else {

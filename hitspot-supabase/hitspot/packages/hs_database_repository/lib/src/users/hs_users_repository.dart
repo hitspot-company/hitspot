@@ -29,6 +29,7 @@ class HSUsersRepository {
       final fetchedUser =
           await _supabase.from(_users).select().eq("id", user.uid!);
       if (fetchedUser.isEmpty) throw HSReadUserFailure(code: 404);
+      HSDebugLogger.logInfo("Fetched: ${fetchedUser.toString()}");
       return HSUser.deserialize(fetchedUser.first);
     } on HSReadUserFailure catch (_) {
       rethrow;

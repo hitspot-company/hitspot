@@ -6,7 +6,7 @@ class HSDatabaseRepsitory {
   HSDatabaseRepsitory(this._supabaseClient) {
     this._usersRepository = HSUsersRepository(_supabaseClient, users);
   }
-  static const String users = "profiles";
+  static const String users = "users";
   final SupabaseClient _supabaseClient;
   late final HSUsersRepository _usersRepository;
 

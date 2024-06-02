@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
             SizedBox(
               width: screenWidth,
             ),
-            HSUserAvatar(radius: 64, imageUrl: currentUser?.profilePicture!),
+            HSUserAvatar(radius: 64, imageUrl: currentUser?.avatarUrl!),
             Gap(16.0),
             HSButton(child: Text("SWITCH"), onPressed: app.switchTheme)
           ]),
