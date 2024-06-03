@@ -6,8 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/home/view/home_page.dart';
-import 'package:hitspot/features/login/view/login_page.dart';
-import 'package:hitspot/features/login/view/login_provider.dart';
+import 'package:hitspot/features/login_1/view/login_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 
 class HSNavigation {
@@ -19,6 +18,10 @@ class HSNavigation {
 
   BuildContext get context => router.configuration.navigatorKey.currentContext!;
   dynamic pop() => router.pop;
+  dynamic pushPage(Widget page) =>
+      router.configuration.navigatorKey.currentState!.push(
+        MaterialPageRoute(builder: (_) => page),
+      );
 
   final GoRouter router = GoRouter(
     initialLocation: "/splash",

@@ -119,7 +119,6 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
         createdAt: DateTime.now(),
         isProfileCompleted: true,
       );
-      await Future.delayed(const Duration(seconds: 3));
       await _databaseRepository.userUpdate(user: user);
       app.authenticationBloc.userChangedEvent(user: user);
       return;

@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:flutter/foundation.dart';
 
@@ -16,6 +18,52 @@ class HSAuthenticationRepository {
       currentUser = supabaseUser.session?.user.toUser ?? null;
       return currentUser;
     });
+  }
+
+  /// Starts the Sign In with Google Flow.
+  ///
+  /// Throws a [LogInWithGoogleFailure] if an exception occurs.
+  Future<void> logInWithGoogle() async {
+    try {
+      // const List<String> scopes = <String>['email', 'profile'];
+
+      // GoogleSignIn _googleSignIn = GoogleSignIn(
+      //   clientId:
+      //       '145078839676-cu1rrvvm3dcfgqjcona6ilt0m4jng5av.apps.googleusercontent.com',
+      //   scopes: scopes,
+      // );
+      // final credential = await _googleSignIn.signIn();
+      // await _supabaseClient.auth.signInWithIdToken(
+      //     provider: supabase.OAuthProvider.google, idToken: credential!.id);
+      await _supabaseClient.auth.signInWithOAuth(supabase.OAuthProvider.google,
+          redirectTo: "hitspot.app://login-callback/");
+    } on supabase.AuthException catch (_) {
+      throw LogInWithGoogleFailure(_.message);
+    } catch (_) {
+      throw LogInWithGoogleFailure(_.toString());
+    }
+  }
+
+  /// Starts the Sign In with Apple Flow.
+  ///
+  /// Throws a [LogInWithAppleFailure] if an exception occurs.
+  Future<void> logInWithApple() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+      await _supabaseClient.auth.signInWithIdToken(
+          provider: supabase.OAuthProvider.apple,
+          idToken: credential.identityToken!);
+      HSDebugLogger.logSuccess("SIGNED IN WITH APPLE");
+    } on supabase.AuthException catch (_) {
+      throw LogInWithGoogleFailure(_.message);
+    } catch (_) {
+      throw LogInWithGoogleFailure(_.toString());
+    }
   }
 
   /// Signs out the current user which will emit
@@ -98,38 +146,6 @@ class HSAuthenticationRepository {
     } catch (_) {
       HSDebugLogger.logError("Error: ${_.toString()}");
       throw LogInWithEmailAndPasswordFailure(_.toString());
-    }
-
-    /// Starts the Sign In with Google Flow.
-    ///
-    /// Throws a [LogInWithGoogleFailure] if an exception occurs.
-    Future<void> logInWithGoogle() async {
-      try {
-        await _supabaseClient.auth.signInWithOAuth(
-          supabase.OAuthProvider.google,
-          redirectTo: 'app.hitspot://login-callback/',
-        );
-      } on supabase.AuthException catch (_) {
-        throw LogInWithGoogleFailure(_.message);
-      } catch (_) {
-        throw LogInWithGoogleFailure(_.toString());
-      }
-    }
-
-    /// Starts the Sign In with Apple Flow.
-    ///
-    /// Throws a [LogInWithAppleFailure] if an exception occurs.
-    Future<void> logInWithApple() async {
-      try {
-        await _supabaseClient.auth.signInWithOAuth(
-          supabase.OAuthProvider.apple,
-          redirectTo: 'app.hitspot://login-callback/',
-        );
-      } on supabase.AuthException catch (_) {
-        throw LogInWithGoogleFailure(_.message);
-      } catch (_) {
-        throw LogInWithGoogleFailure(_.toString());
-      }
     }
 
     Future<void> deleteAccount() async {

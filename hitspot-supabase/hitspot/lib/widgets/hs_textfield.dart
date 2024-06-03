@@ -16,12 +16,14 @@ class HSTextField extends StatelessWidget {
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.textInputAction,
     this.errorText,
+    this.keyboardType,
+    this.obscureText = false,
   });
 
   final String? hintText;
   final Color? fillColor;
   final Function(String)? onChanged;
-  final Icon? suffixIcon;
+  final Widget? suffixIcon;
   final bool autofocus;
   final String? initialValue;
   final bool readOnly;
@@ -31,10 +33,14 @@ class HSTextField extends StatelessWidget {
   final EdgeInsets scrollPadding;
   final TextInputAction? textInputAction;
   final String? errorText;
+  final TextInputType? keyboardType;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      obscureText: maxLines != 1 ? false : obscureText,
+      keyboardType: keyboardType,
       textInputAction: textInputAction,
       scrollPadding: scrollPadding,
       maxLines: maxLines,
