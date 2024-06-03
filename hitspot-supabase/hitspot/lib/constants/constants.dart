@@ -12,6 +12,6 @@ HSTheme get appTheme => app.theme;
 HSNavigation get navi => app.navigation;
 double get screenWidth => app.screenWidth;
 double get screenHeight => app.screenHeight;
-HSUser? get currentUser => app.currentUser;
+HSUser get currentUser => app.currentUser;
 Icon get nextIcon => const Icon(FontAwesomeIcons.arrowRight);
 Icon get backIcon => const Icon(FontAwesomeIcons.arrowLeft);

@@ -11,7 +11,7 @@ class HSTextField extends StatelessWidget {
     this.initialValue,
     this.onTap,
     this.readOnly = false,
-    this.maxLines,
+    this.maxLines = 1,
     this.maxLength,
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.textInputAction,
@@ -28,7 +28,7 @@ class HSTextField extends StatelessWidget {
   final String? initialValue;
   final bool readOnly;
   final VoidCallback? onTap;
-  final int? maxLines;
+  final int maxLines;
   final int? maxLength;
   final EdgeInsets scrollPadding;
   final TextInputAction? textInputAction;
@@ -39,7 +39,7 @@ class HSTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      obscureText: maxLines != 1 ? false : obscureText,
+      obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       scrollPadding: scrollPadding,

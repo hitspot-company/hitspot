@@ -25,21 +25,21 @@ class HSUserAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (child != null) {
       return CircleAvatar(
-        // backgroundColor: app.theme.highlightColor,
+        backgroundColor: currentTheme.highlightColor,
         radius: radius,
         child: child,
       );
     } else if (loading) {
       return HSShimmer(
         child: CircleAvatar(
-          // backgroundColor: app.theme.highlightColor,
+          backgroundColor: currentTheme.highlightColor,
           radius: radius,
         ),
       );
     } else if (imageUrl == null) {
       return CircleAvatar(
         radius: radius,
-        // backgroundColor: app.theme.highlightColor,
+        backgroundColor: currentTheme.highlightColor,
         child: Center(
           child: Icon(
             FontAwesomeIcons.solidUser,
@@ -56,7 +56,7 @@ class HSUserAvatar extends StatelessWidget {
       }
       return CircleAvatar(
         radius: radius,
-        // backgroundColor: app.theme.highlightColor,
+        backgroundColor: currentTheme.highlightColor,
         backgroundImage: image,
       );
     }

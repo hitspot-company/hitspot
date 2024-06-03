@@ -5,6 +5,7 @@ enum HSAuthenticationStatus {
   unauthenitcated,
   emailNotVerified,
   profileIncomplete,
+  magicLinkSent,
   authenticated
 }
 
@@ -33,6 +34,18 @@ final class HSAuthenticationAuthenticatedState extends HSAuthenticationState {
 
   @override
   List<Object> get props => [super.authenticationStatus, currentUser];
+}
+
+final class HSAuthenticationMagicLinkSentState extends HSAuthenticationState {
+  const HSAuthenticationMagicLinkSentState(
+    this.email, {
+    super.authenticationStatus = HSAuthenticationStatus.magicLinkSent,
+  });
+
+  final String email;
+
+  @override
+  List<Object> get props => [super.authenticationStatus, email];
 }
 
 final class HSAuthenticationUnauthenticatedState extends HSAuthenticationState {

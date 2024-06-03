@@ -26,7 +26,6 @@ class HSAuthenticationBloc
         // 2. The user is signed in
         final HSUser fetchedUser =
             await app.databaseRepository.userRead(user: user);
-        HSDebugLogger.logSuccess("Fetched: \n$fetchedUser");
         if (fetchedUser.isProfileCompleted == true) {
           emit(HSAuthenticationAuthenticatedState(currentUser: fetchedUser));
         } else {
@@ -39,6 +38,9 @@ class HSAuthenticationBloc
         HSDebugLogger.logError(_.toString());
       }
     });
+    on<HSAuthenticationMagicLinkSentEvent>(
+      (event, emit) => emit(HSAuthenticationMagicLinkSentState(event.email)),
+    );
     on<HSAuthenticationLogoutEvent>((event, emit) async {
       try {
         await app.authenticationRepository.signOut();

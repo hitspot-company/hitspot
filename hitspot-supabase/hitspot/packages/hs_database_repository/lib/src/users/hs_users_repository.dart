@@ -24,10 +24,11 @@ class HSUsersRepository {
   }
 
   // READ
-  Future<HSUser> read(HSUser user) async {
+  Future<HSUser> read(HSUser? user, String? userID) async {
     try {
-      final fetchedUser =
-          await _supabase.from(_users).select().eq("id", user.uid!);
+      assert(user != null || userID != null, "User or userID must be provided");
+      late final String uid = user?.uid ?? userID!;
+      final fetchedUser = await _supabase.from(_users).select().eq("id", uid);
       if (fetchedUser.isEmpty) throw HSReadUserFailure(code: 404);
       HSDebugLogger.logInfo("Fetched: ${fetchedUser.toString()}");
       return HSUser.deserialize(fetchedUser.first);

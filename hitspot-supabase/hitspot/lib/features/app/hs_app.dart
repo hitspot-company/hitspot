@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/main.dart';
+import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/utils/pickers/hs_pickers.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -10,7 +11,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_storage_repository/hs_storage_repository.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hs_toasts/hs_toasts.dart';
 
 class HSApp {
   HSApp._privateConstructor();
@@ -32,7 +33,7 @@ class HSApp {
   HSAuthenticationBloc get authenticationBloc =>
       BlocProvider.of<HSAuthenticationBloc>(context);
   HSAuthenticationState get authenticationState => authenticationBloc.state;
-  HSUser? get currentUser {
+  HSUser get currentUser {
     if (authenticationState is HSAuthenticationAuthenticatedState) {
       return (authenticationState as HSAuthenticationAuthenticatedState)
           .currentUser;
@@ -40,7 +41,7 @@ class HSApp {
       return (authenticationState as HSAuthenticationProfileIncompleteState)
           .currentUser;
     }
-    return null;
+    return const HSUser();
   }
 
   HSAuthenticationStatus get authenticationStatus =>
@@ -67,4 +68,22 @@ class HSApp {
   // Storage
   HSStorageRepository get storageRepository =>
       RepositoryProvider.of<HSStorageRepository>(context);
+
+  // POPUPS
+  HSToasts get toasts => HSToasts.instance;
+  void showToast(
+          {required HSToastType toastType,
+          required String title,
+          String? description,
+          Alignment? alignment}) =>
+      toasts.toast(
+        context,
+        toastType: toastType,
+        title: title,
+        descriptionText: description,
+        alignment: alignment,
+      );
+
+  // ASSETS
+  HSAssets get assets => HSAssets.instance;
 }

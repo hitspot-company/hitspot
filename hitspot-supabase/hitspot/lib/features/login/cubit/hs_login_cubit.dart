@@ -1,13 +1,15 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/utils/forms/hs_email.dart';
 import 'package:hitspot/utils/forms/hs_password.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hs_toasts/hs_toasts.dart';
+import 'package:equatable/equatable.dart';
 
-part 'login_state.dart';
+part 'hs_login_state.dart';
 
 class HSLoginCubit extends Cubit<HSLoginState> {
   HSLoginCubit(this._authenticationRepository) : super(const HSLoginState());
@@ -40,13 +42,16 @@ class HSLoginCubit extends Cubit<HSLoginState> {
       emit(state.copyWith(isPasswordVisible: !state.isPasswordVisible));
 
   Future<void> logInWithCredentials() async {
-    if (!state.isValid) return;
+    if (state.email.isNotValid) {
+      emit(state.copyWith(errorMessage: "The email is not valid"));
+      return;
+    }
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
-      await _authenticationRepository.logInWithEmailAndPassword(
-        email: state.email.value,
-        password: state.password.value,
-      );
+      await _authenticationRepository.signInWithMagicLink(
+          email: state.email.value);
+      app.authenticationBloc
+          .add(HSAuthenticationMagicLinkSentEvent(state.email.value));
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on LogInWithEmailAndPasswordFailure catch (e) {
       emit(state.copyWith(errorMessage: e.message));
@@ -62,7 +67,7 @@ class HSLoginCubit extends Cubit<HSLoginState> {
       await _authenticationRepository.logInWithGoogle();
       emit(state.copyWith(status: FormzSubmissionStatus.success));
     } on LogInWithGoogleFailure catch (e) {
-      // if (!e.isDefault) _showErrorSnackbar(e.message);
+      if (!e.isDefault) _showErrorSnackbar(e.message);
       _emitFailure();
     } catch (_) {
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
@@ -84,10 +89,10 @@ class HSLoginCubit extends Cubit<HSLoginState> {
     }
   }
 
-  // void _showErrorSnackbar(String message) => app.showToast(
-  //     toastType: HSToastType.error,
-  //     title: "Authentication Error",
-  //     description: message);
+  void _showErrorSnackbar(String message) => app.showToast(
+      toastType: HSToastType.error,
+      title: "Authentication Error",
+      description: message);
 
   void _emitFailure({String? message}) => emit(
         state.copyWith(

@@ -13,8 +13,8 @@ class HSDatabaseRepsitory {
   Future<void> userCreate({required HSUser user}) async =>
       await _usersRepository.create(user);
 
-  Future<HSUser> userRead({required HSUser user}) async =>
-      await _usersRepository.read(user);
+  Future<HSUser> userRead({HSUser? user, String? userID}) async =>
+      await _usersRepository.read(user, userID);
 
   Future<void> userUpdate({required HSUser user}) async =>
       await _usersRepository.update(user);

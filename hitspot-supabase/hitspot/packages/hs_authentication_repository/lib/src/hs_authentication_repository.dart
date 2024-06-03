@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_authentication_repository/src/exceptions/hs_authentication_exception.dart';
 import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -125,6 +126,17 @@ class HSAuthenticationRepository {
       throw SignUpWithEmailAndPasswordFailure.fromCode(_.message);
     } catch (_) {
       throw SignUpWithEmailAndPasswordFailure(_.toString());
+    }
+  }
+
+  Future<void> signInWithMagicLink({required String email}) async {
+    try {
+      await _supabaseClient.auth.signInWithOtp(
+        email: email,
+        emailRedirectTo: kIsWeb ? null : 'app.hitspot://login-callback/',
+      );
+    } catch (_) {
+      throw HSAuthenticationException.magicLink(details: _.toString());
     }
   }
 

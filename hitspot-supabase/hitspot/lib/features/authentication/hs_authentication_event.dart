@@ -16,3 +16,9 @@ final class HSAuthenticationUserChangedEvent extends HSAuthenticationEvent {
 
   final HSUser? user;
 }
+
+final class HSAuthenticationMagicLinkSentEvent extends HSAuthenticationEvent {
+  const HSAuthenticationMagicLinkSentEvent(this.email);
+
+  final String email;
+}

@@ -1,4 +1,4 @@
-part of 'login_cubit.dart';
+part of 'hs_login_cubit.dart';
 
 final class HSLoginState extends Equatable {
   const HSLoginState({
