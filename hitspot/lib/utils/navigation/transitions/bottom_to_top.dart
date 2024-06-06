@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class BottomToTopPage<T> extends CustomTransitionPage<T> {
+  @override
   final Widget child;
 
   BottomToTopPage({required this.child})

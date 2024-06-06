@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
 
 class HSShimmerSkeleton extends StatelessWidget {

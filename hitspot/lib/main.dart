@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,11 +10,9 @@ import 'package:hitspot/features/profile_incomplete/view/profile_completion_page
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_firebase_config/hs_firebase_config.dart';
 import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 import 'package:hs_search_repository/hs_search.dart';
@@ -29,14 +26,12 @@ void main() async {
   const databaseRepository = HSDatabaseRepository();
   final themeRepository = HSThemeRepository.instance;
   final mailingRepository = HSMailingRepository();
-  final searchRepository = HSSearchRepository();
   Animate.restartOnHotReload = true;
 
   // Bind Firebase authentication stream to our HSUser
   await authenticationRepository.user.first;
   runApp(App(
     mailingRepository: mailingRepository,
-    searchRepository: searchRepository,
     themeRepository: themeRepository,
     authenticationRepository: authenticationRepository,
     databaseRepository: databaseRepository,
@@ -48,19 +43,16 @@ class App extends StatelessWidget {
   final HSDatabaseRepository _databaseRepository;
   final HSThemeRepository _themeRepository;
   final HSMailingRepository _mailingRepository;
-  final HSSearchRepository _searchRepository;
 
   const App(
       {required HSThemeRepository themeRepository,
       required HSAuthenticationRepository authenticationRepository,
       required HSDatabaseRepository databaseRepository,
       required HSMailingRepository mailingRepository,
-      required HSSearchRepository searchRepository,
       super.key})
       : _themeRepository = themeRepository,
         _authenticationRepository = authenticationRepository,
         _mailingRepository = mailingRepository,
-        _searchRepository = searchRepository,
         _databaseRepository = databaseRepository;
   @override
   Widget build(BuildContext context) {
@@ -141,7 +133,7 @@ class HSFlowBuilder extends StatelessWidget {
         } else if (appStatus == HSAppStatus.profileNotCompleted) {
           const ProfileCompletionPage();
         } else if (appStatus == HSAppStatus.authenticated) {
-          return HomePage();
+          return const HomePage();
         }
         return Container();
       },

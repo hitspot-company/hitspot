@@ -46,7 +46,7 @@ class ChooseUsersPage extends StatelessWidget {
 }
 
 class _SuggestionsBuilder extends StatelessWidget {
-  _SuggestionsBuilder({required this.chooseUsersCubit});
+  const _SuggestionsBuilder({required this.chooseUsersCubit});
 
   final HSChooseUsersCubit chooseUsersCubit;
 

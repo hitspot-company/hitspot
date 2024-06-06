@@ -65,7 +65,7 @@ class HSScaffold extends StatelessWidget {
 }
 
 class _Bottombar extends StatelessWidget {
-  const _Bottombar({super.key, this.height = 60.0, this.color});
+  const _Bottombar({this.height = 60.0, this.color});
 
   final double height;
   final Color? color;

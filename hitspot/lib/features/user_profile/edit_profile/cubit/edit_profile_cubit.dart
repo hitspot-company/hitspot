@@ -7,7 +7,6 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:path/path.dart' as path;
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';

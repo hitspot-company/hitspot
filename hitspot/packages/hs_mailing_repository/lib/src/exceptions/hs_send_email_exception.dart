@@ -1,4 +1,3 @@
-import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 
 class HSSendEmailException implements Exception {
   final String message;

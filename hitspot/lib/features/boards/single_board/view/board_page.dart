@@ -1,16 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/boards/create_board/view/add_board_provider.dart';
 import 'package:hitspot/features/boards/single_board/bloc/hs_board_bloc.dart';
-import 'package:hitspot/features/trips/create_trip/view/create_trip_provider.dart';
-import 'package:hitspot/utils/navigation/transitions/ripple.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';

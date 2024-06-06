@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/models/hs_trip.dart';
 
 class HSTripsRepository {
   const HSTripsRepository(this._trips, this._users);

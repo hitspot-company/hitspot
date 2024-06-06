@@ -10,7 +10,6 @@ import 'package:hitspot/features/complete_profile/view/complete_profile_provider
 import 'package:hitspot/features/error/view/error_page.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/features/register/view/register_page.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';

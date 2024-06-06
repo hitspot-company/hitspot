@@ -70,7 +70,7 @@ class HSFormButtonsRow extends StatelessWidget {
 }
 
 class HSFormButton extends StatelessWidget {
-  const HSFormButton({this.icon, required this.child, this.onPressed});
+  const HSFormButton({super.key, this.icon, required this.child, this.onPressed});
 
   final Icon? icon;
   final Widget child;

@@ -9,7 +9,7 @@ class RipplePageRoute<T> extends PageRouteBuilder<T> {
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return RippleTransition(
               animation: animation,
-              position: Offset(0.5, 1.0), // bottom center of the screen
+              position: const Offset(0.5, 1.0), // bottom center of the screen
               child: child,
             );
           },

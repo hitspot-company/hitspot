@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 
 class HSUserProfileHeadline extends StatelessWidget {
-  const HSUserProfileHeadline({required this.title});
+  const HSUserProfileHeadline({super.key, required this.title});
 
   final String title;
 
