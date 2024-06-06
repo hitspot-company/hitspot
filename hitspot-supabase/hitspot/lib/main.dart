@@ -75,6 +75,17 @@ class MyApp extends StatelessWidget {
                 theme: theme,
                 title: 'Hitspot',
                 routerConfig: app.navigation.router,
+                builder: (context, child) => Overlay(
+                  initialEntries: [
+                    OverlayEntry(
+                      builder: (context) =>
+                          child ??
+                          const Center(
+                            child: Text("OVERLAY ERROR"),
+                          ),
+                    ),
+                  ],
+                ),
               );
             },
           ),

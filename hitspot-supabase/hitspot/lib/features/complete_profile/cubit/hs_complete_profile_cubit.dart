@@ -106,11 +106,11 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
             file: file,
             bucketName: _storageRepository.avatarsBucket,
             uploadPath:
-                _storageRepository.userAvatarUploadPath(uid: currentUser!.uid!),
+                _storageRepository.userAvatarUploadPath(uid: currentUser.uid!),
             fileOptions: const FileOptions(upsert: true));
       }
 
-      final HSUser user = currentUser!.copyWith(
+      final HSUser user = currentUser.copyWith(
         username: state.usernameVal,
         fullName: state.fullnameVal,
         biogram: state.biogramVal,

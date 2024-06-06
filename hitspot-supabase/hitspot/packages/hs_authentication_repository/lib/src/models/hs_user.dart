@@ -1,5 +1,7 @@
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
+typedef UserID = String;
+
 class HSUser {
   final String? uid, biogram, email, name, avatarUrl, username;
   final DateTime? birthday, createdAt;

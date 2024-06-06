@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -49,26 +50,36 @@ class HSNavigation {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/create_board',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
         path: "/protected",
         redirect: _protectedRedirect,
         routes: [
           GoRoute(
-              path: "home",
-              builder: (context, state) => const HomePage(),
-              redirect: (context, state) {
-                final String? from = state.uri.queryParameters["from"];
-                if (from != null) {
-                  return '/protected/home$from';
-                }
-                return null;
-              },
-              routes: [
-                GoRoute(
-                  path: 'user/:userID',
-                  builder: (context, state) => UserProfileProvider(
-                      userID: state.pathParameters['userID']!),
-                ),
-              ]),
+            path: "home",
+            builder: (context, state) => const HomePage(),
+            redirect: (context, state) {
+              final String? from = state.uri.queryParameters["from"];
+              if (from != null) {
+                return '/protected/home$from';
+              }
+              return null;
+            },
+            routes: [
+              GoRoute(
+                path: 'user/:userID',
+                builder: (context, state) => UserProfileProvider(
+                    userID: state.pathParameters['userID']!),
+              ),
+              GoRoute(
+                path: 'create_board',
+                builder: (context, state) => const CreateBoardProvider(),
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -130,4 +141,6 @@ class HSNavigation {
 
   // Routes
   dynamic toUser({required String userID}) => router.push('/user/$userID');
+  dynamic toBoard({required String boardID}) => router.push('/board/$boardID');
+  dynamic toCreateBoard() => router.push('/create_board');
 }

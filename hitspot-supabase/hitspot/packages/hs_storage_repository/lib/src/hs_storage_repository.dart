@@ -14,6 +14,7 @@ class HSStorageRepository {
   late final HSBucketsRepository _bucketsRepository;
   late final HSFilesRepository _filesRepository;
   final String avatarsBucket = "avatars";
+  final String boardsBucket = "boards";
 
   // Buckets
   Future<String> bucketCreate(
@@ -69,4 +70,7 @@ class HSStorageRepository {
 
   String userAvatarUploadPath({required String uid}) =>
       _filesRepository.userAvatarUploadPath(uid);
+
+  String boardImageUploadPath({required String uid, required String boardID}) =>
+      _filesRepository.boardImageUploadPath(uid, boardID);
 }

@@ -76,4 +76,6 @@ class HSFilesRepository {
   }
 
   String userAvatarUploadPath(String uid) => "$uid/user_avatar";
+  String boardImageUploadPath(String uid, String boardID) =>
+      "$uid/boards/$boardID/image";
 }

@@ -123,7 +123,7 @@ class _BottombarItem extends StatelessWidget {
     _BottombarItem(
       iconData: FontAwesomeIcons.plus,
       iconSize: 36.0,
-      onPressed: () => print("new board"), // navi.newPush("/add_board")
+      onPressed: navi.toCreateBoard,
     ),
     _BottombarItem(iconData: FontAwesomeIcons.a, onPressed: () => print("idk")),
     _BottombarItem(
