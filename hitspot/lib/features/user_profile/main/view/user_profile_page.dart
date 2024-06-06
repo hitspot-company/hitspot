@@ -12,11 +12,13 @@ import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_use
 import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_user_profile_app_bar_skeleton.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_boards_list.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_monitor.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -33,20 +35,24 @@ class UserProfilePage extends StatelessWidget {
         } else if (state is HSUserProfileReady ||
             state is HSUserProfileUpdate) {
           late final HSUser user;
+          late final List<HSBoard>? boards;
           if (state is HSUserProfileReady) {
             user = state.user!;
+            boards = state.boards;
           } else if (state is HSUserProfileUpdate) {
             user = state.user!;
+            boards = state.boards;
           }
           return _ReadyPage(
               controller: controller,
               user: user,
+              boards: boards,
               userProfileBloc: userProfileBloc);
         }
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
-            title: "",
+            titleText: "",
           ),
           body: const Center(
             child: Text(
@@ -61,68 +67,89 @@ class UserProfilePage extends StatelessWidget {
 class _ReadyPage extends StatelessWidget {
   const _ReadyPage({
     required this.controller,
-    required this.user,
     required this.userProfileBloc,
+    required this.user,
+    this.boards,
   });
 
   final ScrollController controller;
-  final HSUser user;
   final HSUserProfileBloc userProfileBloc;
+  final HSUser user;
+  final List<HSBoard>? boards;
 
   @override
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        title: "",
+        titleText: "",
         titleBold: true,
         enableDefaultBackButton: true,
-        right: IconButton(
-            onPressed: () => navi.push(SettingsProvider.route()),
-            icon: const Icon(FontAwesomeIcons.bars)),
+        right: userProfileBloc.isOwnProfile
+            ? IconButton(
+                onPressed: () => navi.push(SettingsProvider.route()),
+                icon: const Icon(FontAwesomeIcons.bars))
+            : const SizedBox(),
       ),
-      body: CustomScrollView(
-        controller: controller,
-        slivers: [
-          _UserDataAppBar.ready(user),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          if (user.biogram != null)
-            SliverMainAxisGroup(
-              slivers: [
-                const HSUserProfileHeadline(title: "BIO"),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Text(
-                      user.biogram!,
-                      style: textTheme.titleSmall,
+      body: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              _UserDataAppBar.ready(user),
+              const SliverToBoxAdapter(
+                child: Gap(16.0),
+              ),
+              if (user.biogram != null)
+                SliverMainAxisGroup(
+                  slivers: [
+                    const HSUserProfileHeadline(title: "BIO"),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Text(
+                          user.biogram!,
+                          style: textTheme.titleSmall,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              const SliverToBoxAdapter(
+                child: Gap(16.0),
+              ),
+              HSUserProfileStatsAppBar.ready(
+                  user: user, userProfileBloc: userProfileBloc),
+              const SliverToBoxAdapter(
+                child: TabBar(
+                  tabs: [
+                    Tab(
+                      text: "Spots",
                     ),
-                  ),
-                )
-              ],
-            ),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
+                    Tab(
+                      text: "Boards",
+                    ),
+                  ],
+                ),
+              ),
+              const SliverToBoxAdapter(
+                child: Gap(16.0),
+              ),
+            ];
+          },
+          body: TabBarView(
+            children: [
+              HSSpotsGrid.ready(spots: user.spots),
+              HSBoardsList(boards: boards, user: user),
+            ],
           ),
-          HSUserProfileStatsAppBar.ready(
-              user: user, userProfileBloc: userProfileBloc),
-          const HSUserProfileHeadline(title: "SPOTS"),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          HSSpotsGrid.ready(spots: user.spots ?? []),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _LoadingPage extends StatelessWidget {
-  const _LoadingPage({
-    super.key,
-    required this.controller,
-  });
+  const _LoadingPage({required this.controller});
 
   final ScrollController controller;
 
@@ -130,7 +157,7 @@ class _LoadingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        title: "",
+        titleText: "",
         titleBold: true,
         enableDefaultBackButton: true,
       ),
@@ -154,7 +181,7 @@ class _LoadingPage extends StatelessWidget {
           const SliverToBoxAdapter(
             child: Gap(16.0),
           ),
-          HSSpotsGrid.loading(),
+          HSSpotsGrid.loading(isSliver: true),
         ],
       ),
     );
@@ -187,7 +214,7 @@ class _UserDataAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!loading) user!;
     return SliverAppBar(
-      surfaceTintColor: Colors.transparent,
+      surfaceTintColor: const Color.fromARGB(0, 97, 51, 51),
       expandedHeight: 140.0,
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(

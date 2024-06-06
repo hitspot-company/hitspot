@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:hitspot/features/user_profile/main/bloc/hs_user_profile_bloc.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSUserProfileActionButton extends StatelessWidget {
   const HSUserProfileActionButton(
@@ -33,6 +32,7 @@ class HSUserProfileActionButton extends StatelessWidget {
       onPressed: () => userProfileBloc.add(
         HSUserProfileFollowUnfollowUserEvent(),
       ),
+      backgroundColor: currentTheme.mainColor,
     );
   }
 
@@ -43,7 +43,6 @@ class HSUserProfileActionButton extends StatelessWidget {
       onPressed: () => userProfileBloc.add(
         HSUserProfileFollowUnfollowUserEvent(),
       ),
-      backgroundColor: currentTheme.mainColor,
     );
   }
 

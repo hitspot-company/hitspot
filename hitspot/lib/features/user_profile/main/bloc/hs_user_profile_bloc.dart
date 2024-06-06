@@ -50,12 +50,12 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
     try {
       if (state is HSUserProfileReady) {
         final HSUserProfileReady readyState = state as HSUserProfileReady;
-        emit(HSUserProfileUpdate(readyState.user));
+        emit(HSUserProfileUpdate(readyState.user, readyState.boards));
         if (isUserFollowed()) {
-          await databaseRepository.unfollowUser(currentUser, readyState.user!);
+          await databaseRepository.userUnfollow(currentUser, readyState.user!);
           followed = false;
         } else {
-          await databaseRepository.followUser(currentUser, readyState.user!);
+          await databaseRepository.userFollow(currentUser, readyState.user!);
           followed = true;
         }
         emitChanged(event, emit, followed: followed, user: readyState.user!);
@@ -86,16 +86,22 @@ class HSUserProfileBloc extends Bloc<HSUserProfileEvent, HSUserProfileState> {
   Future<void> _fetchInitial(event, emit) async {
     emit(HSUserProfileInitialLoading());
     try {
-      final HSUser? userData =
-          await databaseRepository.getUserFromDatabase(userID);
+      final HSUser? userData = await databaseRepository.userGet(userID);
       if (userData == null) {
-        throw const HSUserProfileError("User data could not be fetched.");
+        navi.toError("404: Not found",
+            "The user account does not exist or has been removed.");
+        return;
       }
-      emit(HSUserProfileReady(userData));
+      final List<HSBoard> boards =
+          await databaseRepository.boardGetUserBoards(user: userData);
+      emit(HSUserProfileReady(userData, boards));
     } on DatabaseConnectionFailure catch (e) {
       emit(HSUserProfileError(e.message));
+      navi.toError("Error", e.message);
     } catch (e) {
       emit(const HSUserProfileError("An unknown error occured"));
+      navi.toError("404: Not found",
+          "The user account does not exist or has been removed.");
     }
   }
 }

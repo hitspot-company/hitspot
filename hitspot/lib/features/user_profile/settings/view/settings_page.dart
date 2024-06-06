@@ -17,7 +17,7 @@ class SettingsPage extends StatelessWidget {
     final settingsCubit = context.read<HsSettingsBloc>();
     return HSScaffold(
       appBar: HSAppBar(
-        title: "",
+        titleText: "",
         enableDefaultBackButton: true,
       ),
       body: BlocBuilder<HsSettingsBloc, HsSettingsState>(
@@ -106,7 +106,8 @@ class SettingsPage extends StatelessWidget {
                   SettingsTile.navigation(
                     leading: const Icon(FontAwesomeIcons.trash),
                     title: const Text('Delete Account'),
-                    enabled: false,
+                    onPressed: (_) =>
+                        app.authBloc.requestDelete(user: currentUser),
                   ),
                   SettingsTile.navigation(
                     leading: const Icon(FontAwesomeIcons.arrowRightFromBracket),

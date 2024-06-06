@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/user_profile/edit_profile/cubit/edit_profile_cubit.dart';
 import 'package:hitspot/features/user_profile/edit_value/view/edit_value_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -23,7 +22,7 @@ class EditProfilePage extends StatelessWidget {
     final editProfileCubit = context.read<EditProfileCubit>();
     return HSScaffold(
       appBar: HSAppBar(
-        title: "EDIT PROFILE",
+        titleText: "EDIT PROFILE",
         fontSize: 16.0,
         titleBold: true,
         enableDefaultBackButton: true,

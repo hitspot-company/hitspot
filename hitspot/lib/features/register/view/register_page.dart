@@ -33,7 +33,7 @@ class RegisterPage extends StatelessWidget {
                 leftTitle: "Create a ",
                 rightTitle: "free account",
               ),
-              const Expanded(child: RegisterForm()),
+              const RegisterForm(),
               Text.rich(
                 TextSpan(
                   text: "By creating an account you agree to our",
@@ -42,7 +42,7 @@ class RegisterPage extends StatelessWidget {
                       text: " Terms of Service",
                       style: hsApp.textTheme.bodySmall!
                           .colorify(HSTheme.instance.mainColor)
-                          .boldify(),
+                          .boldify,
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => print("TOS"),
                     ),
@@ -53,7 +53,7 @@ class RegisterPage extends StatelessWidget {
                       text: " Privacy Policy",
                       style: hsApp.textTheme.bodySmall!
                           .colorify(HSTheme.instance.mainColor)
-                          .boldify(),
+                          .boldify,
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => print("PP"),
                     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 
 class HSAuthButton extends StatelessWidget {
@@ -27,7 +28,9 @@ class HSAuthButton extends StatelessWidget {
                 color: Colors.white,
                 size: 24.0,
               )
-            : Text(buttonText),
+            : Text(buttonText,
+                style: textTheme.headlineSmall!.copyWith(
+                    color: currentTheme.currentTheme.colorScheme.background)),
       ),
     );
   }

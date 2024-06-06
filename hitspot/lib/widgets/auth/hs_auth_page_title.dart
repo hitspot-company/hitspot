@@ -26,7 +26,7 @@ class HSAuthPageTitle extends StatelessWidget {
           ),
         ],
       ),
-      style: hsApp.textTheme.displayMedium!.boldify(),
+      style: hsApp.textTheme.displayMedium!.boldify,
       maxLines: 1,
     );
   }

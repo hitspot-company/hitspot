@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/features/home/view/home_search.dart';
+import 'package:hitspot/features/home/search/view/home_search_page.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
 class HSSearchBar extends StatelessWidget {

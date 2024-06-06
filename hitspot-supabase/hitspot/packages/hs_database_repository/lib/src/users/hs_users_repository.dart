@@ -1,0 +1,66 @@
+import 'package:hs_authentication_repository/src/models/hs_user.dart';
+import 'package:hs_database_repository/src/users/exceptions/hs_create_user_failure.dart';
+import 'package:hs_database_repository/src/users/exceptions/hs_read_user_failure.dart';
+import 'package:hs_database_repository/src/users/exceptions/hs_update_user_failure.dart';
+import 'package:hs_database_repository/src/users/exceptions/hs_user_exception.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class HSUsersRepository {
+  const HSUsersRepository(this._supabase, this._users);
+
+  final SupabaseClient _supabase;
+  final String _users;
+
+  // CREATE
+  Future<void> create(HSUser user) async {
+    try {
+      final insertedUser =
+          await _supabase.from(_users).insert(user.serialize()).select();
+      HSDebugLogger.logSuccess("User created: ${insertedUser.isNotEmpty}");
+    } catch (_) {
+      throw HSCreateUserFailure(customDetails: _.toString());
+    }
+  }
+
+  // READ
+  Future<HSUser> read(HSUser? user, String? userID) async {
+    try {
+      assert(user != null || userID != null, "User or userID must be provided");
+      late final String uid = user?.uid ?? userID!;
+      final fetchedUser = await _supabase.from(_users).select().eq("id", uid);
+      if (fetchedUser.isEmpty) throw HSReadUserFailure(code: 404);
+      HSDebugLogger.logInfo("Fetched: ${fetchedUser.toString()}");
+      return HSUser.deserialize(fetchedUser.first);
+    } on HSReadUserFailure catch (_) {
+      rethrow;
+    } catch (_) {
+      throw HSReadUserFailure(customDetails: _.toString());
+    }
+  }
+
+  // UPDATE
+  Future<void> update(HSUser user) async {
+    try {
+      await _supabase.from(_users).update(user.serialize()).eq("id", user.uid!);
+      HSDebugLogger.logSuccess("User (${user.uid}) data updated!");
+    } catch (_) {
+      throw HSUpdateUserFailure(customDetails: _.toString());
+    }
+  }
+  // DELETE
+
+  Future<bool> isUsernameAvailable(String username) async {
+    try {
+      final res = await _supabase
+          .from(_users)
+          .select("username")
+          .eq("username", username)
+          .count(CountOption.exact);
+      final int count = res.count;
+      return count == 0;
+    } catch (_) {
+      throw HSUserException(message: "Error verifying username availability.");
+    }
+  }
+}
