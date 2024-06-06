@@ -2,8 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_form_inputs/hs_form_inputs.dart';
@@ -17,7 +18,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
       : super(const HSRegisterState());
 
   final HSAuthenticationRepository _authenticationRepository;
-  final HSNavigationService _hsNavigationService = HSApp.instance.navigation;
+  final HSNavigation _hsNavigationService = HSApp.instance.navigation;
 
   double get opacity =>
       state.registerPageState == HSRegisterPageState.initial ? 0.0 : 1.0;
@@ -102,20 +103,19 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
           status: FormzSubmissionStatus.failure,
         ),
       );
+      return;
     } on HSSendEmailException catch (e) {
       HSDebugLogger.logError("Error sending welcome email: ${e.message}");
       await _completeRegistration();
+      return;
     } catch (_) {
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }
   }
 
   Future<void> _completeRegistration() async {
-    HSApp.instance.authBloc.add(HSAppUserChanged(
-        HSApp.instance.currentUser.copyWith(isEmailVerified: false)));
-    await Future.delayed(const Duration(seconds: 1));
-    _hsNavigationService.pop();
-    emit(state.copyWith(status: FormzSubmissionStatus.success));
+    app.authBloc
+        .add(HSAppUserChanged(currentUser.copyWith(isEmailVerified: false)));
   }
 
   Future<void> logInWithGoogle() async {

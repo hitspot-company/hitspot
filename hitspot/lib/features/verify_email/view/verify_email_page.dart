@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/verify_email/cubit/hs_verify_email_cubit.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -21,7 +21,7 @@ class VerifyEmailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        title: "Verify Email",
+        titleText: "Verify Email",
         enableDefaultBackButton: true,
         defaultBackButtonCallback: () =>
             HSApp.instance.authBloc.add(const HSAppLogoutRequested()),

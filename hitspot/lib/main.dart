@@ -1,16 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
-import 'package:hitspot/features/home/view/home_page.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/profile_incomplete/view/profile_completion_page.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
 import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -24,7 +23,7 @@ void main() async {
   await Firebase.initializeApp(options: HSFirebaseConfigLoader.loadOptions);
   await FlutterConfig.loadEnvVariables();
   final authenticationRepository = HSAuthenticationRepository();
-  final databaseRepository = HSDatabaseRepository();
+  const databaseRepository = HSDatabaseRepository();
   final themeRepository = HSThemeRepository.instance;
   final mailingRepository = HSMailingRepository();
   final searchRepository = HSSearchRepository();
@@ -68,7 +67,7 @@ class App extends StatelessWidget {
           create: (context) => HSAuthenticationRepository(),
         ),
         RepositoryProvider(
-          create: (context) => HSDatabaseRepository(),
+          create: (context) => const HSDatabaseRepository(),
         ),
         RepositoryProvider(
           create: (context) => HSMailingRepository(),
@@ -92,22 +91,26 @@ class App extends StatelessWidget {
         child: BlocSelector<HSThemeBloc, HSThemeState, ThemeData>(
           selector: (state) => state.theme,
           builder: (context, currentTheme) {
-            return MaterialApp(
-              theme: currentTheme,
-              title: "Hitspot",
-              navigatorKey: HSNavigationService.instance.navigatorKey,
-              builder: (context, child) => Overlay(
-                initialEntries: [
-                  OverlayEntry(
-                    builder: (context) =>
-                        child ??
-                        const Center(
-                          child: Text("OVERLAY ERROR"),
-                        ),
-                  ),
-                ],
+            return BlocListener<HSAuthenticationBloc, HSAuthenticationState>(
+              listener: (context, state) {
+                navi.router.refresh();
+              },
+              child: MaterialApp.router(
+                theme: currentTheme,
+                title: "Hitspot",
+                routerConfig: navi.router,
+                builder: (context, child) => Overlay(
+                  initialEntries: [
+                    OverlayEntry(
+                      builder: (context) =>
+                          child ??
+                          const Center(
+                            child: Text("OVERLAY ERROR"),
+                          ),
+                    ),
+                  ],
+                ),
               ),
-              home: const _HSFlowBuilder(),
             );
           },
         ),
@@ -116,25 +119,44 @@ class App extends StatelessWidget {
   }
 }
 
-class _HSFlowBuilder extends StatelessWidget {
-  const _HSFlowBuilder();
+class HSFlowBuilder extends StatelessWidget {
+  const HSFlowBuilder({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FlowBuilder<HSAppStatus>(
-      state: context.select((HSAuthenticationBloc bloc) => bloc.state.status),
-      onGeneratePages: (appStatus, pages) => [
-        if (appStatus == HSAppStatus.loading)
-          SplashPage.page()
-        else if (appStatus == HSAppStatus.unauthenticated)
-          LoginProvider.page()
-        else if (appStatus == HSAppStatus.emailNotVerified)
-          VerifyEmailPage.page()
-        else if (appStatus == HSAppStatus.profileNotCompleted)
-          ProfileCompletionPage.page()
-        else if (appStatus == HSAppStatus.authenticated)
-          HomePage.page(),
-      ],
+    return StreamBuilder(
+      stream: app.authBloc.stream,
+      builder: (BuildContext context,
+          AsyncSnapshot<HSAuthenticationState> snapshot) {
+        final appStatus = snapshot.data?.status;
+        if (appStatus == HSAppStatus.loading) {
+          const SplashPage();
+        } else if (appStatus == HSAppStatus.unauthenticated) {
+          const LoginProvider();
+        } else if (appStatus == HSAppStatus.emailNotVerified) {
+          const VerifyEmailPage();
+        } else if (appStatus == HSAppStatus.profileNotCompleted) {
+          const ProfileCompletionPage();
+        } else if (appStatus == HSAppStatus.authenticated) {
+          return const HomePage();
+        }
+        return Container();
+      },
     );
+    // FlowBuilder<HSAppStatus>(
+    //   state: context.select((HSAuthenticationBloc bloc) => bloc.state.status),
+    //   onGeneratePages: (appStatus, pages) => [
+    //     if (appStatus == HSAppStatus.loading)
+    //       SplashPage.page()
+    //     else if (appStatus == HSAppStatus.unauthenticated)
+    //       LoginProvider.page()
+    //     else if (appStatus == HSAppStatus.emailNotVerified)
+    //       VerifyEmailPage.page()
+    //     else if (appStatus == HSAppStatus.profileNotCompleted)
+    //       ProfileCompletionPage.page()
+    //     else if (appStatus == HSAppStatus.authenticated)
+    //       HomePage.page(),
+    //   ],
+    // );
   }
 }

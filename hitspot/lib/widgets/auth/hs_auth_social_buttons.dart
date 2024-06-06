@@ -30,7 +30,6 @@ class HSSocialLoginButtons {
 
 class _SocialLoginButton extends StatelessWidget {
   const _SocialLoginButton({
-    super.key,
     required this.labelText,
     this.icon,
     this.onPressed,
@@ -72,7 +71,7 @@ class _SocialLoginButton extends StatelessWidget {
                 labelText,
                 style: textTheme.headlineSmall!
                     .colorify(theme.colorScheme.secondary)
-                    .boldify(),
+                    .boldify,
               ),
             ),
           ],

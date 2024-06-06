@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -86,7 +88,7 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
       return;
     }
     if (!(await _hsDatabaseRepository
-        .isUsernameAvailable(state.username.value))) {
+        .userIsUsernameAvailable(state.username.value))) {
       emit(state.copyWith(
           usernameValidationState: UsernameValidationState.unavailable));
       return;
@@ -129,7 +131,8 @@ class HSProfileCompletionCubit extends Cubit<HSProfileCompletionState> {
         fullName: state.fullname.value,
         isProfileCompleted: true,
       );
-      await _hsDatabaseRepository.completeUserProfile(updatedUser);
+      await _hsDatabaseRepository.userProfileComplete(updatedUser);
+      app.authBloc.add(HSAppUserChanged(updatedUser));
       emit(state.copyWith(pageComplete: true));
     } catch (_) {
       HSDebugLogger.logError(_.toString());

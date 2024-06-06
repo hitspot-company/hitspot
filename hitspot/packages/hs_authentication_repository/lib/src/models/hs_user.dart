@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum HSUserField {
   username("username"),
+  boards("boards"),
+  trips("trips"),
   profilePicture("profile_picture"),
   likedSpots("liked_spots"),
   followers("followers"),
@@ -10,6 +12,7 @@ enum HSUserField {
   fcmTokens("fcm_tokens"),
   previouslySearchedUsers("previously_searched_users"),
   email("email"),
+  saves("saves"),
   fullName("full_name"),
   biogram("biogram"),
   emailHidden("email_hidden"),
@@ -29,6 +32,9 @@ class HSUser {
       following,
       likedSpots,
       previouslySearchedUsers,
+      boards,
+      trips,
+      saves,
       spots;
   final String? uid, biogram, email, fullName, profilePicture, username;
   final Timestamp? birthday, createdAt;
@@ -39,10 +45,12 @@ class HSUser {
     return {
       HSUserField.fcmTokens.name: fcmTokens,
       HSUserField.followers.name: followers,
+      HSUserField.trips.name: trips,
       HSUserField.following.name: following,
       HSUserField.likedSpots.name: likedSpots,
       HSUserField.previouslySearchedUsers.name: previouslySearchedUsers,
       HSUserField.spots.name: spots,
+      HSUserField.saves.name: saves,
       HSUserField.biogram.name: biogram,
       HSUserField.email.name: email,
       HSUserField.fullName.name: fullName,
@@ -52,7 +60,8 @@ class HSUser {
       HSUserField.createdAt.name: createdAt,
       HSUserField.emailHidden.name: emailHidden,
       HSUserField.isProfileCompleted.name: isProfileCompleted ?? false,
-      HSUserField.isEmailVerified.name: isEmailVerified ?? false
+      HSUserField.isEmailVerified.name: isEmailVerified ?? false,
+      HSUserField.boards.name: boards,
     };
   }
 
@@ -65,6 +74,9 @@ class HSUser {
       likedSpots: data[HSUserField.likedSpots.name],
       previouslySearchedUsers: data[HSUserField.previouslySearchedUsers.name],
       spots: data[HSUserField.spots.name],
+      trips: data[HSUserField.trips.name],
+      saves: data[HSUserField.saves.name],
+      boards: data[HSUserField.boards.name],
       biogram: data[HSUserField.biogram.name],
       email: data[HSUserField.email.name],
       fullName: data[HSUserField.fullName.name],
@@ -85,6 +97,9 @@ class HSUser {
     List? likedSpots,
     List? previouslySearchedUsers,
     List? spots,
+    List? trips,
+    List? saves,
+    List? boards,
     String? uid,
     String? biogram,
     String? email,
@@ -105,6 +120,9 @@ class HSUser {
       previouslySearchedUsers:
           previouslySearchedUsers ?? this.previouslySearchedUsers,
       spots: spots ?? this.spots,
+      trips: trips ?? this.trips,
+      saves: saves ?? this.saves,
+      boards: boards ?? this.boards,
       uid: uid ?? this.uid,
       biogram: biogram ?? this.biogram,
       email: email ?? this.email,
@@ -127,6 +145,9 @@ class HSUser {
     this.likedSpots,
     this.previouslySearchedUsers,
     this.spots,
+    this.trips,
+    this.saves,
+    this.boards,
     this.biogram,
     this.email,
     this.fullName,
@@ -138,4 +159,31 @@ class HSUser {
     this.isProfileCompleted,
     this.isEmailVerified,
   });
+
+  @override
+  String toString() {
+    return """
+User $uid data:
+uid: $uid
+fcmTokens: $fcmTokens
+followers: $followers
+following: $following
+likedSpots: $likedSpots
+previouslySearchedUsers: $previouslySearchedUsers
+spots: $spots
+trips: $trips
+saves: $saves
+boards: $boards
+biogram: $biogram
+email: $email
+fullName: $fullName
+profilePicture: $profilePicture
+username: $username
+birthday: $birthday
+createdAt: $createdAt
+emailHidden: $emailHidden
+isProfileCompleted: $isProfileCompleted
+isEmailVerified: $isEmailVerified
+""";
+  }
 }

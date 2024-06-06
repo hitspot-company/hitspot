@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:path/path.dart' as path;
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -101,7 +100,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
 
   Future<void> setProfilePicture(String url) async {
     try {
-      await _databaseRepository.updateField(
+      await _databaseRepository.userUpdateField(
           currentUser, HSUserField.profilePicture.name, url);
       HSDebugLogger.logSuccess("Profile picture changed!");
     } catch (_) {

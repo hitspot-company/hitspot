@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -8,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
+import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/features/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
@@ -36,7 +35,7 @@ class _RegisterFirstPage extends StatelessWidget {
       required this.hsNavigation});
   final HSRegisterCubit registerCubit;
   final HSApp hsApp;
-  final HSNavigationService hsNavigation;
+  final HSNavigation hsNavigation;
 
   @override
   Widget build(BuildContext context) {

@@ -7,13 +7,14 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/features/password_reset/view/password_reset_page.dart';
 import 'package:hitspot/features/register/view/register_page.dart';
-import 'package:hitspot/utils/navigation/hs_navigation_service.dart';
+import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/features/login/cubit/login_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_text_prompt.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
@@ -25,48 +26,50 @@ class LoginForm extends StatelessWidget {
     final hsApp = HSApp.instance;
     final hsNavigation = hsApp.navigation;
     final loginCubit = context.read<HSLoginCubit>();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Gap(32.0),
-        const HSAuthPageTitle(
-          leftTitle: "Log in to ",
-          rightTitle: "Hitspot",
-        ),
-        const Gap(24.0),
-        _EmailInput(loginCubit),
-        const Gap(24.0),
-        _PasswordInput(loginCubit),
-        const Gap(32.0),
-        _LoginButton(loginCubit),
-        const Gap(16.0),
-        HSTextPrompt(
-          prompt: "Forgot password?",
-          pressableText: " Reset",
-          textAlign: TextAlign.right,
-          promptColor: hsApp.theme.mainColor,
-          onTap: () => hsNavigation.push(
-            PasswordResetPage.route(),
+    return HSScaffold(
+      sidePadding: 24.0,
+      body: ListView(
+        children: [
+          const Gap(32.0),
+          const HSAuthPageTitle(
+            leftTitle: "Log in to ",
+            rightTitle: "Hitspot",
           ),
-        ),
-        const Gap(32.0),
-        const HSAuthHorizontalDivider(),
-        const Gap(24.0),
-        HSSocialLoginButtons.google(loginCubit.logInWithGoogle),
-        const Gap(24.0),
-        HSSocialLoginButtons.apple(loginCubit.logInWithApple),
-        const Gap(16.0),
-        HSTextPrompt(
-          prompt: "Don't have an account?",
-          pressableText: " Sign Up",
-          promptColor: hsApp.theme.mainColor,
-          onTap: () => hsNavigation.push(
-            RegisterPage.route(),
+          const Gap(24.0),
+          _EmailInput(loginCubit),
+          const Gap(24.0),
+          _PasswordInput(loginCubit),
+          const Gap(32.0),
+          _LoginButton(loginCubit),
+          const Gap(16.0),
+          HSTextPrompt(
+            prompt: "Forgot password?",
+            pressableText: " Reset",
+            textAlign: TextAlign.right,
+            promptColor: hsApp.theme.mainColor,
+            onTap: () => hsNavigation.push(
+              PasswordResetPage.route(),
+            ),
           ),
-        ),
-        const Spacer(),
-        const _Footer(),
-      ],
+          const Gap(32.0),
+          const HSAuthHorizontalDivider(),
+          const Gap(24.0),
+          HSSocialLoginButtons.google(loginCubit.logInWithGoogle),
+          const Gap(24.0),
+          HSSocialLoginButtons.apple(loginCubit.logInWithApple),
+          const Gap(16.0),
+          HSTextPrompt(
+            prompt: "Don't have an account?",
+            pressableText: " Sign Up",
+            promptColor: hsApp.theme.mainColor,
+            onTap: () => hsNavigation.push(
+              RegisterPage.route(),
+            ),
+          ),
+
+          // const _Footer(),
+        ],
+      ),
     );
   }
 }
@@ -108,7 +111,7 @@ class _ForgotPassword extends StatelessWidget {
   });
 
   final HSApp hsApp;
-  final HSNavigationService hsNavigation;
+  final HSNavigation hsNavigation;
 
   final String prompt = "Forgot password?";
   final String pressableText = " Click here?";
@@ -120,13 +123,13 @@ class _ForgotPassword extends StatelessWidget {
       child: Text.rich(
         TextSpan(
           text: prompt,
-          style: hsApp.textTheme.bodySmall!.hintify(),
+          style: hsApp.textTheme.bodySmall!.hintify,
           children: [
             TextSpan(
               text: pressableText,
               style: hsApp.textTheme.bodySmall!
                   .colorify(HSTheme.instance.mainColor)
-                  .boldify(),
+                  .boldify,
               recognizer: TapGestureRecognizer()
                 ..onTap = () => hsNavigation.push(PasswordResetPage.route()),
             ),

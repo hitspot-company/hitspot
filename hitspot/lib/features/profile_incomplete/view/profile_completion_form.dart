@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/features/bloc/hs_authentication_bloc.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/features/profile_incomplete/cubit/hs_profile_completion_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -15,14 +15,7 @@ class ProfileCompletionForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<HSProfileCompletionCubit, HSProfileCompletionState>(
-      listener: (context, state) {
-        if (state.pageComplete) {
-          final authBloc = context.read<HSAuthenticationBloc>();
-          final currentUser = authBloc.state.user;
-          authBloc.add(HSAppUserChanged(currentUser));
-        }
-      },
+    return BlocBuilder<HSProfileCompletionCubit, HSProfileCompletionState>(
       buildWhen: (previous, current) =>
           previous.step != current.step ||
           previous.usernameValidationState != current.usernameValidationState ||
@@ -206,21 +199,21 @@ class _UsernameGuidelines extends StatelessWidget {
         children: [
           TextSpan(
             text: "unique, ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "between ",
           ),
           TextSpan(
             text: "5 ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "and ",
           ),
           TextSpan(
             text: "16 ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "characters long, ",
@@ -230,14 +223,14 @@ class _UsernameGuidelines extends StatelessWidget {
           ),
           TextSpan(
             text: "alphanumeric ",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
           const TextSpan(
             text: "characters plus the ",
           ),
           TextSpan(
             text: "'_'",
-            style: const TextStyle().boldify(),
+            style: const TextStyle().boldify,
           ),
         ],
       ),

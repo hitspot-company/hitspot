@@ -6,7 +6,6 @@ import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_pr
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSUserProfileStatsAppBar extends StatelessWidget {
   const HSUserProfileStatsAppBar({
@@ -49,7 +48,6 @@ class HSUserProfileStatsAppBar extends StatelessWidget {
         children: [
           BlocBuilder<HSUserProfileBloc, HSUserProfileState>(
             buildWhen: (previous, current) {
-              HSDebugLogger.logInfo("State changed");
               if (previous is HSUserProfileReady &&
                   current is HSUserProfileReady) {
                 return previous.user?.followers != current.user?.followers ||

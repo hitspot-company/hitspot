@@ -59,7 +59,7 @@ class HSMailingRepository {
 }
 
 class _HSMailData {
-  const _HSMailData({this.email, required this.html, required this.subject});
+  const _HSMailData({required this.html, required this.subject, this.email});
 
   final String html;
   final String subject;

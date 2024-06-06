@@ -14,7 +14,7 @@ class HSUserProfileUserDataAppBarReady extends StatelessWidget {
       children: [
         Text(
           "${user.fullName}",
-          style: textTheme.headlineSmall!.hintify(),
+          style: textTheme.headlineSmall!.hintify,
         ),
         Text("@${user.username}", style: textTheme.headlineLarge),
       ],

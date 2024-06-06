@@ -1,40 +1,17 @@
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_search_repository/src/exceptions/hs_search_exception.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class HSSearchRepository {
+  static final HSSearchRepository instance = HSSearchRepository();
   final algoliaCredentials = _AlgoliaCredentials.instance;
-  Stream<_AlgoliaSearchMetadata> get usersSearchMetadata =>
-      algoliaCredentials.users.usersSearcher.responses
-          .map(_AlgoliaSearchMetadata.fromResponse);
 
-  Stream<_AlgoliaSearchMetadata> get spotsSearchMetadata =>
-      algoliaCredentials.spots.spotsSearcher.responses
-          .map(_AlgoliaSearchMetadata.fromResponse);
-
-  HitsSearcher get usersSearcher => algoliaCredentials.users.usersSearcher;
-  HitsSearcher get spotsSearcher => algoliaCredentials.spots.spotsSearcher;
+  UsersSearcher get usersSearcher => algoliaCredentials.users;
+  SpotsSearcher get spotsSearcher => algoliaCredentials.spots;
 
   Stream<UsersHitsPage> get usersSearchPage =>
-      usersSearcher.responses.map(UsersHitsPage.fromResponse);
-
-  Stream<List<HSUser>> streamUsers(String query) {
-    try {
-      usersSearcher.query(query);
-      print("query: $query");
-      return usersSearcher.responses.map((e) => e.hits
-          .map((e) => HSUser.deserialize(e, uid: e["objectID"]))
-          .toList());
-    } catch (e) {
-      throw HSSearchException.users();
-    }
-  }
-
-  void dispose() {
-    if (!usersSearcher.isDisposed) usersSearcher.dispose();
-    if (!spotsSearcher.isDisposed) spotsSearcher.dispose();
-  }
+      usersSearcher.searcher.responses.map(UsersHitsPage.fromResponse);
 }
 
 class _AlgoliaCredentials {
@@ -50,43 +27,53 @@ class _AlgoliaCredentials {
   static final _AlgoliaCredentials _instance = _AlgoliaCredentials();
   static _AlgoliaCredentials get instance => _instance;
 
-  _SpotsSearcher get spots => _SpotsSearcher(applicationID!, apiKey!);
-  _UsersSearcher get users => _UsersSearcher(applicationID!, apiKey!);
+  SpotsSearcher get spots => SpotsSearcher(applicationID!, apiKey!);
+  UsersSearcher get users => UsersSearcher(applicationID!, apiKey!);
 
   late final String? apiKey;
   late final String? applicationID;
 }
 
-class _SpotsSearcher {
-  _SpotsSearcher(String applicationID, String apiKey) {
+class SpotsSearcher {
+  SpotsSearcher(String applicationID, String apiKey) {
     spotsSearcher = HitsSearcher(
       applicationID: applicationID,
       apiKey: apiKey,
       indexName: indexName,
-      debounce: const Duration(milliseconds: 100),
     ); // TODO: Change spots to dev_spots
   }
 
   final String indexName = "spots";
   late final HitsSearcher spotsSearcher;
-  Stream<_AlgoliaSearchMetadata> get spotsSearchMetadata =>
-      spotsSearcher.responses.map(_AlgoliaSearchMetadata.fromResponse);
 }
 
-class _UsersSearcher {
-  _UsersSearcher(String applicationID, String apiKey) {
-    usersSearcher = HitsSearcher(
+class UsersSearcher {
+  UsersSearcher(String applicationID, String apiKey) {
+    searcher = HitsSearcher(
       applicationID: applicationID,
       apiKey: apiKey,
       indexName: indexName,
-      debounce: const Duration(milliseconds: 100),
-    ); // TODO: Change users to dev_users
+      debounce: const Duration(milliseconds: 200),
+    );
     filterState.add(FilterGroupID("is_profile_completed"), filterCategory);
-    usersSearcher.connectFilterState(filterState);
+    searcher.connectFilterState(filterState);
+
+    // Paging
+    searchPage.listen((page) {
+      if (page.pageKey == 0) {
+        pagingController.refresh();
+      }
+      pagingController.appendPage(page.items, page.nextPageKey);
+    }).onError((e) => pagingController.error = e);
+    pagingController.addPageRequestListener((pageKey) =>
+        searcher.applyState((state) => state.copyWith(page: pageKey)));
   }
 
-  late final HitsSearcher usersSearcher;
+  late final HitsSearcher searcher;
   final String indexName = "users";
+  int? hitsPerPage;
+
+  void setHitsPerPage(int hitsPerPage) => this.hitsPerPage = hitsPerPage;
 
   // FILTERING
   final filterState = FilterState();
@@ -95,17 +82,26 @@ class _UsersSearcher {
     filters: {Filter.facet('is_profile_completed', true)},
   );
 
-  Stream<_AlgoliaSearchMetadata> get usersSearchMetadata =>
-      usersSearcher.responses.map(_AlgoliaSearchMetadata.fromResponse);
-}
+  final PagingController<int, HSUser> pagingController =
+      PagingController(firstPageKey: 0);
+  Stream<UsersHitsPage> get searchPage =>
+      searcher.responses.map(UsersHitsPage.fromResponse);
 
-class _AlgoliaSearchMetadata {
-  final int nbHits;
+  void queryChanged(String query) {
+    searcher.applyState(
+      (state) => state.copyWith(
+        query: query,
+        page: 0,
+        hitsPerPage: hitsPerPage,
+      ),
+    );
+  }
 
-  const _AlgoliaSearchMetadata(this.nbHits);
-
-  factory _AlgoliaSearchMetadata.fromResponse(SearchResponse response) =>
-      _AlgoliaSearchMetadata(response.nbHits);
+  void dispose() {
+    searcher.dispose();
+    pagingController.dispose();
+    filterState.dispose();
+  }
 }
 
 class UsersHitsPage {
@@ -116,12 +112,9 @@ class UsersHitsPage {
   final int? nextPageKey;
 
   factory UsersHitsPage.fromResponse(SearchResponse response) {
-    final items = response.hits.map((e) {
-      for (var element in e.entries) {
-        print("entry: ${element.key} : ${element.value}");
-      }
-      return HSUser.deserialize(e);
-    }).toList();
+    final items = response.hits
+        .map((e) => HSUser.deserialize(e, uid: e['objectID']))
+        .toList();
     final isLastPage = response.page >= response.nbPages;
     final nextPageKey = isLastPage ? null : response.page + 1;
     return UsersHitsPage(items, response.page, nextPageKey);

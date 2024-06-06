@@ -22,7 +22,7 @@ class VerifyEmailForm extends StatelessWidget {
       children: [
         Text(
           headline,
-          style: app.textTheme.titleMedium!.hintify(),
+          style: app.textTheme.titleMedium!.hintify,
         ),
         const Gap(24.0),
         BlocSelector<HSVerifyEmailCubit, HSVerifyEmailState,

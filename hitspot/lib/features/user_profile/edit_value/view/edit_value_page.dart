@@ -21,7 +21,7 @@ class EditValuePage extends StatelessWidget {
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
-            title: state.fieldName ?? "Edit",
+            titleText: state.fieldName ?? "Edit",
             right: _DoneButton(editValueCubit),
             defaultBackButtonCallback: () => navi.pop(true),
           ),
