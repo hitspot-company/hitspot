@@ -34,9 +34,6 @@ class HSScaffold extends StatelessWidget {
   static void hideInput() =>
       SystemChannels.textInput.invokeMethod('TextInput.hide');
 
-  static void hideInput() =>
-      SystemChannels.textInput.invokeMethod('TextInput.hide');
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
