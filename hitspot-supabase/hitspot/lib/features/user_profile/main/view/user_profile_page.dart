@@ -220,13 +220,11 @@ class _UserDataAppBar extends StatelessWidget {
         background: Row(
           children: [
             Expanded(
-              child: HSUserMonitor(
-                child: HSUserAvatar(
-                  loading: loading,
-                  radius: 70.0,
-                  iconSize: 50,
-                  imageUrl: user?.avatarUrl,
-                ),
+              child: HSUserAvatar(
+                loading: loading,
+                radius: 70.0,
+                iconSize: 50,
+                imageUrl: user?.avatarUrl,
               ),
             ),
             Expanded(

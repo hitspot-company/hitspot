@@ -102,9 +102,12 @@ class _Container extends StatelessWidget {
       width: width,
       decoration: BoxDecoration(
         borderRadius: borderRadius,
-        color: color,
+        color: image != null ? null : color,
         image: image != null
-            ? DecorationImage(image: image!, fit: fit, opacity: opacity ?? 1.0)
+            ? DecorationImage(
+                image: image!,
+                fit: fit ?? BoxFit.cover,
+                opacity: opacity ?? 1.0)
             : null,
       ),
       child: Align(alignment: childAlignment, child: child),

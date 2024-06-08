@@ -40,6 +40,11 @@ class HSDatabaseRepsitory {
   Future<void> boardDelete({required HSBoard board}) async =>
       await _boardsRepository.delete(board);
 
-  Future<List<HSBoard>> fetchUserBoards({HSUser? user, String? userID}) async =>
+  Future<List<HSBoard>> boardFetchUserBoards(
+          {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchUserBoards(user, userID);
+
+  Future<List<HSBoard>> boardFetchSavedBoards(
+          {HSUser? user, String? userID}) async =>
+      await _boardsRepository.fetchSavedBoards(user, userID);
 }

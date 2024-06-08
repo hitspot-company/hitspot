@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_authentication_repository/src/exceptions/hs_authentication_exception.dart';
 import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
@@ -25,18 +26,26 @@ class HSAuthenticationRepository {
   /// Throws a [LogInWithGoogleFailure] if an exception occurs.
   Future<void> logInWithGoogle() async {
     try {
-      // const List<String> scopes = <String>['email', 'profile'];
+      final iosClientID =
+          '145078839676-l7qo10knv94buh9hedq23juhfo8tk5r1.apps.googleusercontent.com';
+      final serverClientID =
+          '145078839676-cu1rrvvm3dcfgqjcona6ilt0m4jng5av.apps.googleusercontent.com';
+      GoogleSignIn _googleSignIn = GoogleSignIn(
+        clientId: iosClientID,
+        serverClientId: serverClientID,
+      );
+      final credential = await _googleSignIn.signIn();
+      final googleAuth = await credential!.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
 
-      // GoogleSignIn _googleSignIn = GoogleSignIn(
-      //   clientId:
-      //       '145078839676-cu1rrvvm3dcfgqjcona6ilt0m4jng5av.apps.googleusercontent.com',
-      //   scopes: scopes,
-      // );
-      // final credential = await _googleSignIn.signIn();
-      // await _supabaseClient.auth.signInWithIdToken(
-      //     provider: supabase.OAuthProvider.google, idToken: credential!.id);
-      await _supabaseClient.auth.signInWithOAuth(supabase.OAuthProvider.google,
-          redirectTo: "hitspot.app://login-callback/");
+      if (accessToken == null || idToken == null)
+        throw LogInWithGoogleFailure("Failed to get Google credentials.");
+
+      await _supabaseClient.auth.signInWithIdToken(
+          provider: supabase.OAuthProvider.google,
+          idToken: idToken,
+          accessToken: accessToken);
     } on supabase.AuthException catch (_) {
       throw LogInWithGoogleFailure(_.message);
     } catch (_) {

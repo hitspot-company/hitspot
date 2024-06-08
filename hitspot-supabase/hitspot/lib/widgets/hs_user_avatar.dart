@@ -39,7 +39,6 @@ class HSUserAvatar extends StatelessWidget {
     } else if (imageUrl == null) {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: currentTheme.highlightColor,
         child: Center(
           child: Icon(
             FontAwesomeIcons.solidUser,

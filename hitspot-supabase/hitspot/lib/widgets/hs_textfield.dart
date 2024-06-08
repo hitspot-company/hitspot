@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hitspot/constants/constants.dart';
 
 class HSTextField extends StatelessWidget {
   const HSTextField({
@@ -62,6 +63,44 @@ class HSTextField extends StatelessWidget {
         fillColor: fillColor,
         errorText: errorText,
       ),
+    );
+  }
+
+  factory HSTextField.filled({
+    Key? key,
+    String? hintText,
+    Color? fillColor,
+    Function(String)? onChanged,
+    Widget? suffixIcon,
+    bool autofocus = false,
+    String? initialValue,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    int maxLines = 1,
+    int? maxLength,
+    EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
+    TextInputAction? textInputAction,
+    String? errorText,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+  }) {
+    return HSTextField(
+      key: key,
+      hintText: hintText,
+      fillColor: fillColor ?? appTheme.textfieldFillColor,
+      onChanged: onChanged,
+      suffixIcon: suffixIcon,
+      autofocus: autofocus,
+      initialValue: initialValue,
+      readOnly: readOnly,
+      onTap: onTap,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      scrollPadding: scrollPadding,
+      textInputAction: textInputAction,
+      errorText: errorText,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
     );
   }
 }

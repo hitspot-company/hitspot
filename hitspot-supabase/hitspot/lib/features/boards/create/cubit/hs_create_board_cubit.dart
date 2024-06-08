@@ -98,10 +98,10 @@ class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
       if (state.image.isNotEmpty) {
         final String uploadedFileUrl =
             await uploadFile(File(state.image), boardID);
-        await _databaseRepository.boardCreate(
+        await Future.delayed(const Duration(seconds: 1));
+        await _databaseRepository.boardUpdate(
             board: board.copyWith(id: boardID, image: uploadedFileUrl));
       }
-      await Future.delayed(const Duration(seconds: 1));
       navi.toBoard(boardID: boardID);
     } on HSBoardException catch (_) {
       HSDebugLogger.logError("Error creating board: $_");

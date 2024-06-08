@@ -28,6 +28,7 @@ class CreateBoardPage extends StatelessWidget {
       appBar: HSAppBar(
         enableDefaultBackButton: true,
         titleText: addBoardCubit.pageTitle,
+        titleBold: true,
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 32.0),
@@ -69,19 +70,20 @@ class _FirstPage extends StatelessWidget {
           text: "What will you call your board?",
         ),
         const Gap(8.0),
-        HSTextField(
+        HSTextField.filled(
           onChanged: _addBoardCubit.updateTitle,
           suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
           hintText: "Title",
           initialValue: _addBoardCubit.state.title,
           textInputAction: TextInputAction.next,
+          fillColor: appTheme.textfieldFillColor,
         ),
         const Gap(32.0),
         const HSFormCaption(
           text: "Give us some details about the board.",
         ),
         const Gap(8.0),
-        HSTextField(
+        HSTextField.filled(
           textInputAction: TextInputAction.done,
           maxLines: 5,
           onChanged: _addBoardCubit.updateDescription,
@@ -101,10 +103,19 @@ class _FirstPage extends StatelessWidget {
         ),
         const Gap(32.0),
         HSFormButtonsRow(
-            right: HSFormButton(
-          icon: const Icon(FontAwesomeIcons.arrowRight),
-          onPressed: _addBoardCubit.nextPage,
-          child: const Text("Customize"),
+            right: BlocBuilder<HSCreateBoardCubit, HSCreateBoardState>(
+          buildWhen: (previous, current) =>
+              previous.title != current.title ||
+              previous.description != current.description,
+          builder: (context, state) {
+            final bool valid =
+                state.title.isNotEmpty && state.description.isNotEmpty;
+            return HSFormButton(
+              icon: const Icon(FontAwesomeIcons.arrowRight),
+              onPressed: valid ? _addBoardCubit.nextPage : null,
+              child: const Text("Customize"),
+            );
+          },
         ))
       ],
     );

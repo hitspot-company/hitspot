@@ -46,13 +46,6 @@ class LoginForm extends StatelessWidget {
               child: HSSocialLoginButtons.apple(loginCubit.logInWithApple)),
           const SliverToBoxAdapter(child: Gap(24.0)),
           const SliverToBoxAdapter(child: _Footer()),
-          // const SliverFillRemaining(
-          //   hasScrollBody: false,
-          //   child: Align(
-          //     alignment: Alignment.bottomCenter,
-          //     child: _Footer(),
-          //   ),
-          // ),
         ],
       ),
     );

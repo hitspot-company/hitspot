@@ -9,7 +9,9 @@ import 'package:hitspot/features/complete_profile/view/complete_profile_provider
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/login/view/magic_link_sent_page.dart';
+import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
+import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 
 class HSNavigation {
@@ -25,6 +27,7 @@ class HSNavigation {
       router.configuration.navigatorKey.currentState!.push(
         MaterialPageRoute(builder: (_) => page),
       );
+  dynamic push(String location) => router.push(location);
 
   final GoRouter router = GoRouter(
     initialLocation: "/splash",
@@ -50,7 +53,17 @@ class HSNavigation {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/board/:boardID',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
         path: '/create_board',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/saved',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
@@ -75,8 +88,17 @@ class HSNavigation {
                     userID: state.pathParameters['userID']!),
               ),
               GoRoute(
+                path: 'board/:boardID',
+                builder: (context, state) =>
+                    InfoPage(infoText: state.pathParameters['boardID']!),
+              ),
+              GoRoute(
                 path: 'create_board',
                 builder: (context, state) => const CreateBoardProvider(),
+              ),
+              GoRoute(
+                path: 'saved',
+                builder: (context, state) => const SavedProvider(),
               ),
             ],
           ),

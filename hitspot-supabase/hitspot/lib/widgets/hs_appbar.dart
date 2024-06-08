@@ -2,9 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/utils/navigation/hs_navigation.dart';
-// import 'package:hitspot/app/hs_app.dart';
-// import 'package:hitspot/constants/constants.dart';
 
 class HSAppBar extends StatelessWidget {
   HSAppBar({
@@ -72,13 +69,10 @@ class HSAppBar extends StatelessWidget {
                 child: AutoSizeText(
                   titleText!,
                   textAlign: TextAlign.center,
-                  // style: TODO: Change this
-
-                  // textTheme.headlineMedium!.copyWith(
-                  //     color: Colors.white,
-                  //     fontWeight:
-                  //         titleBold ? FontWeight.bold : FontWeight.normal,
-                  //     fontSize: fontSize),
+                  style: textTheme.headlineMedium!.copyWith(
+                      fontWeight:
+                          titleBold ? FontWeight.bold : FontWeight.normal,
+                      fontSize: fontSize),
                   maxLines: maxLines,
                 ),
               ),

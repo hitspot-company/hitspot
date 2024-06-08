@@ -9,6 +9,7 @@ class HSBoardsRepository {
 
   final SupabaseClient _supabase;
   final String _boards;
+  final String _savedBoards = "saved_boards";
 
   // CREATE
   Future<String> create(HSBoard board) async {
@@ -68,6 +69,22 @@ class HSBoardsRepository {
     }
   }
 
+  Future<List<HSBoard>> fetchSavedBoards(HSUser? user, String? userID) async {
+    assert(user != null || userID != null, "User or userID must be provided");
+    final uid = user?.uid ?? userID!;
+    try {
+      final fetchedBoards = await _supabase
+          .from(_boards)
+          .select('*, boards_saves!inner(board_id, user_id)')
+          .eq("boards_saves.user_id", uid)
+          .range(0, 10);
+      return fetchedBoards.map((e) => HSBoard.deserialize(e)).toList();
+    } catch (_) {
+      throw HSBoardException(
+          type: HSBoardExceptionType.read, details: _.toString());
+    }
+  }
+
   // READ ALL USER BOARDS
   Future<List<HSBoard>> fetchUserBoards(HSUser? user, String? userID) async {
     assert(user != null || userID != null, "User or userID must be provided");
@@ -75,9 +92,8 @@ class HSBoardsRepository {
       final fetchedBoards = await _supabase
           .from(_boards)
           .select()
-          .eq("created_by", user?.uid ?? userID!);
-      // TODO: Implement visibility filtering
-      // TODO: Implement pagination
+          .eq("created_by", user?.uid ?? userID!)
+          .range(0, 10);
       return fetchedBoards.map((e) => HSBoard.deserialize(e)).toList();
     } catch (_) {
       throw HSBoardException(

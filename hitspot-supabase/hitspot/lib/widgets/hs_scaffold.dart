@@ -116,7 +116,7 @@ class _BottombarItem extends StatelessWidget {
     _BottombarItem(
       iconData: FontAwesomeIcons.house,
       onPressed: () => print("home"),
-      // iconColor: currentTheme.mainColor
+      iconColor: appTheme.mainColor,
     ),
     _BottombarItem(
         iconData: FontAwesomeIcons.plane, onPressed: () => print("trips")),
@@ -125,10 +125,11 @@ class _BottombarItem extends StatelessWidget {
       iconSize: 36.0,
       onPressed: navi.toCreateBoard,
     ),
-    _BottombarItem(iconData: FontAwesomeIcons.a, onPressed: () => print("idk")),
     _BottombarItem(
-        iconData: FontAwesomeIcons.bookmark,
-        onPressed: () => print("saved") // navi.newPush("/saved"),
-        ),
+        iconData: FontAwesomeIcons.mapPin, onPressed: () => print("map")),
+    _BottombarItem(
+      iconData: FontAwesomeIcons.bookmark,
+      onPressed: () => navi.push("/saved"),
+    ),
   ];
 }

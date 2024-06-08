@@ -17,9 +17,9 @@ class HSBoard {
       id: data["id"],
       title: data["title"],
       description: data["description"],
-      color: data["color"].toString().toColor,
+      color: data["color"]?.toString().toColor,
       image: data["image"],
-      visibility: data["visibility"],
+      visibility: HSBoardVisibility.deserialize(data["visibility"]),
       createdAt: data["created_at"] != null
           ? DateTime.tryParse(data["created_at"])
           : null,
@@ -94,11 +94,11 @@ enum HSBoardVisibility {
   invite,
   public;
 
-  factory HSBoardVisibility.fromCode(int code) {
-    switch (code) {
-      case 1:
+  factory HSBoardVisibility.deserialize(String name) {
+    switch (name) {
+      case "on-invite":
         return HSBoardVisibility.invite;
-      case 2:
+      case "public":
         return HSBoardVisibility.public;
       default:
         return HSBoardVisibility.private;
@@ -121,7 +121,7 @@ enum HSBoardVisibility {
       case HSBoardVisibility.private:
         return "private";
       case HSBoardVisibility.invite:
-        return "invite";
+        return "on-invite";
       case HSBoardVisibility.public:
         return "public";
     }

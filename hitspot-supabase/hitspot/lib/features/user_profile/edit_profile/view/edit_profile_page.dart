@@ -59,12 +59,10 @@ class EditProfilePage extends StatelessWidget {
                               child = InkWell(
                                 radius: 60.0,
                                 onTap: editProfileCubit.chooseImage,
-                                child: HSUserMonitor(
-                                  child: HSUserAvatar(
-                                    imageUrl: app.currentUser.avatarUrl,
-                                    radius: 80,
-                                    iconSize: 50,
-                                  ),
+                                child: HSUserAvatar(
+                                  imageUrl: app.currentUser.avatarUrl,
+                                  radius: 80,
+                                  iconSize: 50,
                                 ),
                               );
                           }
