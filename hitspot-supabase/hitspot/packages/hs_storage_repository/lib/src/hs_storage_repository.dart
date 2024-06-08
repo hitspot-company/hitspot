@@ -13,7 +13,7 @@ class HSStorageRepository {
   final SupabaseClient _supabase;
   late final HSBucketsRepository _bucketsRepository;
   late final HSFilesRepository _filesRepository;
-  final String avatarsBucket = "avatars";
+  final String avatarsBucket = "user_avatars";
   final String boardsBucket = "boards";
 
   // Buckets

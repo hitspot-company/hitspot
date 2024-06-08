@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_authentication_repository/src/exceptions/hs_authentication_exception.dart';
 import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
@@ -61,6 +60,7 @@ class HSAuthenticationRepository {
           idToken: credential.identityToken!);
       HSDebugLogger.logSuccess("SIGNED IN WITH APPLE");
     } on supabase.AuthException catch (_) {
+      HSDebugLogger.logError("Error: ${_.message}");
       throw LogInWithGoogleFailure(_.message);
     } catch (_) {
       throw LogInWithGoogleFailure(_.toString());
