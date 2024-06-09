@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_search_bar.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -70,17 +68,17 @@ class HomePage extends StatelessWidget {
           const SliverToBoxAdapter(
             child: Gap(16.0),
           ),
-          // const SliverAppBar(
-          //   automaticallyImplyLeading: false,
-          //   surfaceTintColor: Colors.transparent,
-          //   stretch: true,
-          //   title: HSSearchBar(
-          //     height: 60.0,
-          //   ),
-          //   centerTitle: true,
-          //   pinned: true,
-          //   toolbarHeight: 60,
-          // ),
+          const SliverAppBar(
+            automaticallyImplyLeading: false,
+            surfaceTintColor: Colors.transparent,
+            stretch: true,
+            title: HSSearchBar(
+              height: 60.0,
+            ),
+            centerTitle: true,
+            pinned: true,
+            toolbarHeight: 60,
+          ),
           const SliverToBoxAdapter(
             child: SizedBox(
               height: 32.0,
