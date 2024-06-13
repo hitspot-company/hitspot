@@ -5,7 +5,7 @@ import 'package:hitspot/widgets/shimmer_skeleton.dart';
 class HSShimmerBox extends StatelessWidget {
   const HSShimmerBox({super.key, required this.width, required this.height});
 
-  final double width, height;
+  final double? width, height;
 
   @override
   Widget build(BuildContext context) {
