@@ -8,6 +8,9 @@ class HSUser {
   final bool? emailHidden;
   final bool? isProfileCompleted, isEmailVerified;
 
+  // Counts
+  final int? followers, following, boards, spots;
+
   Map<String, dynamic> serialize() {
     return {
       "id": uid,
@@ -21,6 +24,10 @@ class HSUser {
       "is_email_hidden": emailHidden,
       "is_profile_completed": isProfileCompleted ?? false,
       "is_email_verified": isEmailVerified ?? false,
+      "followers_count": followers ?? 0,
+      "following_count": following ?? 0,
+      "boards_count": boards ?? 0,
+      "spots_count": spots ?? 0,
     };
   }
 
@@ -41,6 +48,10 @@ class HSUser {
       emailHidden: data["is_email_hidden"] ?? true,
       isProfileCompleted: data["is_profile_completed"] ?? false,
       isEmailVerified: data["is_email_verified"] ?? true, // We use magic links
+      followers: data["followers_count"] ?? 0,
+      following: data["following_count"] ?? 0,
+      boards: data["boards_count"] ?? 0,
+      spots: data["spots_count"] ?? 0,
     );
   }
 
@@ -56,6 +67,10 @@ class HSUser {
     bool? emailHidden,
     bool? isProfileCompleted,
     bool? isEmailVerified,
+    int? followers,
+    int? following,
+    int? boards,
+    int? spots,
   }) {
     return HSUser(
       uid: uid ?? this.uid,
@@ -69,6 +84,10 @@ class HSUser {
       emailHidden: emailHidden ?? this.emailHidden,
       isProfileCompleted: isProfileCompleted ?? this.isProfileCompleted,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+      followers: followers ?? this.followers,
+      following: following ?? this.followers,
+      boards: boards ?? this.followers,
+      spots: spots ?? this.followers,
     );
   }
 
@@ -84,6 +103,10 @@ class HSUser {
     this.emailHidden,
     this.isProfileCompleted,
     this.isEmailVerified,
+    this.followers,
+    this.following,
+    this.boards,
+    this.spots,
   });
 
   @override
@@ -101,6 +124,10 @@ createdAt: $createdAt
 emailHidden: $emailHidden
 isProfileCompleted: $isProfileCompleted
 isEmailVerified: $isEmailVerified
+followers: $followers
+following: $following
+boards: $boards
+spots: $spots
 """;
   }
 }

@@ -49,7 +49,9 @@ class HSLoginCubit extends Cubit<HSLoginState> {
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
       await _authenticationRepository.signInWithMagicLink(
-          email: state.email.value);
+          email: "kuba@bitbucket.local" // TODO: Change
+          // email: state.email.value,
+          );
       app.authenticationBloc
           .add(HSAuthenticationMagicLinkSentEvent(state.email.value));
       emit(state.copyWith(status: FormzSubmissionStatus.success));

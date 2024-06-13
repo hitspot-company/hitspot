@@ -51,7 +51,8 @@ class HSBoardsRepository {
           .from(_boards)
           .update(board.serialize())
           .eq("id", board.id!);
-      HSDebugLogger.logSuccess("Board (${board.id}) data updated!");
+      HSDebugLogger.logSuccess(
+          "Board (${board.id}) data updated with image: (${board.image})!");
     } catch (_) {
       throw HSBoardException(
           type: HSBoardExceptionType.update, details: _.toString());

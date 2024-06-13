@@ -100,14 +100,18 @@ class _BoardsBuilder extends StatelessWidget {
       itemCount: boards.length,
       separatorBuilder: (context, index) => const Gap(16.0),
       itemBuilder: (BuildContext context, int index) {
-        return HSImage(
-          opacity: .6,
-          borderRadius: BorderRadius.circular(14.0),
-          height: 100,
-          width: screenWidth,
-          imageUrl: boards[index].image,
-          color: boards[index].color ?? appTheme.textfieldFillColor,
-          child: Text(boards[index].title!, style: textTheme.headlineSmall),
+        final HSBoard board = boards[index];
+        return GestureDetector(
+          onTap: () => navi.toBoard(boardID: board.id!, title: board.title),
+          child: HSImage(
+            opacity: .6,
+            borderRadius: BorderRadius.circular(14.0),
+            height: 70,
+            width: screenWidth,
+            imageUrl: board.image,
+            color: board.color ?? appTheme.textfieldFillColor,
+            child: Text(board.title!, style: textTheme.headlineSmall),
+          ),
         );
       },
     );

@@ -5,13 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
+import 'package:hitspot/features/boards/single/view/single_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/login/view/magic_link_sent_page.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
-import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 
 class HSNavigation {
@@ -89,8 +89,9 @@ class HSNavigation {
               ),
               GoRoute(
                 path: 'board/:boardID',
-                builder: (context, state) =>
-                    InfoPage(infoText: state.pathParameters['boardID']!),
+                builder: (context, state) => SingleBoardProvider(
+                    boardID: state.pathParameters['boardID']!,
+                    title: state.uri.queryParameters['title'] ?? "title :("),
               ),
               GoRoute(
                 path: 'create_board',
@@ -163,6 +164,7 @@ class HSNavigation {
 
   // Routes
   dynamic toUser({required String userID}) => router.push('/user/$userID');
-  dynamic toBoard({required String boardID}) => router.push('/board/$boardID');
+  dynamic toBoard({required String boardID, required String? title}) =>
+      router.push('/board/$boardID${title != null ? "?title=$title" : ""}');
   dynamic toCreateBoard() => router.push('/create_board');
 }

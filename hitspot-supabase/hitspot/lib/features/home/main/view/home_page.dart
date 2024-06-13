@@ -73,7 +73,7 @@ class HomePage extends StatelessWidget {
             surfaceTintColor: Colors.transparent,
             stretch: true,
             title: HSSearchBar(
-              height: 60.0,
+              height: 52.0,
             ),
             centerTitle: true,
             pinned: true,

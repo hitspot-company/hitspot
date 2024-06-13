@@ -2,6 +2,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/users/hs_users_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
@@ -25,8 +26,34 @@ class HSDatabaseRepsitory {
   Future<void> userUpdate({required HSUser user}) async =>
       await _usersRepository.update(user);
 
-  Future<bool> isUsernameAvailable({required String username}) async =>
+  Future<bool> userIsUsernameAvailable({required String username}) async =>
       await _usersRepository.isUsernameAvailable(username);
+
+  Future<bool?> userIsUserFollowed(
+          {String? followerID,
+          HSUser? follower,
+          String? followedID,
+          HSUser? followed}) async =>
+      await _usersRepository.isUserFollowed(
+          followerID, follower, followedID, followed);
+
+  Future<void> userFollow(
+      {required bool isFollowed,
+      String? followerID,
+      String? followedID,
+      HSUser? follower,
+      HSUser? followed}) async {
+    final bool? foll = await userIsUserFollowed(
+        followedID: followedID, followerID: followerID);
+    if (foll!) {
+      // HSDebugLogger.logInfo("User followed: Yes");
+      await _usersRepository.unfollow(
+          followerID, followedID, follower, followed);
+    } else {
+      // HSDebugLogger.logInfo("User followed: No");
+      await _usersRepository.follow(followerID, followedID, follower, followed);
+    }
+  }
 
   Future<String> boardCreate({required HSBoard board}) async =>
       await _boardsRepository.create(board);

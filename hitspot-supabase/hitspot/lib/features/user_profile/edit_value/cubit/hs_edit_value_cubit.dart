@@ -37,7 +37,8 @@ class HSEditValueCubit extends Cubit<HSEditValueState> {
         if (!HSUsername.usernameRegExp.hasMatch(value)) {
           throw HSUsername.validateUsername(value);
         }
-        if (!await _databaseRepository.isUsernameAvailable(username: value)) {
+        if (!await _databaseRepository.userIsUsernameAvailable(
+            username: value)) {
           throw "The username is not available.";
         }
       case "full_name":

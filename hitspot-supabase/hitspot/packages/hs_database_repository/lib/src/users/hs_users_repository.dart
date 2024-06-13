@@ -48,8 +48,8 @@ class HSUsersRepository {
       throw HSUpdateUserFailure(customDetails: _.toString());
     }
   }
-  // DELETE
 
+  // DELETE
   Future<bool> isUsernameAvailable(String username) async {
     try {
       final res = await _supabase
@@ -61,6 +61,63 @@ class HSUsersRepository {
       return count == 0;
     } catch (_) {
       throw HSUserException(message: "Error verifying username availability.");
+    }
+  }
+
+  Future<void> unfollow(String? followerID, String? followedID,
+      HSUser? follower, HSUser? followed) async {
+    assert(followerID != null || follower != null,
+        "Follower or followerID must be provided");
+    assert(followedID != null || followed != null,
+        "Followed or followedID must be provided");
+    try {
+      final followerUID = follower?.uid ?? followerID!;
+      final followedUID = followed?.uid ?? followedID!;
+      await _supabase.rpc('unfollow_user', params: {
+        "follower_uid": followerUID,
+        "followed_uid": followedUID,
+      });
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> follow(String? followerID, String? followedID, HSUser? follower,
+      HSUser? followed) async {
+    assert(followerID != null || follower != null,
+        "Follower or followerID must be provided");
+    assert(followedID != null || followed != null,
+        "Followed or followedID must be provided");
+    try {
+      final followerUID = follower?.uid ?? followerID!;
+      final followedUID = followed?.uid ?? followedID!;
+      await _supabase.rpc('follow_user',
+          params: {"followed_uid": followedUID, "follower_uid": followerUID});
+      HSDebugLogger.logSuccess("Followed");
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+      rethrow;
+    }
+  }
+
+  Future<bool?> isUserFollowed(String? followerID, HSUser? follower,
+      String? followedID, HSUser? followed) async {
+    assert(followerID != null || follower != null,
+        "Follower or followerID must be provided");
+    assert(followedID != null || followed != null,
+        "Followed or followedID must be provided");
+    try {
+      final String followedUID = followed?.uid ?? followedID!;
+      final String followerUID = follower?.uid ?? followerID!;
+      final bool response = await _supabase.rpc('is_user_followed', params: {
+        'follower_uid': followerUID,
+        'followed_uid': followedUID,
+      });
+      return (response);
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+      rethrow;
     }
   }
 }
