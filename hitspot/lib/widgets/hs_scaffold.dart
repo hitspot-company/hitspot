@@ -50,7 +50,6 @@ class HSScaffold extends StatelessWidget {
               defaultBottombarEnabled ? const _Bottombar() : const SizedBox(),
           backgroundColor: backgroundColor,
           resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-          bottomNavigationBar: bottomAppBar,
           body: SafeArea(
             top: topSafe,
             bottom: bottomSafe,
