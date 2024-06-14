@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/add_spot/view/add_spot_page.dart';
 import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
@@ -98,6 +99,19 @@ class HomePage extends StatelessWidget {
           HSSpotsGrid.loading(isSliver: true)
         ],
       ),
+      bottomAppBar: BottomAppBar(
+          shape: CircularNotchedRectangle(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  navi.push(AddSpotPage.route());
+                },
+              ),
+            ],
+          )),
     );
   }
 }

@@ -9,9 +9,11 @@ import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_search_repository/hs_search.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 import 'package:hs_toasts/hs_toasts.dart';
+import 'package:location/location.dart';
 
 class HSApp {
   // SINGLETON
@@ -34,9 +36,12 @@ class HSApp {
   TextTheme get textTheme => theme.textTheme;
   TextStyle? get headlineMedium => textTheme.headlineMedium;
   Color? get textFieldFillColor => theme.textfieldFillColor;
+
   void changeTheme() => themeBloc.add(HSThemeSwitchEvent());
+
   double get screenWidth => MediaQuery.of(context!).size.width;
   double get screenHeight => MediaQuery.of(context!).size.height;
+
   HSThemeRepository get themeRepository => HSThemeRepository.instance;
 
   // POPUPS
@@ -68,16 +73,20 @@ class HSApp {
     navi.logout();
   }
 
+  // DATABASE
+  HSDatabaseRepository get databaseRepository =>
+      context!.read<HSDatabaseRepository>();
+
   // CURRENT USER
   HSUser get currentUser => authBloc.state.user;
   String? get username => currentUser.username;
   void updateCurrentUser(HSUser user) => authBloc.updateCurrentUser(user);
 
-  // DATABASE
-  HSDatabaseRepository get databaseRepository =>
-      context!.read<HSDatabaseRepository>();
-
   // Full Text Search
   HSSearchRepository get searchRepository =>
       context!.read<HSSearchRepository>();
+
+  // LOCATION
+  HSLocationRepository get locationRepository =>
+      context!.read<HSLocationRepository>();
 }

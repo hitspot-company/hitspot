@@ -1,0 +1,11 @@
+name: hs_location_repository
+description: Hitspot package to manage location utilities
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  location: ^6.0.2
+  google_maps_flutter: ^2.6.1 

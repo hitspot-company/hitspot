@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/exceptions/database_connection_failure.dart';
 
 class HSUsersRepository {
   static final _db = FirebaseFirestore.instance;
@@ -15,7 +16,7 @@ class HSUsersRepository {
         HSUserField.following.name: FieldValue.arrayUnion([user.uid])
       });
     } catch (_) {
-      throw DatabaseConnectionFailure("The user could not be followed.");
+      throw DatabaseRepositoryFailure("The user could not be followed.");
     }
   }
 
@@ -28,7 +29,7 @@ class HSUsersRepository {
         HSUserField.following.name: FieldValue.arrayRemove([user.uid])
       });
     } catch (_) {
-      throw DatabaseConnectionFailure("The user could not be unfollowed.");
+      throw DatabaseRepositoryFailure("The user could not be unfollowed.");
     }
   }
 
@@ -38,7 +39,7 @@ class HSUsersRepository {
         field: newValue,
       }).timeout(const Duration(seconds: 3));
     } catch (_) {
-      throw DatabaseConnectionFailure("The field $field could not be updated.");
+      throw DatabaseRepositoryFailure("The field $field could not be updated.");
     }
   }
 
@@ -50,28 +51,22 @@ class HSUsersRepository {
           .update(user.copyWith(createdAt: now).serialize())
           .timeout(const Duration(seconds: 3));
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      throw DatabaseRepositoryFailure('An unknown exception occured');
     }
   }
 
   // If user does not exist in database, it wil create a new document
   Future<void> updateUserInfoInDatabase(HSUser user) async {
     try {
-      await _usersCollection
-          .doc(user.uid)
-          .set(user.serialize())
-          .timeout(const Duration(seconds: 3));
+      await _usersCollection.doc(user.uid).set(user.serialize());
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      throw DatabaseRepositoryFailure('An unknown exception occured');
     }
   }
 
   Future<HSUser?> getUserFromDatabase(String uid) async {
     try {
-      DocumentSnapshot snapshot = await _usersCollection
-          .doc(uid)
-          .get()
-          .timeout(const Duration(seconds: 5));
+      DocumentSnapshot snapshot = await _usersCollection.doc(uid).get();
 
       // If user is not in database return null
       if (!snapshot.exists) {
@@ -83,7 +78,7 @@ class HSUsersRepository {
 
       return HSUser.deserialize(snapshotInJson, uid: snapshot.id);
     } catch (_) {
-      return null;
+      throw DatabaseRepositoryFailure('An unknown exception occured');
     }
   }
 
@@ -95,7 +90,7 @@ class HSUsersRepository {
           .get();
       return (query.count == 0);
     } catch (_) {
-      throw const DatabaseConnectionFailure('An unknown exception occured');
+      throw DatabaseRepositoryFailure('An unknown exception occured');
     }
   }
 
