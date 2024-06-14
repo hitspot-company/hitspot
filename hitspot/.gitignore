@@ -48,3 +48,5 @@ app.*.map.json
 # Environment files
 lib/firebase_options.dart
 packages/hs_firebase_config/lib/src/hs_firebase_config.*.dart
+
+pubspec.lock

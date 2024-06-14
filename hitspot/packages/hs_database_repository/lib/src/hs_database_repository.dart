@@ -2,11 +2,16 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
+
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/hs_database_repository_boards.dart';
 import 'package:hs_database_repository/src/hs_database_repository_trips.dart';
 import 'package:hs_database_repository/src/hs_database_repository_users.dart';
+import 'package:hs_database_repository/src/hs_database_repository_spots.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HSDatabaseRepository {
   const HSDatabaseRepository();
@@ -20,6 +25,7 @@ class HSDatabaseRepository {
   static final _usersRepository = HSUsersRepository();
   static final _boardsRepository = HSBoardsRepository(boards, users);
   static final _tripsRepository = HSTripsRepository(trips, users);
+  static final _spotsRepository = HSSpotsRepository();
 
   Future<void> userFollow(HSUser currentUser, HSUser user) async =>
       await _usersRepository.followUser(currentUser, user);
@@ -42,12 +48,22 @@ class HSDatabaseRepository {
 
   Future<HSUser?> userGet(String uid) async {
     try {
-      final HSUser? user = await _usersRepository.getUserFromDatabase(uid);
+      HSUser? user = await _usersRepository.getUserFromDatabase(uid);
+      if (user == null) throw DatabaseRepositoryFailure("The user is null");
       return (user);
     } catch (e) {
       throw DatabaseConnectionFailure("The user could not be fetched");
     }
   }
+
+  Future<void> createSpot(
+          {required String userID,
+          required LatLng location,
+          required String title,
+          required String description,
+          required List<XFile> images}) async =>
+      await _spotsRepository.createSpot(
+          userID, location, title, description, images);
 
   Future<bool> userIsUsernameAvailable(String username) async =>
       await _usersRepository.isUsernameAvailable(username);
