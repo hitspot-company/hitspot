@@ -123,7 +123,7 @@ class _BottombarItem extends StatelessWidget {
     _BottombarItem(
       iconData: FontAwesomeIcons.plus,
       iconSize: 36.0,
-      onPressed: navi.toCreateBoard,
+      onPressed: navi.toCreateSpot,
     ),
     _BottombarItem(
         iconData: FontAwesomeIcons.mapPin, onPressed: () => print("map")),

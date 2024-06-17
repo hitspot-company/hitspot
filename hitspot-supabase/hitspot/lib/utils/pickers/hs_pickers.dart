@@ -127,7 +127,7 @@ class HSPickers {
     final ImageCropper cropper = ImageCropper();
     ret = await cropper.cropImage(
       aspectRatio: cropAspectRatio,
-      cropStyle: cropStyle ?? CropStyle.rectangle,
+      // cropStyle: cropStyle ?? CropStyle.rectangle,
       sourcePath: sourcePath,
       uiSettings: [
         IOSUiSettings(

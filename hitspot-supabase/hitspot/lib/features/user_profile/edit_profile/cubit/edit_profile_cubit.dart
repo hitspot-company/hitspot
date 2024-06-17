@@ -25,7 +25,7 @@ class EditProfileCubit extends Cubit<EditProfileState> {
   Future<CroppedFile?> _getCroppedFile(String sourcePath) async {
     late final CroppedFile? ret;
     ret = await ImageCropper().cropImage(
-        cropStyle: CropStyle.circle,
+        // aspectRatio: CropAspectRatio(ratioX: 1),
         sourcePath: sourcePath,
         uiSettings: [
           IOSUiSettings(

@@ -14,6 +14,7 @@ import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_page.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
+import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
@@ -63,6 +64,11 @@ class HSNavigation {
       ),
       GoRoute(
         path: '/create_board',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/create_spot',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
@@ -118,6 +124,10 @@ class HSNavigation {
               GoRoute(
                 path: 'create_board',
                 builder: (context, state) => const CreateBoardProvider(),
+              ),
+              GoRoute(
+                path: 'create_spot',
+                builder: (context, state) => const CreateSpotProvider(),
               ),
               GoRoute(
                 path: 'saved',
@@ -191,4 +201,5 @@ class HSNavigation {
   dynamic toCreateBoard() => router.push('/create_board');
   dynamic toSettings() => router.push('/settings');
   dynamic toEditProfile() => router.push('/edit_profile');
+  dynamic toCreateSpot() => router.push('/create_spot');
 }
