@@ -118,13 +118,13 @@ class _BottombarItem extends StatelessWidget {
         iconData: FontAwesomeIcons.house,
         onPressed: () => print("home"),
         iconColor: currentTheme.mainColor),
-    _BottombarItem(
-        iconData: FontAwesomeIcons.plane, onPressed: () => print("trips")),
+    // _BottombarItem(
+    //     iconData: FontAwesomeIcons.plane, onPressed: () => print("trips")),
     _BottombarItem(
         iconData: FontAwesomeIcons.plus,
         iconSize: 36.0,
         onPressed: () => navi.newPush("/add_board")),
-    _BottombarItem(iconData: FontAwesomeIcons.a, onPressed: () => print("idk")),
+    // _BottombarItem(iconData: FontAwesomeIcons.a, onPressed: () => print("idk")),
     _BottombarItem(
       iconData: FontAwesomeIcons.bookmark,
       onPressed: () => navi.newPush("/saved"),

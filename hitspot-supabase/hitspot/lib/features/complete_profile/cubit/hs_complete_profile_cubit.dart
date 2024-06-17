@@ -85,7 +85,7 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
           usernameValidationState: HSUsernameValidationState.unknown));
       return;
     }
-    if (!(await _databaseRepository.isUsernameAvailable(
+    if (!(await _databaseRepository.userIsUsernameAvailable(
         username: state.usernameVal!))) {
       emit(state.copyWith(
           usernameValidationState: HSUsernameValidationState.unavailable));

@@ -134,16 +134,11 @@ class _SecondPage extends StatelessWidget {
             text: "Step 2/3: customization",
             headlineType: HSFormHeadlineType.display),
         const HSFormCaption(text: "Define the character of your board."),
-        AutoSizeText(
-          "This section is completely optional. You can skip it.",
-          maxLines: 1,
-          style: const TextStyle(color: Colors.grey).hintify,
-        ),
         const Gap(32.0),
         const HSFormHeadline(
           text: "Color",
         ),
-        const HSFormCaption(text: "Do you want to choose a color?"),
+        const HSFormCaption(text: "give your board a unique aura."),
         BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
           selector: (state) => state.color != null,
           builder: (context, isColorSelected) {
@@ -162,7 +157,7 @@ class _SecondPage extends StatelessWidget {
                       ),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    const Text("Yes"),
+                    const Text("Select"),
                     const Gap(16.0),
                     Radio<bool>(
                       value: false,
@@ -194,8 +189,8 @@ class _SecondPage extends StatelessWidget {
           },
         ),
         const Gap(32.0),
-        const HSFormHeadline(text: "Image"),
-        const HSFormCaption(text: "Do you want to choose an image?"),
+        const HSFormHeadline(text: "Cover"),
+        const HSFormCaption(text: "choose the cover of your board."),
         BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
           selector: (state) => state.image.isNotEmpty,
           builder: (context, isImageSelected) {
@@ -214,7 +209,7 @@ class _SecondPage extends StatelessWidget {
                       ),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    const Text("Yes"),
+                    const Text("Select"),
                     const Gap(16.0),
                     Radio<bool>(
                       value: false,
@@ -251,10 +246,15 @@ class _SecondPage extends StatelessWidget {
             onPressed: _addBoardCubit.prevPage,
             child: const Text("Back"),
           ),
-          right: HSFormButton(
-            onPressed: _addBoardCubit.nextPage,
-            icon: const Icon(FontAwesomeIcons.arrowRight),
-            child: const Text("Visibility"),
+          right: BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
+            selector: (state) => state.color != null && state.image.isNotEmpty,
+            builder: (context, valid) {
+              return HSFormButton(
+                onPressed: valid ? _addBoardCubit.nextPage : null,
+                icon: const Icon(FontAwesomeIcons.arrowRight),
+                child: const Text("Visibility"),
+              );
+            },
           ),
         ),
       ],

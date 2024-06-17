@@ -105,6 +105,7 @@ class App extends StatelessWidget {
                 navi.router.refresh();
               },
               child: MaterialApp.router(
+                debugShowCheckedModeBanner: false,
                 theme: currentTheme,
                 title: "Hitspot",
                 routerConfig: navi.router,

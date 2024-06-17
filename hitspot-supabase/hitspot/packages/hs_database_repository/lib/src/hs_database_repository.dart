@@ -25,8 +25,34 @@ class HSDatabaseRepsitory {
   Future<void> userUpdate({required HSUser user}) async =>
       await _usersRepository.update(user);
 
-  Future<bool> isUsernameAvailable({required String username}) async =>
+  Future<bool> userIsUsernameAvailable({required String username}) async =>
       await _usersRepository.isUsernameAvailable(username);
+
+  Future<bool?> userIsUserFollowed(
+          {String? followerID,
+          HSUser? follower,
+          String? followedID,
+          HSUser? followed}) async =>
+      await _usersRepository.isUserFollowed(
+          followerID, follower, followedID, followed);
+
+  Future<void> userFollow(
+      {required bool isFollowed,
+      String? followerID,
+      String? followedID,
+      HSUser? follower,
+      HSUser? followed}) async {
+    final bool? foll = await userIsUserFollowed(
+        followedID: followedID, followerID: followerID);
+    if (foll!) {
+      // HSDebugLogger.logInfo("User followed: Yes");
+      await _usersRepository.unfollow(
+          followerID, followedID, follower, followed);
+    } else {
+      // HSDebugLogger.logInfo("User followed: No");
+      await _usersRepository.follow(followerID, followedID, follower, followed);
+    }
+  }
 
   Future<String> boardCreate({required HSBoard board}) async =>
       await _boardsRepository.create(board);
@@ -40,6 +66,18 @@ class HSDatabaseRepsitory {
   Future<void> boardDelete({required HSBoard board}) async =>
       await _boardsRepository.delete(board);
 
+  Future<bool> boardIsBoardSaved(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.isBoardSaved(board, boardID, user, userID);
+
+  Future<bool> boardIsEditor(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.isEditor(board, boardID, user, userID);
+
+  Future<bool> boardSaveUnsave(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.saveUnsave(board, boardID, user, userID);
+
   Future<List<HSBoard>> boardFetchUserBoards(
           {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchUserBoards(user, userID);
@@ -47,4 +85,7 @@ class HSDatabaseRepsitory {
   Future<List<HSBoard>> boardFetchSavedBoards(
           {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchSavedBoards(user, userID);
+
+  Future<List<HSBoard>> boardFetchTrendingBoards() async =>
+      await _boardsRepository.fetchTrendingBoards();
 }

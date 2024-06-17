@@ -33,7 +33,7 @@ class HSFormHeadline extends StatelessWidget {
     late final TextStyle? textStyle;
     switch (headlineType) {
       case HSFormHeadlineType.display:
-        textStyle = textTheme.headlineLarge;
+        textStyle = textTheme.headlineLarge!;
       case HSFormHeadlineType.normal:
         textStyle = textTheme.headlineMedium;
       case HSFormHeadlineType.small:

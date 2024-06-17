@@ -6,6 +6,7 @@ import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_storage_repository/hs_storage_repository.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -13,9 +14,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterConfig.loadEnvVariables();
-  await Supabase.initialize(
-      url: FlutterConfig.get("SUPABASE_URL"),
-      anonKey: FlutterConfig.get("SUPABASE_ANON_KEY"));
+  final url = FlutterConfig.get("SUPABASE_URL");
+  final anon = FlutterConfig.get("SUPABASE_ANON_KEY");
+  HSDebugLogger.logInfo("$url: $anon");
+  await Supabase.initialize(url: url, anonKey: anon);
 
   final HSAuthenticationRepository authenticationRepository =
       HSAuthenticationRepository(supabase);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 
 class HSUserProfileHeadline extends StatelessWidget {
-  const HSUserProfileHeadline({required this.title});
+  const HSUserProfileHeadline({super.key, required this.title});
 
   final String title;
 
@@ -11,14 +11,14 @@ class HSUserProfileHeadline extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Row(
         children: [
-          const SizedBox(
-            width: 16.0,
-            child: Divider(
-              thickness: .1,
-            ),
-          ),
+          // const SizedBox(
+          //   width: 16.0,
+          //   child: Divider(
+          //     thickness: .1,
+          //   ),
+          // ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.only(right: 8.0),
             child: Text(
               title,
               style: textTheme.headlineMedium,

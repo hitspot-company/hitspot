@@ -33,6 +33,7 @@ class HSAuthenticationBloc
         }
       } on HSReadUserFailure catch (_) {
         HSDebugLogger.logError("Failed to read user: $_");
+        app.signOut();
       } catch (_) {
         HSDebugLogger.logError(_.toString());
       }

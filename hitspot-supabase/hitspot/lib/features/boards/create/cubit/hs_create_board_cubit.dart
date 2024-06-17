@@ -99,10 +99,12 @@ class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
         final String uploadedFileUrl =
             await uploadFile(File(state.image), boardID);
         await Future.delayed(const Duration(seconds: 1));
+        HSDebugLogger.logInfo(
+            "serializing board: ${board.copyWith(id: boardID, image: uploadedFileUrl).serialize()}");
         await _databaseRepository.boardUpdate(
             board: board.copyWith(id: boardID, image: uploadedFileUrl));
       }
-      navi.toBoard(boardID: boardID);
+      navi.router.pushReplacement("/board/$boardID?title=${state.title}");
     } on HSBoardException catch (_) {
       HSDebugLogger.logError("Error creating board: $_");
       emit(state.copyWith(uploadState: HSCreateBoardUploadState.error));
@@ -130,7 +132,7 @@ class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
         image: uploadedFileUrl,
       );
       await _databaseRepository.boardUpdate(board: board);
-      navi.toBoard(boardID: board.id!);
+      navi.toBoard(boardID: board.id!, title: board.title!);
     } on HSBoardException catch (_) {
       HSDebugLogger.logError("Error creating board: ${_.message}");
       emit(state.copyWith(uploadState: HSCreateBoardUploadState.error));
