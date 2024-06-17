@@ -104,7 +104,7 @@ class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
         await _databaseRepository.boardUpdate(
             board: board.copyWith(id: boardID, image: uploadedFileUrl));
       }
-      navi.toBoard(boardID: boardID, title: state.title);
+      navi.router.pushReplacement("/board/$boardID?title=${state.title}");
     } on HSBoardException catch (_) {
       HSDebugLogger.logError("Error creating board: $_");
       emit(state.copyWith(uploadState: HSCreateBoardUploadState.error));

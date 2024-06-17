@@ -2,7 +2,6 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/users/hs_users_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
@@ -67,6 +66,18 @@ class HSDatabaseRepsitory {
   Future<void> boardDelete({required HSBoard board}) async =>
       await _boardsRepository.delete(board);
 
+  Future<bool> boardIsBoardSaved(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.isBoardSaved(board, boardID, user, userID);
+
+  Future<bool> boardIsEditor(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.isEditor(board, boardID, user, userID);
+
+  Future<bool> boardSaveUnsave(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.saveUnsave(board, boardID, user, userID);
+
   Future<List<HSBoard>> boardFetchUserBoards(
           {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchUserBoards(user, userID);
@@ -74,4 +85,7 @@ class HSDatabaseRepsitory {
   Future<List<HSBoard>> boardFetchSavedBoards(
           {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchSavedBoards(user, userID);
+
+  Future<List<HSBoard>> boardFetchTrendingBoards() async =>
+      await _boardsRepository.fetchTrendingBoards();
 }

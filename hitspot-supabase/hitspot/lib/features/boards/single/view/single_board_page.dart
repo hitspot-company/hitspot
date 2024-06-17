@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
+import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_button%20copy.dart';
 import 'package:hitspot/widgets/hs_image.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_builders.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class SingleBoardPage extends StatelessWidget {
   const SingleBoardPage({super.key});
@@ -27,10 +32,23 @@ class SingleBoardPage extends StatelessWidget {
         final bool isLoading = status == HSSingleBoardStatus.loading;
         final HSUser? author = singleBoardCubit.state.author;
         final HSBoard? board = singleBoardCubit.state.board;
+        final bool isBoardSaved = singleBoardCubit.state.isBoardSaved;
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
             titleText: singleBoardCubit.state.board?.title ?? "",
+            right: IconButton(
+              onPressed: () => HSDebugLogger.logInfo("More"),
+              icon: const Icon(
+                FontAwesomeIcons.ellipsisVertical,
+              ),
+            ),
+          ),
+          floatingActionButton: HSButton.icon(
+            label: Text("Create Trip",
+                style: textTheme.headlineMedium!.colorify(appTheme.mainColor)),
+            icon: const Icon(FontAwesomeIcons.mapPin),
+            onPressed: () => HSDebugLogger.logInfo("Creating trip!"),
           ),
           body: CustomScrollView(
             slivers: [
@@ -60,6 +78,20 @@ class SingleBoardPage extends StatelessWidget {
                             author?.username ?? "",
                             style: textTheme.headlineLarge,
                           ),
+                        const Spacer(),
+                        if (isLoading)
+                          const HSShimmerBox(width: 120, height: 30.0)
+                        else
+                          _SaveActionButton(
+                            status: status,
+                            singleBoardCubit: singleBoardCubit,
+                          ),
+                        IconButton(
+                          onPressed: () => HSDebugLogger.logInfo("Share"),
+                          icon: const Icon(
+                            FontAwesomeIcons.arrowUpRightFromSquare,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -108,6 +140,46 @@ class HSSimpleSliverAppBar extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         background: child,
       ),
+    );
+  }
+}
+
+class _SaveActionButton extends StatelessWidget {
+  const _SaveActionButton(
+      {this.accentColor, required this.status, required this.singleBoardCubit});
+
+  final HSSingleBoardStatus status;
+  final HSSingleBoardCubit singleBoardCubit;
+  final Color? accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    late final VoidCallback? onPressed;
+    late final Widget icon;
+    late final bool isEditor;
+    isEditor = singleBoardCubit.state.isEditor;
+    if (isEditor) {
+      onPressed = () => navi.pushPage(
+          page: CreateBoardProvider(prototype: singleBoardCubit.state.board));
+      icon = Icon(FontAwesomeIcons.pen, color: accentColor);
+    } else {
+      switch (status) {
+        case HSSingleBoardStatus.updating || HSSingleBoardStatus.loading:
+          onPressed = null;
+          icon = HSLoadingIndicator(size: 24, color: accentColor);
+        case HSSingleBoardStatus.idle:
+          onPressed = singleBoardCubit.saveUnsave;
+          icon = singleBoardCubit.state.isBoardSaved
+              ? Icon(FontAwesomeIcons.solidBookmark, color: appTheme.mainColor)
+              : const Icon(FontAwesomeIcons.bookmark);
+        case HSSingleBoardStatus.error:
+          onPressed = null;
+          icon = Icon(FontAwesomeIcons.bookmark, color: accentColor);
+      }
+    }
+    return IconButton(
+      onPressed: onPressed,
+      icon: icon,
     );
   }
 }

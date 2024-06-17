@@ -23,11 +23,31 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
           await app.databaseRepository.boardRead(boardID: boardID);
       final HSUser author =
           await app.databaseRepository.userRead(userID: board.createdBy);
+      final bool isBoardSaved = await app.databaseRepository
+          .boardIsBoardSaved(boardID: boardID, user: currentUser);
+      final bool isEditor = await app.databaseRepository
+          .boardIsEditor(boardID: boardID, user: currentUser);
       emit(state.copyWith(
-          status: HSSingleBoardStatus.idle, board: board, author: author));
+          status: HSSingleBoardStatus.idle,
+          board: board,
+          author: author,
+          isBoardSaved: isBoardSaved,
+          isEditor: isEditor));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       emit(state.copyWith(status: HSSingleBoardStatus.error));
+    }
+  }
+
+  Future<void> saveUnsave() async {
+    try {
+      emit(state.copyWith(status: HSSingleBoardStatus.updating));
+      final bool isBoardSaved = await app.databaseRepository
+          .boardSaveUnsave(boardID: boardID, user: currentUser);
+      emit(state.copyWith(
+          status: HSSingleBoardStatus.idle, isBoardSaved: isBoardSaved));
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
     }
   }
 }

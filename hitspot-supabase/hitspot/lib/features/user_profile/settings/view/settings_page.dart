@@ -102,8 +102,7 @@ class SettingsPage extends StatelessWidget {
                   SettingsTile.navigation(
                     leading: const Icon(FontAwesomeIcons.trash),
                     title: const Text('Delete Account'),
-                    // onPressed: (_) =>
-                    // app.authBloc.requestDelete(user: currentUser),
+                    onPressed: (_) => settingsCubit.deleteAccount(),
                   ),
                   SettingsTile.navigation(
                     leading: const Icon(FontAwesomeIcons.arrowRightFromBracket),

@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/single/view/single_board_page.dart';
+import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button%20copy.dart';
@@ -67,7 +68,6 @@ class SavedPage extends StatelessWidget {
                       style: textTheme.headlineLarge,
                     ),
                   ),
-                  const Gap(8.0).toSliver,
                   if (savedCubit.state.ownBoards.isEmpty)
                     SliverMainAxisGroup(
                       slivers: [
@@ -112,15 +112,7 @@ class _BoardsBuilder extends StatelessWidget {
         final HSBoard board = boards[index];
         return GestureDetector(
           onTap: () => navi.toBoard(boardID: board.id!, title: board.title),
-          child: HSImage(
-            opacity: .3,
-            borderRadius: BorderRadius.circular(14.0),
-            height: 70,
-            width: screenWidth,
-            imageUrl: board.image,
-            color: board.color ?? appTheme.textfieldFillColor,
-            child: Text(board.title!, style: textTheme.headlineSmall),
-          ),
+          child: HSBoardTile(board: board, height: 120.0),
         );
       },
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
@@ -27,6 +28,12 @@ class UserProfilePage extends StatelessWidget {
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
+            right: IconButton(
+              onPressed: navi.toSettings,
+              icon: const Icon(
+                FontAwesomeIcons.ellipsisVertical,
+              ),
+            ),
           ),
           body: CustomScrollView(
             slivers: [
@@ -80,7 +87,7 @@ class UserProfilePage extends StatelessWidget {
                     const HSUserProfileHeadline(title: "About Me"),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 0.0),
                         child: Text(
                           user?.biogram ?? "",
                           style: textTheme.titleSmall,
@@ -105,7 +112,6 @@ class UserProfilePage extends StatelessWidget {
                       BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
                         builder: (context, state) {
                           return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               Expanded(
@@ -191,8 +197,8 @@ class HSUserProfileStatsChip extends StatelessWidget {
     }
     return Column(
       children: [
-        Text(label, style: textTheme.headlineMedium),
-        Text("${value ?? 0}"),
+        Text(label, style: textTheme.headlineSmall),
+        Text("${value ?? 0}", style: textTheme.labelLarge),
       ],
     );
   }
@@ -220,9 +226,8 @@ class _UserProfileActionButton extends StatelessWidget {
       );
     }
     if (userProfileCubit.isOwnProfile) {
-      return Container(
-          color: Colors.green,
-          height: 80.0); // .editProfile(false, userProfileBloc!);
+      return HSButton.outlined(
+          onPressed: navi.toEditProfile, child: const Text("Edit Profile"));
     } else {
       if (userProfileCubit.state.isFollowed == true) {
         return HSButton.outlined(

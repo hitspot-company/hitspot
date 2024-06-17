@@ -8,11 +8,15 @@ import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/view/single_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
+import 'package:hitspot/features/home/main/view/home_provider.dart';
+import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/features/login/view/magic_link_sent_page.dart';
+import 'package:hitspot/features/login/magic_link/view/magic_link_sent_page.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
+import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
+import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 
 class HSNavigation {
   HSNavigation._privateConstructor();
@@ -68,12 +72,22 @@ class HSNavigation {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/edit_profile',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/settings',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
         path: "/protected",
         redirect: _protectedRedirect,
         routes: [
           GoRoute(
             path: "home",
-            builder: (context, state) => const HomePage(),
+            builder: (context, state) => const HomeProvider(),
             redirect: (context, state) {
               final String? from = state.uri.queryParameters["from"];
               if (from != null) {
@@ -86,6 +100,14 @@ class HSNavigation {
                 path: 'user/:userID',
                 builder: (context, state) => UserProfileProvider(
                     userID: state.pathParameters['userID']!),
+              ),
+              GoRoute(
+                path: 'edit_profile',
+                builder: (context, state) => const EditProfileProvider(),
+              ),
+              GoRoute(
+                path: 'settings',
+                builder: (context, state) => const SettingsProvider(),
               ),
               GoRoute(
                 path: 'board/:boardID',
@@ -116,7 +138,7 @@ class HSNavigation {
           GoRoute(
             path: "magic_link_sent",
             builder: (context, state) =>
-                MagicLinkSentPage(email: state.uri.queryParameters["to"]!),
+                MagicLinkSentProvider(email: state.uri.queryParameters["to"]!),
           ),
           GoRoute(
               path: "complete_profile",
@@ -167,4 +189,6 @@ class HSNavigation {
   dynamic toBoard({required String boardID, required String? title}) =>
       router.push('/board/$boardID${title != null ? "?title=$title" : ""}');
   dynamic toCreateBoard() => router.push('/create_board');
+  dynamic toSettings() => router.push('/settings');
+  dynamic toEditProfile() => router.push('/edit_profile');
 }

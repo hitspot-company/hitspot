@@ -50,6 +50,19 @@ class HSUsersRepository {
   }
 
   // DELETE
+  Future<void> deleteAccount(HSUser? user, String? userID) async {
+    assert((user != null || userID != null), "User or userID must be provided");
+    try {
+      final uid = user?.uid ?? userID!;
+      await _supabase.from(_users).delete().eq("id", uid);
+      await _supabase.auth.signOut();
+      HSDebugLogger.logSuccess("User (${uid}) deleted!");
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+      throw HSUserException(message: "Error deleting user account.");
+    }
+  }
+
   Future<bool> isUsernameAvailable(String username) async {
     try {
       final res = await _supabase

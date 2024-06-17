@@ -32,7 +32,6 @@ class HSUser {
   }
 
   factory HSUser.deserialize(Map<String, dynamic> data, {String? uid}) {
-    HSDebugLogger.logInfo("DATA: $data");
     return HSUser(
       uid: data["id"],
       biogram: data["biogram"],

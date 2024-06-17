@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/main.dart';
 import 'package:hitspot/utils/forms/hs_email.dart';
 import 'package:hitspot/utils/forms/hs_password.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -49,9 +50,8 @@ class HSLoginCubit extends Cubit<HSLoginState> {
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
       await _authenticationRepository.signInWithMagicLink(
-          email: "kuba@bitbucket.local" // TODO: Change
-          // email: state.email.value,
-          );
+        email: state.email.value,
+      );
       app.authenticationBloc
           .add(HSAuthenticationMagicLinkSentEvent(state.email.value));
       emit(state.copyWith(status: FormzSubmissionStatus.success));
@@ -59,6 +59,7 @@ class HSLoginCubit extends Cubit<HSLoginState> {
       emit(state.copyWith(errorMessage: e.message));
       _emitFailure();
     } catch (_) {
+      HSDebugLogger.logError("Error: $_");
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }
   }

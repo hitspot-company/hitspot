@@ -35,6 +35,7 @@ class HSImage extends StatelessWidget {
     if (imageUrl == null && imageProvider == null) {
       return _Container(
         color: color,
+        opacity: opacity,
         height: height,
         width: width,
         borderRadius: borderRadius,
