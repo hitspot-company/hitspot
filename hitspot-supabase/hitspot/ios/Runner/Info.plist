@@ -64,8 +64,12 @@
       </dict>
       <!-- End of the Google Sign-in Section -->
     </array>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs access to location when open.</string>
+    <!--  Deep Linking  -->
     <key>FlutterDeepLinkingEnabled</key>
     <true/>
+    <!-- Image Picker -->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Our app requires access to your photo library to enable you to upload and share your favorite photos. This will allow you to customize your profile and create posts with your own images.</string>
     <key>NSCameraUsageDescription</key>
@@ -75,4 +79,10 @@
         Our app requests access to your microphone to enable audio recording for voice messages, video creation, and other interactive features. This will help you communicate and create content more effectively.
     </string>
     </dict>
+    <!--  Geolocator  -->
+<!--    <key>NSLocationTemporaryUsageDescriptionDictionary</key>-->
+<!--    <dict>-->
+<!--      <key>YourPurposeKey</key>-->
+<!--      <string>Hitspot requires temporary access to device position.</string>-->
+<!--    </dict>-->
 </plist>
