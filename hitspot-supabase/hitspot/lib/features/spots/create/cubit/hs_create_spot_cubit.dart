@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -110,6 +112,18 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
     } catch (_) {
       HSDebugLogger.logError("Could not fetch tags: $_");
       emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  List<File> get _xfilesToFiles =>
+      state.images.map((e) => File(e.path)).toList();
+
+  Future<void> submitSpot() async {
+    try {
+      // await app.databaseRepository.spo // TODO: Finish
+      // await app.storageRepository.spotUploadImages(files: _xfilesToFiles, uid: currentUser.uid!, sid: sid)
+    } catch (_) {
+      HSDebugLogger.logError("Could not submit spot: $_");
     }
   }
 }

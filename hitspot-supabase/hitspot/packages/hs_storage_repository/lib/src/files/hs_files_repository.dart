@@ -78,4 +78,22 @@ class HSFilesRepository {
   String userAvatarUploadPath(String uid) => "$uid/user_avatar";
   String boardImageUploadPath(String uid, String boardID) =>
       "$uid/boards/$boardID/image";
+
+  String spotImagesUploadPath(String uid, String sid) => "$uid/spots/$sid";
+
+  Future<List<String>> spotUploadImages(
+      List<File> images, String uid, String sid) async {
+    try {
+      final List<String> ret = [];
+      for (var i = 0; i < images.length; i++) {
+        final File image = images[i];
+        final String imageUrl = await uploadAndFetchPublicUrl(
+            image, "spots", spotImagesUploadPath(uid, sid), null);
+        ret.add(imageUrl);
+      }
+      return (ret);
+    } catch (_) {
+      throw ("Could not upload spot images");
+    }
+  }
 }

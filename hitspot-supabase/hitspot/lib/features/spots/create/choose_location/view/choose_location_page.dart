@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
@@ -149,6 +150,65 @@ class _Pin extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _PlacemarkAutocomplete extends StatelessWidget {
+  const _PlacemarkAutocomplete({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GooglePlaceAutoCompleteTextField(
+      googleAPIKey: FlutterConfig.get('GOOGLE_MAPS_KEY') ?? "",
+      textEditingController: TextEditingController(),
+      textStyle: const TextStyle(color: Colors.white),
+      inputDecoration: InputDecoration(
+        contentPadding: EdgeInsets.all(11),
+        border: InputBorder.none,
+        hintText: "Search your location...",
+        hintStyle: textTheme.headlineSmall!
+            .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
+        prefixIcon: const Icon(
+          Icons.location_pin,
+          color: Colors.white,
+        ),
+      ),
+      isLatLngRequired: true,
+      getPlaceDetailWithLatLng: (Prediction prediction) async {
+        if (prediction.lat == null || prediction.lng == null) {
+          return;
+        }
+
+        double? lat = double.tryParse(prediction.lat!);
+        double? lng = double.tryParse(prediction.lng!);
+
+        if (lat == null || lng == null) {
+          return;
+        }
+
+        LatLng latLng = LatLng(lat, lng);
+
+        // addSpotCubit.locationChanged(location: latLng);
+        // animateCameraToNewLatLng(latLng);
+      },
+      itemClick: (Prediction prediction) {
+        // _searchBarController.text = prediction.description ?? "";
+        // _searchBarController.selection = TextSelection.fromPosition(
+        //     TextPosition(offset: prediction.description!.length));
+      },
+      itemBuilder: (context, index, Prediction prediction) {
+        return Container(
+          color: Colors.grey[850],
+          child: ListTile(
+            title: Text(
+              prediction.description ?? "",
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      },
+      isCrossBtnShown: true,
     );
   }
 }

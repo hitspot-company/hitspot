@@ -12,6 +12,7 @@ class HSDatabaseRepsitory {
 
   static const String users = "users";
   static const String boards = "boards";
+  static const String spots = "boards";
   final SupabaseClient _supabaseClient;
   late final HSUsersRepository _usersRepository;
   late final HSBoardsRepository _boardsRepository;

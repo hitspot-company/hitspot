@@ -73,4 +73,10 @@ class HSStorageRepository {
 
   String boardImageUploadPath({required String uid, required String boardID}) =>
       _filesRepository.boardImageUploadPath(uid, boardID);
+
+  Future<List<String>> spotUploadImages(
+          {required List<File> files,
+          required String uid,
+          required String sid}) async =>
+      _filesRepository.spotUploadImages(files, uid, sid);
 }
