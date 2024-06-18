@@ -1,10 +1,115 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-// import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/spots/create/choose_location/view/choose_location_provider.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:image_picker/image_picker.dart';
 
 part 'hs_create_spot_state.dart';
 
 class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
-  HSCreateSpotCubit() : super(const HSCreateSpotState());
+  HSCreateSpotCubit() : super(const HSCreateSpotState()) {
+    _initializeCreatingSpot();
+  }
+
+  final List<String> categories = [
+    "graffiti",
+    "monument",
+    "park",
+    "nightlife",
+    "cafe",
+    "bar",
+  ];
+
+  final PageController pageController = PageController();
+  final _locationRepository = app.locationRepository;
+  String get titleHint =>
+      state.title.isEmpty ? "The best spot on earth..." : state.title;
+
+  String get descriptionHint =>
+      state.description.isEmpty ? "Writings on the wall..." : state.description;
+
+  void nextPage() => pageController.nextPage(
+      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+
+  void prevPage() => pageController.previousPage(
+      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+
+  void _initializeCreatingSpot() async {
+    try {
+      emit(state.copyWith(
+          status: HSCreateSpotStatus.requestingLocationPermission));
+      await _requestLocationPermission();
+      await _chooseImages();
+      await _chooseLocation();
+    } catch (_) {
+      HSDebugLogger.logError("Error: $_");
+    }
+  }
+
+  Future<void> _requestLocationPermission() async {
+    try {
+      late final Position currentPosition;
+      final bool isPermissionGranted =
+          await _locationRepository.requestLocationPermission();
+      if (!isPermissionGranted) {
+        HSDebugLogger.logInfo("Permission not granted");
+        currentPosition = kDefaultPosition;
+      } else {
+        currentPosition = await _locationRepository.getCurrentLocation();
+      }
+      emit(state.copyWith(
+          currentLocation: currentPosition,
+          status: HSCreateSpotStatus.choosingImages));
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> _chooseImages() async {
+    try {
+      final List<XFile> images = await app.pickers.multipleImages();
+      emit(state.copyWith(
+          images: images, status: HSCreateSpotStatus.choosingLocation));
+    } catch (_) {
+      HSDebugLogger.logError("Picker error: $_");
+      navi.pop();
+    }
+  }
+
+  Future<void> _chooseLocation() async {
+    final HSLocation? result = await navi.pushPage(
+        page: ChooseLocationProvider(
+            initialUserLocation: state.currentLocation!));
+    if (result != null) {
+      HSDebugLogger.logSuccess("Received location: $result");
+      emit(state.copyWith(
+          spotLocation: result, status: HSCreateSpotStatus.fillingData));
+    } else {
+      HSDebugLogger.logError("No location selected");
+    }
+  }
+
+  void updateTitle(String value) => emit(state.copyWith(title: value));
+  void updateDescription(String value) =>
+      emit(state.copyWith(description: value));
+  void updateTagsQuery(String value) {
+    emit(state.copyWith(tagsQuery: value));
+    _fetchTags();
+  }
+
+  Future<void> _fetchTags() async {
+    try {
+      emit(state.copyWith(isLoading: true));
+      await Future.delayed(const Duration(seconds: 2));
+      final List<String> res =
+          categories.where((e) => e.contains(state.tagsQuery)).toList();
+      emit(state.copyWith(isLoading: false, queriedTags: res));
+    } catch (_) {
+      HSDebugLogger.logError("Could not fetch tags: $_");
+      emit(state.copyWith(isLoading: false));
+    }
+  }
 }

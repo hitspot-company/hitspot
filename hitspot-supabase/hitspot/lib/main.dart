@@ -7,6 +7,7 @@ import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_storage_repository/hs_storage_repository.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -54,6 +55,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider.value(
           value: themeRepository,
+        ),
+        RepositoryProvider(
+          create: (_) => HSLocationRepository(),
         ),
       ],
       child: MultiBlocProvider(

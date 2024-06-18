@@ -95,17 +95,23 @@ class HSFormButton extends StatelessWidget {
 
 class HSFormPageBody extends StatelessWidget {
   const HSFormPageBody(
-      {super.key, this.heading, this.caption, required this.children});
+      {super.key,
+      this.heading,
+      this.caption,
+      required this.children,
+      this.topPadding = 16.0});
 
   final String? heading;
   final String? caption;
   final List<Widget> children;
+  final double topPadding;
 
   @override
   Widget build(BuildContext context) {
     return ListView(shrinkWrap: true, children: [
       if (heading != null) HSFormHeadline(text: heading!),
       if (caption != null) HSFormCaption(text: caption!),
+      Gap(topPadding),
       Column(children: children),
     ]);
   }

@@ -23,7 +23,7 @@ class HSPickers {
     DateTime? pickedDate;
     DateTime now = DateTime.now();
     pickedDate = await showDatePicker(
-        context: app.context!,
+        context: app.context,
         currentDate: currentDate ?? now,
         firstDate: firstDate ?? now,
         lastDate: lastDate ?? DateTime(now.year + 50, now.month, now.day));
@@ -34,8 +34,7 @@ class HSPickers {
     Color? pickedColor;
 
     await ColorPicker(
-      color: previousColor ??
-          Colors.teal, // TODO: Change this ?? currentTheme.mainColor,
+      color: previousColor ?? appTheme.mainColor,
       onColorChanged: (Color color) => pickedColor = color,
       width: 40,
       height: 40,
@@ -43,15 +42,15 @@ class HSPickers {
       spacing: 5,
       runSpacing: 5,
       wheelDiameter: 155,
-      heading: Text(
+      heading: const Text(
         'Select color',
         // style: textTheme.titleSmall,
       ),
-      subheading: Text(
+      subheading: const Text(
         'Select color shade',
         // style: textTheme.titleSmall,
       ),
-      wheelSubheading: Text(
+      wheelSubheading: const Text(
         'Selected color and its shades',
         // style: textTheme.titleSmall,
       ),
@@ -93,6 +92,20 @@ class HSPickers {
     );
 
     return (pickedColor);
+  }
+
+  Future<List<XFile>> multipleImages({
+    CropAspectRatio? cropAspectRatio,
+  }) async {
+    try {
+      final picker = ImagePicker();
+      final List<XFile> images = await picker.pickMultiImage(imageQuality: 80);
+      if (images.isEmpty) throw "No images selected";
+      return images;
+    } catch (e) {
+      HSDebugLogger.logError(e.toString());
+      rethrow;
+    }
   }
 
   Future<CroppedFile?> image(

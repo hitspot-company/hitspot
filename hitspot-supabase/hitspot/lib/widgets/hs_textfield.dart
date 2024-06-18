@@ -19,6 +19,7 @@ class HSTextField extends StatelessWidget {
     this.errorText,
     this.keyboardType,
     this.obscureText = false,
+    this.focusNode,
   });
 
   final String? hintText;
@@ -36,10 +37,12 @@ class HSTextField extends StatelessWidget {
   final String? errorText;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      focusNode: focusNode,
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
@@ -66,27 +69,28 @@ class HSTextField extends StatelessWidget {
     );
   }
 
-  factory HSTextField.filled({
-    Key? key,
-    String? hintText,
-    Color? fillColor,
-    Function(String)? onChanged,
-    Widget? suffixIcon,
-    bool autofocus = false,
-    String? initialValue,
-    bool readOnly = false,
-    VoidCallback? onTap,
-    int maxLines = 1,
-    int? maxLength,
-    EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
-    TextInputAction? textInputAction,
-    String? errorText,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-  }) {
+  factory HSTextField.filled(
+      {Key? key,
+      String? hintText,
+      Color? fillColor,
+      Function(String)? onChanged,
+      Widget? suffixIcon,
+      bool autofocus = false,
+      String? initialValue,
+      bool readOnly = false,
+      VoidCallback? onTap,
+      int maxLines = 1,
+      int? maxLength,
+      EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
+      TextInputAction? textInputAction,
+      String? errorText,
+      TextInputType? keyboardType,
+      bool obscureText = false,
+      FocusNode? focusNode}) {
     return HSTextField(
       key: key,
       hintText: hintText,
+      focusNode: focusNode,
       fillColor: fillColor ?? appTheme.textfieldFillColor,
       onChanged: onChanged,
       suffixIcon: suffixIcon,
