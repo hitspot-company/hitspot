@@ -78,5 +78,5 @@ class HSStorageRepository {
           {required List<File> files,
           required String uid,
           required String sid}) async =>
-      _filesRepository.spotUploadImages(files, uid, sid);
+      await _filesRepository.spotUploadImages(files, uid, sid);
 }

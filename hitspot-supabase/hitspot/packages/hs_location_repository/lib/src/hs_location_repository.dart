@@ -1,3 +1,4 @@
+import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_location_repository/src/models/hs_place_details.dart';
@@ -107,6 +108,27 @@ class HSLocationRepository {
     } catch (e) {
       print("Error: $e");
       rethrow;
+    }
+  }
+
+  String encodeGeoHash(double lat, double long) {
+    final GeoHasher geoHasher = GeoHasher();
+    return geoHasher.encode(long, lat);
+  }
+
+  Map<String, String> fetchNeighbors(String? geohash, LatLng? latLng) {
+    assert(geohash != null || latLng != null,
+        "Either a geoHash or latLng is required");
+    try {
+      late final GeoHash hash;
+      if (geohash != null) {
+        hash = GeoHash(geohash);
+      } else {
+        GeoHash.fromDecimalDegrees(latLng!.longitude, latLng.latitude);
+      }
+      return hash.neighbors;
+    } catch (_) {
+      throw Exception("Could not fetch neighbors : $_");
     }
   }
 }

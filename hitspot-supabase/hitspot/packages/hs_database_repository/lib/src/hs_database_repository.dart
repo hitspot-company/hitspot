@@ -1,6 +1,8 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
+import 'package:hs_database_repository/src/spots/hs_spot.dart';
+import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
 import 'package:hs_database_repository/src/users/hs_users_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,14 +10,16 @@ class HSDatabaseRepsitory {
   HSDatabaseRepsitory(this._supabaseClient) {
     this._usersRepository = HSUsersRepository(_supabaseClient, users);
     this._boardsRepository = HSBoardsRepository(_supabaseClient, boards);
+    this._spotsRepository = HSSpotsRepository(_supabaseClient, spots);
   }
 
   static const String users = "users";
   static const String boards = "boards";
-  static const String spots = "boards";
+  static const String spots = "spots";
   final SupabaseClient _supabaseClient;
   late final HSUsersRepository _usersRepository;
   late final HSBoardsRepository _boardsRepository;
+  late final HSSpotsRepository _spotsRepository;
 
   Future<void> userCreate({required HSUser user}) async =>
       await _usersRepository.create(user);
@@ -89,4 +93,22 @@ class HSDatabaseRepsitory {
 
   Future<List<HSBoard>> boardFetchTrendingBoards() async =>
       await _boardsRepository.fetchTrendingBoards();
+
+  Future<String> spotCreate({required HSSpot spot}) async =>
+      await _spotsRepository.create(spot);
+
+  Future<HSSpot> spotRead({HSSpot? spot, String? spotID}) async =>
+      await _spotsRepository.read(spot, spotID);
+
+  Future<void> spotUpdate({required HSSpot spot}) async =>
+      await _spotsRepository.update(spot);
+
+  Future<void> spotDelete({required HSSpot spot}) async =>
+      await _spotsRepository.delete(spot);
+
+  Future<void> spotUploadImages(
+          {required String spotID,
+          required List<String> imageUrls,
+          required String uid}) async =>
+      await _spotsRepository.uploadImages(spotID, imageUrls, uid);
 }

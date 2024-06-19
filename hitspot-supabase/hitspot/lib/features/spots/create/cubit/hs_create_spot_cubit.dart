@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/view/choose_location_provider.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:image_picker/image_picker.dart';
@@ -120,8 +121,26 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
 
   Future<void> submitSpot() async {
     try {
-      // await app.databaseRepository.spo // TODO: Finish
-      // await app.storageRepository.spotUploadImages(files: _xfilesToFiles, uid: currentUser.uid!, sid: sid)
+      emit(state.copyWith(status: HSCreateSpotStatus.submitting));
+      final double lat = state.spotLocation!.latitude;
+      final double long = state.spotLocation!.longitude;
+      final HSSpot spot = HSSpot(
+        title: state.title,
+        description: state.description,
+        geohash: _locationRepository.encodeGeoHash(lat, long),
+        createdBy: currentUser.uid!,
+        latitude: lat,
+        longitude: long,
+      );
+      HSDebugLogger.logInfo(spot.toString());
+      final String sid = await app.databaseRepository.spotCreate(spot: spot);
+      HSDebugLogger.logSuccess("Spot created: $sid");
+      final List<String> urls = await app.storageRepository.spotUploadImages(
+          files: _xfilesToFiles, uid: currentUser.uid!, sid: sid);
+      await app.databaseRepository.spotUploadImages(
+          spotID: sid, imageUrls: urls, uid: currentUser.uid!);
+      HSDebugLogger.logSuccess("Spot submitted: $sid");
+      navi.toSpot(sid: sid);
     } catch (_) {
       HSDebugLogger.logError("Could not submit spot: $_");
     }

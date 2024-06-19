@@ -87,13 +87,14 @@ class HSFilesRepository {
       final List<String> ret = [];
       for (var i = 0; i < images.length; i++) {
         final File image = images[i];
-        final String imageUrl = await uploadAndFetchPublicUrl(
-            image, "spots", spotImagesUploadPath(uid, sid), null);
+        final String uploadPath = "${spotImagesUploadPath(uid, sid)}__$i";
+        final String imageUrl =
+            await uploadAndFetchPublicUrl(image, "spots", uploadPath, null);
         ret.add(imageUrl);
       }
       return (ret);
     } catch (_) {
-      throw ("Could not upload spot images");
+      throw ("Could not upload spot images: $_");
     }
   }
 }

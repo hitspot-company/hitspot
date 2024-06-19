@@ -50,6 +50,8 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
           latitude: cameraLocation.latitude,
           longitude: cameraLocation.longitude);
       searchController.clear();
+      HSDebugLogger.logInfo(
+          "Camera idle: ${selectedLocation.placemark.name}, ${cameraLocation.latitude}, ${cameraLocation.longitude}");
       emit(state.copyWith(
           selectedLocation: selectedLocation,
           status: HSChooseLocationStatus.idle));
@@ -68,7 +70,6 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
           predictions: predictions, status: HSChooseLocationStatus.idle));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
-      emit(state.copyWith(status: HSChooseLocationStatus.error));
     }
   }
 

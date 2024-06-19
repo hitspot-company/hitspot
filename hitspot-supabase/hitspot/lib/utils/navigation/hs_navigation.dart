@@ -13,6 +13,7 @@ import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
+import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
@@ -52,6 +53,11 @@ class HSNavigation {
       GoRoute(path: "/", redirect: (context, state) => "/protected/home"),
       GoRoute(
         path: '/user/:userID',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/spot/:spotID',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
@@ -118,6 +124,11 @@ class HSNavigation {
                 builder: (context, state) => SingleBoardProvider(
                     boardID: state.pathParameters['boardID']!,
                     title: state.uri.queryParameters['title'] ?? "title :("),
+              ),
+              GoRoute(
+                path: 'spot/:spotID',
+                builder: (context, state) =>
+                    InfoPage(infoText: state.pathParameters['spotID']!),
               ),
               GoRoute(
                 path: 'create_board',
@@ -200,4 +211,5 @@ class HSNavigation {
   dynamic toSettings() => router.push('/settings');
   dynamic toEditProfile() => router.push('/edit_profile');
   dynamic toCreateSpot() => router.push('/create_spot');
+  dynamic toSpot({required String sid}) => router.push('/spot/$sid');
 }

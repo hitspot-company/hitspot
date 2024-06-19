@@ -157,7 +157,10 @@ class _ThirdPage extends StatelessWidget {
           },
         ),
         HSFormButtonsRow(
-          right: const HSFormButton(child: Text("Submit")),
+          right: HSFormButton(
+            child: Text("Submit"),
+            onPressed: createSpotCubit.submitSpot,
+          ),
           left: HSFormButton(
               onPressed: createSpotCubit.prevPage, child: const Text("Back")),
         )
