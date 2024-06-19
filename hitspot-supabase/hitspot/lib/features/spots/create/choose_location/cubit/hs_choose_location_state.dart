@@ -1,36 +1,45 @@
 part of 'hs_choose_location_cubit.dart';
 
 final class HsChooseLocationState extends Equatable {
-  const HsChooseLocationState(
-      {required this.usersLocation,
-      this.chosenLocation,
-      this.isSearching = false,
-      this.location = const LatLng(0, 0),
-      this.selectedLocation = const LatLng(0, 0)});
+  const HsChooseLocationState({
+    required this.userLocation,
+    this.predictions = const [],
+    this.isSearching = false,
+    this.selectedPlace,
+    this.selectedLocation,
+    this.cameraLocation,
+  });
 
-  final Position usersLocation;
-  final Placemark? chosenLocation;
-  final LatLng location;
-  final LatLng selectedLocation;
+  final Position userLocation;
+  final HSLocation? selectedLocation;
+  final List<HSPrediction> predictions;
   final bool isSearching;
+  final HSPlaceDetails? selectedPlace;
+  final LatLng? cameraLocation;
 
   @override
-  List<Object?> get props =>
-      [usersLocation, chosenLocation, location, selectedLocation, isSearching];
+  List<Object?> get props => [
+        selectedLocation,
+        selectedPlace,
+        isSearching,
+        predictions,
+        cameraLocation
+      ];
 
   HsChooseLocationState copyWith({
     Position? usersLocation,
     Placemark? chosenLocation,
-    LatLng? location,
-    LatLng? selectedLocation,
+    LatLng? cameraLocation,
+    HSLocation? selectedLocation,
     bool? isSearching,
+    List<HSPrediction>? predictions,
+    HSPlaceDetails? selectedPlace,
   }) {
     return HsChooseLocationState(
-      usersLocation: usersLocation ?? this.usersLocation,
-      chosenLocation: chosenLocation ?? this.chosenLocation,
-      location: location ?? this.location,
-      selectedLocation: selectedLocation ?? this.selectedLocation,
       isSearching: isSearching ?? this.isSearching,
+      predictions: predictions ?? this.predictions,
+      selectedPlace: selectedPlace ?? this.selectedPlace,
+      userLocation: userLocation,
     );
   }
 }

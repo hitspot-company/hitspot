@@ -57,7 +57,10 @@ class MyApp extends StatelessWidget {
           value: themeRepository,
         ),
         RepositoryProvider(
-          create: (_) => HSLocationRepository(),
+          create: (_) => HSLocationRepository(
+            FlutterConfig.get("GOOGLE_MAPS_KEY"),
+            FlutterConfig.get("GOOGLE_MAPS_KEY"),
+          ),
         ),
       ],
       child: MultiBlocProvider(

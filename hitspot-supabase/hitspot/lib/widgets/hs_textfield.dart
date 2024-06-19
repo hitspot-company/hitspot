@@ -5,6 +5,7 @@ class HSTextField extends StatelessWidget {
   const HSTextField({
     super.key,
     this.hintText,
+    this.controller,
     this.fillColor,
     this.onChanged,
     this.suffixIcon,
@@ -38,10 +39,12 @@ class HSTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final bool obscureText;
   final FocusNode? focusNode;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       focusNode: focusNode,
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -72,6 +75,7 @@ class HSTextField extends StatelessWidget {
   factory HSTextField.filled(
       {Key? key,
       String? hintText,
+      TextEditingController? controller,
       Color? fillColor,
       Function(String)? onChanged,
       Widget? suffixIcon,
@@ -91,6 +95,7 @@ class HSTextField extends StatelessWidget {
       key: key,
       hintText: hintText,
       focusNode: focusNode,
+      controller: controller,
       fillColor: fillColor ?? appTheme.textfieldFillColor,
       onChanged: onChanged,
       suffixIcon: suffixIcon,

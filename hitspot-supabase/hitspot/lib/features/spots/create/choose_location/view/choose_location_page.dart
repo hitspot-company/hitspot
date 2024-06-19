@@ -30,11 +30,11 @@ class ChooseLocationPage extends StatelessWidget {
             bottom: 0,
             child: BlocBuilder<HsChooseLocationCubit, HsChooseLocationState>(
               buildWhen: (previous, current) =>
-                  previous.chosenLocation != current.chosenLocation ||
+                  previous.selectedLocation != current.selectedLocation ||
                   previous.isSearching != current.isSearching,
               builder: (context, state) {
                 final String address =
-                    state.chosenLocation?.name ?? "Where is your spot?";
+                    state.selectedLocation?.name ?? "Where is your spot?";
                 final bool isSearching = state.isSearching;
                 final double searchBarHeight =
                     !isSearching ? 180.0 : screenHeight - 80;
@@ -55,6 +55,7 @@ class ChooseLocationPage extends StatelessWidget {
                         child: HSTextField.filled(
                           focusNode: chooseLocationCubit.searchNode,
                           hintText: address,
+                          controller: chooseLocationCubit.searchController,
                           suffixIcon: const Icon(Icons.location_pin),
                         ),
                       ),
@@ -72,7 +73,35 @@ class ChooseLocationPage extends StatelessWidget {
                               child: const Text("Select"),
                             ),
                           ],
-                        )
+                        ),
+                      if (isSearching)
+                        const Text("Click on one of the predictions below"),
+                      if (isSearching)
+                        Expanded(
+                          child: BlocSelector<HsChooseLocationCubit,
+                              HsChooseLocationState, List<HSPrediction>>(
+                            selector: (state) => state.predictions,
+                            builder: (context, predictions) =>
+                                ListView.separated(
+                              itemCount: predictions.length,
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return const SizedBox(
+                                  height: 20.0,
+                                );
+                              },
+                              itemBuilder: (BuildContext context, int index) {
+                                final HSPrediction prediction =
+                                    predictions[index];
+                                return ListTile(
+                                  title: Text(prediction.description),
+                                  onTap: () => chooseLocationCubit
+                                      .selectPrediction(prediction),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 );
@@ -110,14 +139,15 @@ class _MapAndSearchBar extends StatelessWidget {
                 mapController.complete(controller);
               },
               initialCameraPosition: CameraPosition(
-                target: state.usersLocation.toLatLng,
+                target: state.userLocation.toLatLng,
                 zoom: 16.0,
               ),
               onCameraMove: (position) {
-                chooseLocationCubit.locationChanged(location: position.target);
+                chooseLocationCubit.cameraLocationChanged(
+                    location: position.target);
               },
               onCameraIdle: () => chooseLocationCubit.setLocationChanged(
-                  location: state.location),
+                  location: state.cameraLocation!),
               onTap: (LatLng location) {
                 _searchBarController.text = "";
                 chooseLocationCubit.searchNode.unfocus();
@@ -138,7 +168,7 @@ class _Pin extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HsChooseLocationCubit, HsChooseLocationState>(
       builder: (context, state) {
-        final isIdle = state.location == state.selectedLocation;
+        final isIdle = state.cameraLocation == state.selectedLocation;
         return Center(
           child: Padding(
             padding: EdgeInsets.only(bottom: isIdle ? 36.0 : 32.0),
@@ -150,65 +180,6 @@ class _Pin extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _PlacemarkAutocomplete extends StatelessWidget {
-  const _PlacemarkAutocomplete({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GooglePlaceAutoCompleteTextField(
-      googleAPIKey: FlutterConfig.get('GOOGLE_MAPS_KEY') ?? "",
-      textEditingController: TextEditingController(),
-      textStyle: const TextStyle(color: Colors.white),
-      inputDecoration: InputDecoration(
-        contentPadding: EdgeInsets.all(11),
-        border: InputBorder.none,
-        hintText: "Search your location...",
-        hintStyle: textTheme.headlineSmall!
-            .copyWith(color: Colors.white, fontWeight: FontWeight.normal),
-        prefixIcon: const Icon(
-          Icons.location_pin,
-          color: Colors.white,
-        ),
-      ),
-      isLatLngRequired: true,
-      getPlaceDetailWithLatLng: (Prediction prediction) async {
-        if (prediction.lat == null || prediction.lng == null) {
-          return;
-        }
-
-        double? lat = double.tryParse(prediction.lat!);
-        double? lng = double.tryParse(prediction.lng!);
-
-        if (lat == null || lng == null) {
-          return;
-        }
-
-        LatLng latLng = LatLng(lat, lng);
-
-        // addSpotCubit.locationChanged(location: latLng);
-        // animateCameraToNewLatLng(latLng);
-      },
-      itemClick: (Prediction prediction) {
-        // _searchBarController.text = prediction.description ?? "";
-        // _searchBarController.selection = TextSelection.fromPosition(
-        //     TextPosition(offset: prediction.description!.length));
-      },
-      itemBuilder: (context, index, Prediction prediction) {
-        return Container(
-          color: Colors.grey[850],
-          child: ListTile(
-            title: Text(
-              prediction.description ?? "",
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        );
-      },
-      isCrossBtnShown: true,
     );
   }
 }

@@ -11,4 +11,6 @@ dependencies:
   geocoding: ^3.0.0
   google_places_flutter: ^2.0.8
   google_maps_flutter: ^2.7.0
+  uuid: ^4.4.0
+  dio: ^5.4.3+1
   
