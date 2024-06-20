@@ -157,4 +157,15 @@ class HSSpotsRepository {
       throw Exception("Could not fetch spot author: $_");
     }
   }
+
+  Future<HSSpot> fetchSpotWithAuthor(HSSpot? spot, String? spotID) async {
+    try {
+      final fetchedSpot = await read(spot, spotID);
+      final spotWithImages = await _composeSpotWithImages(fetchedSpot);
+      final fetchedAuthor = await fetchSpotAuthor(spotWithImages, null);
+      return spotWithImages.copyWith(author: fetchedAuthor);
+    } catch (_) {
+      throw Exception("Could not fetch spot with author: $_");
+    }
+  }
 }

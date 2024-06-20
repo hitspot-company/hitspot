@@ -104,7 +104,12 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
   void _toggleSearchfield(bool focused) =>
       emit(state.copyWith(isSearching: focused));
 
-  void submit() => navi.pop(state.selectedLocation);
+  void submit() async {
+    final location = state.selectedLocation;
+    final String address = await _locationRepository.getAddress(
+        location!.latitude, location.longitude);
+    navi.pop(state.selectedLocation!.copyWith(address: address));
+  }
 
   void cancel() => navi.router.go("/");
 

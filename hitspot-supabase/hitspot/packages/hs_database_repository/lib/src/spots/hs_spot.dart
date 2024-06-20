@@ -1,14 +1,15 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 class HSSpot {
-  final String? sid, title, description, geohash, createdBy;
+  final String? sid, title, description, geohash, createdBy, address;
   final int? likesCount, commentsCount, savesCount, tripsCount, boardsCount;
   final double? latitude, longitude;
   final List<String>? images;
   final HSUser? author;
 
-  HSSpot({
+  const HSSpot({
     this.sid,
+    this.address,
     this.author,
     this.title,
     this.description,
@@ -29,6 +30,7 @@ class HSSpot {
     String? title,
     String? description,
     String? geohash,
+    String? address,
     String? createdBy,
     int? likesCount,
     int? commentsCount,
@@ -43,6 +45,7 @@ class HSSpot {
     return HSSpot(
       sid: sid ?? this.sid,
       title: title ?? this.title,
+      address: address ?? this.address,
       description: description ?? this.description,
       geohash: geohash ?? this.geohash,
       createdBy: createdBy ?? this.createdBy,
@@ -70,6 +73,7 @@ class HSSpot {
       'trips_count': tripsCount,
       'boards_count': boardsCount,
       "location": "POINT($longitude $latitude)",
+      'address': address,
     };
   }
 
@@ -85,7 +89,7 @@ class HSSpot {
       savesCount: data['saves_count'],
       tripsCount: data['trips_count'],
       boardsCount: data['boards_count'],
-      // TODO: ADD POSITION
+      address: data['address'],
     );
   }
 

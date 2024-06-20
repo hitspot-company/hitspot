@@ -143,6 +143,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
         createdBy: currentUser.uid!,
         latitude: lat,
         longitude: long,
+        address: state.spotLocation!.address,
       );
       HSDebugLogger.logInfo(spot.toString());
       final String sid = await app.databaseRepository.spotCreate(spot: spot);
@@ -154,7 +155,8 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
           spotID: sid, imageUrls: urls, uid: currentUser.uid!);
       HSDebugLogger.logSuccess("Uploaded images to the database!");
       HSDebugLogger.logSuccess("Spot submitted: $sid");
-      navi.toSpot(sid: sid);
+      navi.toSpot(sid: sid, isSubmit: true);
+      return;
     } catch (_) {
       HSDebugLogger.logError("Could not submit spot: $_");
     }

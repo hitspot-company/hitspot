@@ -39,8 +39,37 @@ class HSLocationRepository {
 
   Future<String> getAddress(double lat, double long) async {
     try {
-      final Placemark placemark = await getPlacemark(lat, long);
-      return placemark.name ?? 'Unknown';
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
+
+      var address = '';
+
+      if (placemarks.isNotEmpty) {
+        // Concatenate non-null components of the address
+        var streets = placemarks.reversed
+            .map((placemark) => placemark.street)
+            .where((street) => street != null);
+
+        // Filter out unwanted parts
+        streets = streets.where((street) =>
+            street!.toLowerCase() !=
+            placemarks.reversed.last.locality!
+                .toLowerCase()); // Remove city names
+        streets = streets
+            .where((street) => !street!.contains('+')); // Remove street codes
+
+        address += streets.join(', ');
+
+        address += ', ${placemarks.reversed.last.subLocality ?? ''}';
+        address += ', ${placemarks.reversed.last.locality ?? ''}';
+        address += ', ${placemarks.reversed.last.subAdministrativeArea ?? ''}';
+        address += ', ${placemarks.reversed.last.administrativeArea ?? ''}';
+        address += ', ${placemarks.reversed.last.postalCode ?? ''}';
+        address += ', ${placemarks.reversed.last.country ?? ''}';
+      }
+
+      print("Your Address for ($lat, $long) is: $address");
+
+      return address;
     } catch (_) {
       throw "Could not fetch address : $_";
     }

@@ -26,60 +26,64 @@ class HSSpotTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CachedNetworkImage(
-          imageUrl: spot != null ? spot!.images![0] : _imgUrl(index),
-          progressIndicatorBuilder: (context, url, progress) =>
-              _loadingWidget(),
-          imageBuilder: (context, imageProvider) => Container(
-            height: extent,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20.0),
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: spot?.sid != null ? () => navi.toSpot(sid: spot!.sid!) : null,
+      child: Column(
+        children: [
+          CachedNetworkImage(
+            imageUrl: spot != null ? spot!.images![0] : _imgUrl(index),
+            progressIndicatorBuilder: (context, url, progress) =>
+                _loadingWidget(),
+            imageBuilder: (context, imageProvider) => Container(
+              height: extent,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
-        ),
-        const Gap(16.0),
-        SizedBox(
-          height: 40.0,
-          child: Row(
-            children: [
-              HSUserAvatar(
-                radius: 24.0,
-                iconSize: 16,
-                imageUrl: spot?.author?.avatarUrl,
-              ),
-              const Gap(8.0),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AutoSizeText(
-                    spot!.title!,
-                    maxLines: 1,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                    ),
+          const Gap(16.0),
+          SizedBox(
+            height: 60.0,
+            child: Row(
+              children: [
+                HSUserAvatar(
+                  radius: 24.0,
+                  iconSize: 16,
+                  imageUrl: spot?.author?.avatarUrl,
+                ),
+                const Gap(8.0),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AutoSizeText(
+                        spot!.title!,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      AutoSizeText(
+                        'by @${spot?.author?.username}',
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
-                  AutoSizeText(
-                    'by @${spot?.author?.username}',
-                    maxLines: 1,
-                    style: const TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        )
-      ],
+                )
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 
