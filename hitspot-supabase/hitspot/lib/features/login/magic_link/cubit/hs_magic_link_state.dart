@@ -9,11 +9,15 @@ final class HSMagicLinkState extends Equatable {
   final HSMagicLinkStatus status;
 
   @override
-  List<Object> get props => [otp];
+  List<Object> get props => [otp, status];
 
   HSMagicLinkState copyWith({
     String? otp,
+    HSMagicLinkStatus? status,
   }) {
-    return HSMagicLinkState(otp: otp ?? this.otp);
+    return HSMagicLinkState(
+      otp: otp ?? this.otp,
+      status: status ?? this.status,
+    );
   }
 }

@@ -19,16 +19,23 @@ class CreateSpotPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final createSpotCubit = context.read<HSCreateSpotCubit>();
     return HSScaffold(
-      appBar: HSAppBar(
-        titleText: 'Create Spot',
-        enableDefaultBackButton: true,
-      ),
-      body: PageView(
-        controller: createSpotCubit.pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [const _FirstPage(), const _SecondPage(), const _ThirdPage()],
-      ),
-    );
+        appBar: HSAppBar(
+          titleText: 'Create Spot',
+          enableDefaultBackButton: true,
+        ),
+        body: BlocSelector<HSCreateSpotCubit, HSCreateSpotState, bool>(
+          selector: (state) =>
+              state.status == HSCreateSpotStatus.fillingData ||
+              state.status == HSCreateSpotStatus.submitting,
+          builder: (context, isVisible) {
+            if (!isVisible) return Container();
+            return PageView(
+              controller: createSpotCubit.pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: const [_FirstPage(), _SecondPage(), _ThirdPage()],
+            );
+          },
+        ));
   }
 }
 
@@ -43,6 +50,7 @@ class _FirstPage extends StatelessWidget {
       caption: "Give your spot the name it deserves",
       children: [
         HSTextField.filled(
+          autofocus: true,
           maxLength: 64,
           onChanged: createSpotCubit.updateTitle,
           hintText: createSpotCubit.titleHint,
@@ -77,6 +85,7 @@ class _SecondPage extends StatelessWidget {
           "Give the description of the spot, what is it, where is it etc...",
       children: [
         HSTextField.filled(
+          autofocus: true,
           onChanged: createSpotCubit.updateDescription,
           hintText: createSpotCubit.descriptionHint,
           maxLength: 512,
@@ -157,9 +166,15 @@ class _ThirdPage extends StatelessWidget {
           },
         ),
         HSFormButtonsRow(
-          right: HSFormButton(
-            child: Text("Submit"),
-            onPressed: createSpotCubit.submitSpot,
+          right: BlocSelector<HSCreateSpotCubit, HSCreateSpotState, bool>(
+            selector: (state) => state.status == HSCreateSpotStatus.submitting,
+            builder: (context, isSubmitting) {
+              if (isSubmitting) return HSFormButton.loading();
+              return HSFormButton(
+                onPressed: createSpotCubit.submitSpot,
+                child: const Text("Submit"),
+              );
+            },
           ),
           left: HSFormButton(
               onPressed: createSpotCubit.prevPage, child: const Text("Back")),

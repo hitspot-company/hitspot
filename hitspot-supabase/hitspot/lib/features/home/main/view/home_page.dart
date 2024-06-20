@@ -107,9 +107,25 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               const Gap(32.0).toSliver,
-              Text("Closest to you", style: textTheme.headlineMedium).toSliver,
-              const Gap(16.0).toSliver,
-              HSSpotsGrid.loading(isSliver: true),
+              if (!isLoading && homeCubit.state.nearbySpots.isNotEmpty)
+                SliverMainAxisGroup(
+                  slivers: [
+                    Text("Nearby Spots", style: textTheme.headlineMedium)
+                        .toSliver,
+                    const Gap(16.0).toSliver,
+                    BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
+                      selector: (state) => state.nearbySpots,
+                      builder: (context, nearbySpots) => HSSpotsGrid(
+                        spots: nearbySpots,
+                        isSliver: true,
+                        mainAxisSpacing: 16.0,
+                        crossAxisSpacing: 16.0,
+                      ),
+                    ),
+                  ],
+                )
+              else
+                HSSpotsGrid.loading(isSliver: true),
             ],
           );
         },

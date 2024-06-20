@@ -72,7 +72,7 @@ class HSPickers {
         ColorPickerType.wheel: true,
       },
     ).showPickerDialog(
-      app.context!,
+      app.context,
       surfaceTintColor: Colors.transparent,
       transitionBuilder: (BuildContext context, Animation<double> a1,
           Animation<double> a2, Widget widget) {
@@ -96,10 +96,12 @@ class HSPickers {
 
   Future<List<XFile>> multipleImages({
     CropAspectRatio? cropAspectRatio,
+    int limit = 5,
   }) async {
     try {
       final picker = ImagePicker();
-      final List<XFile> images = await picker.pickMultiImage(imageQuality: 80);
+      final List<XFile> images =
+          await picker.pickMultiImage(imageQuality: 80, limit: limit);
       if (images.isEmpty) throw "No images selected";
       return images;
     } catch (e) {

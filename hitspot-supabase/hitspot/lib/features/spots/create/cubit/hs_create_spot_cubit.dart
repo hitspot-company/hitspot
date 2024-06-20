@@ -5,9 +5,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/view/choose_location_provider.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 part 'hs_create_spot_state.dart';
@@ -34,11 +36,19 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
   String get descriptionHint =>
       state.description.isEmpty ? "Writings on the wall..." : state.description;
 
-  void nextPage() => pageController.nextPage(
-      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  void unfocus() => HSScaffold.hideInput();
 
-  void prevPage() => pageController.previousPage(
-      duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  void nextPage() {
+    unfocus();
+    pageController.nextPage(
+        duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  }
+
+  void prevPage() {
+    unfocus();
+    pageController.previousPage(
+        duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+  }
 
   void _initializeCreatingSpot() async {
     try {
@@ -49,6 +59,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
       await _chooseLocation();
     } catch (_) {
       HSDebugLogger.logError("Error: $_");
+      navi.pop();
     }
   }
 
@@ -73,12 +84,13 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
 
   Future<void> _chooseImages() async {
     try {
-      final List<XFile> images = await app.pickers.multipleImages();
+      final List<XFile> images = await app.pickers.multipleImages(
+          cropAspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1));
       emit(state.copyWith(
           images: images, status: HSCreateSpotStatus.choosingLocation));
     } catch (_) {
       HSDebugLogger.logError("Picker error: $_");
-      navi.pop();
+      throw Exception("Could not choose images: $_");
     }
   }
 
@@ -137,8 +149,10 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
       HSDebugLogger.logSuccess("Spot created: $sid");
       final List<String> urls = await app.storageRepository.spotUploadImages(
           files: _xfilesToFiles, uid: currentUser.uid!, sid: sid);
+      HSDebugLogger.logSuccess("Uploaded images to the storage!");
       await app.databaseRepository.spotUploadImages(
           spotID: sid, imageUrls: urls, uid: currentUser.uid!);
+      HSDebugLogger.logSuccess("Uploaded images to the database!");
       HSDebugLogger.logSuccess("Spot submitted: $sid");
       navi.toSpot(sid: sid);
     } catch (_) {

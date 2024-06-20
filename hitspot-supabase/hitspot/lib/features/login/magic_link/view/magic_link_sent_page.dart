@@ -5,6 +5,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/login/magic_link/cubit/hs_magic_link_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -66,9 +67,16 @@ class MagicLinkSentPage extends StatelessWidget {
           const Gap(32.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: HSButton(
-              onPressed: magiclinkCubit.verifyOtp,
-              child: const Text("Verify"),
+            child: BlocSelector<HSMagicLinkCubit, HSMagicLinkState, bool>(
+              selector: (state) => state.status == HSMagicLinkStatus.verifying,
+              builder: (context, isVerifying) {
+                return HSButton(
+                  onPressed: isVerifying ? null : magiclinkCubit.verifyOtp,
+                  child: isVerifying
+                      ? const HSLoadingIndicator()
+                      : const Text("Verify"),
+                );
+              },
             ),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 
 enum HSFormHeadlineType { display, normal, small }
 
@@ -90,6 +91,10 @@ class HSFormButton extends StatelessWidget {
       onPressed: onPressed,
       child: child,
     );
+  }
+
+  factory HSFormButton.loading() {
+    return const HSFormButton(child: HSLoadingIndicator(size: 24.0));
   }
 }
 

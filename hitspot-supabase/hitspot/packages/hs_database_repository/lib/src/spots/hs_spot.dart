@@ -1,10 +1,15 @@
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+
 class HSSpot {
   final String? sid, title, description, geohash, createdBy;
   final int? likesCount, commentsCount, savesCount, tripsCount, boardsCount;
   final double? latitude, longitude;
+  final List<String>? images;
+  final HSUser? author;
 
   HSSpot({
     this.sid,
+    this.author,
     this.title,
     this.description,
     this.geohash,
@@ -16,6 +21,7 @@ class HSSpot {
     this.boardsCount,
     this.latitude,
     this.longitude,
+    this.images,
   });
 
   HSSpot copyWith({
@@ -31,6 +37,8 @@ class HSSpot {
     int? boardsCount,
     double? latitude,
     double? longitude,
+    List<String>? images,
+    HSUser? author,
   }) {
     return HSSpot(
       sid: sid ?? this.sid,
@@ -45,6 +53,8 @@ class HSSpot {
       boardsCount: boardsCount ?? this.boardsCount,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      images: images ?? this.images,
+      author: author ?? this.author,
     );
   }
 
@@ -59,13 +69,13 @@ class HSSpot {
       'saves_count': savesCount,
       'trips_count': tripsCount,
       'boards_count': boardsCount,
-      "location": "POINT($latitude $longitude)",
+      "location": "POINT($longitude $latitude)",
     };
   }
 
   static HSSpot deserialize(Map<String, dynamic> data) {
     return HSSpot(
-      sid: data['sid'],
+      sid: data['id'],
       title: data['title'],
       description: data['description'],
       geohash: data['geohash'],

@@ -111,4 +111,13 @@ class HSDatabaseRepsitory {
           required List<String> imageUrls,
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
+
+  Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
+      await _spotsRepository.fetchNearbySpots(lat, long);
+
+  Future<List<HSSpot>> spotFetchSpotsWithinRadius(
+          {required double lat, required double long, double? radius}) async =>
+      await _spotsRepository.fetchSpotsWithinRadius(lat, long, radius);
+  Future<HSUser> spotFetchAuthor({HSSpot? spot, String? authorID}) async =>
+      await _spotsRepository.fetchSpotAuthor(spot, authorID);
 }

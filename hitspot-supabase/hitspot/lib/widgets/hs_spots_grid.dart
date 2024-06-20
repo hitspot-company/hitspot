@@ -5,6 +5,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 
 class HSSpotsGrid extends StatelessWidget {
   const HSSpotsGrid(
@@ -13,28 +14,23 @@ class HSSpotsGrid extends StatelessWidget {
       this.loading = false,
       this.emptyMessage,
       this.emptyIcon,
-      required this.isSliver});
+      this.heightFactor = 60.0,
+      required this.isSliver,
+      this.crossAxisCount = 2,
+      this.mainAxisSpacing = 8.0,
+      this.crossAxisSpacing = 8.0});
 
-  final List? spots;
+  final List<HSSpot>? spots;
   final bool loading;
   final String? emptyMessage;
   final Icon? emptyIcon;
   final bool isSliver;
+  final double heightFactor;
+  final int crossAxisCount;
+  final double mainAxisSpacing, crossAxisSpacing;
 
   factory HSSpotsGrid.loading({bool isSliver = false}) {
     return HSSpotsGrid(loading: true, isSliver: isSliver);
-  }
-
-  factory HSSpotsGrid.ready({required List? spots, bool isSliver = false}) {
-    return HSSpotsGrid(
-      spots: spots,
-      isSliver: isSliver,
-      emptyMessage: "THERE ARE NO SPOTS HERE",
-      emptyIcon: const Icon(
-        FontAwesomeIcons.mapLocation,
-        size: 64.0,
-      ),
-    );
   }
 
   @override
@@ -43,25 +39,25 @@ class HSSpotsGrid extends StatelessWidget {
       const int childCount = 8;
       if (isSliver) {
         return SliverMasonryGrid.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: mainAxisSpacing,
+          crossAxisSpacing: crossAxisSpacing,
           childCount: childCount,
           itemBuilder: (context, index) => HSShimmer(
             child: HSShimmerSkeleton(
-              height: (index % 3 + 2) * 100,
+              height: (index % 3 + 2) * heightFactor,
             ),
           ),
         );
       }
       return MasonryGridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
+        crossAxisCount: crossAxisCount,
+        mainAxisSpacing: mainAxisSpacing,
+        crossAxisSpacing: crossAxisSpacing,
         itemCount: childCount,
         itemBuilder: (context, index) => HSShimmer(
           child: HSShimmerSkeleton(
-            height: (index % 3 + 2) * 100,
+            height: (index % 3 + 2) * heightFactor,
           ),
         ),
       );
@@ -78,27 +74,29 @@ class HSSpotsGrid extends StatelessWidget {
     }
     if (isSliver) {
       return SliverMasonryGrid.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
+        crossAxisCount: crossAxisCount,
+        mainAxisSpacing: mainAxisSpacing,
+        crossAxisSpacing: crossAxisSpacing,
         childCount: spots!.length,
         itemBuilder: (context, index) {
           return HSSpotTile(
             index: index,
-            extent: (index % 3 + 2) * 100,
+            spot: spots?[index],
+            extent: (index % 3 + 2) * heightFactor,
           );
         },
       );
     }
     return MasonryGridView.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 8.0,
-      crossAxisSpacing: 8.0,
+      crossAxisCount: crossAxisCount,
+      mainAxisSpacing: mainAxisSpacing,
+      crossAxisSpacing: crossAxisSpacing,
       itemCount: spots!.length,
       itemBuilder: (context, index) {
         return HSSpotTile(
           index: index,
-          extent: (index % 3 + 2) * 100,
+          spot: spots?[index],
+          extent: (index % 3 + 2) * heightFactor,
         );
       },
     );

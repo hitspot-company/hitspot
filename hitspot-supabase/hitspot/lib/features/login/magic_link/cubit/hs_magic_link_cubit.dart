@@ -15,11 +15,14 @@ class HSMagicLinkCubit extends Cubit<HSMagicLinkState> {
 
   Future<void> verifyOtp() async {
     try {
+      emit(state.copyWith(status: HSMagicLinkStatus.verifying));
       await supabase.auth
           .verifyOTP(email: email, token: state.otp, type: OtpType.magiclink);
       HSDebugLogger.logSuccess("Successfully verified OTP!");
+      return;
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
+    emit(state.copyWith(status: HSMagicLinkStatus.idle));
   }
 }

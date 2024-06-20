@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,7 +18,9 @@ class ChooseLocationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HSScaffold(
+      resizeToAvoidBottomInset: false,
       sidePadding: 0.0,
+      topSafe: false,
       body: Stack(
         fit: StackFit.expand,
         children: [_MapAndSearchBar(), const _Pin(), const _BottomBar()],
@@ -112,7 +115,7 @@ class _BottomBar extends StatelessWidget {
               state.selectedLocation?.name ?? "Where is your spot?";
           final bool isSearching = state.isSearching;
           final double searchBarHeight =
-              !isSearching ? 180.0 : screenHeight - 180.0;
+              !isSearching ? 180.0 : screenHeight - 100.0;
           return AnimatedContainer(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.vertical(
@@ -121,12 +124,14 @@ class _BottomBar extends StatelessWidget {
               color: currentTheme.scaffoldBackgroundColor,
             ),
             width: screenWidth,
+            curve: Curves.easeIn,
             duration: const Duration(milliseconds: 250),
             height: searchBarHeight,
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding:
+                      const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                   child: HSTextField.filled(
                     focusNode: chooseLocationCubit.searchNode,
                     hintText: address,
@@ -149,8 +154,6 @@ class _BottomBar extends StatelessWidget {
                       ),
                     ],
                   ),
-                if (isSearching)
-                  const Text("Click on one of the predictions below"),
                 if (isSearching)
                   Expanded(
                     child: BlocBuilder<HSChooseLocationCubit,
@@ -181,7 +184,9 @@ class _BottomBar extends StatelessWidget {
                           itemBuilder: (BuildContext context, int index) {
                             final HSPrediction prediction = predictions[index];
                             return ListTile(
-                              title: Text(prediction.description),
+                              leading: const Icon(FontAwesomeIcons.mapPin),
+                              title: AutoSizeText(prediction.description,
+                                  maxLines: 1),
                               onTap: () => chooseLocationCubit
                                   .onPredictionSelected(prediction),
                             );
