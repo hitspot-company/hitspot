@@ -3,7 +3,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
 class HSSpotTile extends StatelessWidget {
@@ -82,15 +84,11 @@ class HSSpotTile extends StatelessWidget {
   }
 
   Widget _loadingWidget() => ClipRRect(
-        borderRadius: BorderRadius.circular(20.0),
-        child: Container(
-          height: extent,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: Colors.black.withOpacity(.04),
-          ),
-        ),
-      );
+      borderRadius: BorderRadius.circular(20.0),
+      child: HSShimmerBox(
+        height: extent,
+        width: double.infinity,
+      ));
 
   String _imgUrl(int index) {
     return "https://picsum.photos/40$index";

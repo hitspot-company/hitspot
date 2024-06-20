@@ -28,7 +28,7 @@ class CreateSpotPage extends StatelessWidget {
               state.status == HSCreateSpotStatus.fillingData ||
               state.status == HSCreateSpotStatus.submitting,
           builder: (context, isVisible) {
-            if (!isVisible) return Container();
+            if (!isVisible) return const HSLoadingIndicator();
             return PageView(
               controller: createSpotCubit.pageController,
               physics: const NeverScrollableScrollPhysics(),

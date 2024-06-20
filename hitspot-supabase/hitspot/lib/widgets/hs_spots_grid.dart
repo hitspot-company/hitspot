@@ -18,6 +18,7 @@ class HSSpotsGrid extends StatelessWidget {
       required this.isSliver,
       this.crossAxisCount = 2,
       this.mainAxisSpacing = 8.0,
+      this.fixedHeight = 60.0,
       this.crossAxisSpacing = 8.0});
 
   final List<HSSpot>? spots;
@@ -27,7 +28,7 @@ class HSSpotsGrid extends StatelessWidget {
   final bool isSliver;
   final double heightFactor;
   final int crossAxisCount;
-  final double mainAxisSpacing, crossAxisSpacing;
+  final double mainAxisSpacing, crossAxisSpacing, fixedHeight;
 
   factory HSSpotsGrid.loading({bool isSliver = false}) {
     return HSSpotsGrid(loading: true, isSliver: isSliver);
@@ -45,7 +46,7 @@ class HSSpotsGrid extends StatelessWidget {
           childCount: childCount,
           itemBuilder: (context, index) => HSShimmer(
             child: HSShimmerSkeleton(
-              height: (index % 3 + 2) * heightFactor,
+              height: (index % 3 + 2) * heightFactor + fixedHeight,
             ),
           ),
         );
@@ -57,7 +58,7 @@ class HSSpotsGrid extends StatelessWidget {
         itemCount: childCount,
         itemBuilder: (context, index) => HSShimmer(
           child: HSShimmerSkeleton(
-            height: (index % 3 + 2) * heightFactor,
+            height: (index % 3 + 2) * heightFactor + fixedHeight,
           ),
         ),
       );
@@ -82,7 +83,7 @@ class HSSpotsGrid extends StatelessWidget {
           return HSSpotTile(
             index: index,
             spot: spots?[index],
-            extent: (index % 3 + 2) * heightFactor,
+            extent: (index % 3 + 2) * heightFactor + fixedHeight,
           );
         },
       );
@@ -96,7 +97,7 @@ class HSSpotsGrid extends StatelessWidget {
         return HSSpotTile(
           index: index,
           spot: spots?[index],
-          extent: (index % 3 + 2) * heightFactor,
+          extent: (index % 3 + 2) * heightFactor + fixedHeight,
         );
       },
     );

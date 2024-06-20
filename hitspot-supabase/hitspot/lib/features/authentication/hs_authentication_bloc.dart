@@ -30,6 +30,7 @@ class HSAuthenticationBloc
         } else {
           emit(
               HSAuthenticationProfileIncompleteState(currentUser: fetchedUser));
+          print("EMITTED");
         }
       } on HSReadUserFailure catch (_) {
         HSDebugLogger.logError("Failed to read user: $_");
@@ -51,7 +52,6 @@ class HSAuthenticationBloc
   }
 
   void initializeStreamSubscription() {
-    HSDebugLogger.logInfo("Initialized subscription");
     _userSubscription = app.authenticationRepository.user
         .listen((user) => userChangedEvent(user: user));
   }
