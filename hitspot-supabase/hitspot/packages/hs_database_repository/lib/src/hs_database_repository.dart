@@ -1,4 +1,5 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spot.dart';
@@ -98,6 +99,10 @@ class HSDatabaseRepsitory {
 
   Future<List<HSBoard>> boardFetchTrendingBoards() async =>
       await _boardsRepository.fetchTrendingBoards();
+
+  Future<List<HSSpot>> boardFetchBoardSpots(
+          {HSBoard? board, String? boardID}) async =>
+      await _boardsRepository.fetchBoardSpots(board, boardID);
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);

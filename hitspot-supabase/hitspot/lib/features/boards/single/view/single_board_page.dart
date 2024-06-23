@@ -12,9 +12,9 @@ import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
-import 'package:hitspot/widgets/shimmers/hs_shimmer_builders.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -25,18 +25,19 @@ class SingleBoardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final singleBoardCubit = BlocProvider.of<HSSingleBoardCubit>(context);
-    return BlocSelector<HSSingleBoardCubit, HSSingleBoardState,
-        HSSingleBoardStatus>(
-      selector: (state) => state.status,
-      builder: (context, status) {
-        final bool isLoading = status == HSSingleBoardStatus.loading;
-        final HSUser? author = singleBoardCubit.state.author;
-        final HSBoard? board = singleBoardCubit.state.board;
-        final bool isBoardSaved = singleBoardCubit.state.isBoardSaved;
+    return BlocBuilder<HSSingleBoardCubit, HSSingleBoardState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status || previous.spots != current.spots,
+      builder: (context, state) {
+        final bool isLoading = state.status == HSSingleBoardStatus.loading;
+        final HSUser? author = state.author;
+        final HSBoard? board = state.board;
+        final List<HSSpot> spots = state.spots;
+        HSDebugLogger.logInfo("Updated, spots_count: ${spots.length}");
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
-            titleText: singleBoardCubit.state.board?.title ?? "",
+            titleText: state.board?.title ?? "",
             right: IconButton(
               onPressed: () => HSDebugLogger.logInfo("More"),
               icon: const Icon(
@@ -83,7 +84,7 @@ class SingleBoardPage extends StatelessWidget {
                           const HSShimmerBox(width: 120, height: 30.0)
                         else
                           _SaveActionButton(
-                            status: status,
+                            status: state.status,
                             singleBoardCubit: singleBoardCubit,
                           ),
                         IconButton(
@@ -111,9 +112,11 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 ),
               const Gap(24.0).toSliver,
-              const HSShimmerGridBuilder(
+              HSSpotsGrid(
                 isSliver: true,
-                crossAxisCount: 2,
+                spots: spots,
+                emptyIcon: const Icon(FontAwesomeIcons.mapPin),
+                emptyMessage: "No spots",
               ),
             ],
           ),

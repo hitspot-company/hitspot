@@ -6,6 +6,7 @@ import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSSpotsGrid extends StatelessWidget {
   const HSSpotsGrid(

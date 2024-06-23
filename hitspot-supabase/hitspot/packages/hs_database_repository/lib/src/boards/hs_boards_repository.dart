@@ -1,4 +1,5 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_board_exception.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -191,6 +192,24 @@ class HSBoardsRepository {
           type: HSBoardExceptionType.read,
           message: "Failed fetching trending boards.",
           details: _.toString());
+    }
+  }
+
+  // READ BOARD SPOTS
+  Future<List<HSSpot>> fetchBoardSpots(HSBoard? board, String? boardID) async {
+    try {
+      final bid = board?.id ?? boardID!;
+      final List fetchedSpots = await _supabase
+          .rpc('boards_fetch_board_spots', params: {'board_id_input': bid});
+      HSDebugLogger.logSuccess("Fetched spots of board: $fetchedSpots");
+      final List<HSSpot> ret = [];
+      for (var i = 0; i < fetchedSpots.length; i++) {
+        ret.add(HSSpot.deserialize(fetchedSpots[i]));
+      }
+      return ret;
+    } catch (_) {
+      throw HSBoardException(
+          type: HSBoardExceptionType.read, details: _.toString());
     }
   }
 }

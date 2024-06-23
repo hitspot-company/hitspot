@@ -27,9 +27,12 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
           .boardIsBoardSaved(boardID: boardID, user: currentUser);
       final bool isEditor = await app.databaseRepository
           .boardIsEditor(boardID: boardID, user: currentUser);
+      final List<HSSpot> spots =
+          await app.databaseRepository.boardFetchBoardSpots(boardID: boardID);
       emit(state.copyWith(
           status: HSSingleBoardStatus.idle,
           board: board,
+          spots: spots,
           author: author,
           isBoardSaved: isBoardSaved,
           isEditor: isEditor));

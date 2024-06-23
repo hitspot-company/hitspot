@@ -194,23 +194,23 @@ class HSBoardTile extends StatelessWidget {
           imageUrl: board.image,
           opacity: .8,
         ),
-        Positioned(
-          bottom: 8.0,
-          left: 16.0,
-          right: 16.0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(4.0),
-              child: AutoSizeText(
-                board.title!,
-                style: textTheme.headlineMedium,
-                maxLines: 1,
-              ),
-            ),
-          ),
-        ),
+        // Positioned(
+        //   bottom: 8.0,
+        //   left: 16.0,
+        //   right: 16.0,
+        //   child: ClipRRect(
+        //     borderRadius: BorderRadius.circular(8.0),
+        //     child: Container(
+        //       color: Colors.white,
+        //       padding: const EdgeInsets.all(4.0),
+        //       child: AutoSizeText(
+        //         board.title!,
+        //         style: textTheme.headlineMedium,
+        //         maxLines: 1,
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

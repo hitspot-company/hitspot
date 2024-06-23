@@ -9,6 +9,7 @@ final class HSSingleBoardState extends Equatable {
     this.author,
     this.isBoardSaved = false,
     this.isEditor = false,
+    this.spots = const [],
   });
 
   final HSSingleBoardStatus status;
@@ -16,9 +17,11 @@ final class HSSingleBoardState extends Equatable {
   final HSUser? author;
   final bool isBoardSaved;
   final bool isEditor;
+  final List<HSSpot> spots;
 
   @override
-  List<Object?> get props => [status, board, author, isBoardSaved, isEditor];
+  List<Object?> get props =>
+      [status, board, author, isBoardSaved, isEditor, spots];
 
   HSSingleBoardState copyWith({
     HSSingleBoardStatus? status,
@@ -26,6 +29,7 @@ final class HSSingleBoardState extends Equatable {
     HSUser? author,
     bool? isBoardSaved,
     bool? isEditor,
+    List<HSSpot>? spots,
   }) {
     return HSSingleBoardState(
       status: status ?? this.status,
@@ -33,6 +37,7 @@ final class HSSingleBoardState extends Equatable {
       author: author ?? this.author,
       isEditor: isEditor ?? this.isEditor,
       isBoardSaved: isBoardSaved ?? this.isBoardSaved,
+      spots: spots ?? this.spots,
     );
   }
 }
