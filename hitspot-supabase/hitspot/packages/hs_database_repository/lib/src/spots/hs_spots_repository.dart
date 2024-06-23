@@ -296,4 +296,26 @@ class HSSpotsRepository {
       throw Exception("Error saving / unsaving spot: $_");
     }
   }
+
+  Future<List<HSSpot>> userSpots(
+      HSUser? user, String? userID, int batchOffset, int batchSize) async {
+    try {
+      assert(user != null || userID != null, "User or userID must be provided");
+      final uid = user?.uid ?? userID!;
+      final data = await _supabase.rpc('spots_fetch_user_spots', params: {
+        'user_id': uid,
+        'batch_offset': batchOffset,
+        'batch_size': batchSize,
+      });
+      final List<HSSpot> spots =
+          (data as List<dynamic>).map((e) => HSSpot.deserialize(e)).toList();
+      for (var i = 0; i < spots.length; i++) {
+        final spot = await _composeSpotWithImages(spots[i]);
+        spots[i] = spot;
+      }
+      return (spots);
+    } catch (_) {
+      throw Exception("Error fetching user spots: $_");
+    }
+  }
 }

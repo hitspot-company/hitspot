@@ -9,7 +9,6 @@ import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:hs_toasts/hs_toasts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -37,13 +36,17 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
           spotID: spotID, userID: currentUser.uid);
       final bool isAuthor =
           spot.createdBy == currentUser.uid && currentUser.uid != null;
-      HSDebugLogger.logSuccess("Fetched spot: $spot");
+      final List<HSTag> tags =
+          await _databaseRepository.tagFetchSpotTags(spotID: spotID);
       HSDebugLogger.logSuccess("With images: ${spot.images.toString()}");
+      HSDebugLogger.logSuccess("With images: ${spot.images.toString()}");
+      HSDebugLogger.logSuccess("With tags: ${tags.toString()}");
       emit(state.copyWith(
         spot: spot,
         isSpotLiked: isSpotLiked,
         isSpotSaved: isSpotSaved,
         isAuthor: isAuthor,
+        tags: tags,
         status: HSSingleSpotStatus.loaded,
       ));
     } catch (_) {

@@ -69,6 +69,29 @@
     <!--  Deep Linking  -->
     <key>FlutterDeepLinkingEnabled</key>
     <true/>
+    <!--  Maps Launcher  -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>comgooglemaps</string>
+        <string>baidumap</string>
+        <string>iosamap</string>
+        <string>waze</string>
+        <string>yandexmaps</string>
+        <string>yandexnavi</string>
+        <string>citymapper</string>
+        <string>mapswithme</string>
+        <string>osmandmaps</string>
+        <string>dgis</string>
+        <string>qqmap</string>
+        <string>here-location</string>
+        <string>tomtomgo</string>
+        <string>copilot</string>
+        <string>com.sygic.aura</string>
+        <string>nmap</string>
+        <string>kakaomap</string>
+        <string>tmap</string>
+        <string>szn-mapy</string>
+    </array>
     <!-- Image Picker -->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Our app requires access to your photo library to enable you to upload and share your favorite photos. This will allow you to customize your profile and create posts with your own images.</string>

@@ -13,6 +13,7 @@ class HSTextField extends StatelessWidget {
     this.initialValue,
     this.onTap,
     this.readOnly = false,
+    this.autocorrect = true,
     this.maxLines = 1,
     this.maxLength,
     this.scrollPadding = const EdgeInsets.all(20.0),
@@ -37,13 +38,14 @@ class HSTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final String? errorText;
   final TextInputType? keyboardType;
-  final bool obscureText;
+  final bool obscureText, autocorrect;
   final FocusNode? focusNode;
   final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      autocorrect: autocorrect,
       controller: controller,
       focusNode: focusNode,
       obscureText: obscureText,
@@ -80,6 +82,7 @@ class HSTextField extends StatelessWidget {
       Function(String)? onChanged,
       Widget? suffixIcon,
       bool autofocus = false,
+      bool? autocorrect,
       String? initialValue,
       bool readOnly = false,
       VoidCallback? onTap,
@@ -96,6 +99,7 @@ class HSTextField extends StatelessWidget {
       hintText: hintText,
       focusNode: focusNode,
       controller: controller,
+      autocorrect: autocorrect ?? true,
       fillColor: fillColor ?? appTheme.textfieldFillColor,
       onChanged: onChanged,
       suffixIcon: suffixIcon,

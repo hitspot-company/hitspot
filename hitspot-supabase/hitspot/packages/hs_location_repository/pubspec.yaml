@@ -14,4 +14,4 @@ dependencies:
   uuid: ^4.4.0
   dio: ^5.4.3+1
   dart_geohash: ^2.1.0
-  
+  map_launcher: ^3.3.1  

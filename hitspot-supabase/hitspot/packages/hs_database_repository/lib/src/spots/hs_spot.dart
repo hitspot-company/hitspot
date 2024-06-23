@@ -9,7 +9,7 @@ class HSSpot {
       boardsCount,
       sharesCount;
   final double? latitude, longitude;
-  final List<String>? images;
+  final List<String>? images, tags;
   final HSUser? author;
 
   const HSSpot({
@@ -17,6 +17,7 @@ class HSSpot {
     this.address,
     this.author,
     this.title,
+    this.tags,
     this.description,
     this.geohash,
     this.createdBy,
@@ -47,6 +48,7 @@ class HSSpot {
     double? latitude,
     double? longitude,
     List<String>? images,
+    List<String>? tags,
     HSUser? author,
   }) {
     return HSSpot(
@@ -65,6 +67,7 @@ class HSSpot {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       images: images ?? this.images,
+      tags: tags ?? this.tags,
       author: author ?? this.author,
     );
   }
@@ -107,6 +110,6 @@ class HSSpot {
 
   @override
   String toString() {
-    return 'HSSpot{sid: $sid, title: $title, description: $description, geohash: $geohash, createdBy: $createdBy, likesCount: $likesCount, commentsCount: $commentsCount, savesCount: $savesCount, tripsCount: $tripsCount, boardsCount: $boardsCount, latitude: $latitude, longitude: $longitude}';
+    return 'HSSpot{sid: $sid, title: $title, description: $description, geohash: $geohash, createdBy: $createdBy, likesCount: $likesCount, commentsCount: $commentsCount, savesCount: $savesCount, tripsCount: $tripsCount, boardsCount: $boardsCount, latitude: $latitude, longitude: $longitude, tags: $tags, images: $images, author: $author, address: $address, sharesCount: $sharesCount}';
   }
 }

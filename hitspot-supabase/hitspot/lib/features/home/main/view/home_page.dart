@@ -18,12 +18,6 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  static Route<void> route() {
-    return MaterialPageRoute<void>(builder: (_) => const HomePage());
-  }
-
-  static Page<void> page() => const MaterialPage<void>(child: HomePage());
-
   @override
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HSHomeCubit>(context);
@@ -34,99 +28,102 @@ class HomePage extends StatelessWidget {
         builder: (context, status) {
           final isLoading = status == HSHomeStatus.loading;
           final trendingBoards = homeCubit.state.tredingBoards;
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                automaticallyImplyLeading: false,
-                surfaceTintColor: Colors.transparent,
-                title: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Image.asset(
-                    app.assets.textLogo,
-                    height: 30,
+          return RefreshIndicator.adaptive(
+            onRefresh: homeCubit.handleRefresh,
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  automaticallyImplyLeading: false,
+                  surfaceTintColor: Colors.transparent,
+                  title: Align(
                     alignment: Alignment.centerLeft,
-                  ),
-                ),
-                actions: <Widget>[
-                  IconButton(
-                    icon: HSUserAvatar(
-                        radius: 30.0, imageUrl: currentUser.avatarUrl),
-                    onPressed: () => navi.toUser(
-                      userID: currentUser.uid!,
+                    child: Image.asset(
+                      app.assets.textLogo,
+                      height: 30,
+                      alignment: Alignment.centerLeft,
                     ),
                   ),
-                ],
-                floating: true,
-                pinned: true,
-              ),
-              SliverAppBar(
-                automaticallyImplyLeading: false,
-                surfaceTintColor: Colors.transparent,
-                centerTitle: false,
-                title: Text.rich(
-                    TextSpan(
-                      text: "Hello ",
-                      children: [
-                        TextSpan(
-                            text: currentUser.username,
-                            style: textTheme.headlineMedium),
-                        TextSpan(
-                            text: " ,\nWhere would you like to go?",
-                            style: textTheme.headlineLarge!.hintify),
-                      ],
-                    ),
-                    style: textTheme.headlineMedium!.hintify),
-                floating: true,
-                pinned: true,
-              ),
-              const SliverToBoxAdapter(
-                child: Gap(16.0),
-              ),
-              const SliverAppBar(
-                automaticallyImplyLeading: false,
-                surfaceTintColor: Colors.transparent,
-                stretch: true,
-                title: HSSearchBar(
-                  height: 52.0,
-                ),
-                centerTitle: true,
-              ),
-              if (trendingBoards.isNotEmpty)
-                SliverMainAxisGroup(
-                  slivers: [
-                    const Gap(32.0).toSliver,
-                    Text("Trending Boards", style: textTheme.headlineMedium)
-                        .toSliver,
-                    const Gap(16.0).toSliver,
-                    SliverToBoxAdapter(
-                      child: _TrendingBoardsBuilder(
-                        isLoading: isLoading,
-                        trendingBoards: trendingBoards,
+                  actions: <Widget>[
+                    IconButton(
+                      icon: HSUserAvatar(
+                          radius: 30.0, imageUrl: currentUser.avatarUrl),
+                      onPressed: () => navi.toUser(
+                        userID: currentUser.uid!,
                       ),
                     ),
                   ],
+                  floating: true,
+                  pinned: true,
                 ),
-              const Gap(32.0).toSliver,
-              if (!isLoading && homeCubit.state.nearbySpots.isNotEmpty)
-                SliverMainAxisGroup(
-                  slivers: [
-                    Text("Nearby Spots", style: textTheme.headlineMedium)
-                        .toSliver,
-                    const Gap(16.0).toSliver,
-                    BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
-                      selector: (state) => state.nearbySpots,
-                      builder: (context, nearbySpots) => HSSpotsGrid(
-                        spots: nearbySpots,
-                        isSliver: true,
-                        mainAxisSpacing: 16.0,
-                        crossAxisSpacing: 16.0,
+                SliverAppBar(
+                  automaticallyImplyLeading: false,
+                  surfaceTintColor: Colors.transparent,
+                  centerTitle: false,
+                  title: Text.rich(
+                      TextSpan(
+                        text: "Hello ",
+                        children: [
+                          TextSpan(
+                              text: currentUser.username,
+                              style: textTheme.headlineMedium),
+                          TextSpan(
+                              text: " ,\nWhere would you like to go?",
+                              style: textTheme.headlineLarge!.hintify),
+                        ],
                       ),
-                    ),
-                  ],
-                )
-              else
-                HSSpotsGrid.loading(isSliver: true),
-            ],
+                      style: textTheme.headlineMedium!.hintify),
+                  floating: true,
+                  pinned: true,
+                ),
+                const SliverToBoxAdapter(
+                  child: Gap(16.0),
+                ),
+                const SliverAppBar(
+                  automaticallyImplyLeading: false,
+                  surfaceTintColor: Colors.transparent,
+                  stretch: true,
+                  title: HSSearchBar(
+                    height: 52.0,
+                  ),
+                  centerTitle: true,
+                ),
+                if (trendingBoards.isNotEmpty)
+                  SliverMainAxisGroup(
+                    slivers: [
+                      const Gap(32.0).toSliver,
+                      Text("Trending Boards", style: textTheme.headlineMedium)
+                          .toSliver,
+                      const Gap(16.0).toSliver,
+                      SliverToBoxAdapter(
+                        child: _TrendingBoardsBuilder(
+                          isLoading: isLoading,
+                          trendingBoards: trendingBoards,
+                        ),
+                      ),
+                    ],
+                  ),
+                const Gap(32.0).toSliver,
+                if (!isLoading && homeCubit.state.nearbySpots.isNotEmpty)
+                  SliverMainAxisGroup(
+                    slivers: [
+                      Text("Nearby Spots", style: textTheme.headlineMedium)
+                          .toSliver,
+                      const Gap(16.0).toSliver,
+                      BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
+                        selector: (state) => state.nearbySpots,
+                        builder: (context, nearbySpots) => HSSpotsGrid(
+                          spots: nearbySpots,
+                          isSliver: true,
+                          mainAxisSpacing: 16.0,
+                          crossAxisSpacing: 16.0,
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  HSSpotsGrid.loading(isSliver: true),
+              ],
+            ),
           );
         },
       ),

@@ -14,7 +14,6 @@ import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
-import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
@@ -213,6 +212,9 @@ class HSNavigation {
   dynamic toEditProfile() => router.push('/edit_profile');
   dynamic toCreateSpot() => router.push('/create_spot');
   dynamic toSpot(
-          {required String sid, String? authorID, bool isSubmit = false}) =>
+          {required String sid,
+          String? authorID,
+          bool isSubmit = false,
+          String? spotID}) =>
       isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
 }

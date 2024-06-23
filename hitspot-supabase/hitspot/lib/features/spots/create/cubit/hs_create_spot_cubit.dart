@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/view/choose_location_provider.dart';
+import 'package:hitspot/main.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -19,20 +20,12 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
     _initializeCreatingSpot();
   }
 
-  final List<String> categories = [
-    "graffiti",
-    "monument",
-    "park",
-    "nightlife",
-    "cafe",
-    "bar",
-  ];
-
   final HSSpot? prototype;
   final PageController pageController = PageController();
   final _locationRepository = app.locationRepository;
   String get titleHint =>
       state.title.isEmpty ? "The best spot on earth..." : state.title;
+  final HSDatabaseRepsitory _databaseRepository = app.databaseRepository;
 
   String get descriptionHint =>
       state.description.isEmpty ? "Writings on the wall..." : state.description;
@@ -125,19 +118,6 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
     _fetchTags();
   }
 
-  Future<void> _fetchTags() async {
-    try {
-      emit(state.copyWith(isLoading: true));
-      await Future.delayed(const Duration(seconds: 2));
-      final List<String> res =
-          categories.where((e) => e.contains(state.tagsQuery)).toList();
-      emit(state.copyWith(isLoading: false, queriedTags: res));
-    } catch (_) {
-      HSDebugLogger.logError("Could not fetch tags: $_");
-      emit(state.copyWith(isLoading: false));
-    }
-  }
-
   List<File> get _xfilesToFiles =>
       state.images.map((e) => File(e.path)).toList();
 
@@ -171,11 +151,55 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
         HSDebugLogger.logSuccess("Uploaded images to the database!");
         HSDebugLogger.logSuccess("Spot submitted: $sid");
       }
+      if (state.selectedTags.isNotEmpty) {
+        await uploadTags(sid);
+      }
       HSDebugLogger.logSuccess("Spot created / updated: $sid");
       navi.toSpot(sid: sid, isSubmit: true);
       return;
     } catch (_) {
       HSDebugLogger.logError("Could not submit spot: $_");
+    }
+  }
+
+  Future<void> _fetchTags() async {
+    try {
+      final res = await supabase
+          .from('tags')
+          .select()
+          .textSearch('tag_value', "${state.tagsQuery}:*")
+          .limit(10)
+          .select();
+      final List<String> tags =
+          res.map((e) => e['tag_value'] as String).toList();
+      emit(state.copyWith(queriedTags: tags));
+    } catch (_) {
+      HSDebugLogger.logError("Could not fetch tags: $_");
+    }
+  }
+
+  void selectTag(String tag) {
+    if (!state.selectedTags.contains(tag)) {
+      final newSelectedTags = List<String>.from(state.selectedTags)..add(tag);
+      emit(state.copyWith(selectedTags: newSelectedTags, tagsQuery: ""));
+    }
+  }
+
+  void deselectTag(String tag) {
+    final newSelectedTags = List<String>.from(state.selectedTags)..remove(tag);
+    emit(state.copyWith(selectedTags: newSelectedTags));
+  }
+
+  Future<void> uploadTags(String spotID) async {
+    try {
+      final List<String> tags = state.selectedTags;
+      for (var i = 0; i < tags.length; i++) {
+        await _databaseRepository.tagSpotCreate(
+            value: tags[i], spotID: spotID, userID: currentUser.uid!);
+      }
+      HSDebugLogger.logSuccess("Uploaded tags: $tags");
+    } catch (_) {
+      HSDebugLogger.logError("Failed to upload tags: $_");
     }
   }
 }

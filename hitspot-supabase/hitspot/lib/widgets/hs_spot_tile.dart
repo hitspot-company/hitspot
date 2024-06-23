@@ -11,18 +11,20 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 class HSSpotTile extends StatelessWidget {
   const HSSpotTile({
     super.key,
-    required this.index,
+    this.index,
     this.extent,
     this.backgroundColor,
     this.bottomSpace,
     this.spot,
+    this.bottom,
   });
 
-  final int index;
+  final int? index;
   final double? extent;
   final double? bottomSpace;
   final Color? backgroundColor;
   final HSSpot? spot;
+  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class HSSpotTile extends StatelessWidget {
       child: Column(
         children: [
           CachedNetworkImage(
-            imageUrl: spot != null ? spot!.images![0] : _imgUrl(index),
+            imageUrl: spot != null ? spot!.images![0] : "",
             progressIndicatorBuilder: (context, url, progress) =>
                 _loadingWidget(),
             imageBuilder: (context, imageProvider) => Container(
@@ -46,41 +48,44 @@ class HSSpotTile extends StatelessWidget {
             ),
           ),
           const Gap(16.0),
-          SizedBox(
-            child: Row(
-              children: [
-                HSUserAvatar(
-                  radius: 24.0,
-                  iconSize: 16,
-                  imageUrl: spot?.author?.avatarUrl,
-                ),
-                const Gap(8.0),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AutoSizeText(
-                        spot!.title!,
-                        maxLines: 2,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      AutoSizeText(
-                        'by @${spot?.author?.username}',
-                        maxLines: 1,
-                        style: const TextStyle(
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+          if (bottom == null)
+            SizedBox(
+              child: Row(
+                children: [
+                  HSUserAvatar(
+                    radius: 24.0,
+                    iconSize: 16,
+                    imageUrl: spot?.author?.avatarUrl,
                   ),
-                )
-              ],
-            ),
-          )
+                  const Gap(8.0),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AutoSizeText(
+                          spot!.title!,
+                          maxLines: 2,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        AutoSizeText(
+                          'by @${spot?.author?.username}',
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            )
+          else
+            bottom!,
         ],
       ),
     );

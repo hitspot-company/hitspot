@@ -8,7 +8,7 @@ import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
-import 'package:hitspot/widgets/hs_button%20copy.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';

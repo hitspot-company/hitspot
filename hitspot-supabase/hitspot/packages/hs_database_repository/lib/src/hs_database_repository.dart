@@ -3,6 +3,8 @@ import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spot.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
+import 'package:hs_database_repository/src/tags/hs_tag.dart';
+import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
 import 'package:hs_database_repository/src/users/hs_users_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,15 +13,18 @@ class HSDatabaseRepsitory {
     this._usersRepository = HSUsersRepository(_supabaseClient, users);
     this._boardsRepository = HSBoardsRepository(_supabaseClient, boards);
     this._spotsRepository = HSSpotsRepository(_supabaseClient, spots);
+    this._tagsRepository = HSTagsRepository(_supabaseClient, spots);
   }
 
   static const String users = "users";
   static const String boards = "boards";
   static const String spots = "spots";
+  static const String tags = "tags";
   final SupabaseClient _supabaseClient;
   late final HSUsersRepository _usersRepository;
   late final HSBoardsRepository _boardsRepository;
   late final HSSpotsRepository _spotsRepository;
+  late final HSTagsRepository _tagsRepository;
 
   Future<void> userCreate({required HSUser user}) async =>
       await _usersRepository.create(user);
@@ -146,4 +151,37 @@ class HSDatabaseRepsitory {
   Future<bool> spotSaveUnsave(
           {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
       await _spotsRepository.saveUnsave(spot, spotID, user, userID);
+
+  /// Fetches the spots that belong to the user of given UID and are visible to the requester.
+  ///
+  /// The requester can be the user themselves or another user.
+  ///
+  /// The requester can specify the batch offset and batch size to fetch the spots in batches for pagination purposes.
+  Future<List<HSSpot>> spotfetchUserSpots(
+          {HSUser? user,
+          String? userID,
+          int batchOffset = 0,
+          int batchSize = 20}) async =>
+      await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
+
+  Future<void> tagCreate({required String tag}) async =>
+      await _tagsRepository.create(tag);
+  Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>
+      await _tagsRepository.read(tag, tagID);
+  Future<void> tagUpdate({required HSTag tag}) async =>
+      await _tagsRepository.update(tag);
+  Future<void> tagDelete({required HSTag tag}) async =>
+      await _tagsRepository.delete(tag);
+  Future<void> tagSpotCreate(
+          {required String value,
+          required String userID,
+          required String spotID}) async =>
+      await _tagsRepository.createSpot(value, userID, spotID);
+  Future<void> tagSpotDelete({required String tag}) async =>
+      await _tagsRepository.deleteSpot(tag);
+  Future<bool> tagExists({required String tagValue}) async =>
+      await _tagsRepository.tagExists(tagValue);
+
+  Future<List<HSTag>> tagFetchSpotTags({HSSpot? spot, String? spotID}) async =>
+      await _tagsRepository.fetchSpotTags(spot, spotID);
 }

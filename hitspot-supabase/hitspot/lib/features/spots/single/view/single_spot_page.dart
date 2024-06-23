@@ -64,6 +64,8 @@ class SingleSpotPage extends StatelessWidget {
                 style: const TextStyle(fontSize: 14.0, color: Colors.grey),
                 maxLines: 2,
               ).toSliver,
+
+              const _TagsBuilder().toSliver,
               const Gap(32.0).toSliver,
               Text(spot.description!, style: const TextStyle(fontSize: 16.0))
                   .toSliver,
@@ -182,6 +184,11 @@ class _MapView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: GoogleMap(
+                onTap: (argument) => app.locationRepository.launchMaps(
+                  coords: spotLocation,
+                  description: singleSpotCubit.state.spot.address!,
+                  title: singleSpotCubit.state.spot.title!,
+                ),
                 cameraTargetBounds: CameraTargetBounds(LatLngBounds(
                     southwest: spotLocation, northeast: spotLocation)),
                 initialCameraPosition: CameraPosition(
@@ -201,6 +208,35 @@ class _MapView extends StatelessWidget {
           );
         }
         return const SizedBox();
+      },
+    );
+  }
+}
+
+class _TagsBuilder extends StatelessWidget {
+  const _TagsBuilder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
+      builder: (context, state) {
+        final tags = state.tags;
+        if (tags.isEmpty) {
+          return const SizedBox();
+        }
+        return Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Wrap(
+            children: tags
+                .map(
+                  (tag) => Chip(
+                    side: BorderSide.none,
+                    label: Text("#${tag.value}"),
+                  ),
+                )
+                .toList(),
+          ),
+        );
       },
     );
   }

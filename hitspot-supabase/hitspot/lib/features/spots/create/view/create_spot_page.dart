@@ -1,8 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:choice/choice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_create_spot_cubit.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -86,6 +88,7 @@ class _SecondPage extends StatelessWidget {
       children: [
         HSTextField.filled(
           autofocus: true,
+          autocorrect: false,
           onChanged: createSpotCubit.updateDescription,
           hintText: createSpotCubit.descriptionHint,
           maxLength: 512,
@@ -129,42 +132,11 @@ class _ThirdPage extends StatelessWidget {
           suffixIcon: const Icon(FontAwesomeIcons.magnifyingGlass),
         ),
         const Gap(16.0),
-        BlocBuilder<HSCreateSpotCubit, HSCreateSpotState>(
-          buildWhen: (previous, current) =>
-              previous.queriedTags != current.queriedTags ||
-              previous.isLoading != current.isLoading,
-          builder: (context, state) {
-            final List<String> tags = state.queriedTags;
-            HSDebugLogger.logInfo("Rebuilding");
-            if (state.isLoading) {
-              return const HSLoadingIndicator();
-            }
-            if (tags.isEmpty) {
-              return Column(
-                children: [
-                  const AutoSizeText(
-                    "This tag does not exist yet. Would you like to add it?",
-                    maxLines: 1,
-                  ),
-                  const Gap(8.0),
-                  HSButton(
-                      onPressed: () => HSDebugLogger.logInfo("Create new tag"),
-                      child: const Text("Add new tag"))
-                ],
-              );
-            }
-            // TODO: Change to the chips choice package and add selecting
-            return GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2),
-              shrinkWrap: true,
-              itemCount: tags.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Chip(label: Text(tags[index]));
-              },
-            );
-          },
-        ),
+        const _TagsBuilder(),
+        const Gap(16.0),
+        const _SelectedTagsBuilder(),
+        const Gap(16.0),
+        const Gap(16.0),
         HSFormButtonsRow(
           right: BlocSelector<HSCreateSpotCubit, HSCreateSpotState, bool>(
             selector: (state) => state.status == HSCreateSpotStatus.submitting,
@@ -180,6 +152,105 @@ class _ThirdPage extends StatelessWidget {
               onPressed: createSpotCubit.prevPage, child: const Text("Back")),
         )
       ],
+    );
+  }
+}
+
+class _SelectedTagsBuilder extends StatelessWidget {
+  const _SelectedTagsBuilder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: screenWidth,
+      child: BlocSelector<HSCreateSpotCubit, HSCreateSpotState, List<String>>(
+        selector: (state) => state.selectedTags,
+        builder: (context, selectedTags) {
+          return Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: selectedTags.map((tag) {
+              final isSelected = selectedTags.contains(tag);
+              return ChoiceChip(
+                selected: isSelected,
+                onSelected: (selected) {
+                  if (selected) {
+                    context.read<HSCreateSpotCubit>().selectTag(tag);
+                  } else {
+                    context.read<HSCreateSpotCubit>().deselectTag(tag);
+                  }
+                },
+                label: Text('#$tag'), // Prefix the tag with a hashtag
+                showCheckmark: false,
+              );
+            }).toList(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TagsBuilder extends StatelessWidget {
+  const _TagsBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: screenWidth,
+      child: BlocBuilder<HSCreateSpotCubit, HSCreateSpotState>(
+        buildWhen: (previous, current) =>
+            previous.queriedTags != current.queriedTags ||
+            previous.isLoading != current.isLoading ||
+            previous.selectedTags != current.selectedTags ||
+            previous.tagsQuery != current.tagsQuery,
+        builder: (context, state) {
+          final List<String> queriedTags = state.queriedTags;
+          final List<String> selectedTags = state.selectedTags;
+          HSDebugLogger.logInfo("Selected tags: $selectedTags");
+          if (state.isLoading) {
+            return const HSLoadingIndicator();
+          }
+          if (queriedTags.isEmpty && state.tagsQuery.isNotEmpty) {
+            return Column(
+              children: [
+                const AutoSizeText(
+                  "This tag does not exist yet. Would you like to add it?",
+                  maxLines: 1,
+                ),
+                const SizedBox(height: 8.0),
+                HSButton(
+                  onPressed: () {
+                    context
+                        .read<HSCreateSpotCubit>()
+                        .selectTag(state.tagsQuery);
+                  },
+                  child: const Text("Add new tag"),
+                ),
+              ],
+            );
+          }
+
+          return Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: queriedTags.map((tag) {
+              final isSelected = selectedTags.contains(tag);
+              return ChoiceChip(
+                selected: isSelected,
+                onSelected: (selected) {
+                  if (selected) {
+                    context.read<HSCreateSpotCubit>().selectTag(tag);
+                  } else {
+                    context.read<HSCreateSpotCubit>().deselectTag(tag);
+                  }
+                },
+                label: Text('#$tag'),
+              );
+            }).toList(),
+          );
+        },
+      ),
     );
   }
 }

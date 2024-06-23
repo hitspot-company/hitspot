@@ -1,7 +1,7 @@
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:hs_location_repository/src/models/hs_place_details.dart';
+import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:uuid/uuid.dart';
 
 class HSLocationRepository {
@@ -159,5 +159,27 @@ class HSLocationRepository {
     } catch (_) {
       throw Exception("Could not fetch neighbors : $_");
     }
+  }
+
+  Future<void> launchMaps(
+      {required String title,
+      required String description,
+      required LatLng coords}) async {
+    final List<ml.AvailableMap> availableMaps =
+        await ml.MapLauncher.installedMaps;
+    late final ml.MapType preferredMapType;
+    if (availableMaps.contains(ml.MapType.google)) {
+      preferredMapType = ml.MapType.google;
+    } else if (availableMaps.contains(ml.MapType.apple)) {
+      preferredMapType = ml.MapType.apple;
+    } else {
+      preferredMapType = availableMaps.first.mapType;
+    }
+    final ml.Coords launchCoords = ml.Coords(coords.latitude, coords.longitude);
+    await ml.MapLauncher.showMarker(
+        coords: launchCoords,
+        title: title,
+        description: description,
+        mapType: preferredMapType);
   }
 }

@@ -1,8 +1,11 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
 import 'package:hitspot/features/user_profile/main/view/widgets/hs_user_profile_headline.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -10,10 +13,13 @@ import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
+import 'package:hitspot/widgets/hs_spot_tile.dart';
+import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -167,6 +173,53 @@ class UserProfilePage extends StatelessWidget {
                     },
                   ),
                 ])
+              else
+                SliverMainAxisGroup(
+                  slivers: [
+                    const Gap(24.0).toSliver,
+                    const HSUserProfileHeadline(title: "Spots"),
+                    const Gap(24.0).toSliver,
+                    SliverGrid.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 12.0,
+                        crossAxisSpacing: 12.0,
+                        mainAxisExtent: 140.0,
+                      ),
+                      itemCount: state.spots.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final HSSpot spot = state.spots[index];
+                        return GestureDetector(
+                          onTap: () => navi.toSpot(sid: spot.sid!),
+                          child: CachedNetworkImage(
+                            imageUrl: spot.images!.first,
+                            progressIndicatorBuilder:
+                                (context, url, progress) =>
+                                    const HSShimmerBox(width: 60, height: 60),
+                            imageBuilder: (context, imageProvider) => Column(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const Gap(8.0),
+                                AutoSizeText(spot.title!, maxLines: 2),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
             ],
           ),
         );

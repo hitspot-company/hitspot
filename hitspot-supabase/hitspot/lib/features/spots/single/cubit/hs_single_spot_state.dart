@@ -9,14 +9,17 @@ final class HSSingleSpotState extends Equatable {
     this.isSpotLiked = false,
     this.isSpotSaved = false,
     this.isAuthor = false,
+    this.tags = const [],
   });
 
   final HSSingleSpotStatus status;
   final HSSpot spot;
   final bool isSpotLiked, isSpotSaved, isAuthor;
+  final List<HSTag> tags;
 
   @override
-  List<Object> get props => [status, spot, isSpotLiked, isSpotSaved, isAuthor];
+  List<Object> get props =>
+      [status, spot, isSpotLiked, isSpotSaved, isAuthor, tags];
 
   HSSingleSpotState copyWith({
     HSSingleSpotStatus? status,
@@ -24,6 +27,7 @@ final class HSSingleSpotState extends Equatable {
     bool? isSpotLiked,
     bool? isSpotSaved,
     bool? isAuthor,
+    List<HSTag>? tags,
   }) {
     return HSSingleSpotState(
       status: status ?? this.status,
@@ -31,6 +35,7 @@ final class HSSingleSpotState extends Equatable {
       isSpotLiked: isSpotLiked ?? this.isSpotLiked,
       isSpotSaved: isSpotSaved ?? this.isSpotSaved,
       isAuthor: isAuthor ?? this.isAuthor,
+      tags: tags ?? this.tags,
     );
   }
 }

@@ -17,7 +17,7 @@ final class HSCreateSpotState extends Equatable {
     this.images = const [],
     this.title = '',
     this.description = '',
-    this.tags = const [],
+    this.selectedTags = const [],
     this.tagsQuery = "",
     this.queriedTags = const [],
     this.isLoading = false,
@@ -29,7 +29,7 @@ final class HSCreateSpotState extends Equatable {
   final List<XFile> images;
   final String title;
   final String description;
-  final List<String> tags;
+  final List<String> selectedTags;
   final List<String> queriedTags;
   final String tagsQuery;
   final bool isLoading;
@@ -41,7 +41,7 @@ final class HSCreateSpotState extends Equatable {
     List<XFile>? images,
     String? title,
     String? description,
-    List<String>? tags,
+    List<String>? selectedTags,
     List<String>? queriedTags,
     String? tagsQuery,
     bool? isLoading,
@@ -53,7 +53,7 @@ final class HSCreateSpotState extends Equatable {
       images: images ?? this.images,
       title: title ?? this.title,
       description: description ?? this.description,
-      tags: tags ?? this.tags,
+      selectedTags: selectedTags ?? this.selectedTags,
       queriedTags: queriedTags ?? this.queriedTags,
       tagsQuery: tagsQuery ?? this.tagsQuery,
       isLoading: isLoading ?? this.isLoading,
@@ -68,7 +68,7 @@ final class HSCreateSpotState extends Equatable {
         images,
         title,
         description,
-        tags,
+        selectedTags,
         queriedTags,
         tagsQuery,
         isLoading,

@@ -14,8 +14,9 @@ class HSUserSearchCubit extends Cubit<HSUserSearchState> {
   Timer? _debounce; // Define a Timer for debouncing
 
   void searchUsers(String query) {
-    if (_debounce?.isActive ?? false)
+    if (_debounce?.isActive ?? false) {
       _debounce?.cancel(); // Cancel previous timer if it exists and is active
+    }
 
     _debounce = Timer(const Duration(milliseconds: 300), () async {
       // Set debounce duration to 300 milliseconds
