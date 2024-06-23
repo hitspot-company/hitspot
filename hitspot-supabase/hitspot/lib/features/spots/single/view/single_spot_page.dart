@@ -13,6 +13,7 @@ import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 
 class SingleSpotPage extends StatelessWidget {
   const SingleSpotPage({super.key});
@@ -52,31 +53,66 @@ class SingleSpotPage extends StatelessWidget {
               const Gap(16.0).toSliver,
               AutoSizeText(
                 "${spot.address}",
-                style: textTheme.displaySmall!.hintify,
+                style: const TextStyle(fontSize: 14.0, color: Colors.grey),
                 maxLines: 2,
               ).toSliver,
               const Gap(32.0).toSliver,
-              Text(
-                spot.description!,
-                style: textTheme.headlineMedium,
-              ).toSliver,
+              Text(spot.description!, style: const TextStyle(fontSize: 16.0))
+                  .toSliver,
               const Gap(32.0).toSliver,
               Row(
                 children: [
                   HsUserTile(
                     user: spot.author!,
                   ),
-                  const Expanded(
+                  Expanded(
                       child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Icon(FontAwesomeIcons.heart),
-                      Icon(FontAwesomeIcons.comment),
-                      Icon(FontAwesomeIcons.bookmark),
+                      GestureDetector(
+                        onTap: singleSpotCubit.likeDislikeSpot,
+                        child: BlocSelector<HSSingleSpotCubit,
+                            HsSingleSpotState, bool>(
+                          selector: (state) => state.isSpotLiked,
+                          builder: (context, isSpotLiked) {
+                            if (singleSpotCubit.state.status ==
+                                HSSingleSpotStatus.liking) {
+                              return const HSLoadingIndicator(size: 24.0);
+                            }
+                            if (isSpotLiked) {
+                              return Icon(FontAwesomeIcons.solidHeart,
+                                  color: appTheme.mainColor);
+                            }
+                            return const Icon(FontAwesomeIcons.heart);
+                          },
+                        ),
+                      ),
+                      const Icon(FontAwesomeIcons.comment),
+                      GestureDetector(
+                        onTap: singleSpotCubit.saveUnsaveSpot,
+                        child: BlocSelector<HSSingleSpotCubit,
+                            HsSingleSpotState, bool>(
+                          selector: (state) => state.isSpotSaved,
+                          builder: (context, isSpotSaved) {
+                            if (singleSpotCubit.state.status ==
+                                HSSingleSpotStatus.saving) {
+                              return const HSLoadingIndicator(size: 24.0);
+                            }
+                            if (isSpotSaved) {
+                              return Icon(FontAwesomeIcons.solidBookmark,
+                                  color: appTheme.mainColor);
+                            }
+                            return const Icon(FontAwesomeIcons.bookmark);
+                          },
+                        ),
+                      ),
                     ],
                   )),
                 ],
               ).toSliver,
+              const Gap(32.0).toSliver,
+              // TODO: Style the map in dark colors
+              _MapView(singleSpotCubit: singleSpotCubit).toSliver,
               const Gap(32.0).toSliver,
               SliverList.separated(
                 itemCount: imagesCount - 1,
@@ -93,6 +129,50 @@ class SingleSpotPage extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _MapView extends StatelessWidget {
+  const _MapView({
+    required this.singleSpotCubit,
+  });
+
+  final HSSingleSpotCubit singleSpotCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<HSSingleSpotCubit, HsSingleSpotState, bool>(
+      selector: (state) =>
+          state.spot.latitude != null && state.spot.longitude != null,
+      builder: (context, isSpotLocationLoaded) {
+        if (isSpotLocationLoaded) {
+          final LatLng spotLocation = singleSpotCubit.spotLocation!;
+          return SizedBox(
+            height: 200.0,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: GoogleMap(
+                cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                    southwest: spotLocation, northeast: spotLocation)),
+                initialCameraPosition: CameraPosition(
+                  target: spotLocation,
+                  zoom: 16.0,
+                ),
+                markers: {
+                  Marker(
+                    markerId: const MarkerId('1'),
+                    position: spotLocation,
+                  )
+                },
+                myLocationEnabled: false,
+                myLocationButtonEnabled: false,
+              ),
+            ),
+          );
+        }
+        return const SizedBox();
+      },
     );
   }
 }

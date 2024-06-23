@@ -124,4 +124,26 @@ class HSDatabaseRepsitory {
   Future<HSSpot> spotfetchSpotWithAuthor(
           {HSSpot? spot, String? spotID}) async =>
       await _spotsRepository.fetchSpotWithAuthor(spot, spotID);
+
+  Future<void> spotDislike(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.dislike(spot, spotID, user, userID);
+  Future<void> spotLike(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.like(spot, spotID, user, userID);
+  Future<bool> spotIsSpotLiked(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.isSpotLiked(spot, spotID, user, userID);
+
+  Future<bool> spotLikeDislike(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.likeDislike(spot, spotID, user, userID);
+
+  Future<bool> spotIsSaved(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.isSaved(spot, spotID, user, userID);
+
+  Future<bool> spotSaveUnsave(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.saveUnsave(spot, spotID, user, userID);
 }

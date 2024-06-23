@@ -47,7 +47,6 @@ class HSSpotTile extends StatelessWidget {
           ),
           const Gap(16.0),
           SizedBox(
-            height: 60.0,
             child: Row(
               children: [
                 HSUserAvatar(

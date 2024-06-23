@@ -47,7 +47,7 @@ class HSLocationRepository {
         // Concatenate non-null components of the address
         var streets = placemarks.reversed
             .map((placemark) => placemark.street)
-            .where((street) => street != null);
+            .where((street) => street != null && street != '');
 
         // Filter out unwanted parts
         streets = streets.where((street) =>

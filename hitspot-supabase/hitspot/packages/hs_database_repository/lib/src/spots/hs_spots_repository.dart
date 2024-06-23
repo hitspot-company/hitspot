@@ -28,7 +28,9 @@ class HSSpotsRepository {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
       final sid = spot?.sid ?? spotID!;
-      final fetchedSpot = await _supabase.from(_spots).select().eq("id", sid);
+      final fetchedSpot = await _supabase.rpc('spots_fetch_spot', params: {
+        'requested_spot_id': sid,
+      });
       if (fetchedSpot.isEmpty) throw "Spot not found";
       HSDebugLogger.logInfo("Fetched: ${fetchedSpot.toString()}");
       return HSSpot.deserialize(fetchedSpot.first);
@@ -108,8 +110,10 @@ class HSSpotsRepository {
         'radius': radius ?? DEFAULT_RADIUS,
       });
       HSDebugLogger.logInfo(data.toString());
-      final List<HSSpot> spots =
-          (data as List<dynamic>).map((e) => HSSpot.deserialize(e)).toList();
+      final List<HSSpot> spots = (data as List<dynamic>).map((e) {
+        print(data);
+        return HSSpot.deserialize(e);
+      }).toList();
       for (var i = 0; i < spots.length; i++) {
         final spot = await _composeSpotWithImages(spots[i]);
         spots[i] = spot;
@@ -166,6 +170,130 @@ class HSSpotsRepository {
       return spotWithImages.copyWith(author: fetchedAuthor);
     } catch (_) {
       throw Exception("Could not fetch spot with author: $_");
+    }
+  }
+
+  Future<bool> isSpotLiked(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final sid = spot?.sid ?? spotID!;
+      final uid = user?.uid ?? userID!;
+      final bool data = await _supabase.rpc('spots_is_spot_liked', params: {
+        'requested_spot_id': sid,
+        'requested_by_id': uid,
+      });
+      return data;
+    } catch (_) {
+      throw Exception("Error checking if spot is liked: $_");
+    }
+  }
+
+  Future<void> like(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final sid = spot?.sid ?? spotID!;
+      final uid = user?.uid ?? userID!;
+      await _supabase.rpc('spots_like_spot', params: {
+        'requested_spot_id': sid,
+        'requested_by_id': uid,
+      });
+    } catch (_) {
+      throw Exception("Error liking spot: $_");
+    }
+  }
+
+  Future<void> dislike(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final sid = spot?.sid ?? spotID!;
+      final uid = user?.uid ?? userID!;
+      await _supabase.rpc('spots_dislike_spot', params: {
+        'requested_spot_id': sid,
+        'requested_by_id': uid,
+      });
+    } catch (_) {
+      throw Exception("Error disliking spot: $_");
+    }
+  }
+
+  Future<bool> likeDislike(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      if (await isSpotLiked(spot, spotID, user, userID)) {
+        await dislike(spot, spotID, user, userID);
+        return false;
+      } else {
+        await like(spot, spotID, user, userID);
+        return true;
+      }
+    } catch (_) {
+      throw Exception("Error disliking spot: $_");
+    }
+  }
+
+  Future<bool> isSaved(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final sid = spot?.sid ?? spotID!;
+      final uid = user?.uid ?? userID!;
+      final bool data = await _supabase.rpc('spots_is_spot_saved', params: {
+        'requested_spot_id': sid,
+        'requested_by_id': uid,
+      });
+      return data;
+    } catch (_) {
+      throw Exception("Error checking if spot is saved: $_");
+    }
+  }
+
+  Future<void> _save(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final sid = spot?.sid ?? spotID!;
+      final uid = user?.uid ?? userID!;
+      await _supabase.rpc('spots_save_spot', params: {
+        'requested_spot_id': sid,
+        'requested_by_id': uid,
+      });
+    } catch (_) {
+      throw Exception("Error saving spot: $_");
+    }
+  }
+
+  Future<void> _unsave(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final sid = spot?.sid ?? spotID!;
+      final uid = user?.uid ?? userID!;
+      await _supabase.rpc('spots_unsave_spot', params: {
+        'requested_spot_id': sid,
+        'requested_by_id': uid,
+      });
+    } catch (_) {
+      throw Exception("Error unsaving spot: $_");
+    }
+  }
+
+  Future<bool> saveUnsave(
+      HSSpot? spot, String? spotID, HSUser? user, String? userID) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      if (await isSaved(spot, spotID, user, userID)) {
+        await _unsave(spot, spotID, user, userID);
+        return false;
+      } else {
+        await _save(spot, spotID, user, userID);
+        return true;
+      }
+    } catch (_) {
+      throw Exception("Error saving / unsaving spot: $_");
     }
   }
 }

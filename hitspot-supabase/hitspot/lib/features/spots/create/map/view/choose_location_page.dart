@@ -170,9 +170,11 @@ class _BottomBar extends StatelessWidget {
                           return const HSLoadingIndicator();
                         }
                         if (predictions.isEmpty) {
-                          return const Center(
-                            child: Text("No predictions found"),
-                          );
+                          return Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: Text(chooseLocationCubit.query.isEmpty
+                                  ? "Search for a place..."
+                                  : "No predictions found"));
                         }
                         return ListView.separated(
                           itemCount: predictions.length,

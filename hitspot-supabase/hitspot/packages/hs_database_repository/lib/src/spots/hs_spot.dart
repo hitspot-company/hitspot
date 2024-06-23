@@ -2,7 +2,12 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 class HSSpot {
   final String? sid, title, description, geohash, createdBy, address;
-  final int? likesCount, commentsCount, savesCount, tripsCount, boardsCount;
+  final int? likesCount,
+      commentsCount,
+      savesCount,
+      tripsCount,
+      boardsCount,
+      sharesCount;
   final double? latitude, longitude;
   final List<String>? images;
   final HSUser? author;
@@ -20,6 +25,7 @@ class HSSpot {
     this.savesCount,
     this.tripsCount,
     this.boardsCount,
+    this.sharesCount,
     this.latitude,
     this.longitude,
     this.images,
@@ -37,6 +43,7 @@ class HSSpot {
     int? savesCount,
     int? tripsCount,
     int? boardsCount,
+    int? sharesCount,
     double? latitude,
     double? longitude,
     List<String>? images,
@@ -53,6 +60,7 @@ class HSSpot {
       commentsCount: commentsCount ?? this.commentsCount,
       savesCount: savesCount ?? this.savesCount,
       tripsCount: tripsCount ?? this.tripsCount,
+      sharesCount: sharesCount ?? this.sharesCount,
       boardsCount: boardsCount ?? this.boardsCount,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
@@ -67,11 +75,12 @@ class HSSpot {
       'description': description,
       'geohash': geohash,
       'created_by': createdBy,
-      'likes_count': likesCount,
-      'comments_count': commentsCount,
-      'saves_count': savesCount,
-      'trips_count': tripsCount,
-      'boards_count': boardsCount,
+      'likes_count': likesCount ?? 0,
+      'comments_count': commentsCount ?? 0,
+      'saves_count': savesCount ?? 0,
+      'trips_count': tripsCount ?? 0,
+      'boards_count': boardsCount ?? 0,
+      'shares_count': sharesCount ?? 0,
       "location": "POINT($longitude $latitude)",
       'address': address,
     };
@@ -87,9 +96,12 @@ class HSSpot {
       likesCount: data['likes_count'],
       commentsCount: data['comments_count'],
       savesCount: data['saves_count'],
+      sharesCount: data['shares_count'],
       tripsCount: data['trips_count'],
       boardsCount: data['boards_count'],
       address: data['address'],
+      latitude: data['lat'] ?? data['latitude'],
+      longitude: data['long'] ?? data['longitude'],
     );
   }
 
