@@ -111,7 +111,7 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
     navi.pop(state.selectedLocation!.copyWith(address: address));
   }
 
-  void cancel() => navi.router.go("/");
+  void cancel() => navi.pop(null);
 
   @override
   Future<void> close() {

@@ -15,7 +15,7 @@ import 'package:image_picker/image_picker.dart';
 part 'hs_create_spot_state.dart';
 
 class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
-  HSCreateSpotCubit() : super(const HSCreateSpotState()) {
+  HSCreateSpotCubit({this.prototype}) : super(const HSCreateSpotState()) {
     _initializeCreatingSpot();
   }
 
@@ -28,6 +28,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
     "bar",
   ];
 
+  final HSSpot? prototype;
   final PageController pageController = PageController();
   final _locationRepository = app.locationRepository;
   String get titleHint =>
@@ -55,8 +56,18 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
       emit(state.copyWith(
           status: HSCreateSpotStatus.requestingLocationPermission));
       await _requestLocationPermission();
-      await _chooseImages();
+      if (prototype == null) {
+        await _chooseImages();
+      }
       await _chooseLocation();
+      if (prototype != null) {
+        emit(
+          state.copyWith(
+            title: prototype!.title,
+            description: prototype!.description,
+          ),
+        );
+      }
     } catch (_) {
       HSDebugLogger.logError("Error: $_");
       navi.pop();
@@ -89,8 +100,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
       emit(state.copyWith(
           images: images, status: HSCreateSpotStatus.choosingLocation));
     } catch (_) {
-      HSDebugLogger.logError("Picker error: $_");
-      throw Exception("Could not choose images: $_");
+      throw Exception("No images selected: $_");
     }
   }
 
@@ -103,7 +113,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
       emit(state.copyWith(
           spotLocation: result, status: HSCreateSpotStatus.fillingData));
     } else {
-      HSDebugLogger.logError("No location selected");
+      throw "No location selected";
     }
   }
 
@@ -146,15 +156,22 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
         address: state.spotLocation!.address,
       );
       HSDebugLogger.logInfo(spot.toString());
-      final String sid = await app.databaseRepository.spotCreate(spot: spot);
-      HSDebugLogger.logSuccess("Spot created: $sid");
-      final List<String> urls = await app.storageRepository.spotUploadImages(
-          files: _xfilesToFiles, uid: currentUser.uid!, sid: sid);
-      HSDebugLogger.logSuccess("Uploaded images to the storage!");
-      await app.databaseRepository.spotUploadImages(
-          spotID: sid, imageUrls: urls, uid: currentUser.uid!);
-      HSDebugLogger.logSuccess("Uploaded images to the database!");
-      HSDebugLogger.logSuccess("Spot submitted: $sid");
+      late final String sid;
+      if (prototype != null) {
+        await app.databaseRepository
+            .spotUpdate(spot: spot.copyWith(sid: prototype!.sid!));
+        sid = prototype!.sid!;
+      } else {
+        sid = await app.databaseRepository.spotCreate(spot: spot);
+        final List<String> urls = await app.storageRepository.spotUploadImages(
+            files: _xfilesToFiles, uid: currentUser.uid!, sid: sid);
+        HSDebugLogger.logSuccess("Uploaded images to the storage!");
+        await app.databaseRepository.spotUploadImages(
+            spotID: sid, imageUrls: urls, uid: currentUser.uid!);
+        HSDebugLogger.logSuccess("Uploaded images to the database!");
+        HSDebugLogger.logSuccess("Spot submitted: $sid");
+      }
+      HSDebugLogger.logSuccess("Spot created / updated: $sid");
       navi.toSpot(sid: sid, isSubmit: true);
       return;
     } catch (_) {

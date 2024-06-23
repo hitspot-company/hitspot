@@ -39,3 +39,20 @@ Long: $longitude
     );
   }
 }
+
+extension HSLocationExtension on Position {
+  Position copyWith(double lat, double long) {
+    return Position(
+      longitude: lat,
+      latitude: long,
+      timestamp: timestamp,
+      accuracy: accuracy,
+      altitude: altitude,
+      altitudeAccuracy: altitudeAccuracy,
+      heading: heading,
+      headingAccuracy: headingAccuracy,
+      speed: speed,
+      speedAccuracy: speedAccuracy,
+    );
+  }
+}

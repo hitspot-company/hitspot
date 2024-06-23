@@ -5,9 +5,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
-import 'package:hitspot/features/boards/single/view/single_board_page.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
+import 'package:hitspot/features/spots/single/view/single_spot_image_full_screen_page.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
@@ -24,8 +23,20 @@ class SingleSpotPage extends StatelessWidget {
     return HSScaffold(
       appBar: HSAppBar(
         enableDefaultBackButton: true,
+        right: BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
+          selector: (state) => state.isAuthor,
+          builder: (context, isAuthor) {
+            if (!isAuthor) return const SizedBox();
+            return IconButton(
+              icon: const Icon(
+                FontAwesomeIcons.ellipsisVertical,
+              ),
+              onPressed: singleSpotCubit.showBottomSheet,
+            );
+          },
+        ),
       ),
-      body: BlocBuilder<HSSingleSpotCubit, HsSingleSpotState>(
+      body: BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
         buildWhen: (previous, current) =>
             previous.status != current.status || previous.spot != current.spot,
         builder: (context, state) {
@@ -44,11 +55,8 @@ class SingleSpotPage extends StatelessWidget {
                 style: textTheme.displayMedium,
               ).toSliver,
               const Gap(24.0).toSliver,
-              HSImage(
-                imageUrl: spot.images?.first,
-                height: 300.0,
-                width: screenWidth,
-                borderRadius: BorderRadius.circular(16.0),
+              _ImageTile(
+                imageUrl: spot.images!.first,
               ).toSliver,
               const Gap(16.0).toSliver,
               AutoSizeText(
@@ -72,7 +80,7 @@ class SingleSpotPage extends StatelessWidget {
                       GestureDetector(
                         onTap: singleSpotCubit.likeDislikeSpot,
                         child: BlocSelector<HSSingleSpotCubit,
-                            HsSingleSpotState, bool>(
+                            HSSingleSpotState, bool>(
                           selector: (state) => state.isSpotLiked,
                           builder: (context, isSpotLiked) {
                             if (singleSpotCubit.state.status ==
@@ -91,7 +99,7 @@ class SingleSpotPage extends StatelessWidget {
                       GestureDetector(
                         onTap: singleSpotCubit.saveUnsaveSpot,
                         child: BlocSelector<HSSingleSpotCubit,
-                            HsSingleSpotState, bool>(
+                            HSSingleSpotState, bool>(
                           selector: (state) => state.isSpotSaved,
                           builder: (context, isSpotSaved) {
                             if (singleSpotCubit.state.status ==
@@ -117,17 +125,38 @@ class SingleSpotPage extends StatelessWidget {
               SliverList.separated(
                 itemCount: imagesCount - 1,
                 separatorBuilder: (context, index) => const Gap(16.0),
-                itemBuilder: (context, index) => HSImage(
-                  imageUrl: spot.images?[index + 1],
-                  height: 300.0,
-                  width: screenWidth,
-                  borderRadius: BorderRadius.circular(16.0),
+                itemBuilder: (context, index) => _ImageTile(
+                  imageUrl: spot.images![index + 1],
                 ),
               ),
               const Gap(32.0).toSliver,
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _ImageTile extends StatelessWidget {
+  const _ImageTile({required this.imageUrl, this.height = 300.0});
+
+  final String imageUrl;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => navi.pushPage(
+          page: SingleSpotImageFullScreenPage(imageUrl: imageUrl)),
+      child: Hero(
+        tag: imageUrl,
+        child: HSImage(
+          imageUrl: imageUrl,
+          height: height,
+          width: screenWidth,
+          borderRadius: BorderRadius.circular(16.0),
+        ),
       ),
     );
   }
@@ -142,7 +171,7 @@ class _MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<HSSingleSpotCubit, HsSingleSpotState, bool>(
+    return BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
       selector: (state) =>
           state.spot.latitude != null && state.spot.longitude != null,
       builder: (context, isSpotLocationLoaded) {
