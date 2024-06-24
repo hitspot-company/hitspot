@@ -20,6 +20,8 @@ class HSSpotsGrid extends StatelessWidget {
       this.crossAxisCount = 2,
       this.mainAxisSpacing = 8.0,
       this.fixedHeight = 60.0,
+      this.onLongPress,
+      this.onTap,
       this.crossAxisSpacing = 8.0});
 
   final List<HSSpot>? spots;
@@ -30,6 +32,8 @@ class HSSpotsGrid extends StatelessWidget {
   final double heightFactor;
   final int crossAxisCount;
   final double mainAxisSpacing, crossAxisSpacing, fixedHeight;
+  final VoidCallback? onTap;
+  final Function(HSSpot)? onLongPress;
 
   factory HSSpotsGrid.loading({bool isSliver = false}) {
     return HSSpotsGrid(loading: true, isSliver: isSliver);
@@ -82,6 +86,8 @@ class HSSpotsGrid extends StatelessWidget {
         childCount: spots!.length,
         itemBuilder: (context, index) {
           return HSSpotTile(
+            onTap: onTap,
+            onLongPress: onLongPress,
             index: index,
             spot: spots?[index],
             extent: (index % 3 + 2) * heightFactor + fixedHeight,
@@ -96,6 +102,8 @@ class HSSpotsGrid extends StatelessWidget {
       itemCount: spots!.length,
       itemBuilder: (context, index) {
         return HSSpotTile(
+          onTap: onTap,
+          onLongPress: onLongPress,
           index: index,
           spot: spots?[index],
           extent: (index % 3 + 2) * heightFactor + fixedHeight,

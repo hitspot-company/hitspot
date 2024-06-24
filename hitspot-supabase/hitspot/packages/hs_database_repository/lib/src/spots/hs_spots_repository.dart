@@ -95,7 +95,6 @@ class HSSpotsRepository {
       throw Exception("Error fetching nearby spots: $_");
     }
 
-    // TODO: Add fetching spots in the given radius (say 50km)
     // TODO: Add map view with clustering (https://pub.dev/packages/google_maps_cluster_manager)
   }
 

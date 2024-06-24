@@ -9,6 +9,7 @@ import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:hs_toasts/hs_toasts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -81,6 +82,63 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     }
   }
 
+  Future<List<HSBoard>> fetchUserSpots() async {
+    try {
+      return await _databaseRepository.boardFetchUserBoards(
+          user: currentUser, userID: currentUser.uid);
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+      return [];
+    }
+  }
+
+  Future<void> _addToBoard(HSBoard board) async {
+    try {
+      emit(state.copyWith(status: HSSingleSpotStatus.addingToBoard));
+      await _databaseRepository.boardAddSpot(
+          board: board, spot: state.spot, addedBy: currentUser);
+      emit(state.copyWith(status: HSSingleSpotStatus.loaded));
+      app.showToast(
+          toastType: HSToastType.success,
+          title: "Spot added.",
+          description: "Spot added to board ${board.title}");
+      navi.pop();
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+    }
+  }
+
+  Future<void> _addToBoardPrompt(List<HSBoard> boards) async {
+    try {
+      await showCupertinoModalBottomSheet(
+        context: app.context,
+        builder: (context) => SingleChildScrollView(
+          controller: ModalScrollController.of(context),
+          child: Column(
+            children: [
+              const Gap(16.0),
+              Text(
+                "Choose a board",
+                style: textTheme.headlineMedium,
+              ),
+              const Gap(16.0),
+              ...boards.map(
+                (e) => HSModalBottomSheetItem(
+                  title: e.title!,
+                  iconData: FontAwesomeIcons.a,
+                  onTap: () => _addToBoard(e),
+                ),
+              ),
+              const Gap(32.0),
+            ],
+          ),
+        ),
+      );
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+    }
+  }
+
   Future<void> showBottomSheet() async {
     return showCupertinoModalBottomSheet(
       context: app.context,
@@ -90,12 +148,21 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Gap(8.0),
-            HSModalBottomSheetItem(
-              title: "Edit",
-              iconData: FontAwesomeIcons.penToSquare,
-              onTap: () => navi.pushPage(
-                page: CreateSpotProvider(prototype: state.spot),
+            if (state.isAuthor)
+              HSModalBottomSheetItem(
+                title: "Edit",
+                iconData: FontAwesomeIcons.penToSquare,
+                onTap: () => navi.pushPage(
+                  page: CreateSpotProvider(prototype: state.spot),
+                ),
               ),
+            HSModalBottomSheetItem(
+              title: "Add to Board",
+              iconData: FontAwesomeIcons.plus,
+              onTap: () async {
+                final List<HSBoard> boards = await fetchUserSpots();
+                await _addToBoardPrompt(boards);
+              },
             ),
             HSModalBottomSheetItem(
               iconData: FontAwesomeIcons.arrowUpRightFromSquare,

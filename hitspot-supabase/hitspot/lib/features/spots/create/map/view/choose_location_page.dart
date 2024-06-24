@@ -167,7 +167,13 @@ class _BottomBar extends StatelessWidget {
                         final isFetching = state.status ==
                             HSChooseLocationStatus.fetchingPredictions;
                         if (isFetching) {
-                          return const HSLoadingIndicator();
+                          return const Align(
+                            alignment: Alignment.topCenter,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 16.0),
+                              child: HSLoadingIndicator(enableCenter: false),
+                            ),
+                          );
                         }
                         if (predictions.isEmpty) {
                           return Padding(

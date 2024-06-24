@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
@@ -12,6 +13,7 @@ import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -112,11 +114,19 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 ),
               const Gap(24.0).toSliver,
-              HSSpotsGrid(
-                isSliver: true,
-                spots: spots,
-                emptyIcon: const Icon(FontAwesomeIcons.mapPin),
-                emptyMessage: "No spots",
+              SliverMasonryGrid.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                childCount: spots.length,
+                itemBuilder: (context, index) {
+                  return HSSpotTile(
+                    onLongPress: singleBoardCubit.onLongPress,
+                    index: index,
+                    spot: spots[index],
+                    extent: (index % 3 + 2) * 70.0 + 70.0,
+                  );
+                },
               ),
             ],
           ),

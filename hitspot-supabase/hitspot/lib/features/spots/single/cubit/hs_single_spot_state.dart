@@ -1,6 +1,14 @@
 part of 'hs_single_spot_cubit.dart';
 
-enum HSSingleSpotStatus { loading, loaded, liking, saving, deleting, error }
+enum HSSingleSpotStatus {
+  loading,
+  loaded,
+  liking,
+  saving,
+  addingToBoard,
+  deleting,
+  error
+}
 
 final class HSSingleSpotState extends Equatable {
   const HSSingleSpotState({

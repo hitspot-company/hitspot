@@ -3,7 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -17,6 +16,8 @@ class HSSpotTile extends StatelessWidget {
     this.bottomSpace,
     this.spot,
     this.bottom,
+    this.onTap,
+    this.onLongPress,
   });
 
   final int? index;
@@ -25,11 +26,15 @@ class HSSpotTile extends StatelessWidget {
   final Color? backgroundColor;
   final HSSpot? spot;
   final Widget? bottom;
+  final VoidCallback? onTap;
+  final Function(HSSpot spot)? onLongPress;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: spot?.sid != null ? () => navi.toSpot(sid: spot!.sid!) : null,
+      onTap: onTap ??
+          (spot?.sid != null ? () => navi.toSpot(sid: spot!.sid!) : null),
+      onLongPress: () => onLongPress != null ? onLongPress!(spot!) : null,
       child: Column(
         children: [
           CachedNetworkImage(

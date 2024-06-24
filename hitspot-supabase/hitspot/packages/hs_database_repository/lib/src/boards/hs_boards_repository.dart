@@ -1,7 +1,5 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/boards/hs_board.dart';
-import 'package:hs_database_repository/src/boards/hs_board_exception.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -196,20 +194,65 @@ class HSBoardsRepository {
   }
 
   // READ BOARD SPOTS
-  Future<List<HSSpot>> fetchBoardSpots(HSBoard? board, String? boardID) async {
+  Future<List<HSSpot>> fetchBoardSpots(HSBoard? board, String? boardID,
+      [int batchSize = 20, int batchOffset = 0]) async {
     try {
       final bid = board?.id ?? boardID!;
-      final List fetchedSpots = await _supabase
-          .rpc('boards_fetch_board_spots', params: {'board_id_input': bid});
+      final List fetchedSpots = await _supabase.rpc('boards_fetch_board_spots',
+          params: {
+            'board_id_input': bid,
+            "batch_size": batchSize,
+            "batch_offset": batchOffset
+          });
       HSDebugLogger.logSuccess("Fetched spots of board: $fetchedSpots");
       final List<HSSpot> ret = [];
       for (var i = 0; i < fetchedSpots.length; i++) {
-        ret.add(HSSpot.deserialize(fetchedSpots[i]));
+        final spot = HSSpot.deserialize(fetchedSpots[i]);
+        ret.add(await HSDatabaseRepsitory(_supabase)
+            .spotfetchSpotWithAuthor(spot: spot));
       }
       return ret;
     } catch (_) {
       throw HSBoardException(
           type: HSBoardExceptionType.read, details: _.toString());
+    }
+  }
+
+  Future<void> addSpot(HSBoard? board, String? boardID, HSSpot? spot,
+      String? spotID, HSUser? addedBy, String? addedByID) async {
+    try {
+      assert(board != null || boardID != null,
+          "Board or boardID must be provided");
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      assert(addedBy != null || addedByID != null,
+          "AddedBy or addedByID must be provided");
+      final bid = board?.id ?? boardID!;
+      final sid = spot?.sid ?? spotID!;
+      final uid = addedBy?.uid ?? addedByID!;
+      await _supabase.rpc('boards_add_spot_to_board', params: {
+        "board_id_input": bid,
+        "spot_id_input": sid,
+        "added_by_input": uid,
+      });
+    } catch (_) {
+      throw Exception("Error adding spot: $_");
+    }
+  }
+
+  Future<void> removeSpot(
+      HSBoard? board, String? boardID, HSSpot? spot, String? spotID) async {
+    try {
+      assert(board != null || boardID != null,
+          "Board or boardID must be provided");
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final bid = board?.id ?? boardID!;
+      final sid = spot?.sid ?? spotID!;
+      await _supabase.rpc('boards_delete_spot_from_board', params: {
+        "board_id_input": bid,
+        "spot_id_input": sid,
+      });
+    } catch (_) {
+      throw Exception("Error adding spot: $_");
     }
   }
 }
