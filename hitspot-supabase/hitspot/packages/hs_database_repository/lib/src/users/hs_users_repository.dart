@@ -30,11 +30,9 @@ class HSUsersRepository {
       late final String uid = user?.uid ?? userID!;
       final fetchedUser = await _supabase.from(_users).select().eq("id", uid);
       if (fetchedUser.isEmpty) throw HSReadUserFailure(code: 404);
-      HSDebugLogger.logInfo("Fetched: ${fetchedUser.toString()}");
       return HSUser.deserialize(fetchedUser.first);
-    } on HSReadUserFailure catch (_) {
-      rethrow;
     } catch (_) {
+      HSDebugLogger.logError("Error fetching user: $_");
       throw HSReadUserFailure(customDetails: _.toString());
     }
   }

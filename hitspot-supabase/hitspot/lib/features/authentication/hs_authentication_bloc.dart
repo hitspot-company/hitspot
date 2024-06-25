@@ -16,12 +16,11 @@ class HSAuthenticationBloc
     on<HSAuthenticationUserChangedEvent>((event, emit) async {
       try {
         final HSUser? user = event.user;
-        HSDebugLogger.logInfo("initial user: $user");
-        // 1. The user is not authenticated
         if (user == null) {
           emit(const HSAuthenticationUnauthenticatedState());
           return;
         }
+
         // 2. The user is signed in
         final HSUser fetchedUser =
             await app.databaseRepository.userRead(user: user);
@@ -30,12 +29,12 @@ class HSAuthenticationBloc
         } else {
           emit(
               HSAuthenticationProfileIncompleteState(currentUser: fetchedUser));
-          print("EMITTED");
         }
       } on HSReadUserFailure catch (_) {
         HSDebugLogger.logError("Failed to read user: $_");
         app.signOut();
       } catch (_) {
+        HSDebugLogger.logError("IDK what happened: $_");
         HSDebugLogger.logError(_.toString());
       }
     });
