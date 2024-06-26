@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 
 class HSTextPrompt extends StatelessWidget {
@@ -21,7 +21,6 @@ class HSTextPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HSApp app = HSApp.instance;
     return SizedBox(
       width: double.maxFinite,
       child: Text.rich(

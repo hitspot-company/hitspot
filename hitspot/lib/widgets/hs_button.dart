@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:hitspot/constants/constants.dart';
 
 class HSButton extends StatelessWidget {
-  const HSButton(
-      {super.key,
-      required this.child,
-      required this.onPressed,
-      this.borderRadius = 10,
-      this.disabled = false,
-      this.isIconButton = false,
-      this.icon});
+  const HSButton({
+    super.key,
+    required this.child,
+    this.onPressed,
+    this.borderRadius = 10,
+    this.icon,
+    this.isIconButton = false,
+    this.isOutlined = false,
+  });
 
   final Widget child;
   final VoidCallback? onPressed;
   final double borderRadius;
-  final bool disabled;
   final bool isIconButton;
   final Icon? icon;
+  final bool isOutlined;
 
   @override
   Widget build(BuildContext context) {
+    if (isOutlined) {
+      return OutlinedButton(
+        key: key,
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+        ),
+        onPressed: onPressed,
+        child: child,
+      );
+    }
     if (isIconButton) {
       assert((icon != null), "The icon cannot be null");
       return ElevatedButton.icon(
@@ -41,6 +55,19 @@ class HSButton extends StatelessWidget {
         ),
       ),
       onPressed: onPressed,
+      child: child,
+    );
+  }
+
+  factory HSButton.outlined({
+    required Widget child,
+    VoidCallback? onPressed,
+    double borderRadius = 10,
+  }) {
+    return HSButton(
+      isOutlined: true,
+      onPressed: onPressed,
+      borderRadius: borderRadius,
       child: child,
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 
@@ -30,6 +29,7 @@ class HSSocialLoginButtons {
 
 class _SocialLoginButton extends StatelessWidget {
   const _SocialLoginButton({
+    super.key,
     required this.labelText,
     this.icon,
     this.onPressed,
@@ -43,7 +43,7 @@ class _SocialLoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = HSApp.instance.currentTheme;
+    final ThemeData theme = app.currentTheme;
     return SizedBox(
       width: double.maxFinite,
       height: 44.0,
@@ -52,7 +52,7 @@ class _SocialLoginButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: HSApp.instance.theme.mainColor, width: 1.0),
+            side: BorderSide(color: app.theme.mainColor, width: 1.0),
             borderRadius: BorderRadius.circular(8.0),
           ),
           backgroundColor: backgroundColor ?? theme.scaffoldBackgroundColor,

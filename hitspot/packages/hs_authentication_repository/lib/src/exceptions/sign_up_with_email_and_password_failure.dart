@@ -34,4 +34,9 @@ class SignUpWithEmailAndPasswordFailure implements Exception {
         return const SignUpWithEmailAndPasswordFailure();
     }
   }
+
+  @override
+  String toString() {
+    return message;
+  }
 }

@@ -1,10 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
         android:label="hitspot"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -21,32 +19,11 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
-			<meta-data
-			  android:name="flutter_deeplinking_enabled"
-			  android:value="true" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-			<intent-filter android:autoVerify="true">
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-				<category android:name="android.intent.category.BROWSABLE" />
-				<data android:scheme="https" />
-				<data android:host="hitspot.app" />
-				<!-- exact path value must be "/login/" -->
-				<data android:path="/login/" />  
-				<!-- path must start with "/product/" and then it can contain any number of characters; in this case, it would probably be a product ID. -->
-				<data android:pathPattern="/spots/.*" />
-				<!-- path must start with /account/, so it may be /account/confirm, /account/verify etc. -->
-				<data android:pathPattern="/users/.*" />
-			  </intent-filter>			  
         </activity>
-		<activity
-			android:name="com.yalantis.ucrop.UCropActivity"
-			android:screenOrientation="portrait"
-			android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/GOOGLE_MAPS_API_KEY" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

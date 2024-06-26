@@ -1,103 +1,58 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
-import 'package:hitspot/features/boards/create_board/view/add_board_provider.dart';
-import 'package:hitspot/features/boards/single_board/view/board_provider.dart';
-import 'package:hitspot/features/choose_users/view/choose_users_provider.dart';
+import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
+import 'package:hitspot/features/boards/single/view/single_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
-import 'package:hitspot/features/error/view/error_page.dart';
-import 'package:hitspot/features/home/main/view/home_page.dart';
+import 'package:hitspot/features/home/main/view/home_provider.dart';
+import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/features/register/view/register_page.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
-import 'package:hitspot/features/tmp/info_page/view/info_page.dart';
-import 'package:hitspot/features/trips/create_trip/view/create_trip_provider.dart';
+import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
+import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
+import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
-import 'package:hitspot/features/verify_email/view/verify_email_page.dart';
-import 'package:hitspot/utils/navigation/transitions/bottom_to_top.dart';
-import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSNavigation {
-  // SINGLETON
-  HSNavigation._internal();
-  static final HSNavigation _instance = HSNavigation._internal();
-  static HSNavigation get instance => _instance;
-  static final routing = HSRouting.instance;
-  static final routes = _HSRoutes();
-
-  GlobalKey<NavigatorState> get navigatorKey =>
-      routing.router.routerDelegate.navigatorKey;
-  GoRouter get router => routing.router;
-
-  dynamic push(Route<void> route, {dynamic arguments}) =>
-      navigatorKey.currentState?.push(route);
-
-  dynamic pushReplacement(Route<void> route, {dynamic arguments}) =>
-      navigatorKey.currentState?.pushReplacement(route);
-
-  dynamic pushNamed(String route, {dynamic arguments}) {
-    return navigatorKey.currentState?.pushNamed(route, arguments: arguments);
+  HSNavigation._privateConstructor();
+  static final HSNavigation _instance = HSNavigation._privateConstructor();
+  factory HSNavigation() {
+    return _instance;
   }
 
-  dynamic pop([bool shouldUpdate = false]) {
-    return navigatorKey.currentState?.pop(shouldUpdate);
-  }
-
-  dynamic logout() =>
-      navigatorKey.currentState?.popUntil((route) => route.isFirst);
-
-  // UPDATED NAVI
-  dynamic newPush(String location) => router.push(location);
-  dynamic toUserProfile(String userID) => routes.toUserProfile(userID);
-  dynamic toError(String headingText, String bodyText) =>
-      routes.toError(headingText, bodyText);
-  dynamic toBoard(String boardID) => routes.toBoard(boardID);
-  dynamic toCreateTrip({HSBoard? board}) => routes.toCreateTrip(board: board);
-  dynamic toChooseUsers({required String title, required String description}) =>
-      routes.toChooseUsers(title: title, description: description);
-}
-
-class HSRouting {
-  // SINGLETON
-  HSRouting._internal();
-  static final HSRouting _instance = HSRouting._internal();
-  static HSRouting get instance => _instance;
+  BuildContext get context => router.configuration.navigatorKey.currentContext!;
+  dynamic pop([dynamic value = false]) => router.pop(value);
+  dynamic pushPage({required Widget page}) =>
+      router.configuration.navigatorKey.currentState!.push(
+        MaterialPageRoute(builder: (_) => page),
+      );
+  dynamic push(String location) => router.push(location);
 
   final GoRouter router = GoRouter(
-    initialLocation: '/splash',
+    initialLocation: "/splash",
     routes: [
       GoRoute(
-        path: '/splash',
+        path: "/splash",
         builder: (context, state) => const SplashPage(),
         redirect: (context, state) {
-          final authBloc = context.read<HSAuthenticationBloc>();
-          if (authBloc.state.status != HSAppStatus.loading) {
+          final HSAuthenticationStatus status =
+              BlocProvider.of<HSAuthenticationBloc>(context)
+                  .state
+                  .authenticationStatus;
+          if (status != HSAuthenticationStatus.unknown) {
             return "/protected/home";
           }
           return null;
         },
       ),
-      GoRoute(
-        path: '/',
-        redirect: (context, state) => '/protected/home',
-      ),
+      GoRoute(path: "/", redirect: (context, state) => "/protected/home"),
       GoRoute(
         path: '/user/:userID',
-        redirect: (context, state) =>
-            '/protected/home?from=${state.matchedLocation}',
-      ),
-      GoRoute(
-        path: '/trip/:tripID',
-        redirect: (context, state) =>
-            '/protected/home?from=${state.matchedLocation}',
-      ),
-      GoRoute(
-        path: '/saved',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
@@ -107,47 +62,42 @@ class HSRouting {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
-        path: '/info/:text',
-        redirect: (context, state) =>
-            '/protected/home?from=${state.matchedLocation}',
-      ),
-      GoRoute(
         path: '/board/:boardID',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
-        path: '/add_board',
+        path: '/create_board',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
-          path: '/error',
-          redirect: (context, state) {
-            final headingText = state.uri.queryParameters["headingText"];
-            final bodyText = state.uri.queryParameters["bodyText"];
-            if (headingText == null || bodyText == null) {
-              HSDebugLogger.logError(
-                  "No headingText and bodyText provided, redirecting to /");
-            }
-            return '/protected/home/error?headingText=$headingText&bodyText=$bodyText';
-          }),
+        path: '/create_spot',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
       GoRoute(
-        path: '/protected',
-        redirect: (context, state) {
-          final authBloc = context.read<HSAuthenticationBloc>();
-          final String from = "?from=${state.uri}";
-          final loggedIn = authBloc.state.status == HSAppStatus.authenticated;
-          if (!loggedIn) {
-            final String ret = "/auth$from";
-            return ret;
-          }
-          return null;
-        },
+        path: '/saved',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/edit_profile',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/settings',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: "/protected",
+        redirect: _protectedRedirect,
         routes: [
           GoRoute(
-            path: 'home',
-            builder: (context, state) => const HomePage(),
+            path: "home",
+            builder: (context, state) => const HomeProvider(),
             redirect: (context, state) {
               final String? from = state.uri.queryParameters["from"];
               if (from != null) {
@@ -162,102 +112,109 @@ class HSRouting {
                     userID: state.pathParameters['userID']!),
               ),
               GoRoute(
-                path: 'board/:boardID',
-                builder: (context, state) =>
-                    BoardProvider(boardID: state.pathParameters['boardID']!),
-              ),
-              GoRoute(
-                path: 'spot/:spotID',
-                builder: (context, state) =>
-                    InfoPage(infoText: state.pathParameters['spotID']!),
-              ),
-              GoRoute(
-                path: 'trip/:tripID',
-                builder: (context, state) =>
-                    InfoPage(infoText: state.pathParameters['tripID']!),
+                path: 'edit_profile',
+                builder: (context, state) => const EditProfileProvider(),
               ),
               GoRoute(
                 path: 'settings',
                 builder: (context, state) => const SettingsProvider(),
               ),
               GoRoute(
-                path: 'add_board',
+                path: 'board/:boardID',
+                builder: (context, state) => SingleBoardProvider(
+                    boardID: state.pathParameters['boardID']!,
+                    title: state.uri.queryParameters['title'] ?? "title :("),
+              ),
+              GoRoute(
+                path: 'spot/:spotID',
+                builder: (context, state) =>
+                    SingleSpotProvider(spotID: state.pathParameters['spotID']!),
+              ),
+              GoRoute(
+                path: 'create_board',
                 builder: (context, state) => const CreateBoardProvider(),
+              ),
+              GoRoute(
+                path: 'create_spot',
+                builder: (context, state) => const CreateSpotProvider(),
               ),
               GoRoute(
                 path: 'saved',
                 builder: (context, state) => const SavedProvider(),
               ),
-              GoRoute(
-                  path: 'info/:text',
-                  builder: (context, state) =>
-                      InfoPage(infoText: state.pathParameters['text']!)),
-              GoRoute(
-                  path: 'error',
-                  builder: (context, state) {
-                    final headingText =
-                        state.uri.queryParameters["headingText"] ?? "";
-                    final bodyText =
-                        state.uri.queryParameters["bodyText"] ?? "";
-                    return ErrorPage(
-                        headingText: headingText, bodyText: bodyText);
-                  }),
             ],
           ),
         ],
       ),
       GoRoute(
-        path: '/auth',
-        redirect: (context, state) {
-          final String from = "?from=${state.uri.queryParameters["from"]}";
-          final authBloc = context.read<HSAuthenticationBloc>();
-          final appStatus = authBloc.state.status;
-          late final String ret;
-          switch (appStatus) {
-            case HSAppStatus.emailNotVerified:
-              ret = "/auth/verify_email$from";
-            case HSAppStatus.profileNotCompleted:
-              ret = "/auth/complete_profile$from";
-            case HSAppStatus.authenticated:
-              ret = state.uri.queryParameters["from"] ?? "/protected/home";
-            default:
-              ret = "/auth/login$from";
-          }
-          return ret;
-        },
+        path: "/auth",
+        redirect: _authRedirect,
         routes: [
           GoRoute(
-            path: 'register',
-            builder: (context, state) => const RegisterPage(),
-          ),
-          GoRoute(
-            path: 'login',
+            path: "login",
             builder: (context, state) => const LoginProvider(),
           ),
           GoRoute(
-            path: 'verify_email',
-            builder: (context, state) => const VerifyEmailPage(),
+            path: "magic_link_sent",
+            builder: (context, state) =>
+                MagicLinkSentProvider(email: state.uri.queryParameters["to"]!),
           ),
           GoRoute(
-            path: 'complete_profile',
-            builder: (context, state) => const CompleteProfileProvider(),
-          ),
+              path: "complete_profile",
+              builder: (context, state) => const CompleteProfileProvider()),
         ],
       ),
     ],
   );
-}
 
-class _HSRoutes {
-  dynamic toError(String headingText, String bodyText) =>
-      navi.router.go("/error?headingText=$headingText&bodyText=$bodyText");
-  dynamic toUserProfile(String userID) => navi.router.push("/user/$userID");
-  dynamic toBoard(String boardID) => navi.router.push("/board/$boardID");
-  dynamic toChooseUsers({required String title, required String description}) =>
-      navi.push(MaterialPageRoute(
-          builder: (_) =>
-              ChooseUsersProvider(description: description, title: title)));
-  dynamic toCreateTrip({HSBoard? board}) =>
-      navi.push(BottomToTopPage(child: const CreateTripProvider())
-          .createRoute(app.context!));
+  static FutureOr<String?>? _protectedRedirect(
+      BuildContext _, GoRouterState state) {
+    final HSAuthenticationStatus status =
+        BlocProvider.of<HSAuthenticationBloc>(_).state.authenticationStatus;
+    final String? path = state.uri.queryParameters['from'];
+    final String from = path != null ? "?from=$path" : "";
+    if (status != HSAuthenticationStatus.authenticated) return "/auth$from";
+    return null;
+  }
+
+  static FutureOr<String?>? _authRedirect(BuildContext _, GoRouterState state) {
+    final HSAuthenticationState authenticationState =
+        BlocProvider.of<HSAuthenticationBloc>(_).state;
+    final HSAuthenticationStatus status =
+        authenticationState.authenticationStatus;
+    final String? path = state.uri.queryParameters['from'];
+    final String from = path != null ? "?from=$path" : "";
+    switch (status) {
+      case HSAuthenticationStatus.unauthenitcated:
+        return "/auth/login$from";
+      case HSAuthenticationStatus.magicLinkSent:
+        final String email =
+            (authenticationState as HSAuthenticationMagicLinkSentState).email;
+        final String to = "?to=$email";
+        return "/auth/magic_link_sent$to";
+      case HSAuthenticationStatus.emailNotVerified:
+        return "/auth/verify_email$from";
+      case HSAuthenticationStatus.profileIncomplete:
+        return "/auth/complete_profile$from";
+      case HSAuthenticationStatus.authenticated:
+        return "/protected/home$from";
+      default:
+        return "/auth/login$from";
+    }
+  }
+
+  // Routes
+  dynamic toUser({required String userID}) => router.push('/user/$userID');
+  dynamic toBoard({required String boardID, required String? title}) =>
+      router.push('/board/$boardID${title != null ? "?title=$title" : ""}');
+  dynamic toCreateBoard() => router.push('/create_board');
+  dynamic toSettings() => router.push('/settings');
+  dynamic toEditProfile() => router.push('/edit_profile');
+  dynamic toCreateSpot() => router.push('/create_spot');
+  dynamic toSpot(
+          {required String sid,
+          String? authorID,
+          bool isSubmit = false,
+          String? spotID}) =>
+      isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
 }

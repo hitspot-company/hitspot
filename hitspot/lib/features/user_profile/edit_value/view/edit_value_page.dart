@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/edit_value/cubit/hs_edit_value_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -63,7 +62,7 @@ class _DoneButton extends StatelessWidget {
         return TextButton(
           onPressed: isDisabled
               ? null
-              : () => _editValueCubit.updateUser(HSApp.instance.currentUser),
+              : () => _editValueCubit.updateUser(currentUser!),
           child: _getChild(currentStatus),
         );
       },

@@ -9,8 +9,8 @@ enum HSRegisterPageState {
 
 final class HSRegisterState extends Equatable {
   const HSRegisterState({
-    this.email = const Email.pure(),
-    this.password = const Password.pure(),
+    this.email = const HSEmail.pure(),
+    this.password = const HSPassword.pure(),
     this.status = FormzSubmissionStatus.initial,
     this.isValid = false,
     this.errorMessage,
@@ -18,8 +18,8 @@ final class HSRegisterState extends Equatable {
     this.registerPageState = HSRegisterPageState.initial,
   });
 
-  final Email email;
-  final Password password;
+  final HSEmail email;
+  final HSPassword password;
   final FormzSubmissionStatus status;
   final bool isValid;
   final bool isPasswordVisible;
@@ -38,9 +38,8 @@ final class HSRegisterState extends Equatable {
       ];
 
   HSRegisterState copyWith({
-    Email? email,
-    Password? password,
-    ConfirmedPassword? confirmedPassword,
+    HSEmail? email,
+    HSPassword? password,
     FormzSubmissionStatus? status,
     bool? isValid,
     String? errorMessage,

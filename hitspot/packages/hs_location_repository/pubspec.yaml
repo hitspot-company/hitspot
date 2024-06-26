@@ -4,8 +4,14 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.3 <4.0.0'
+  sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
-  location: ^6.0.2
-  google_maps_flutter: ^2.6.1 
+  geolocator: ^12.0.0
+  geocoding: ^3.0.0
+  google_places_flutter: ^2.0.8
+  google_maps_flutter: ^2.7.0
+  uuid: ^4.4.0
+  dio: ^5.4.3+1
+  dart_geohash: ^2.1.0
+  map_launcher: ^3.3.1  

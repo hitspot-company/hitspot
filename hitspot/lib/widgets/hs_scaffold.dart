@@ -10,7 +10,6 @@ class HSScaffold extends StatelessWidget {
     this.bottomSafe = true,
     this.sidePadding = 16.0,
     this.appBar,
-    this.bottomAppBar,
     required this.body,
     this.ignoring = false,
     this.resizeToAvoidBottomInset = true,
@@ -24,7 +23,6 @@ class HSScaffold extends StatelessWidget {
   final bool bottomSafe;
   final double sidePadding;
   final Widget? appBar;
-  final Widget? bottomAppBar;
   final Widget body;
   final bool ignoring;
   final bool resizeToAvoidBottomInset;
@@ -67,7 +65,7 @@ class HSScaffold extends StatelessWidget {
 }
 
 class _Bottombar extends StatelessWidget {
-  const _Bottombar({this.height = 60.0, this.color});
+  const _Bottombar({super.key, this.height = 60.0, this.color});
 
   final double height;
   final Color? color;
@@ -81,7 +79,7 @@ class _Bottombar extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.0),
           child: Container(
             height: height,
-            color: color ?? currentTheme.textfieldFillColor,
+            color: color ?? appTheme.textfieldFillColor,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List<_BottombarItem>.from(
@@ -113,21 +111,25 @@ class _BottombarItem extends StatelessWidget {
         icon: Icon(iconData, color: iconColor, size: iconSize));
   }
 
+  /// TODO: Change the values below
   static final List<_BottombarItem> defaultList = [
     _BottombarItem(
-        iconData: FontAwesomeIcons.house,
-        onPressed: () => print("home"),
-        iconColor: currentTheme.mainColor),
-    // _BottombarItem(
-    //     iconData: FontAwesomeIcons.plane, onPressed: () => print("trips")),
+      iconData: FontAwesomeIcons.house,
+      onPressed: () => print("home"),
+      iconColor: appTheme.mainColor,
+    ),
     _BottombarItem(
-        iconData: FontAwesomeIcons.plus,
-        iconSize: 36.0,
-        onPressed: () => navi.newPush("/add_board")),
-    // _BottombarItem(iconData: FontAwesomeIcons.a, onPressed: () => print("idk")),
+        iconData: FontAwesomeIcons.plane, onPressed: () => print("trips")),
+    _BottombarItem(
+      iconData: FontAwesomeIcons.plus,
+      iconSize: 36.0,
+      onPressed: navi.toCreateSpot,
+    ),
+    _BottombarItem(
+        iconData: FontAwesomeIcons.mapPin, onPressed: () => print("map")),
     _BottombarItem(
       iconData: FontAwesomeIcons.bookmark,
-      onPressed: () => navi.newPush("/saved"),
+      onPressed: () => navi.push("/saved"),
     ),
   ];
 }

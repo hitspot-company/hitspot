@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 
@@ -21,7 +20,7 @@ class HSAuthButton extends StatelessWidget {
     return SizedBox(
       width: double.maxFinite,
       child: CupertinoButton(
-        color: HSApp.instance.theme.mainColor,
+        color: app.theme.mainColor,
         onPressed: onPressed,
         child: loading
             ? const HSLoadingIndicator(
@@ -29,8 +28,8 @@ class HSAuthButton extends StatelessWidget {
                 size: 24.0,
               )
             : Text(buttonText,
-                style: textTheme.headlineSmall!.copyWith(
-                    color: currentTheme.currentTheme.colorScheme.background)),
+                style: textTheme.headlineSmall!
+                    .copyWith(color: currentTheme.colorScheme.background)),
       ),
     );
   }

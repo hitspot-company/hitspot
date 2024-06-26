@@ -1,131 +1,208 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
-
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/hs_database_repository_boards.dart';
-import 'package:hs_database_repository/src/hs_database_repository_trips.dart';
-import 'package:hs_database_repository/src/hs_database_repository_users.dart';
-import 'package:hs_database_repository/src/hs_database_repository_spots.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hs_database_repository/src/boards/hs_board.dart';
+import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
+import 'package:hs_database_repository/src/spots/hs_spot.dart';
+import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
+import 'package:hs_database_repository/src/tags/hs_tag.dart';
+import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
+import 'package:hs_database_repository/src/users/hs_users_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HSDatabaseRepository {
-  const HSDatabaseRepository();
-  static final CollectionReference boards =
-      FirebaseFirestore.instance.collection("boards");
-  static final CollectionReference trips =
-      FirebaseFirestore.instance.collection("trips");
-  static final CollectionReference users =
-      FirebaseFirestore.instance.collection("users");
-
-  static final _usersRepository = HSUsersRepository();
-  static final _boardsRepository = HSBoardsRepository(boards, users);
-  static final _tripsRepository = HSTripsRepository(trips, users);
-  static final _spotsRepository = HSSpotsRepository();
-
-  Future<void> userFollow(HSUser currentUser, HSUser user) async =>
-      await _usersRepository.followUser(currentUser, user);
-
-  Future<void> userUnfollow(HSUser currentUser, HSUser user) async =>
-      await _usersRepository.unfollowUser(currentUser, user);
-
-  Future<void> userDelete({required HSUser user}) async =>
-      _usersRepository.delete(user);
-
-  Future<void> userUpdateField(
-          HSUser user, String field, String newValue) async =>
-      _usersRepository.updateField(user, field, newValue);
-
-  Future<void> userProfileComplete(HSUser user) async =>
-      await _usersRepository.completeUserProfile(user);
-
-  Future<void> userUpdate(HSUser user) async =>
-      await _usersRepository.updateUserInfoInDatabase(user);
-
-  Future<HSUser?> userGet(String uid) async {
-    try {
-      HSUser? user = await _usersRepository.getUserFromDatabase(uid);
-      if (user == null) throw DatabaseRepositoryFailure("The user is null");
-      return (user);
-    } catch (e) {
-      throw DatabaseConnectionFailure("The user could not be fetched");
-    }
+class HSDatabaseRepsitory {
+  HSDatabaseRepsitory(this._supabaseClient) {
+    this._usersRepository = HSUsersRepository(_supabaseClient, users);
+    this._boardsRepository = HSBoardsRepository(_supabaseClient, boards);
+    this._spotsRepository = HSSpotsRepository(_supabaseClient, spots);
+    this._tagsRepository = HSTagsRepository(_supabaseClient, spots);
   }
 
-  Future<void> createSpot(
-          {required String userID,
-          required LatLng location,
-          required String title,
-          required String description,
-          required List<XFile> images}) async =>
-      await _spotsRepository.createSpot(
-          userID, location, title, description, images);
+  static const String users = "users";
+  static const String boards = "boards";
+  static const String spots = "spots";
+  static const String tags = "tags";
+  final SupabaseClient _supabaseClient;
+  late final HSUsersRepository _usersRepository;
+  late final HSBoardsRepository _boardsRepository;
+  late final HSSpotsRepository _spotsRepository;
+  late final HSTagsRepository _tagsRepository;
 
-  Future<bool> userIsUsernameAvailable(String username) async =>
+  Future<void> userCreate({required HSUser user}) async =>
+      await _usersRepository.create(user);
+
+  Future<HSUser> userRead({HSUser? user, String? userID}) async =>
+      await _usersRepository.read(user, userID);
+
+  Future<void> userUpdate({required HSUser user}) async =>
+      await _usersRepository.update(user);
+
+  Future<bool> userIsUsernameAvailable({required String username}) async =>
       await _usersRepository.isUsernameAvailable(username);
 
-  Future<HSBoard> boardGet(String boardID) async =>
-      await _boardsRepository.getBoard(boardID);
+  Future<bool?> userIsUserFollowed(
+          {String? followerID,
+          HSUser? follower,
+          String? followedID,
+          HSUser? followed}) async =>
+      await _usersRepository.isUserFollowed(
+          followerID, follower, followedID, followed);
 
-  Future<String> boardCreate(HSBoard board) async =>
-      await _boardsRepository.createBoard(board);
-
-  Future<void> boardUpdate(HSBoard board) async =>
-      await _boardsRepository.updateBoard(board);
-
-  Future<void> boardSave(
-          {required HSBoard board, required HSUser user}) async =>
-      await _boardsRepository.saveBoard(board, user);
-
-  Future<void> boardUnsave(
-          {required HSBoard board, required HSUser user}) async =>
-      await _boardsRepository.unsaveBoard(board, user);
-
-  Future<List<HSBoard>> boardGetUserBoards({required HSUser user}) async =>
-      await _boardsRepository.getUserBoards(user);
-
-  Future<List<HSBoard>> boardGetSaved({required HSUser user}) async =>
-      await _boardsRepository.getSavedBoards(user);
-
-  Future<void> boardDelete({required HSBoard board}) async =>
-      await _boardsRepository.deleteBoard(board: board);
-
-  Future<void> boardDeleteImage({required HSBoard board}) async =>
-      await _boardsRepository.deleteBoardImage(board);
-
-  // TRIPS
-  Future<void> tripDelete({required HSTrip trip}) async =>
-      _tripsRepository.delete(trip: trip);
-
-  Future<void> tripAddToEditors(
-          {required HSTrip trip, required HSUser user}) async =>
-      _tripsRepository.addToEditors(trip: trip, user: user);
-
-  Future<void> tripRemoveFromEditors(
-          {required HSTrip trip, required HSUser user}) async =>
-      _tripsRepository.removeFromEditors(trip: trip, user: user);
-
-  Future<List<HSTrip>> tripGetUserTrips(HSUser user) async =>
-      _tripsRepository.getUserTrips(user);
-
-  Future<HSTrip> tripGet(String tripID) async => _tripsRepository.get(tripID);
-
-  Future<String> tripCreate(HSTrip trip) async => _tripsRepository.create(trip);
-
-  Future<void> tripUpdate(HSTrip trip) async => _tripsRepository.update(trip);
-
-  Future<String> uploadFile(File file, Reference reference) async {
-    try {
-      final UploadTask uploadTask = reference.putFile(file);
-      final TaskSnapshot downloadUrl = await uploadTask;
-      final String url = await downloadUrl.ref.getDownloadURL();
-      return url;
-    } catch (_) {
-      rethrow;
+  Future<void> userFollow(
+      {required bool isFollowed,
+      String? followerID,
+      String? followedID,
+      HSUser? follower,
+      HSUser? followed}) async {
+    final bool? foll = await userIsUserFollowed(
+        followedID: followedID, followerID: followerID);
+    if (foll!) {
+      // HSDebugLogger.logInfo("User followed: Yes");
+      await _usersRepository.unfollow(
+          followerID, followedID, follower, followed);
+    } else {
+      // HSDebugLogger.logInfo("User followed: No");
+      await _usersRepository.follow(followerID, followedID, follower, followed);
     }
   }
+
+  Future<String> boardCreate({required HSBoard board}) async =>
+      await _boardsRepository.create(board);
+
+  Future<HSBoard> boardRead({HSBoard? board, String? boardID}) async =>
+      await _boardsRepository.read(board, boardID);
+
+  Future<void> boardUpdate({required HSBoard board}) async =>
+      await _boardsRepository.update(board);
+
+  Future<void> boardDelete({required HSBoard board}) async =>
+      await _boardsRepository.delete(board);
+
+  Future<bool> boardIsBoardSaved(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.isBoardSaved(board, boardID, user, userID);
+
+  Future<bool> boardIsEditor(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.isEditor(board, boardID, user, userID);
+
+  Future<bool> boardSaveUnsave(
+          {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
+      _boardsRepository.saveUnsave(board, boardID, user, userID);
+
+  Future<List<HSBoard>> boardFetchUserBoards(
+          {HSUser? user, String? userID}) async =>
+      await _boardsRepository.fetchUserBoards(user, userID);
+
+  Future<List<HSBoard>> boardFetchSavedBoards(
+          {HSUser? user, String? userID}) async =>
+      await _boardsRepository.fetchSavedBoards(user, userID);
+
+  Future<List<HSBoard>> boardFetchTrendingBoards() async =>
+      await _boardsRepository.fetchTrendingBoards();
+
+  Future<List<HSSpot>> boardFetchBoardSpots(
+          {HSBoard? board, String? boardID}) async =>
+      await _boardsRepository.fetchBoardSpots(board, boardID);
+
+  Future<void> boardAddSpot(
+          {HSBoard? board,
+          String? boardID,
+          HSSpot? spot,
+          String? spotID,
+          HSUser? addedBy,
+          String? addedByID}) async =>
+      await _boardsRepository.addSpot(
+          board, boardID, spot, spotID, addedBy, addedByID);
+  Future<void> boardRemoveSpot(
+          {HSBoard? board,
+          String? boardID,
+          HSSpot? spot,
+          String? spotID}) async =>
+      await _boardsRepository.removeSpot(board, boardID, spot, spotID);
+
+  Future<String> spotCreate({required HSSpot spot}) async =>
+      await _spotsRepository.create(spot);
+
+  Future<HSSpot> spotRead({HSSpot? spot, String? spotID}) async =>
+      await _spotsRepository.read(spot, spotID);
+
+  Future<void> spotUpdate({required HSSpot spot}) async =>
+      await _spotsRepository.update(spot);
+
+  Future<void> spotDelete({required HSSpot spot}) async =>
+      await _spotsRepository.delete(spot);
+
+  Future<void> spotUploadImages(
+          {required String spotID,
+          required List<String> imageUrls,
+          required String uid}) async =>
+      await _spotsRepository.uploadImages(spotID, imageUrls, uid);
+
+  Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
+      await _spotsRepository.fetchNearbySpots(lat, long);
+
+  Future<List<HSSpot>> spotFetchSpotsWithinRadius(
+          {required double lat, required double long, double? radius}) async =>
+      await _spotsRepository.fetchSpotsWithinRadius(lat, long, radius);
+  Future<HSUser> spotFetchAuthor({HSSpot? spot, String? authorID}) async =>
+      await _spotsRepository.fetchSpotAuthor(spot, authorID);
+
+  Future<HSSpot> spotfetchSpotWithAuthor(
+          {HSSpot? spot, String? spotID}) async =>
+      await _spotsRepository.fetchSpotWithAuthor(spot, spotID);
+
+  Future<void> spotDislike(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.dislike(spot, spotID, user, userID);
+  Future<void> spotLike(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.like(spot, spotID, user, userID);
+  Future<bool> spotIsSpotLiked(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.isSpotLiked(spot, spotID, user, userID);
+
+  Future<bool> spotLikeDislike(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.likeDislike(spot, spotID, user, userID);
+
+  Future<bool> spotIsSaved(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.isSaved(spot, spotID, user, userID);
+
+  Future<bool> spotSaveUnsave(
+          {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
+      await _spotsRepository.saveUnsave(spot, spotID, user, userID);
+
+  /// Fetches the spots that belong to the user of given UID and are visible to the requester.
+  ///
+  /// The requester can be the user themselves or another user.
+  ///
+  /// The requester can specify the batch offset and batch size to fetch the spots in batches for pagination purposes.
+  Future<List<HSSpot>> spotfetchUserSpots(
+          {HSUser? user,
+          String? userID,
+          int batchOffset = 0,
+          int batchSize = 20}) async =>
+      await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
+
+  Future<void> tagCreate({required String tag}) async =>
+      await _tagsRepository.create(tag);
+  Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>
+      await _tagsRepository.read(tag, tagID);
+  Future<void> tagUpdate({required HSTag tag}) async =>
+      await _tagsRepository.update(tag);
+  Future<void> tagDelete({required HSTag tag}) async =>
+      await _tagsRepository.delete(tag);
+  Future<void> tagSpotCreate(
+          {required String value,
+          required String userID,
+          required String spotID}) async =>
+      await _tagsRepository.createSpot(value, userID, spotID);
+  Future<void> tagSpotDelete({required String tag}) async =>
+      await _tagsRepository.deleteSpot(tag);
+  Future<bool> tagExists({required String tagValue}) async =>
+      await _tagsRepository.tagExists(tagValue);
+
+  Future<List<HSTag>> tagFetchSpotTags({HSSpot? spot, String? spotID}) async =>
+      await _tagsRepository.fetchSpotTags(spot, spotID);
 }

@@ -1,22 +1,23 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/user_profile/main/bloc/hs_user_profile_bloc.dart';
-import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_profile_headline.dart';
-import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_profile_stats_app_bar.dart';
-import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_profile_stats_chip_ready.dart';
-import 'package:hitspot/features/user_profile/main/view/widgets/ready/hs_user_profile_user_data_app_bar_ready.dart';
-import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_user_profile_stats_chip_skeleton.dart';
-import 'package:hitspot/features/user_profile/main/view/widgets/skeletons/hs_user_profile_app_bar_skeleton.dart';
-import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
+import 'package:hitspot/extensions/hs_sliver_extensions.dart';
+import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
+import 'package:hitspot/features/user_profile/main/view/widgets/hs_user_profile_headline.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
-import 'package:hitspot/widgets/hs_boards_list.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_shimmer.dart';
+import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hitspot/widgets/hs_user_monitor.dart';
+import 'package:hitspot/widgets/shimmer_skeleton.dart';
+import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -25,89 +26,76 @@ class UserProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = ScrollController();
-    return BlocBuilder<HSUserProfileBloc, HSUserProfileState>(
-      buildWhen: (previous, current) => previous.props != current.props,
+    final userProfileCubit = BlocProvider.of<HSUserProfileCubit>(context);
+    return BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
       builder: (context, state) {
-        final userProfileBloc = context.read<HSUserProfileBloc>();
-        if (state is HSUserProfileInitialLoading) {
-          return _LoadingPage(controller: controller);
-        } else if (state is HSUserProfileReady ||
-            state is HSUserProfileUpdate) {
-          late final HSUser user;
-          late final List<HSBoard>? boards;
-          if (state is HSUserProfileReady) {
-            user = state.user!;
-            boards = state.boards;
-          } else if (state is HSUserProfileUpdate) {
-            user = state.user!;
-            boards = state.boards;
-          }
-          return _ReadyPage(
-              controller: controller,
-              user: user,
-              boards: boards,
-              userProfileBloc: userProfileBloc);
-        }
+        final HSUser? user = userProfileCubit.state.user;
+        final bool loading = state.status == HSUserProfileStatus.loading;
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
-            titleText: "",
+            right: IconButton(
+              onPressed: navi.toSettings,
+              icon: const Icon(
+                FontAwesomeIcons.ellipsisVertical,
+              ),
+            ),
           ),
-          body: const Center(
-            child: Text(
-                "An error occured. Please try again later."), // TODO: redirect to error page
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _ReadyPage extends StatelessWidget {
-  const _ReadyPage({
-    required this.controller,
-    required this.userProfileBloc,
-    required this.user,
-    this.boards,
-  });
-
-  final ScrollController controller;
-  final HSUserProfileBloc userProfileBloc;
-  final HSUser user;
-  final List<HSBoard>? boards;
-
-  @override
-  Widget build(BuildContext context) {
-    return HSScaffold(
-      appBar: HSAppBar(
-        titleText: "",
-        titleBold: true,
-        enableDefaultBackButton: true,
-        right: userProfileBloc.isOwnProfile
-            ? IconButton(
-                onPressed: () => navi.push(SettingsProvider.route()),
-                icon: const Icon(FontAwesomeIcons.bars))
-            : const SizedBox(),
-      ),
-      body: DefaultTabController(
-        length: 2,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              _UserDataAppBar.ready(user),
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                surfaceTintColor: const Color.fromARGB(0, 97, 51, 51),
+                expandedHeight: 140.0,
+                automaticallyImplyLeading: false,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Row(
+                    children: [
+                      Expanded(
+                        child: HSUserAvatar(
+                          loading: loading,
+                          radius: 70.0,
+                          iconSize: 50,
+                          imageUrl: user?.avatarUrl,
+                        ),
+                      ),
+                      Expanded(
+                        child: loading
+                            ? const HSShimmer(
+                                child: HSShimmerSkeleton(
+                                  height: 60,
+                                  width: 100,
+                                ),
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${user?.name}",
+                                    style: textTheme.headlineSmall!.hintify,
+                                  ),
+                                  Text("@${user?.username}",
+                                      style: textTheme.headlineLarge),
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SliverToBoxAdapter(
                 child: Gap(16.0),
               ),
-              if (user.biogram != null)
+              if (loading)
+                HSShimmerBox(width: screenWidth, height: 60).toSliverBox,
+              if (!loading && user?.biogram != null)
                 SliverMainAxisGroup(
                   slivers: [
-                    const HSUserProfileHeadline(title: "BIO"),
+                    const HSUserProfileHeadline(title: "About Me"),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 0.0),
                         child: Text(
-                          user.biogram!,
+                          user?.biogram ?? "",
                           style: textTheme.titleSmall,
                         ),
                       ),
@@ -117,164 +105,193 @@ class _ReadyPage extends StatelessWidget {
               const SliverToBoxAdapter(
                 child: Gap(16.0),
               ),
-              HSUserProfileStatsAppBar.ready(
-                  user: user, userProfileBloc: userProfileBloc),
-              const SliverToBoxAdapter(
-                child: TabBar(
-                  tabs: [
-                    Tab(
-                      text: "Spots",
+              SliverAppBar(
+                surfaceTintColor: Colors.transparent,
+                expandedHeight: 100.0,
+                floating: true,
+                snap: false,
+                pinned: false,
+                automaticallyImplyLeading: false,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Column(
+                    children: [
+                      BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
+                        builder: (context, state) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Expanded(
+                                  child: HSUserProfileStatsChip(
+                                label: "Followers",
+                                value: user?.followers,
+                                loading: loading,
+                              )),
+                              Expanded(
+                                  child: HSUserProfileStatsChip(
+                                label: "Following",
+                                value: user?.following,
+                                loading: loading,
+                              )),
+                              Expanded(
+                                  child: HSUserProfileStatsChip(
+                                label: "Spots",
+                                value: user?.spots,
+                                loading: loading,
+                              )),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 50.0,
+                  child: _UserProfileActionButton(
+                      isLoading: loading, userProfileCubit: userProfileCubit),
+                ),
+              ),
+              if (loading)
+                SliverMainAxisGroup(slivers: [
+                  const SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 16.0,
                     ),
-                    Tab(
-                      text: "Boards",
+                  ),
+                  SliverGrid.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 12.0,
+                      crossAxisSpacing: 12.0,
+                    ),
+                    itemCount: 12,
+                    itemBuilder: (BuildContext context, int index) {
+                      return const HSShimmerBox(width: 10, height: 10);
+                    },
+                  ),
+                ])
+              else
+                SliverMainAxisGroup(
+                  slivers: [
+                    const Gap(24.0).toSliver,
+                    const HSUserProfileHeadline(title: "Spots"),
+                    const Gap(24.0).toSliver,
+                    SliverGrid.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 12.0,
+                        crossAxisSpacing: 12.0,
+                        mainAxisExtent: 140.0,
+                      ),
+                      itemCount: state.spots.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final HSSpot spot = state.spots[index];
+                        return GestureDetector(
+                          onTap: () => navi.toSpot(sid: spot.sid!),
+                          child: CachedNetworkImage(
+                            imageUrl: spot.images!.first,
+                            progressIndicatorBuilder:
+                                (context, url, progress) =>
+                                    const HSShimmerBox(width: 60, height: 60),
+                            imageBuilder: (context, imageProvider) => Column(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const Gap(8.0),
+                                AutoSizeText(spot.title!, maxLines: 2),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
-              ),
-              const SliverToBoxAdapter(
-                child: Gap(16.0),
-              ),
-            ];
-          },
-          body: TabBarView(
-            children: [
-              HSSpotsGrid.ready(spots: user.spots),
-              HSBoardsList(boards: boards, user: user),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-class _LoadingPage extends StatelessWidget {
-  const _LoadingPage({required this.controller});
-
-  final ScrollController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return HSScaffold(
-      appBar: HSAppBar(
-        titleText: "",
-        titleBold: true,
-        enableDefaultBackButton: true,
-      ),
-      body: CustomScrollView(
-        controller: controller,
-        slivers: [
-          _UserDataAppBar.loading(),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          const SliverToBoxAdapter(
-            child: Divider(
-              thickness: .1,
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          HSUserProfileStatsAppBar.loading(),
-          const HSUserProfileHeadline(title: "SPOTS"),
-          const SliverToBoxAdapter(
-            child: Gap(16.0),
-          ),
-          HSSpotsGrid.loading(isSliver: true),
-        ],
-      ),
-    );
-  }
-}
-
-class _UserDataAppBar extends StatelessWidget {
-  const _UserDataAppBar({
-    this.user = const HSUser(),
-    this.loading = false,
+class HSUserProfileStatsChip extends StatelessWidget {
+  const HSUserProfileStatsChip({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.loading,
   });
 
-  final HSUser? user;
-  final bool loading;
-
-  factory _UserDataAppBar.loading() {
-    return const _UserDataAppBar(
-      user: HSUser(),
-      loading: true,
-    );
-  }
-
-  factory _UserDataAppBar.ready(HSUser user) {
-    return _UserDataAppBar(
-      user: user,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!loading) user!;
-    return SliverAppBar(
-      surfaceTintColor: const Color.fromARGB(0, 97, 51, 51),
-      expandedHeight: 140.0,
-      automaticallyImplyLeading: false,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Row(
-          children: [
-            Expanded(
-              child: HSUserMonitor(
-                child: HSUserAvatar(
-                  loading: loading,
-                  radius: 70.0,
-                  iconSize: 50,
-                  imgUrl: user?.profilePicture,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  loading
-                      ? const HSUserProfileUserDataAppBarSkeleton()
-                      : HSUserProfileUserDataAppBarReady(user: user!),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatsChip extends StatelessWidget {
-  const _StatsChip({
-    this.label,
-    this.value,
-    this.loading = false,
-  });
-
-  final String? label;
+  final String label;
   final int? value;
   final bool loading;
 
-  factory _StatsChip.loading() {
-    return const _StatsChip(loading: true);
-  }
-
-  factory _StatsChip.ready({required String label, required int value}) {
-    return _StatsChip(
-      label: label,
-      value: value,
+  @override
+  Widget build(BuildContext context) {
+    if (loading) {
+      return const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: HSShimmerBox(width: 60, height: 60),
+      );
+    }
+    return Column(
+      children: [
+        Text(label, style: textTheme.headlineSmall),
+        Text("${value ?? 0}", style: textTheme.labelLarge),
+      ],
     );
   }
+}
+
+class _UserProfileActionButton extends StatelessWidget {
+  const _UserProfileActionButton(
+      {required this.isLoading, required this.userProfileCubit});
+
+  final bool isLoading;
+  final HSUserProfileCubit userProfileCubit;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: loading
-          ? const HSUserProfileStatsChipSkeleton()
-          : HSUserProfileStatsChipReady(label: label!, value: value),
-    );
+    if (isLoading) {
+      return const HSShimmer(
+        child: HSShimmerSkeleton(
+          borderRadius: 8.0,
+          child: Opacity(
+              opacity: 0.0,
+              child: HSButton(
+                child: Text("data"),
+              )),
+        ),
+      );
+    }
+    if (userProfileCubit.isOwnProfile) {
+      return HSButton.outlined(
+          onPressed: navi.toEditProfile, child: const Text("Edit Profile"));
+    } else {
+      if (userProfileCubit.state.isFollowed == true) {
+        return HSButton.outlined(
+            borderRadius: 6.0,
+            onPressed: userProfileCubit.followUser,
+            child: const Text("Unfollow"));
+      } else {
+        return HSButton(
+            onPressed: userProfileCubit.followUser,
+            child: const Text("Follow"));
+      }
+    }
   }
 }

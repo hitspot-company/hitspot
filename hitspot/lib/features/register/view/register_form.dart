@@ -6,13 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/features/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
-import 'package:hitspot/widgets/hs_text_prompt.dart';
+import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
 class RegisterForm extends StatelessWidget {
@@ -20,11 +21,9 @@ class RegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hsApp = HSApp.instance;
-    final hsNavigation = hsApp.navigation;
     final registerCubit = context.read<HSRegisterCubit>();
     return _RegisterFirstPage(
-        registerCubit: registerCubit, hsApp: hsApp, hsNavigation: hsNavigation);
+        registerCubit: registerCubit, hsApp: app, hsNavigation: app.navigation);
   }
 }
 
@@ -52,7 +51,7 @@ class _RegisterFirstPage extends StatelessWidget {
           prompt: "Already have an account?",
           pressableText: " Sign In",
           promptColor: hsApp.theme.mainColor,
-          onTap: () => hsNavigation.pop(),
+          onTap: () => navi.pop(false),
           textAlign: TextAlign.right,
         ),
       ],
@@ -123,7 +122,7 @@ class _EmailInput extends StatelessWidget {
         onChanged: _registerCubit.emailChanged,
         keyboardType: TextInputType.emailAddress,
         hintText: "Email",
-        prefixIcon: const Icon(FontAwesomeIcons.envelope),
+        suffixIcon: const Icon(FontAwesomeIcons.envelope),
         errorText: _errorText(state),
       ),
     );
@@ -154,10 +153,12 @@ class _PasswordInput extends StatelessWidget {
               obscureText: !state.isPasswordVisible,
               errorText: _errorText(state),
               hintText: "Password",
-              onTapPrefix: _registerCubit.togglePasswordVisibility,
-              prefixIcon: Icon(state.isPasswordVisible
-                  ? FontAwesomeIcons.lockOpen
-                  : FontAwesomeIcons.lock),
+              suffixIcon: GestureDetector(
+                onTap: _registerCubit.togglePasswordVisibility,
+                child: Icon(state.isPasswordVisible
+                    ? FontAwesomeIcons.lockOpen
+                    : FontAwesomeIcons.lock),
+              ),
             );
           },
         ),

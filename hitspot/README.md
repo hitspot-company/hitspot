@@ -1,33 +1,16 @@
-# MacOS Development Environments Setup
+# hitspot
 
-To setup the development environments on MacOS a script is provided in the `.config` directory. 
+A new Flutter project.
 
-It sets up the following:
-- <b>Development</b> (dev)
-- <b>Staging</b> (stage)
-- <b>Production</b> (prod)
+## Getting Started
 
-Then use the launch.json options to choose the preset that suits you.
+This project is a starting point for a Flutter application.
 
-# Windows Environments Setup
+A few resources to get you started if this is your first Flutter project:
 
-Musisz sam wymyslic jak nie masz komputera :((
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-# Visual Studio Code Presets
-
-There are 6 available VSCode presets. Each environment has 2 different presets.
-
-### Development
-- Development Environment Debug Mode
-- Development Environment Release Mode
-
-### Staging
-- Staging Environment Debug Mode
-- Staging Environment Release Mode
-
-### Production
-- Production Environment Debug Mode
-- Production Environment Release Mode
-
-<br>
-Press `F5` or use the "Run and Debug" option to launch your application with the selected configuration.
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

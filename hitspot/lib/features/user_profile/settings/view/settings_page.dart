@@ -30,16 +30,12 @@ class SettingsPage extends StatelessWidget {
           return SettingsList(
             contentPadding: const EdgeInsets.all(0.0),
             lightTheme: SettingsThemeData(
-              settingsSectionBackground:
-                  currentTheme.currentTheme.scaffoldBackgroundColor,
-              settingsListBackground:
-                  currentTheme.currentTheme.scaffoldBackgroundColor,
+              settingsSectionBackground: currentTheme.scaffoldBackgroundColor,
+              settingsListBackground: currentTheme.scaffoldBackgroundColor,
             ),
             darkTheme: SettingsThemeData(
-              settingsSectionBackground:
-                  currentTheme.currentTheme.highlightColor,
-              settingsListBackground:
-                  currentTheme.currentTheme.scaffoldBackgroundColor,
+              settingsSectionBackground: currentTheme.highlightColor,
+              settingsListBackground: currentTheme.scaffoldBackgroundColor,
             ),
             sections: [
               SettingsSection(
@@ -101,13 +97,12 @@ class SettingsPage extends StatelessWidget {
                   SettingsTile.navigation(
                     leading: const Icon(FontAwesomeIcons.lock),
                     title: const Text('Change Password'),
-                    onPressed: (_) => settingsCubit.changePassword(),
+                    // onPressed: (_) => settingsCubit.changePassword(),
                   ),
                   SettingsTile.navigation(
                     leading: const Icon(FontAwesomeIcons.trash),
                     title: const Text('Delete Account'),
-                    onPressed: (_) =>
-                        app.authBloc.requestDelete(user: currentUser),
+                    onPressed: (_) => settingsCubit.deleteAccount(),
                   ),
                   SettingsTile.navigation(
                     leading: const Icon(FontAwesomeIcons.arrowRightFromBracket),

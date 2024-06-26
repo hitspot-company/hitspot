@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
 
 class HSAppBar extends StatelessWidget {
@@ -55,8 +54,7 @@ class HSAppBar extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  onPressed: defaultBackButtonCallback ??
-                      HSApp.instance.navigation.pop,
+                  onPressed: defaultBackButtonCallback ?? app.navigation.pop,
                   icon:
                       Icon(defaultButtonBackIcon ?? FontAwesomeIcons.arrowLeft),
                 ),
@@ -72,7 +70,6 @@ class HSAppBar extends StatelessWidget {
                   titleText!,
                   textAlign: TextAlign.center,
                   style: textTheme.headlineMedium!.copyWith(
-                      color: Colors.white,
                       fontWeight:
                           titleBold ? FontWeight.bold : FontWeight.normal,
                       fontSize: fontSize),
