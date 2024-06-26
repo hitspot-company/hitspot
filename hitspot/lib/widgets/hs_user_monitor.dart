@@ -11,7 +11,8 @@ class HSUserMonitor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<HSAuthenticationBloc, HSAuthenticationState, HSUser>(
-      selector: (state) => state.user,
+      selector: (state) =>
+          (state as HSAuthenticationAuthenticatedState).currentUser,
       builder: (context, state) => child,
     );
   }

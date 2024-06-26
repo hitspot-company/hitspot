@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/register/cubit/hs_register_cubit.dart';
 import 'package:hitspot/features/register/view/register_form.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -18,14 +18,13 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hsApp = HSApp.instance;
     return HSScaffold(
       resizeToAvoidBottomInset: true,
       sidePadding: 16.0,
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: BlocProvider<HSRegisterCubit>(
-          create: (_) => HSRegisterCubit(HSApp.instance.authRepository),
+          create: (_) => HSRegisterCubit(app.authenticationRepository),
           child: ListView(
             children: [
               const Gap(32.0),
@@ -40,7 +39,7 @@ class RegisterPage extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: " Terms of Service",
-                      style: hsApp.textTheme.bodySmall!
+                      style: app.textTheme.bodySmall!
                           .colorify(HSTheme.instance.mainColor)
                           .boldify,
                       recognizer: TapGestureRecognizer()
@@ -51,7 +50,7 @@ class RegisterPage extends StatelessWidget {
                     ),
                     TextSpan(
                       text: " Privacy Policy",
-                      style: hsApp.textTheme.bodySmall!
+                      style: app.textTheme.bodySmall!
                           .colorify(HSTheme.instance.mainColor)
                           .boldify,
                       recognizer: TapGestureRecognizer()

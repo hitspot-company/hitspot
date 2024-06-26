@@ -6,7 +6,7 @@ import 'package:hitspot/widgets/hs_shimmer.dart';
 class HSUserAvatar extends StatelessWidget {
   const HSUserAvatar({
     super.key,
-    this.imgUrl,
+    this.imageUrl,
     required this.radius,
     this.iconSize,
     this.loading = false,
@@ -14,7 +14,7 @@ class HSUserAvatar extends StatelessWidget {
     this.child,
   });
 
-  final String? imgUrl;
+  final String? imageUrl;
   final double radius;
   final double? iconSize;
   final bool loading;
@@ -25,21 +25,20 @@ class HSUserAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (child != null) {
       return CircleAvatar(
-        backgroundColor: app.theme.highlightColor,
+        backgroundColor: currentTheme.highlightColor,
         radius: radius,
         child: child,
       );
     } else if (loading) {
       return HSShimmer(
         child: CircleAvatar(
-          backgroundColor: app.theme.highlightColor,
+          backgroundColor: currentTheme.highlightColor,
           radius: radius,
         ),
       );
-    } else if (imgUrl == null) {
+    } else if (imageUrl == null) {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: app.theme.highlightColor,
         child: Center(
           child: Icon(
             FontAwesomeIcons.solidUser,
@@ -50,13 +49,13 @@ class HSUserAvatar extends StatelessWidget {
     } else {
       late final ImageProvider<Object> image;
       if (isAsset) {
-        image = AssetImage(imgUrl!);
+        image = AssetImage(imageUrl!);
       } else {
-        image = NetworkImage(imgUrl!);
+        image = NetworkImage(imageUrl!);
       }
       return CircleAvatar(
         radius: radius,
-        backgroundColor: app.theme.highlightColor,
+        backgroundColor: currentTheme.highlightColor,
         backgroundImage: image,
       );
     }

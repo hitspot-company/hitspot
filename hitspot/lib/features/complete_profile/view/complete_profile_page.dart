@@ -4,13 +4,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/complete_profile/cubit/hs_complete_profile_cubit.dart';
+import 'package:hitspot/utils/forms/hs_birthdate.dart';
+import 'package:hitspot/utils/forms/hs_username.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hs_form_inputs/hs_form_inputs.dart';
 
 class CompleteProfilePage extends StatelessWidget {
   const CompleteProfilePage({super.key});
@@ -22,7 +23,7 @@ class CompleteProfilePage extends StatelessWidget {
     return HSScaffold(
       appBar: HSAppBar(
         enableDefaultBackButton: true,
-        defaultBackButtonCallback: app.logout,
+        defaultBackButtonCallback: app.signOut,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +61,7 @@ class _FirstPage extends StatelessWidget {
             text: "Welcome to Hitspot!",
             headlineType: HSFormHeadlineType.display),
         HSFormCaption(
-            text: "Hi ${currentUser.email}!\nPlease complete your profile."),
+            text: "Hi ${currentUser?.email}!\nPlease complete your profile."),
         const Gap(16.0),
         const HSFormHeadline(text: "Birthday"),
         const HSFormCaption(text: "You have to be at least 16 to use Hitspot"),
@@ -103,8 +104,7 @@ class _SecondPage extends StatelessWidget {
         HSTextField(
           autofocus: true,
           onChanged: _completeProfileCubit.updateName,
-          fillColor: currentTheme.textfieldFillColor,
-          suffixIcon: const Icon(FontAwesomeIcons.a, color: Colors.transparent),
+          fillColor: appTheme.textfieldFillColor,
           hintText: "Your name",
           initialValue: _completeProfileCubit.state.fullnameVal,
         ),
@@ -170,11 +170,7 @@ class _FourthPage extends StatelessWidget {
           maxLines: 6,
           maxLength: 256,
           initialValue: _completeProfileCubit.state.biogramVal,
-          fillColor: currentTheme.textfieldFillColor,
-          suffixIcon: const Icon(
-            FontAwesomeIcons.a,
-            color: Colors.transparent,
-          ),
+          fillColor: appTheme.textfieldFillColor,
         ),
         const Gap(8.0),
         const HSFormCaption(
@@ -186,7 +182,7 @@ class _FourthPage extends StatelessWidget {
               onPressed: _completeProfileCubit.prevPage,
               child: const Text("Back")),
           right: HSFormButton(
-            icon: nextIcon,
+            // icon: nextIcon,
             onPressed: _completeProfileCubit.nextPage,
             child: const Text("Next"),
           ),
@@ -214,7 +210,7 @@ class _FifthPage extends StatelessWidget {
               String?>(
             selector: (state) => state.avatar.isNotEmpty ? state.avatar : null,
             builder: (context, avatar) => HSUserAvatar(
-                radius: 64.0, iconSize: 64.0, isAsset: true, imgUrl: avatar),
+                radius: 64.0, iconSize: 64.0, isAsset: true, imageUrl: avatar),
           ),
         ),
         const Gap(8.0),
@@ -222,7 +218,7 @@ class _FifthPage extends StatelessWidget {
           onPressed: _completeProfileCubit.changeAvatar,
           child: Text(
             "Choose Avatar",
-            style: TextStyle(color: currentTheme.mainColor),
+            style: TextStyle(color: appTheme.mainColor),
           ),
         ),
         const Gap(32.0),
@@ -240,7 +236,8 @@ class _FifthPage extends StatelessWidget {
             selector: (state) => state.completeProfileStatus,
             builder: (context, status) {
               switch (status) {
-                case HSCompleteProfileStatus.idle:
+                case HSCompleteProfileStatus.idle ||
+                      HSCompleteProfileStatus.error:
                   return HSFormButton(
                     onPressed: _completeProfileCubit.submit,
                     icon: const Icon(FontAwesomeIcons.check),
@@ -281,10 +278,10 @@ class _UsernameInput extends StatelessWidget {
         textInputAction: TextInputAction.next,
         scrollPadding: const EdgeInsets.all(84.0),
         onChanged: _completeProfileCubit.updateUsername,
-        fillColor: currentTheme.textfieldFillColor,
+        fillColor: appTheme.textfieldFillColor,
         hintText: "Your username",
         initialValue: state.usernameVal,
-        prefixIcon: _getPrefixIcon,
+        suffixIcon: _getPrefixIcon,
         errorText: _errorText,
       ),
     );
@@ -294,9 +291,9 @@ class _UsernameInput extends StatelessWidget {
     final usernameValidationState =
         _completeProfileCubit.state.usernameValidationState;
     switch (usernameValidationState) {
-      case UsernameValidationState.available:
+      case HSUsernameValidationState.available:
         return const Icon(FontAwesomeIcons.check, color: Colors.green);
-      case UsernameValidationState.unavailable:
+      case HSUsernameValidationState.unavailable:
         return const Icon(FontAwesomeIcons.xmark, color: Colors.red);
       default:
         return const Icon(FontAwesomeIcons.question);
@@ -305,21 +302,23 @@ class _UsernameInput extends StatelessWidget {
 
   String? get _errorText {
     final state = _completeProfileCubit.state;
-    UsernameValidationError? error = state.username.displayError;
-    if (state.usernameValidationState == UsernameValidationState.unavailable) {
-      error = UsernameValidationError.unavailable;
-    } else if (state.usernameValidationState == UsernameValidationState.empty) {
-      error = UsernameValidationError.invalid;
+    HSUsernameValidationError? error = state.username.displayError;
+    if (state.usernameValidationState ==
+        HSUsernameValidationState.unavailable) {
+      error = HSUsernameValidationError.unavailable;
+    } else if (state.usernameValidationState ==
+        HSUsernameValidationState.empty) {
+      error = HSUsernameValidationError.invalid;
     }
     if (error == null) return null;
     switch (error) {
-      case UsernameValidationError.notLowerCase:
+      case HSUsernameValidationError.notLowerCase:
         return "No uppercase letters.";
-      case UsernameValidationError.short:
+      case HSUsernameValidationError.short:
         return "At least 5 characters.";
-      case UsernameValidationError.long:
+      case HSUsernameValidationError.long:
         return "More than 16 characters.";
-      case UsernameValidationError.unavailable:
+      case HSUsernameValidationError.unavailable:
         return "The username is already taken.";
       default:
         return "Invalid username";
@@ -338,29 +337,29 @@ class _UsernameNextButton extends StatelessWidget {
       left: HSFormButton(
           onPressed: _completeProfileCubit.prevPage, child: const Text("Back")),
       right: BlocSelector<HSCompleteProfileCubit, HSCompleteProfileState,
-          UsernameValidationState>(
+          HSUsernameValidationState>(
         selector: (state) => state.usernameValidationState,
         builder: (context, usernameValidationState) {
           switch (usernameValidationState) {
-            case UsernameValidationState.unknown:
+            case HSUsernameValidationState.unknown:
               return HSFormButton(
                 onPressed: _completeProfileCubit.isUsernameValid,
                 child: const Text('VERIFY'),
               );
-            case UsernameValidationState.verifying:
+            case HSUsernameValidationState.verifying:
               return const HSFormButton(
                 onPressed: null,
                 child: HSLoadingIndicator(
                   size: 32.0,
                 ),
               );
-            case UsernameValidationState.unavailable ||
-                  UsernameValidationState.empty:
+            case HSUsernameValidationState.unavailable ||
+                  HSUsernameValidationState.empty:
               return const HSFormButton(
                 onPressed: null,
                 child: Text("NEXT"),
               );
-            case UsernameValidationState.available:
+            case HSUsernameValidationState.available:
               return HSFormButton(
                 onPressed: _completeProfileCubit.nextPage,
                 child: const Text("NEXT"),
@@ -384,12 +383,12 @@ class _BirthdayInput extends StatelessWidget {
           previous.birthday != current.birthday ||
           previous.error != current.error,
       builder: (context, state) => HSTextField(
-        fillColor: currentTheme.textfieldFillColor,
-        prefixIcon: const Icon(FontAwesomeIcons.cakeCandles),
+        fillColor: appTheme.textfieldFillColor,
+        suffixIcon: const Icon(FontAwesomeIcons.cakeCandles),
         readOnly: true,
         onTap: _completeProfileCubit.updateBirthday,
         hintText: _hintText,
-        errorText: _errorText,
+        // errorText: _errorText,
       ),
     );
   }

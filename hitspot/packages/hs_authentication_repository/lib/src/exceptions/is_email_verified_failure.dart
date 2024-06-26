@@ -7,4 +7,9 @@ class IsEmailVerifiedFailure implements Exception {
   const IsEmailVerifiedFailure([
     this.message = 'An unknown exception occurred.',
   ]);
+
+  @override
+  String toString() {
+    return message;
+  }
 }

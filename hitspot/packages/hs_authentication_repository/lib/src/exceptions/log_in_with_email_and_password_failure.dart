@@ -29,4 +29,9 @@ class LogInWithEmailAndPasswordFailure implements Exception {
   }
 
   bool get isDefault => message == 'An unknown exception occurred.';
+
+  @override
+  String toString() {
+    return message;
+  }
 }

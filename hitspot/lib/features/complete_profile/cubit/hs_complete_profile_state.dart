@@ -6,19 +6,19 @@ final class HSCompleteProfileState extends Equatable {
   const HSCompleteProfileState({
     this.completeProfileStatus = HSCompleteProfileStatus.idle,
     this.biogram = "",
-    this.username = const Username.pure(),
-    this.fullname = const Fullname.pure(),
-    this.usernameValidationState = UsernameValidationState.empty,
-    this.birthday = const Birthdate.pure(),
+    this.username = const HSUsername.pure(),
+    this.fullname = const HSFullname.pure(),
+    this.usernameValidationState = HSUsernameValidationState.empty,
+    this.birthday = const HSBirthdate.pure(),
     this.error = "",
     this.avatar = "",
     this.loading = false,
   });
 
-  final Username username;
-  final Fullname fullname;
-  final UsernameValidationState usernameValidationState;
-  final Birthdate birthday;
+  final HSUsername username;
+  final HSFullname fullname;
+  final HSUsernameValidationState usernameValidationState;
+  final HSBirthdate birthday;
   final String error;
   final String biogram;
   final String avatar;
@@ -29,7 +29,7 @@ final class HSCompleteProfileState extends Equatable {
   String? get fullnameVal => fullname.value.isEmpty ? null : fullname.value;
   String? get avatarVal => avatar.isEmpty ? null : avatar;
   String? get biogramVal => biogram.isEmpty ? null : biogram;
-  Timestamp? get birthdayVal => birthday.value.dateTimeStringToTimestamp();
+  DateTime? get birthdayVal => birthday.value.stringToDateTime();
 
   @override
   List<Object?> get props => [
@@ -45,10 +45,10 @@ final class HSCompleteProfileState extends Equatable {
       ];
 
   HSCompleteProfileState copyWith({
-    Username? username,
-    Fullname? fullname,
-    UsernameValidationState? usernameValidationState,
-    Birthdate? birthday,
+    HSUsername? username,
+    HSFullname? fullname,
+    HSUsernameValidationState? usernameValidationState,
+    HSBirthdate? birthday,
     String? error,
     String? biogram,
     String? avatar,

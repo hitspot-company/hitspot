@@ -8,8 +8,8 @@ final class HSTheme {
   static final HSTheme _instance = HSTheme._internal();
   static HSTheme get instance => _instance;
 
-  static const Color _mainColor = Color(0xFF04cc91);
-  static const Color _textfieldFillColor = Color.fromARGB(16, 158, 158, 158);
+  static const Color _mainColor = Color(0xFF00c0ca);
+  static const Color _textfieldFillColor = Color.fromARGB(57, 160, 160, 160);
 
   final ThemeData lightTheme = ThemeData(
     colorSchemeSeed: _mainColor,
@@ -21,15 +21,13 @@ final class HSTheme {
     colorSchemeSeed: _mainColor,
     brightness: Brightness.dark,
     textTheme: _HSTextThemes.darkTextTheme,
-    // appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
-    // scaffoldBackgroundColor: Colors.black,
   ).copyWith(highlightColor: Colors.black.withOpacity(.08));
 
   Color get highlightColor => currentTheme.highlightColor;
   Color get mainColor => _mainColor;
   Color get textfieldFillColor => _textfieldFillColor;
 
-  BuildContext get context => app.navigation.navigatorKey.currentContext!;
+  BuildContext get context => app.context;
   TextTheme get textTheme => Theme.of(context).textTheme;
   ThemeData get currentTheme => Theme.of(context);
 }

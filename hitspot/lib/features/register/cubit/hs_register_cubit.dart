@@ -1,14 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
-import 'package:hitspot/app/hs_app.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
-import 'package:hitspot/utils/navigation/hs_navigation.dart';
+import 'package:hitspot/utils/forms/hs_email.dart';
+import 'package:hitspot/utils/forms/hs_password.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:hs_form_inputs/hs_form_inputs.dart';
-import 'package:hs_mailing_repository/hs_mailing_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 
 part 'hs_register_state.dart';
@@ -18,7 +15,6 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
       : super(const HSRegisterState());
 
   final HSAuthenticationRepository _authenticationRepository;
-  final HSNavigation _hsNavigationService = HSApp.instance.navigation;
 
   double get opacity =>
       state.registerPageState == HSRegisterPageState.initial ? 0.0 : 1.0;
@@ -39,7 +35,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
       emit(state.copyWith(isPasswordVisible: !state.isPasswordVisible));
 
   void emailChanged(String value) {
-    final email = Email.dirty(value);
+    final email = HSEmail.dirty(value);
     emit(
       state.copyWith(
         email: email,
@@ -53,7 +49,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
   }
 
   void passwordChanged(String value) {
-    final password = Password.dirty(value);
+    final password = HSPassword.dirty(value);
     emit(
       state.copyWith(
         errorMessage: getPasswordErrorText(value),
@@ -68,7 +64,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
 
   String? getPasswordErrorText(String value) {
     String? ret;
-    if (!Password.passwordRegExp.hasMatch(value)) {
+    if (!HSPassword.passwordRegExp.hasMatch(value)) {
       ret = "The password has to: ";
       if (value.length < 8) {
         ret += "\n at least 8 characters long";
@@ -90,9 +86,9 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
     if (!state.isValid) return;
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
     try {
-      await _authenticationRepository.signUp(
+      await _authenticationRepository.logInWithEmailAndPassword(
         email: state.email.value,
-        password: state.password.value,
+        password: "",
       );
       await _completeRegistration();
     } on SignUpWithEmailAndPasswordFailure catch (e) {
@@ -104,18 +100,12 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
         ),
       );
       return;
-    } on HSSendEmailException catch (e) {
-      HSDebugLogger.logError("Error sending welcome email: ${e.message}");
-      await _completeRegistration();
-      return;
-    } catch (_) {
-      emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }
   }
 
   Future<void> _completeRegistration() async {
-    app.authBloc
-        .add(HSAppUserChanged(currentUser.copyWith(isEmailVerified: false)));
+    app.authenticationBloc
+        .userChangedEvent(user: currentUser?.copyWith(isEmailVerified: false));
   }
 
   Future<void> logInWithGoogle() async {
@@ -154,7 +144,7 @@ class HSRegisterCubit extends Cubit<HSRegisterState> {
     }
   }
 
-  void _showErrorSnackbar(String message) => HSApp.instance.showToast(
+  void _showErrorSnackbar(String message) => app.showToast(
       toastType: HSToastType.error,
       title: "Authentication Error",
       description: message);

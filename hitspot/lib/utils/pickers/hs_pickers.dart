@@ -23,7 +23,7 @@ class HSPickers {
     DateTime? pickedDate;
     DateTime now = DateTime.now();
     pickedDate = await showDatePicker(
-        context: app.context!,
+        context: app.context,
         currentDate: currentDate ?? now,
         firstDate: firstDate ?? now,
         lastDate: lastDate ?? DateTime(now.year + 50, now.month, now.day));
@@ -34,7 +34,7 @@ class HSPickers {
     Color? pickedColor;
 
     await ColorPicker(
-      color: previousColor ?? currentTheme.mainColor,
+      color: previousColor ?? appTheme.mainColor,
       onColorChanged: (Color color) => pickedColor = color,
       width: 40,
       height: 40,
@@ -42,17 +42,17 @@ class HSPickers {
       spacing: 5,
       runSpacing: 5,
       wheelDiameter: 155,
-      heading: Text(
+      heading: const Text(
         'Select color',
-        style: textTheme.titleSmall,
+        // style: textTheme.titleSmall,
       ),
-      subheading: Text(
+      subheading: const Text(
         'Select color shade',
-        style: textTheme.titleSmall,
+        // style: textTheme.titleSmall,
       ),
-      wheelSubheading: Text(
+      wheelSubheading: const Text(
         'Selected color and its shades',
-        style: textTheme.titleSmall,
+        // style: textTheme.titleSmall,
       ),
       showMaterialName: true,
       showColorName: true,
@@ -60,9 +60,9 @@ class HSPickers {
       copyPasteBehavior: const ColorPickerCopyPasteBehavior(
         longPressMenu: true,
       ),
-      materialNameTextStyle: textTheme.bodySmall,
-      colorNameTextStyle: textTheme.bodySmall,
-      colorCodeTextStyle: textTheme.bodySmall,
+      // materialNameTextStyle: textTheme.bodySmall,
+      // colorNameTextStyle: textTheme.bodySmall,
+      // colorCodeTextStyle: textTheme.bodySmall,
       pickersEnabled: const <ColorPickerType, bool>{
         ColorPickerType.both: false,
         ColorPickerType.primary: true,
@@ -72,7 +72,7 @@ class HSPickers {
         ColorPickerType.wheel: true,
       },
     ).showPickerDialog(
-      app.context!,
+      app.context,
       surfaceTintColor: Colors.transparent,
       transitionBuilder: (BuildContext context, Animation<double> a1,
           Animation<double> a2, Widget widget) {
@@ -92,6 +92,22 @@ class HSPickers {
     );
 
     return (pickedColor);
+  }
+
+  Future<List<XFile>> multipleImages({
+    CropAspectRatio? cropAspectRatio,
+    int limit = 5,
+  }) async {
+    try {
+      final picker = ImagePicker();
+      final List<XFile> images =
+          await picker.pickMultiImage(imageQuality: 80, limit: limit);
+      if (images.isEmpty) throw "No images selected";
+      return images;
+    } catch (e) {
+      HSDebugLogger.logError(e.toString());
+      rethrow;
+    }
   }
 
   Future<CroppedFile?> image(
@@ -126,7 +142,7 @@ class HSPickers {
     final ImageCropper cropper = ImageCropper();
     ret = await cropper.cropImage(
       aspectRatio: cropAspectRatio,
-      cropStyle: cropStyle ?? CropStyle.rectangle,
+      // cropStyle: cropStyle ?? CropStyle.rectangle,
       sourcePath: sourcePath,
       uiSettings: [
         IOSUiSettings(

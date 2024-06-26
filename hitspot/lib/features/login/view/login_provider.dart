@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/app/hs_app.dart';
-import 'package:hitspot/features/login/cubit/login_cubit.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/login/cubit/hs_login_cubit.dart';
 import 'package:hitspot/features/login/view/login_page.dart';
 
 class LoginProvider extends StatelessWidget {
@@ -16,7 +16,7 @@ class LoginProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HSLoginCubit(HSApp.instance.authRepository),
+      create: (_) => HSLoginCubit(app.authenticationRepository),
       child: const LoginForm(),
     );
   }

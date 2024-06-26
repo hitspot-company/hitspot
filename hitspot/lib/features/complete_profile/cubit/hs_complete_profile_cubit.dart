@@ -1,18 +1,20 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/utils/forms/hs_birthdate.dart';
+import 'package:hitspot/utils/forms/hs_full_name.dart';
+import 'package:hitspot/utils/forms/hs_username.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:hs_form_inputs/hs_form_inputs.dart';
-import 'package:hs_toasts/hs_toasts.dart';
+import 'package:hs_storage_repository/hs_storage_repository.dart';
+// import 'package:hs_toasts/hs_toasts.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'hs_complete_profile_state.dart';
 
@@ -20,7 +22,8 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
   HSCompleteProfileCubit() : super(const HSCompleteProfileState());
 
   final PageController pageController = PageController();
-  final HSDatabaseRepository _databaseRepository = app.databaseRepository;
+  final HSDatabaseRepsitory _databaseRepository = app.databaseRepository;
+  final HSStorageRepository _storageRepository = app.storageRepository;
 
   void nextPage() {
     HSScaffold.hideInput();
@@ -52,7 +55,7 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
     if (dateTime != null) {
       emit(
         state.copyWith(
-          birthday: Birthdate.dirty(dateTime.toString()),
+          birthday: HSBirthdate.dirty(dateTime.toString()),
           error: "",
         ),
       );
@@ -60,36 +63,36 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
   }
 
   void updateName(String value) =>
-      emit(state.copyWith(fullname: Fullname.dirty(value)));
+      emit(state.copyWith(fullname: HSFullname.dirty(value)));
 
   void updateUsername(String value) => emit(state.copyWith(
-      username: Username.dirty(value),
-      usernameValidationState: Username.dirty(value).isValid
-          ? UsernameValidationState.unknown
-          : UsernameValidationState.empty));
+      username: HSUsername.dirty(value),
+      usernameValidationState: HSUsername.dirty(value).isValid
+          ? HSUsernameValidationState.unknown
+          : HSUsernameValidationState.empty));
 
   Future<void> isUsernameValid() async {
     if (state.username.value.isEmpty) {
       emit(state.copyWith(
-        usernameValidationState: UsernameValidationState.empty,
+        usernameValidationState: HSUsernameValidationState.empty,
       ));
     }
     emit(state.copyWith(
-        usernameValidationState: UsernameValidationState.verifying));
+        usernameValidationState: HSUsernameValidationState.verifying));
     await Future.delayed(const Duration(seconds: 2));
     if (state.username.isNotValid) {
       emit(state.copyWith(
-          usernameValidationState: UsernameValidationState.unknown));
+          usernameValidationState: HSUsernameValidationState.unknown));
       return;
     }
-    if (!(await _databaseRepository
-        .userIsUsernameAvailable(state.username.value))) {
+    if (!(await _databaseRepository.userIsUsernameAvailable(
+        username: state.usernameVal!))) {
       emit(state.copyWith(
-          usernameValidationState: UsernameValidationState.unavailable));
+          usernameValidationState: HSUsernameValidationState.unavailable));
       return;
     }
     emit(state.copyWith(
-        usernameValidationState: UsernameValidationState.available));
+        usernameValidationState: HSUsernameValidationState.available));
   }
 
   void submit() async {
@@ -98,33 +101,33 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
     try {
       String? avatarUrl;
       if (state.avatarVal != null) {
-        final Reference ref = FirebaseStorage.instance
-            .ref("users")
-            .child(currentUser.uid!)
-            .child("avatar");
-        avatarUrl =
-            await _databaseRepository.uploadFile(File(state.avatar), ref);
+        final File file = File(state.avatarVal!);
+        avatarUrl = await _storageRepository.fileUploadAndFetchPublicUrl(
+            file: file,
+            bucketName: _storageRepository.avatarsBucket,
+            uploadPath:
+                _storageRepository.userAvatarUploadPath(uid: currentUser.uid!),
+            fileOptions: const FileOptions(upsert: true));
       }
+
       final HSUser user = currentUser.copyWith(
         username: state.usernameVal,
         fullName: state.fullnameVal,
         biogram: state.biogramVal,
         birthday: state.birthdayVal,
         profilePicture: avatarUrl,
-        createdAt: Timestamp.now(),
+        createdAt: DateTime.now(),
         isProfileCompleted: true,
       );
-      await Future.delayed(const Duration(seconds: 1));
-      HSDebugLogger.logInfo(user.toString());
-      await _databaseRepository.userUpdate(user);
-      app.updateCurrentUser(user);
+      await _databaseRepository.userUpdate(user: user);
+      app.authenticationBloc.userChangedEvent(user: user);
+      return;
+    } on HSFileException catch (_) {
+      HSDebugLogger.logError(_.toString());
+      emit(
+          state.copyWith(completeProfileStatus: HSCompleteProfileStatus.error));
     } catch (_) {
-      HSDebugLogger.logError("Error submiting: $_");
-      app.showToast(
-          toastType: HSToastType.error,
-          title: "Error",
-          alignment: Alignment.bottomCenter,
-          description: "Error submitting your data. Please try again later.");
+      HSDebugLogger.logError("Error submitting: $_");
       emit(
           state.copyWith(completeProfileStatus: HSCompleteProfileStatus.error));
     }

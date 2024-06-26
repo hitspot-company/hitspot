@@ -27,10 +27,11 @@ class EditProfilePage extends StatelessWidget {
         titleBold: true,
         enableDefaultBackButton: true,
         defaultBackButtonCallback: () =>
-            navi.pop(editProfileCubit.shouldUpdate ?? false),
+            navi.pop(editProfileCubit.shouldUpdate),
       ),
       body: BlocSelector<HSAuthenticationBloc, HSAuthenticationState, HSUser>(
-        selector: (state) => state.user,
+        selector: (state) =>
+            (state as HSAuthenticationAuthenticatedState).currentUser,
         builder: (context, state) {
           return CustomScrollView(
             slivers: [
@@ -58,12 +59,10 @@ class EditProfilePage extends StatelessWidget {
                               child = InkWell(
                                 radius: 60.0,
                                 onTap: editProfileCubit.chooseImage,
-                                child: HSUserMonitor(
-                                  child: HSUserAvatar(
-                                    imgUrl: app.currentUser.profilePicture,
-                                    radius: 80,
-                                    iconSize: 50,
-                                  ),
+                                child: HSUserAvatar(
+                                  imageUrl: app.currentUser.avatarUrl,
+                                  radius: 80,
+                                  iconSize: 50,
                                 ),
                               );
                           }
@@ -86,8 +85,8 @@ class EditProfilePage extends StatelessWidget {
                   fieldName: 'Full name',
                   fieldDescription:
                       "Your full name is used to make it easier for your friends to find your profile.",
-                  initialValue: app.currentUser.fullName ?? "",
-                  field: HSUserField.fullName.name,
+                  initialValue: app.currentUser.name ?? "",
+                  field: "name",
                 ),
               ),
               const SliverToBoxAdapter(child: Gap(24.0)),
@@ -97,7 +96,7 @@ class EditProfilePage extends StatelessWidget {
                   fieldDescription:
                       "Your username is your unique identifier among other users. Make it stand out!",
                   initialValue: app.currentUser.username ?? "",
-                  field: HSUserField.username.name,
+                  field: "username",
                 ),
               ),
               const SliverToBoxAdapter(child: Gap(24.0)),
@@ -107,7 +106,7 @@ class EditProfilePage extends StatelessWidget {
                   fieldDescription:
                       "Your biogram is here for you to tell your story. Let other users know what kind of a traveller you are!",
                   initialValue: app.currentUser.biogram ?? "Your biogram...",
-                  field: HSUserField.biogram.name,
+                  field: "biogram",
                 ),
               ),
             ],
@@ -135,19 +134,18 @@ class _TextEditPrompt extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSTextField(
       onTap: () => _toEdit(context.read<EditProfileCubit>()),
-      labelText: fieldName,
       suffixIcon: const Opacity(
         opacity: 0.0,
         child: Icon(FontAwesomeIcons.user),
       ),
       readOnly: true,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
       hintText: initialValue,
     );
   }
 
   Future<void> _toEdit(EditProfileCubit editProfileCubit) async {
-    final bool shouldUpdate = await app.navigation.push(EditValueProvider.route(
+    final bool shouldUpdate = await navi.pushPage(
+        page: EditValueProvider(
       field: field,
       initialValue: initialValue,
       fieldName: fieldName,

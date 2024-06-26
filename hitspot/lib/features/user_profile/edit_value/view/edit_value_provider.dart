@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/app/hs_app.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/edit_value/cubit/hs_edit_value_cubit.dart';
 import 'package:hitspot/features/user_profile/edit_value/view/edit_value_page.dart';
 
@@ -36,7 +36,7 @@ class EditValueProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HSEditValueCubit(
-        HSApp.instance.databaseRepository,
+        app.databaseRepository,
         field: field,
         fieldDescription: fieldDescription,
         fieldName: fieldName,

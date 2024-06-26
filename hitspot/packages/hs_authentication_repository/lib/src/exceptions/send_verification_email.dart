@@ -7,4 +7,9 @@ class SendVerificationEmailFailure implements Exception {
   const SendVerificationEmailFailure([
     this.message = 'An unknown exception occurred.',
   ]);
+
+  @override
+  String toString() {
+    return message;
+  }
 }

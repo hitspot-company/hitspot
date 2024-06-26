@@ -1,49 +1,111 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_authentication_repository/src/exceptions/is_email_verified_failure.dart';
+import 'package:hs_authentication_repository/src/exceptions/hs_authentication_exception.dart';
 import 'package:hs_authentication_repository/src/exceptions/send_verification_email.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+import 'package:flutter/foundation.dart';
 
 class HSAuthenticationRepository {
-  final firebase_auth.FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.standard();
+  HSAuthenticationRepository(this._supabaseClient);
+  final supabase.SupabaseClient _supabaseClient;
 
   HSUser? currentUser;
 
-  HSAuthenticationRepository({
-    firebase_auth.FirebaseAuth? firebaseAuth,
-  }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance;
-
-  Future<void> reloadCurrentUser() async {
-    try {
-      await _firebaseAuth.currentUser!.reload();
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   Stream<HSUser?> get user {
-    return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      currentUser = firebaseUser?.toUser;
+    return _supabaseClient.auth.onAuthStateChange.map((supabaseUser) {
+      currentUser = supabaseUser.session?.user.toUser ?? null;
       return currentUser;
     });
   }
 
-  Future<bool> isEmailVerified() async {
+  /// Starts the Sign In with Google Flow.
+  ///
+  /// Throws a [LogInWithGoogleFailure] if an exception occurs.
+  Future<void> logInWithGoogle() async {
     try {
-      if (_firebaseAuth.currentUser == null)
-        throw IsEmailVerifiedFailure("The user is not signed in.");
-      await _firebaseAuth.currentUser!.reload();
-      return _firebaseAuth.currentUser!.emailVerified;
+      final iosClientID =
+          '145078839676-l7qo10knv94buh9hedq23juhfo8tk5r1.apps.googleusercontent.com';
+      final serverClientID =
+          '145078839676-cu1rrvvm3dcfgqjcona6ilt0m4jng5av.apps.googleusercontent.com';
+      GoogleSignIn _googleSignIn = GoogleSignIn(
+        clientId: iosClientID,
+        serverClientId: serverClientID,
+      );
+      final credential = await _googleSignIn.signIn();
+      final googleAuth = await credential!.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (accessToken == null || idToken == null)
+        throw LogInWithGoogleFailure("Failed to get Google credentials.");
+
+      await _supabaseClient.auth.signInWithIdToken(
+          provider: supabase.OAuthProvider.google,
+          idToken: idToken,
+          accessToken: accessToken);
+    } on supabase.AuthException catch (_) {
+      throw LogInWithGoogleFailure(_.message);
     } catch (_) {
-      throw IsEmailVerifiedFailure();
+      throw LogInWithGoogleFailure(_.toString());
     }
+  }
+
+  /// Starts the Sign In with Apple Flow.
+  ///
+  /// Throws a [LogInWithAppleFailure] if an exception occurs.
+  Future<void> logInWithApple() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+      await _supabaseClient.auth.signInWithIdToken(
+          provider: supabase.OAuthProvider.apple,
+          idToken: credential.identityToken!);
+      HSDebugLogger.logSuccess("SIGNED IN WITH APPLE");
+    } on supabase.AuthException catch (_) {
+      HSDebugLogger.logError("Error: ${_.message}");
+      throw LogInWithGoogleFailure(_.message);
+    } catch (_) {
+      throw LogInWithGoogleFailure(_.toString());
+    }
+  }
+
+  /// Signs out the current user which will emit
+  /// [User.empty] from the [user] Stream.
+  ///
+  /// Throws a [LogOutFailure] if an exception occurs.
+  Future<void> signOut() async {
+    try {
+      await _supabaseClient.auth.signOut();
+    } catch (_) {
+      throw LogOutFailure();
+    }
+  }
+
+  Future<bool> isEmailVerified() async {
+    // TODO: Implement real check
+    return true;
+    // try {
+    //   if (_supabaseClient.auth.currentUser == null)
+    //     throw IsEmailVerifiedFailure("The user is not signed in.");
+    //   return _firebaseAuth.currentUser!.emailVerified;
+    // } catch (_) {
+    //   throw IsEmailVerifiedFailure();
+    // }
   }
 
   Future<void> sendEmailVerification() async {
     try {
-      await _firebaseAuth.currentUser!.sendEmailVerification();
+      // TODO: Implement real email verification
+      return;
+      // await _supabaseClient.auth.
+      // await _firebaseAuth.currentUser!.sendEmailVerification();
     } catch (_) {
       throw SendVerificationEmailFailure();
     }
@@ -51,7 +113,8 @@ class HSAuthenticationRepository {
 
   Future<void> sendResetPasswordEmail(String email) async {
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      // TODO: Implement real password reset
+      // await _firebaseAuth.sendPasswordResetEmail(email: email);
     } catch (_) {
       throw SendResetPasswordEmailFailure();
     }
@@ -62,15 +125,27 @@ class HSAuthenticationRepository {
   /// Throws a [SignUpWithEmailAndPasswordFailure] if an exception occurs.
   Future<void> signUp({required String email, required String password}) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      await _firebaseAuth.currentUser!.sendEmailVerification();
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
+      await logInWithEmailAndPassword(email: email, password: password);
+      // await _firebaseAuth.createUserWithEmailAndPassword(
+      //   email: email,
+      //   password: password,
+      // );
+      // await _firebaseAuth.currentUser!.sendEmailVerification();
+    } on supabase.AuthException catch (_) {
+      throw SignUpWithEmailAndPasswordFailure.fromCode(_.message);
     } catch (_) {
-      throw const SignUpWithEmailAndPasswordFailure();
+      throw SignUpWithEmailAndPasswordFailure(_.toString());
+    }
+  }
+
+  Future<void> signInWithMagicLink({required String email}) async {
+    try {
+      await _supabaseClient.auth.signInWithOtp(
+        email: email,
+        emailRedirectTo: kIsWeb ? null : 'app.hitspot://login-callback/',
+      );
+    } catch (_) {
+      throw HSAuthenticationException.magicLink(details: _.toString());
     }
   }
 
@@ -82,85 +157,35 @@ class HSAuthenticationRepository {
     required String password,
   }) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
+      await _supabaseClient.auth.signInWithOtp(
         email: email,
-        password: password,
+        emailRedirectTo: kIsWeb ? null : 'app.hitspot://login-callback/',
       );
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      print(e.message);
-      throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
+    } on supabase.AuthException catch (_) {
+      HSDebugLogger.logError("Error: ${_.toString()}");
+      throw LogInWithEmailAndPasswordFailure(_.message);
     } catch (_) {
-      throw const LogInWithEmailAndPasswordFailure();
+      HSDebugLogger.logError("Error: ${_.toString()}");
+      throw LogInWithEmailAndPasswordFailure(_.toString());
     }
-  }
 
-  /// Starts the Sign In with Google Flow.
-  ///
-  /// Throws a [LogInWithGoogleFailure] if an exception occurs.
-  Future<void> logInWithGoogle() async {
-    try {
-      late final firebase_auth.AuthCredential credential;
-      final googleUser = await _googleSignIn.signIn();
-      final googleAuth = await googleUser!.authentication;
-
-      credential = firebase_auth.GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await _firebaseAuth.signInWithCredential(credential);
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw LogInWithGoogleFailure.fromCode(e.code);
-    } catch (_) {
-      throw const LogInWithGoogleFailure();
-    }
-  }
-
-  /// Starts the Sign In with Apple Flow.
-  ///
-  /// Throws a [LogInWithAppleFailure] if an exception occurs.
-  Future<void> logInWithApple() async {
-    try {
-      final appleProvider = firebase_auth.AppleAuthProvider();
-      await _firebaseAuth.signInWithProvider(appleProvider);
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw LogInWithAppleFailure.fromCode(e.code);
-    } catch (_) {
-      throw const LogInWithAppleFailure();
-    }
-  }
-
-  /// Signs out the current user which will emit
-  /// [User.empty] from the [user] Stream.
-  ///
-  /// Throws a [LogOutFailure] if an exception occurs.
-  Future<void> logOut() async {
-    try {
-      await Future.wait([
-        _firebaseAuth.signOut(),
-        _googleSignIn.signOut(),
-      ]);
-    } catch (_) {
-      throw LogOutFailure();
-    }
-  }
-
-  Future<void> deleteAccount() async {
-    try {
-      await _firebaseAuth.currentUser?.delete();
-    } catch (_) {
-      rethrow;
+    Future<void> deleteAccount() async {
+      try {
+        // TODO: Implement
+      } catch (_) {
+        rethrow;
+      }
     }
   }
 }
 
-extension on firebase_auth.User {
+extension on supabase.User {
   /// Maps a [firebase_auth.User] into a [User].
   HSUser get toUser {
     return HSUser(
-      uid: uid,
-      email: email,
-      isEmailVerified: this.emailVerified,
+      uid: this.id,
+      email: this.email,
+      isEmailVerified: this.userMetadata?["is_email_verified"] ?? false,
     );
   }
 }

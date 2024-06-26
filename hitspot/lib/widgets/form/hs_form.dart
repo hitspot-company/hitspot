@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 
 enum HSFormHeadlineType { display, normal, small }
 
@@ -33,7 +34,7 @@ class HSFormHeadline extends StatelessWidget {
     late final TextStyle? textStyle;
     switch (headlineType) {
       case HSFormHeadlineType.display:
-        textStyle = textTheme.headlineLarge;
+        textStyle = textTheme.headlineLarge!;
       case HSFormHeadlineType.normal:
         textStyle = textTheme.headlineMedium;
       case HSFormHeadlineType.small:
@@ -70,7 +71,8 @@ class HSFormButtonsRow extends StatelessWidget {
 }
 
 class HSFormButton extends StatelessWidget {
-  const HSFormButton({super.key, this.icon, required this.child, this.onPressed});
+  const HSFormButton(
+      {super.key, this.icon, required this.child, this.onPressed});
 
   final Icon? icon;
   final Widget child;
@@ -90,21 +92,31 @@ class HSFormButton extends StatelessWidget {
       child: child,
     );
   }
+
+  factory HSFormButton.loading() {
+    return const HSFormButton(child: HSLoadingIndicator(size: 24.0));
+  }
 }
 
 class HSFormPageBody extends StatelessWidget {
   const HSFormPageBody(
-      {super.key, this.heading, this.caption, required this.children});
+      {super.key,
+      this.heading,
+      this.caption,
+      required this.children,
+      this.topPadding = 16.0});
 
   final String? heading;
   final String? caption;
   final List<Widget> children;
+  final double topPadding;
 
   @override
   Widget build(BuildContext context) {
     return ListView(shrinkWrap: true, children: [
       if (heading != null) HSFormHeadline(text: heading!),
       if (caption != null) HSFormCaption(text: caption!),
+      Gap(topPadding),
       Column(children: children),
     ]);
   }

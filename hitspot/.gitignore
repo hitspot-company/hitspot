@@ -42,11 +42,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Environment variables
 .env
-
-# Environment files
-lib/firebase_options.dart
-packages/hs_firebase_config/lib/src/hs_firebase_config.*.dart
-
-pubspec.lock
+.env.*

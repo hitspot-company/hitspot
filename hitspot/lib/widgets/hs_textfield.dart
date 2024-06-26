@@ -1,110 +1,119 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hitspot/constants/constants.dart';
 
 class HSTextField extends StatelessWidget {
   const HSTextField({
     super.key,
     this.hintText,
-    this.errorText,
-    this.prefixIcon,
-    this.onTapPrefix,
-    this.suffixIcon,
-    this.onTapSuffix,
     this.controller,
-    this.validator,
+    this.fillColor,
     this.onChanged,
-    this.keyboardType,
-    this.obscureText = false,
-    this.node,
+    this.suffixIcon,
+    this.autofocus = false,
+    this.initialValue,
     this.onTap,
     this.readOnly = false,
-    this.scrollPadding = const EdgeInsets.all(20.0),
-    this.textInputAction,
-    this.fillColor,
-    this.labelText,
-    this.initialValue,
-    this.floatingLabelBehavior,
-    this.autofocus = false,
+    this.autocorrect = true,
     this.maxLines = 1,
     this.maxLength,
-    this.inputFormatters,
+    this.scrollPadding = const EdgeInsets.all(20.0),
+    this.textInputAction,
+    this.errorText,
+    this.keyboardType,
+    this.obscureText = false,
+    this.focusNode,
   });
 
   final String? hintText;
-  final String? labelText;
-  final Widget? prefixIcon;
-  final VoidCallback? onTapPrefix;
-  final Widget? suffixIcon;
-  final VoidCallback? onTapSuffix;
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-  final Function(String)? onChanged;
-  final TextInputType? keyboardType;
-  final bool obscureText;
-  final bool readOnly;
-  final bool autofocus;
-  final FocusNode? node;
-  final VoidCallback? onTap;
-  final String? errorText;
-  final EdgeInsets scrollPadding;
-  final TextInputAction? textInputAction;
   final Color? fillColor;
-  final FloatingLabelBehavior? floatingLabelBehavior;
+  final Function(String)? onChanged;
+  final Widget? suffixIcon;
+  final bool autofocus;
   final String? initialValue;
+  final bool readOnly;
+  final VoidCallback? onTap;
   final int maxLines;
   final int? maxLength;
-  final List<TextInputFormatter>? inputFormatters;
+  final EdgeInsets scrollPadding;
+  final TextInputAction? textInputAction;
+  final String? errorText;
+  final TextInputType? keyboardType;
+  final bool obscureText, autocorrect;
+  final FocusNode? focusNode;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
-    assert(!(prefixIcon != null && suffixIcon != null),
-        "Suffix and prefix cannot be used at the same time");
-    return GestureDetector(
+    return TextField(
+      autocorrect: autocorrect,
+      controller: controller,
+      focusNode: focusNode,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      scrollPadding: scrollPadding,
+      maxLines: maxLines,
+      maxLength: maxLength,
       onTap: onTap,
-      child: AbsorbPointer(
-        absorbing: readOnly,
-        child: TextFormField(
-          maxLength: maxLength,
-          inputFormatters: inputFormatters,
-          maxLines: maxLines,
-          autofocus: autofocus,
-          scrollPadding: scrollPadding,
-          controller: controller,
-          focusNode: node,
-          validator: validator,
-          onChanged: onChanged,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          initialValue: initialValue,
-          decoration: InputDecoration(
-            fillColor: fillColor,
-            filled: fillColor != null ? true : false,
-            floatingLabelBehavior: floatingLabelBehavior,
-            errorText: errorText,
-            prefixIcon: suffixIcon != null
-                ? null
-                : GestureDetector(onTap: onTapPrefix, child: prefixIcon),
-            suffixIcon: suffixIcon == null && prefixIcon == null
-                ? GestureDetector(
-                    child: const Icon(FontAwesomeIcons.a,
-                        color: Colors.transparent))
-                : prefixIcon != null
-                    ? null
-                    : GestureDetector(onTap: onTapSuffix, child: suffixIcon),
-            hintText: hintText,
-            labelText: labelText,
-            border: OutlineInputBorder(
-              borderSide:
-                  fillColor != null ? BorderSide.none : const BorderSide(),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-            ),
+      readOnly: readOnly,
+      autofocus: autofocus,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: hintText,
+        suffixIcon: suffixIcon,
+        border: OutlineInputBorder(
+          borderSide: fillColor != null ? BorderSide.none : const BorderSide(),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(8.0),
           ),
         ),
+        filled: fillColor != null,
+        fillColor: fillColor,
+        errorText: errorText,
       ),
+    );
+  }
+
+  factory HSTextField.filled(
+      {Key? key,
+      String? hintText,
+      TextEditingController? controller,
+      Color? fillColor,
+      Function(String)? onChanged,
+      Widget? suffixIcon,
+      bool autofocus = false,
+      bool? autocorrect,
+      String? initialValue,
+      bool readOnly = false,
+      VoidCallback? onTap,
+      int maxLines = 1,
+      int? maxLength,
+      EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
+      TextInputAction? textInputAction,
+      String? errorText,
+      TextInputType? keyboardType,
+      bool obscureText = false,
+      FocusNode? focusNode}) {
+    return HSTextField(
+      key: key,
+      hintText: hintText,
+      focusNode: focusNode,
+      controller: controller,
+      autocorrect: autocorrect ?? true,
+      fillColor: fillColor ?? appTheme.textfieldFillColor,
+      onChanged: onChanged,
+      suffixIcon: suffixIcon,
+      autofocus: autofocus,
+      initialValue: initialValue,
+      readOnly: readOnly,
+      onTap: onTap,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      scrollPadding: scrollPadding,
+      textInputAction: textInputAction,
+      errorText: errorText,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
     );
   }
 }
