@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';

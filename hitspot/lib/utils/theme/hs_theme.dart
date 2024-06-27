@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 
 final class HSTheme {
   // SINGLETON
@@ -39,6 +42,15 @@ final class HSTheme {
   BuildContext get context => app.context;
   TextTheme get textTheme => Theme.of(context).textTheme;
   ThemeData get currentTheme => Theme.of(context);
+
+  Future<void> applyMapDarkStyle(
+      Completer<GoogleMapController> controller) async {
+    if (await app.themeRepository.isDark()) {
+      controller.future.then((value) {
+        value.setMapStyle(mapStyle);
+      });
+    }
+  }
 }
 
 extension TextStyleAltering on TextStyle {

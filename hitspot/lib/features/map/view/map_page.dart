@@ -119,7 +119,7 @@ class MapPage extends StatelessWidget {
             child: Container(
               width: screenWidth,
               height: appBarHeight,
-              color: Colors.white,
+              color: currentTheme.scaffoldBackgroundColor,
               child: Center(
                 child: SafeArea(
                     child:
@@ -133,7 +133,7 @@ class MapPage extends StatelessWidget {
                       titleText = "Fetched Spots";
                     } else {
                       icon = FontAwesomeIcons.arrowLeft;
-                      titleText = "";
+                      titleText = "SearchBar Here";
                     }
                     return HSAppBar(
                       enableDefaultBackButton: true,

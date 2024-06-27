@@ -125,6 +125,7 @@ class HomePage extends StatelessWidget {
                               mapController = Completer<GoogleMapController>();
                             }
                             mapController.complete(controller);
+                            app.theme.applyMapDarkStyle(mapController);
                           },
                           myLocationButtonEnabled: false,
                           initialCameraPosition: const CameraPosition(

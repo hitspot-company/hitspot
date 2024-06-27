@@ -67,16 +67,13 @@ class HSMapCubit extends Cubit<HSMapState> {
 
   void onMapCreated(GoogleMapController cont) async {
     controller.complete(cont);
-    controller.future.then((value) {
-      value.setMapStyle(app.theme.mapStyle);
-    });
+    await app.theme.applyMapDarkStyle(controller);
   }
 
   void onCameraIdle() async {
     final bounds =
         await controller.future.then((value) => value.getVisibleRegion());
     emit(state.copyWith(status: HSMapStatus.fetchingSpots, bounds: bounds));
-    HSDebugLogger.logInfo("bounds: $bounds");
     fetchSpots();
   }
 
