@@ -78,7 +78,8 @@ class MapPage extends StatelessWidget {
                   selector: (state) => state.spotsInView,
                   builder: (context, spots) {
                     return ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      physics: const ClampingScrollPhysics(),
                       itemCount: spots.length,
                       separatorBuilder: (BuildContext context, int index) {
                         return const Gap(16.0);

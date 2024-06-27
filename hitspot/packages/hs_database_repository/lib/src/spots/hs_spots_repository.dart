@@ -331,8 +331,10 @@ class HSSpotsRepository {
         'max_lat': maxLat,
         'max_long': maxLong,
       });
-      final List<HSSpot> spots =
-          (data as List<dynamic>).map((e) => HSSpot.deserialize(e)).toList();
+      final List<HSSpot> spots = (data as List<dynamic>).map((e) {
+        final spot = HSSpot.deserialize(e);
+        return spot.copyWith(images: [e['thumbnail']]);
+      }).toList();
       return spots;
     } catch (_) {
       throw Exception("Error fetching spots in view: $_");

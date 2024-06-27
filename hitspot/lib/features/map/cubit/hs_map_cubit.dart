@@ -42,6 +42,7 @@ class HSMapCubit extends Cubit<HSMapState> {
 
   Future<void> fetchSpots() async {
     try {
+      emit(state.copyWith(spotsInView: []));
       emit(state.copyWith(status: HSMapStatus.fetchingSpots));
       final LatLngBounds bounds = state.bounds!;
       final spots = await _databaseRepository.spotFetchSpotsInView(
@@ -53,7 +54,6 @@ class HSMapCubit extends Cubit<HSMapState> {
       HSDebugLogger.logSuccess("Fetched: ${spots.length} spots");
       emit(state.copyWith(spotsInView: spots, status: HSMapStatus.success));
     } catch (e) {
-      emit(state.copyWith(status: HSMapStatus.error));
       HSDebugLogger.logError("Error fetching spots: $e");
     }
   }
