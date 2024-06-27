@@ -6,7 +6,9 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/cubit/hs_map_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -53,9 +55,14 @@ class MapPage extends StatelessWidget {
               ),
               height: persistentHeaderHeight,
               width: screenWidth,
-              child: BlocSelector<HSMapCubit, HSMapState, int>(
-                selector: (state) => state.spotsInView.length,
-                builder: (context, spotsCount) {
+              child: BlocBuilder<HSMapCubit, HSMapState>(
+                buildWhen: (previous, current) =>
+                    previous.spotsInView != current.spotsInView ||
+                    previous.status != current.status,
+                builder: (context, state) {
+                  final int spotsCount = state.spotsInView.length;
+                  final bool isLoading =
+                      state.status == HSMapStatus.fetchingSpots;
                   return Center(
                     child: Column(
                       children: [
@@ -68,8 +75,11 @@ class MapPage extends StatelessWidget {
                           ),
                         ),
                         const Gap(4.0),
-                        Text("Found $spotsCount spots",
-                            style: textTheme.headlineSmall),
+                        if (isLoading)
+                          const HSShimmerBox(width: 128, height: 24.0)
+                        else
+                          Text("Found $spotsCount spots",
+                              style: textTheme.headlineSmall),
                       ],
                     ),
                   );

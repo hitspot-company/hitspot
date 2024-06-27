@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:choice/choice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -127,6 +126,7 @@ class _ThirdPage extends StatelessWidget {
       caption: "Select categories that best describe your spot.",
       children: [
         HSTextField.filled(
+          controller: createSpotCubit.categoriesController,
           onChanged: createSpotCubit.updateTagsQuery,
           hintText: "Search for category...",
           suffixIcon: const Icon(FontAwesomeIcons.magnifyingGlass),

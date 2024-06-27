@@ -26,6 +26,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
   String get titleHint =>
       state.title.isEmpty ? "The best spot on earth..." : state.title;
   final HSDatabaseRepsitory _databaseRepository = app.databaseRepository;
+  final TextEditingController categoriesController = TextEditingController();
 
   String get descriptionHint =>
       state.description.isEmpty ? "Writings on the wall..." : state.description;
@@ -181,6 +182,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
   void selectTag(String tag) {
     if (!state.selectedTags.contains(tag)) {
       final newSelectedTags = List<String>.from(state.selectedTags)..add(tag);
+      categoriesController.clear();
       emit(state.copyWith(selectedTags: newSelectedTags, tagsQuery: ""));
     }
   }
@@ -201,5 +203,11 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
     } catch (_) {
       HSDebugLogger.logError("Failed to upload tags: $_");
     }
+  }
+
+  @override
+  Future<void> close() async {
+    categoriesController.dispose();
+    return super.close();
   }
 }
