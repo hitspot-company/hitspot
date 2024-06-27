@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/utils/assets/hs_assets.dart';
 
 final class HSTheme {
   // SINGLETON
-  HSTheme._internal();
+  HSTheme._internal() {
+    rootBundle.loadString(HSAssets.mapStyle).then((string) {
+      _mapStyleString = string;
+    });
+  }
   static final HSTheme _instance = HSTheme._internal();
   static HSTheme get instance => _instance;
 
   static const Color _mainColor = Color(0xFF00c0ca);
   static const Color _textfieldFillColor = Color.fromARGB(57, 160, 160, 160);
+
+  late String _mapStyleString;
+  String get mapStyle => _mapStyleString;
 
   final ThemeData lightTheme = ThemeData(
     colorSchemeSeed: _mainColor,

@@ -173,6 +173,19 @@ class HSDatabaseRepsitory {
           {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
       await _spotsRepository.saveUnsave(spot, spotID, user, userID);
 
+  Future<List<HSSpot>> spotFetchSpotsInView({
+    required double minLat,
+    required double minLong,
+    required double maxLat,
+    required double maxLong,
+  }) async =>
+      await _spotsRepository.fetchInView(
+        minLat,
+        minLong,
+        maxLat,
+        maxLong,
+      );
+
   /// Fetches the spots that belong to the user of given UID and are visible to the requester.
   ///
   /// The requester can be the user themselves or another user.

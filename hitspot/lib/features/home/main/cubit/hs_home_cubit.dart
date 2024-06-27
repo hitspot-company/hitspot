@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/main.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 
 part 'hs_home_state.dart';
 
@@ -11,6 +14,10 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   HSHomeCubit() : super(const HSHomeState()) {
     _fetchInitial();
   }
+
+  late final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
+  Completer<GoogleMapController> get mapController => _mapController;
 
   Future<void> _fetchInitial() async {
     try {
@@ -52,9 +59,14 @@ class HSHomeCubit extends Cubit<HSHomeState> {
           ),
         );
       }
-      emit(state.copyWith(nearbySpots: ret));
+      emit(state.copyWith(nearbySpots: ret, currentPosition: currentPosition));
     } catch (_) {
       HSDebugLogger.logError("Error fetching nearby spots: $_");
     }
+  }
+
+  Future<void> animateCameraToNewLatLng(LatLng location) async {
+    final GoogleMapController controller = await mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(location, 14));
   }
 }

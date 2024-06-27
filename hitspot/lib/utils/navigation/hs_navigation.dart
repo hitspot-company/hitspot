@@ -10,6 +10,7 @@ import 'package:hitspot/features/complete_profile/view/complete_profile_provider
 import 'package:hitspot/features/home/main/view/home_provider.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
+import 'package:hitspot/features/map/view/map_provider.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
@@ -17,6 +18,7 @@ import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 
 class HSNavigation {
   HSNavigation._privateConstructor();
@@ -211,6 +213,8 @@ class HSNavigation {
   dynamic toSettings() => router.push('/settings');
   dynamic toEditProfile() => router.push('/edit_profile');
   dynamic toCreateSpot() => router.push('/create_spot');
+  dynamic toSpotsMap(Position? initialPosition) =>
+      pushPage(page: MapProvider(initialCameraPosition: initialPosition));
   dynamic toSpot(
           {required String sid,
           String? authorID,

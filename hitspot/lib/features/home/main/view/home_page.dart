@@ -1,4 +1,5 @@
-import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -6,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
+import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -14,6 +16,7 @@ import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_location_repository/hs_location_repository.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -21,6 +24,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HSHomeCubit>(context);
+    Completer<GoogleMapController> mapController = homeCubit.mapController;
     return HSScaffold(
       defaultBottombarEnabled: true,
       body: BlocSelector<HSHomeCubit, HSHomeState, HSHomeStatus>(
@@ -102,6 +106,36 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
+                const Gap(32.0).toSliver,
+                SizedBox(
+                  height: 140,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: BlocSelector<HSHomeCubit, HSHomeState, Position?>(
+                      selector: (state) => state.currentPosition,
+                      builder: (context, currentPosition) {
+                        if (currentPosition != null) {
+                          homeCubit.animateCameraToNewLatLng(
+                              currentPosition.toLatLng);
+                        }
+                        return GoogleMap(
+                          onTap: (latLng) => navi.toSpotsMap(currentPosition),
+                          onMapCreated: (GoogleMapController controller) {
+                            if (mapController.isCompleted) {
+                              mapController = Completer<GoogleMapController>();
+                            }
+                            mapController.complete(controller);
+                          },
+                          myLocationButtonEnabled: false,
+                          initialCameraPosition: const CameraPosition(
+                            zoom: 16.0,
+                            target: LatLng(0, 0),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ).toSliver,
                 const Gap(32.0).toSliver,
                 if (!isLoading && homeCubit.state.nearbySpots.isNotEmpty)
                   SliverMainAxisGroup(

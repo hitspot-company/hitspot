@@ -6,4 +6,5 @@ class HSAssets {
   static const String _iconsPath = "assets/icons";
   final String textLogo = "$_iconsPath/logotype/blue.png";
   final String logo = "$_iconsPath/logo/blue.png";
+  static const String mapStyle = "assets/map/map_blue.json";
 }
