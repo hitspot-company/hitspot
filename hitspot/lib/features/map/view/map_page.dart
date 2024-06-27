@@ -6,7 +6,6 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/cubit/hs_map_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
-import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
@@ -21,7 +20,7 @@ class MapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double expandedHeight = screenHeight - appBarHeight - 100;
+    final double expandedHeight = screenHeight;
     final mapCubit = BlocProvider.of<HSMapCubit>(context);
     return HSScaffold(
       sidePadding: 0.0,
@@ -31,7 +30,10 @@ class MapPage extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           ExpandableBottomSheet(
+            key: mapCubit.sheetKey,
             enableToggle: true,
+            onIsContractedCallback: mapCubit.updateSheetExpansionStatus,
+            onIsExtendedCallback: mapCubit.updateSheetExpansionStatus,
             background: BlocSelector<HSMapCubit, HSMapState, List<Marker>>(
               selector: (state) => state.markersInView,
               builder: (context, markersInView) => GoogleMap(
@@ -101,6 +103,9 @@ class MapPage extends StatelessWidget {
                       },
                       itemBuilder: (BuildContext context, int index) {
                         return HSBetterSpotTile(
+                          onTap: (p0) => navi.toSpot(sid: p0!.sid!),
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          borderRadius: BorderRadius.circular(20.0),
                           spot: spots[index],
                           height: 120,
                         );
@@ -117,10 +122,27 @@ class MapPage extends StatelessWidget {
               color: Colors.white,
               child: Center(
                 child: SafeArea(
-                  child: HSAppBar(
-                    enableDefaultBackButton: true,
-                  ),
-                ),
+                    child:
+                        BlocSelector<HSMapCubit, HSMapState, ExpansionStatus>(
+                  selector: (state) => state.sheetExpansionStatus,
+                  builder: (context, state) {
+                    late final IconData icon;
+                    late final String? titleText;
+                    if (mapCubit.sheetStatus == ExpansionStatus.expanded) {
+                      icon = FontAwesomeIcons.xmark;
+                      titleText = "Fetched Spots";
+                    } else {
+                      icon = FontAwesomeIcons.arrowLeft;
+                      titleText = "";
+                    }
+                    return HSAppBar(
+                      enableDefaultBackButton: true,
+                      defaultBackButtonCallback: mapCubit.defaultButtonCallback,
+                      titleText: titleText,
+                      defaultButtonBackIcon: icon,
+                    );
+                  },
+                )),
               ),
             ),
           ),

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
+import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -17,6 +19,9 @@ class HSMapCubit extends Cubit<HSMapState> {
   final _databaseRepository = app.databaseRepository;
   final Position? _initialCameraPosition;
   final Completer<GoogleMapController> controller = Completer();
+  GlobalKey<ExpandableBottomSheetState> sheetKey = GlobalKey();
+  ExpansionStatus get sheetStatus =>
+      sheetKey.currentState?.expansionStatus ?? ExpansionStatus.contracted;
 
   Future<void> init() async {
     try {
@@ -83,5 +88,16 @@ class HSMapCubit extends Cubit<HSMapState> {
             position: LatLng(e.latitude!, e.longitude!)))
         .toList();
     emit(state.copyWith(markersInView: markers));
+  }
+
+  void updateSheetExpansionStatus() => emit(state.copyWith(
+      sheetExpansionStatus: sheetKey.currentState?.expansionStatus));
+
+  void defaultButtonCallback() {
+    if (sheetKey.currentState?.expansionStatus == ExpansionStatus.contracted) {
+      navi.pop();
+      return;
+    }
+    sheetKey.currentState?.contract();
   }
 }

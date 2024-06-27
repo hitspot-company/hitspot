@@ -112,6 +112,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     try {
       await showCupertinoModalBottomSheet(
         context: app.context,
+        duration: const Duration(milliseconds: 200),
         builder: (context) => SingleChildScrollView(
           controller: ModalScrollController.of(context),
           child: Column(

@@ -10,6 +10,7 @@ final class HSMapState extends Equatable {
     this.currentPosition,
     this.cameraPosition,
     this.bounds,
+    this.sheetExpansionStatus = ExpansionStatus.contracted,
   });
 
   final HSMapStatus status;
@@ -18,6 +19,7 @@ final class HSMapState extends Equatable {
   final Position? currentPosition;
   final LatLng? cameraPosition;
   final LatLngBounds? bounds;
+  final ExpansionStatus sheetExpansionStatus;
 
   @override
   List<Object?> get props => [
@@ -26,7 +28,8 @@ final class HSMapState extends Equatable {
         currentPosition,
         cameraPosition,
         bounds,
-        markersInView
+        markersInView,
+        sheetExpansionStatus,
       ];
 
   HSMapState copyWith({
@@ -36,6 +39,7 @@ final class HSMapState extends Equatable {
     LatLng? cameraPosition,
     LatLngBounds? bounds,
     List<Marker>? markersInView,
+    ExpansionStatus? sheetExpansionStatus,
   }) {
     return HSMapState(
       spotsInView: spotsInView ?? this.spotsInView,
@@ -44,6 +48,7 @@ final class HSMapState extends Equatable {
       currentPosition: currentPosition ?? this.currentPosition,
       cameraPosition: cameraPosition ?? this.cameraPosition,
       bounds: bounds ?? this.bounds,
+      sheetExpansionStatus: sheetExpansionStatus ?? this.sheetExpansionStatus,
     );
   }
 }
