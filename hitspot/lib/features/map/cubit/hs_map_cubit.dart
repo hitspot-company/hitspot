@@ -9,8 +9,8 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 
 part 'hs_map_state.dart';
 
-class HSMapCubit extends Cubit<HsMapState> {
-  HSMapCubit(this._initialCameraPosition) : super(const HsMapState()) {
+class HSMapCubit extends Cubit<HSMapState> {
+  HSMapCubit(this._initialCameraPosition) : super(const HSMapState()) {
     init();
   }
 
