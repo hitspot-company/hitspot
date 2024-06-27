@@ -19,7 +19,7 @@ class MapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double expandedHeight = screenHeight - appBarHeight;
+    final double expandedHeight = screenHeight - appBarHeight - 100;
     final mapCubit = BlocProvider.of<HSMapCubit>(context);
     return HSScaffold(
       sidePadding: 0.0,
@@ -30,14 +30,18 @@ class MapPage extends StatelessWidget {
         children: [
           ExpandableBottomSheet(
             enableToggle: true,
-            background: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                zoom: 16.0,
-                target: mapCubit.state.cameraPosition!,
+            background: BlocSelector<HSMapCubit, HSMapState, List<Marker>>(
+              selector: (state) => state.markersInView,
+              builder: (context, markersInView) => GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  zoom: 16.0,
+                  target: mapCubit.state.cameraPosition!,
+                ),
+                onMapCreated: mapCubit.onMapCreated,
+                myLocationButtonEnabled: false,
+                onCameraIdle: mapCubit.onCameraIdle,
+                markers: Set.from(markersInView),
               ),
-              onMapCreated: mapCubit.onMapCreated,
-              myLocationButtonEnabled: false,
-              onCameraIdle: mapCubit.onCameraIdle,
             ),
             persistentHeader: Container(
               decoration: BoxDecoration(
@@ -53,21 +57,22 @@ class MapPage extends StatelessWidget {
                 selector: (state) => state.spotsInView.length,
                 builder: (context, spotsCount) {
                   return Center(
-                      child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 32.0, vertical: 4.0),
-                        child: SizedBox(
-                          width: 128.0,
-                          child: Divider(thickness: 4),
+                    child: Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 32.0, vertical: 4.0),
+                          child: SizedBox(
+                            width: 128.0,
+                            child: Divider(thickness: 4),
+                          ),
                         ),
-                      ),
-                      const Gap(4.0),
-                      Text("Found $spotsCount spots",
-                          style: textTheme.headlineSmall),
-                    ],
-                  ));
+                        const Gap(4.0),
+                        Text("Found $spotsCount spots",
+                            style: textTheme.headlineSmall),
+                      ],
+                    ),
+                  );
                 },
               ),
             ),

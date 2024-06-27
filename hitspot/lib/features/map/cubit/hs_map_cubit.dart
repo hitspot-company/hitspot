@@ -42,17 +42,18 @@ class HSMapCubit extends Cubit<HSMapState> {
 
   Future<void> fetchSpots() async {
     try {
-      emit(state.copyWith(spotsInView: []));
       emit(state.copyWith(status: HSMapStatus.fetchingSpots));
       final LatLngBounds bounds = state.bounds!;
       final spots = await _databaseRepository.spotFetchSpotsInView(
         minLat: bounds.southwest.latitude,
         minLong: bounds.southwest.longitude,
         maxLat: bounds.northeast.latitude,
-        maxLong: bounds.southwest.longitude,
+        maxLong: bounds.northeast.longitude,
       );
       HSDebugLogger.logSuccess("Fetched: ${spots.length} spots");
+      spots.removeWhere((e) => state.spotsInView.contains(e));
       emit(state.copyWith(spotsInView: spots, status: HSMapStatus.success));
+      placeMarkers();
     } catch (e) {
       HSDebugLogger.logError("Error fetching spots: $e");
     }
@@ -71,5 +72,15 @@ class HSMapCubit extends Cubit<HSMapState> {
     emit(state.copyWith(status: HSMapStatus.fetchingSpots, bounds: bounds));
     HSDebugLogger.logInfo("bounds: $bounds");
     fetchSpots();
+  }
+
+  void placeMarkers() async {
+    final List<HSSpot> spots = state.spotsInView;
+    List<Marker> markers = spots
+        .map((e) => Marker(
+            markerId: MarkerId(e.sid!),
+            position: LatLng(e.latitude!, e.longitude!)))
+        .toList();
+    emit(state.copyWith(markersInView: markers));
   }
 }

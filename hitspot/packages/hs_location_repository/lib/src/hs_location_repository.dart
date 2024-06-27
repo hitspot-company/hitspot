@@ -182,4 +182,24 @@ class HSLocationRepository {
         description: description,
         mapType: preferredMapType);
   }
+
+  // void _initialiseMarkerBitmap(context) async {
+  //   await _bitmapDescriptorFromSvgAsset(
+  //           context, FileConstants.icPharmacyMarker, markerSizeMedium)
+  //       .then((value) => _pharmacyMarker = value);
+  //   await _bitmapDescriptorFromSvgAsset(
+  //           context, FileConstants.icFarPharmacyMarker, markerSizeMedium)
+  //       .then((value) => _farPharmacyMarker = value);
+  // }
+
+  // Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
+  //     BuildContext context, String assetName, int width) async {
+  //   var svgString = await DefaultAssetBundle.of(context).loadString(assetName);
+  //   var svgDrawableRoot = await svg.fromSvgString(svgString, "");
+  //   var picture = svgDrawableRoot.toPicture(
+  //       size: Size(width.toDouble(), width.toDouble()));
+  //   var image = await picture.toImage(width, width);
+  //   var bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  //   return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  // }
 }
