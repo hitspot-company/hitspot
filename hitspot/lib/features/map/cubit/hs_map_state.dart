@@ -2,8 +2,8 @@ part of 'hs_map_cubit.dart';
 
 enum HSMapStatus { initial, loading, fetchingSpots, error, success }
 
-final class HsMapState extends Equatable {
-  const HsMapState({
+final class HSMapState extends Equatable {
+  const HSMapState({
     this.spotsInView = const [],
     this.status = HSMapStatus.initial,
     this.currentPosition,
@@ -21,14 +21,14 @@ final class HsMapState extends Equatable {
   List<Object?> get props =>
       [spotsInView, status, currentPosition, cameraPosition, bounds];
 
-  HsMapState copyWith({
+  HSMapState copyWith({
     List<HSSpot>? spotsInView,
     HSMapStatus? status,
     Position? currentPosition,
     LatLng? cameraPosition,
     LatLngBounds? bounds,
   }) {
-    return HsMapState(
+    return HSMapState(
       spotsInView: spotsInView ?? this.spotsInView,
       status: status ?? this.status,
       currentPosition: currentPosition ?? this.currentPosition,
