@@ -1,5 +1,6 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spot.dart';
+import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -163,10 +164,11 @@ class HSSpotsRepository {
 
   Future<HSSpot> fetchSpotWithAuthor(HSSpot? spot, String? spotID) async {
     try {
-      final fetchedSpot = await read(spot, spotID);
-      final spotWithImages = await _composeSpotWithImages(fetchedSpot);
-      final fetchedAuthor = await fetchSpotAuthor(spotWithImages, null);
-      return spotWithImages.copyWith(author: fetchedAuthor);
+      final fetchedSpot =
+          await _supabase.rpc('spots_fetch_spot_with_author', params: {
+        'spotsid': spotID,
+      });
+      return HSSpotsUtils.deserializeSpotWithAuthor(fetchedSpot.first);
     } catch (_) {
       throw Exception("Could not fetch spot with author: $_");
     }
