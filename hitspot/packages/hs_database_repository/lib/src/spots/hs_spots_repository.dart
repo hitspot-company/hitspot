@@ -1,4 +1,5 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spot.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -315,6 +316,24 @@ class HSSpotsRepository {
         spots[i] = spot;
       }
       return (spots);
+    } catch (_) {
+      throw Exception("Error fetching user spots: $_");
+    }
+  }
+
+  Future<List<HSBoard>> userBoards(
+      HSUser? user, String? userID, int batchOffset, int batchSize) async {
+    try {
+      assert(user != null || userID != null, "User or userID must be provided");
+      final uid = user?.uid ?? userID!;
+      final data = await _supabase.rpc('fetch_user_boards', params: {
+        'user_id': uid,
+        'batch_offset': batchOffset,
+        'batch_size': batchSize,
+      });
+      final List<HSBoard> boards =
+          (data as List<dynamic>).map((e) => HSBoard.deserialize(e)).toList();
+      return boards;
     } catch (_) {
       throw Exception("Error fetching user spots: $_");
     }
