@@ -104,6 +104,10 @@ class HSDatabaseRepsitory {
           {HSBoard? board, String? boardID}) async =>
       await _boardsRepository.fetchBoardSpots(board, boardID);
 
+  Future<List<HSUser>> boardFetchBoardCollaborators(
+          {HSBoard? board, String? boardID}) async =>
+      await _boardsRepository.fetchBoardCollaborators(board, boardID);
+
   Future<void> boardAddSpot(
           {HSBoard? board,
           String? boardID,
