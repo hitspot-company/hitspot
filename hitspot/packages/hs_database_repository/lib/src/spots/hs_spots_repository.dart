@@ -380,6 +380,7 @@ class HSSpotsRepository {
       throw Exception("Error fetching user spots: $_");
     }
   }
+<<<<<<< HEAD
 
   Future<HSSpot> fetchTopSpotWithTag(String tag) async {
     try {
@@ -408,4 +409,6 @@ class HSSpotsRepository {
       throw Exception("Error fetching trending spots: $_");
     }
   }
+=======
+>>>>>>> 2f3e318 ([WT][Backend] Implement interfaces to interact with database functions)
 }
