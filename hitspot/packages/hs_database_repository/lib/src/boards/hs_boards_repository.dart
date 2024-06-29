@@ -221,6 +221,9 @@ class HSBoardsRepository {
   Future<List<HSUser>> fetchBoardCollaborators(HSBoard? board, String? boardID,
       [int batchSize = 20, int batchOffset = 0]) async {
     try {
+      assert((board != null || boardID != null),
+          "The board or the boardID has to be provided.");
+
       final bid = board?.id ?? boardID!;
       final List fetchedCollaborators = await _supabase
           .rpc('boards_fetch_board_collaborators', params: {
