@@ -218,6 +218,34 @@ class HSBoardsRepository {
     }
   }
 
+  Future<List<HSUser>> fetchBoardCollaborators(HSBoard? board, String? boardID,
+      [int batchSize = 20, int batchOffset = 0]) async {
+    try {
+      assert((board != null || boardID != null),
+          "The board or the boardID has to be provided.");
+
+      final bid = board?.id ?? boardID!;
+      final List fetchedCollaborators = await _supabase
+          .rpc('boards_fetch_board_collaborators', params: {
+        'requested_board_id': bid,
+        "batch_size": batchSize,
+        "batch_offset": batchOffset
+      });
+
+      HSDebugLogger.logSuccess(
+          "Fetched collaborators of board: $fetchedCollaborators");
+
+      final deserializedFetchedCollaborators =
+          fetchedCollaborators.map((user) => HSUser.deserialize(user)).toList();
+      board?.copyWith(collaborators: deserializedFetchedCollaborators);
+
+      return deserializedFetchedCollaborators;
+    } catch (_) {
+      throw HSBoardException(
+          type: HSBoardExceptionType.read, details: _.toString());
+    }
+  }
+
   Future<void> addSpot(HSBoard? board, String? boardID, HSSpot? spot,
       String? spotID, HSUser? addedBy, String? addedByID) async {
     try {

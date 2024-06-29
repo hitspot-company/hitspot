@@ -6,6 +6,7 @@ typedef BoardID = String;
 
 class HSBoard {
   final UserID? createdBy;
+  final List<HSUser>? collaborators;
   final BoardID? id;
   final String? title, description, image;
   final Color? color;
@@ -41,6 +42,7 @@ class HSBoard {
 
   HSBoard copyWith({
     UserID? createdBy,
+    List<HSUser>? collaborators,
     BoardID? id,
     String? title,
     String? description,
@@ -51,6 +53,7 @@ class HSBoard {
   }) =>
       HSBoard(
         createdBy: createdBy ?? this.createdBy,
+        collaborators: collaborators ?? this.collaborators,
         id: id ?? this.id,
         title: title ?? this.title,
         description: description ?? this.description,
@@ -62,6 +65,7 @@ class HSBoard {
 
   HSBoard({
     this.createdBy,
+    this.collaborators,
     this.id,
     this.title,
     this.description,

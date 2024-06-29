@@ -104,6 +104,10 @@ class HSDatabaseRepsitory {
           {HSBoard? board, String? boardID}) async =>
       await _boardsRepository.fetchBoardSpots(board, boardID);
 
+  Future<List<HSUser>> boardFetchBoardCollaborators(
+          {HSBoard? board, String? boardID}) async =>
+      await _boardsRepository.fetchBoardCollaborators(board, boardID);
+
   Future<void> boardAddSpot(
           {HSBoard? board,
           String? boardID,
@@ -184,6 +188,13 @@ class HSDatabaseRepsitory {
           int batchOffset = 0,
           int batchSize = 20}) async =>
       await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
+
+  Future<List<HSBoard>> spotfetchUserBoards(
+          {HSUser? user,
+          String? userID,
+          int batchOffset = 0,
+          int batchSize = 20}) async =>
+      await _spotsRepository.userBoards(user, userID, batchOffset, batchSize);
 
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);

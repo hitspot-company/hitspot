@@ -27,6 +27,9 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
       final user = await app.databaseRepository.userRead(userID: userID);
       final List<HSSpot> userSpots =
           await _databaseRepository.spotfetchUserSpots(user: user);
+      final List<HSBoard> userBoards =
+          await _databaseRepository.spotfetchUserBoards(user: user);
+
       HSDebugLogger.logSuccess("Fetched user spots: ${userSpots.length}");
       final bool? isFollowed = await app.databaseRepository
           .userIsUserFollowed(followerID: currentUser.uid, followedID: userID);
