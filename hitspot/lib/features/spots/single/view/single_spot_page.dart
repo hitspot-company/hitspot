@@ -184,6 +184,8 @@ class _MapView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: GoogleMap(
+                onMapCreated: (controller) =>
+                    controller.setMapStyle(appTheme.mapStyle),
                 onTap: (argument) => app.locationRepository.launchMaps(
                   coords: spotLocation,
                   description: singleSpotCubit.state.spot.address!,

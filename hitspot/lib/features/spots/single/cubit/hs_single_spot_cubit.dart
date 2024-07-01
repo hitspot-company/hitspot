@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
+import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -58,8 +59,8 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
 
   Future<void> likeDislikeSpot() async {
     try {
-      emit(state.copyWith(status: HSSingleSpotStatus.liking));
-      await Future.delayed(const Duration(seconds: 1));
+      // emit(state.copyWith(status: HSSingleSpotStatus.liking));
+      // await Future.delayed(const Duration(seconds: 1));
       final bool isSpotLiked = await _databaseRepository.spotLikeDislike(
           spotID: spotID, userID: currentUser.uid);
       emit(state.copyWith(
@@ -72,7 +73,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
   Future<void> saveUnsaveSpot() async {
     try {
       emit(state.copyWith(status: HSSingleSpotStatus.saving));
-      await Future.delayed(const Duration(seconds: 1));
+      // await Future.delayed(const Duration(seconds: 1));
       final bool isSpotSaved = await _databaseRepository.spotSaveUnsave(
           spotID: spotID, userID: currentUser.uid);
       emit(state.copyWith(
@@ -113,25 +114,38 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       await showCupertinoModalBottomSheet(
         context: app.context,
         duration: const Duration(milliseconds: 200),
-        builder: (context) => SingleChildScrollView(
-          controller: ModalScrollController.of(context),
-          child: Column(
-            children: [
-              const Gap(16.0),
-              Text(
-                "Choose a board",
-                style: textTheme.headlineMedium,
-              ),
-              const Gap(16.0),
-              ...boards.map(
-                (e) => HSModalBottomSheetItem(
-                  title: e.title!,
-                  iconData: FontAwesomeIcons.a,
-                  onTap: () => _addToBoard(e),
+        builder: (context) => Material(
+          color: Colors.transparent,
+          child: SingleChildScrollView(
+            controller: ModalScrollController.of(context),
+            child: Column(
+              children: [
+                const Gap(16.0),
+                Text(
+                  "Choose a board",
+                  style: textTheme.headlineMedium,
                 ),
-              ),
-              const Gap(32.0),
-            ],
+                const Gap(16.0),
+                if (boards.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: HSTextPrompt(
+                      prompt: "You don't have any boards yet.",
+                      pressableText: "\nCreate",
+                      promptColor: appTheme.mainColor,
+                      onTap: navi.toCreateBoard,
+                    ),
+                  ),
+                ...boards.map(
+                  (e) => HSModalBottomSheetItem(
+                    title: e.title!,
+                    iconData: FontAwesomeIcons.a,
+                    onTap: () => _addToBoard(e),
+                  ),
+                ),
+                const Gap(32.0),
+              ],
+            ),
           ),
         ),
       );
