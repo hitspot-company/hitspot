@@ -14,6 +14,8 @@ part 'hs_map_state.dart';
 class HSMapCubit extends Cubit<HSMapState> {
   HSMapCubit(this._initialCameraPosition) : super(const HSMapState()) {
     init();
+    // clusterManager = app.locationRepository.initializeClusterManager(
+    //     [], (mark) => HSDebugLogger.logInfo("Cluster tapped"));
   }
 
   final _databaseRepository = app.databaseRepository;
@@ -22,6 +24,7 @@ class HSMapCubit extends Cubit<HSMapState> {
   GlobalKey<ExpandableBottomSheetState> sheetKey = GlobalKey();
   ExpansionStatus get sheetStatus =>
       sheetKey.currentState?.expansionStatus ?? ExpansionStatus.contracted;
+  // late final clusterManager;
 
   Future<void> init() async {
     try {

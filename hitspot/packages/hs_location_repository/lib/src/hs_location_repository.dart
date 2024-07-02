@@ -1,8 +1,15 @@
 import 'dart:async';
-
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
-import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+// import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart'
+// as gmcm;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hs_location_repository/src/models/hs_place_details.dart';
+import 'package:hs_location_repository/src/models/hs_prediction.dart';
+// import 'package:hs_location_repository/src/models/hs_spot_with_cluster_item.dart'
+// as gm;
 import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:uuid/uuid.dart';
 
@@ -184,6 +191,32 @@ class HSLocationRepository {
         description: description,
         mapType: preferredMapType);
   }
+
+  /// Map Spots Clustering
+  // gmcm.ClusterManager<gm.HSSpotWithClusterItem> initializeClusterManager(
+  //     List<HSSpot> spots, Function(Set<Marker>) _updateMarkers) {
+  //   return gmcm.ClusterManager<gm.HSSpotWithClusterItem>(
+  //       spots.map((e) => gm.HSSpotWithClusterItem(e)).toList(),
+  //       _updateMarkers, // Method to be called when markers are updated
+  //       // markerBuilder:
+  //       // _markerBuilder, // Optional : Method to implement if you want to customize markers
+  //       levels: [
+  //         1,
+  //         4.25,
+  //         6.75,
+  //         8.25,
+  //         11.5,
+  //         14.5,
+  //         16.0,
+  //         16.5,
+  //         20.0
+  //       ], // Optional : Configure this if you want to change zoom levels at which the clustering precision change
+  //       extraPercent:
+  //           0.2, // Optional : This number represents the percentage (0.2 for 20%) of latitude and longitude (in each direction) to be considered on top of the visible map bounds to render clusters. This way, clusters don't "pop out" when you cross the map.
+  //       stopClusteringZoom:
+  //           17.0 // Optional : The zoom level to stop clustering, so it's only rendering single item "clusters"
+  //       );
+  // }
 
   // void _initialiseMarkerBitmap(context) async {
   //   await _bitmapDescriptorFromSvgAsset(
