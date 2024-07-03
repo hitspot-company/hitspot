@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/map/cubit/hs_map_cubit.dart';
+import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
+import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
+import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -133,12 +135,19 @@ class MapPage extends StatelessWidget {
                       titleText = "Fetched Spots";
                     } else {
                       icon = FontAwesomeIcons.arrowLeft;
-                      titleText = "SearchBar Here";
                     }
                     return HSAppBar(
                       enableDefaultBackButton: true,
                       defaultBackButtonCallback: mapCubit.defaultButtonCallback,
-                      titleText: titleText,
+                      right: IconButton(
+                        icon: const Icon(FontAwesomeIcons.magnifyingGlass),
+                        onPressed: () => showSearch(
+                          context: context,
+                          delegate: MapSearchDelegate(
+                            BlocProvider.of<HSMapSearchCubit>(context),
+                          ),
+                        ),
+                      ),
                       defaultButtonBackIcon: icon,
                     );
                   },

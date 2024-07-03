@@ -10,7 +10,7 @@ import 'package:hitspot/features/complete_profile/view/complete_profile_provider
 import 'package:hitspot/features/home/main/view/home_provider.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/features/map/view/map_provider.dart';
+import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';

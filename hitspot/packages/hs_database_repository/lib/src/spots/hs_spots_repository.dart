@@ -165,9 +165,10 @@ class HSSpotsRepository {
 
   Future<HSSpot> fetchSpotWithAuthor(HSSpot? spot, String? spotID) async {
     try {
+      final sid = spot?.sid ?? spotID!;
       final fetchedSpot =
           await _supabase.rpc('spots_fetch_spot_with_author', params: {
-        'spotsid': spotID,
+        'spotsid': sid,
       });
       return HSSpotsUtils.deserializeSpotWithAuthor(fetchedSpot.first);
     } catch (_) {
