@@ -42,7 +42,6 @@ class MapSearchDelegate extends SearchDelegate<String> {
         icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
-          // When pressed here the query will be cleared from the search bar.
         },
       ),
     ];
@@ -65,9 +64,10 @@ class MapSearchDelegate extends SearchDelegate<String> {
           const Gap(16.0),
           const TabBar(
             dividerHeight: 0.0,
+            indicatorColor: Colors.transparent,
             tabs: [
-              Icon(FontAwesomeIcons.user),
-              Icon(FontAwesomeIcons.solidMap),
+              Tab(text: 'Spots', icon: Icon(FontAwesomeIcons.mapPin)),
+              Tab(text: 'Boards', icon: Icon(FontAwesomeIcons.solidSquare)),
             ],
           ),
           const Gap(16.0),

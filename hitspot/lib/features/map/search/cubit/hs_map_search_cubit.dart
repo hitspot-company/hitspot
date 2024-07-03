@@ -25,11 +25,9 @@ class HSMapSearchCubit extends Cubit<HsMapSearchState> {
       final List<HSSpot> spotsWithImages = [];
       for (var i = 0; i < fetchedSpots.length; i++) {
         final HSSpot spot = HSSpot.deserialize(fetchedSpots[i]);
-        HSDebugLogger.logInfo("Deserialized spot: $spot");
         spotsWithImages.add(
             await app.databaseRepository.spotfetchSpotWithAuthor(spot: spot));
       }
-      HSDebugLogger.logSuccess("Composed $spotsWithImages");
       emit(state.copyWith(spots: spotsWithImages));
     } catch (e) {
       HSDebugLogger.logError("Error $e");
