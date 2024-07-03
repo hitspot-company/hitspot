@@ -1,12 +1,8 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
-import 'package:hs_database_repository/src/spots/hs_spot.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
-import 'package:hs_database_repository/src/tags/hs_tag.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
-import 'package:hs_database_repository/src/users/hs_users_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
@@ -89,10 +85,6 @@ class HSDatabaseRepsitory {
           {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
       _boardsRepository.saveUnsave(board, boardID, user, userID);
 
-  Future<List<HSBoard>> boardFetchUserBoards(
-          {HSUser? user, String? userID}) async =>
-      await _boardsRepository.fetchUserBoards(user, userID);
-
   Future<List<HSBoard>> boardFetchSavedBoards(
           {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchSavedBoards(user, userID);
@@ -117,12 +109,22 @@ class HSDatabaseRepsitory {
           String? addedByID}) async =>
       await _boardsRepository.addSpot(
           board, boardID, spot, spotID, addedBy, addedByID);
+
   Future<void> boardRemoveSpot(
           {HSBoard? board,
           String? boardID,
           HSSpot? spot,
           String? spotID}) async =>
       await _boardsRepository.removeSpot(board, boardID, spot, spotID);
+
+  Future<List<HSBoard>> boardFetchUserBoards({
+    HSUser? user,
+    String? userID,
+    int batchOffset = 0,
+    int batchSize = 20,
+  }) async =>
+      await _boardsRepository.fetchUserBoards(
+          user, userID, batchOffset, batchSize);
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);

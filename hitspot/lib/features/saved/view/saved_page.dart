@@ -73,8 +73,8 @@ class SavedPage extends StatelessWidget {
                         const Center(child: Text('No boards.')).toSliver,
                         const Gap(16.0).toSliver,
                         HSButton(
-                                child: const Text("Create Board"),
-                                onPressed: navi.toCreateBoard)
+                                onPressed: navi.toCreateBoard,
+                                child: const Text("Create Board"))
                             .toSliver,
                       ],
                     )

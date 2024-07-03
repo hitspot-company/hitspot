@@ -11,7 +11,6 @@ import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hitspot/widgets/hs_user_monitor.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 class EditProfilePage extends StatelessWidget {
@@ -59,10 +58,23 @@ class EditProfilePage extends StatelessWidget {
                               child = InkWell(
                                 radius: 60.0,
                                 onTap: editProfileCubit.chooseImage,
-                                child: HSUserAvatar(
-                                  imageUrl: app.currentUser.avatarUrl,
-                                  radius: 80,
-                                  iconSize: 50,
+                                child: BlocSelector<HSAuthenticationBloc,
+                                    HSAuthenticationState, String?>(
+                                  selector: (state) {
+                                    if (state.authenticationStatus ==
+                                        HSAuthenticationStatus.authenticated) {
+                                      return (state
+                                              as HSAuthenticationAuthenticatedState)
+                                          .currentUser
+                                          .avatarUrl;
+                                    }
+                                    return null;
+                                  },
+                                  builder: (context, avatar) => HSUserAvatar(
+                                    imageUrl: avatar,
+                                    radius: 80,
+                                    iconSize: 50,
+                                  ),
                                 ),
                               );
                           }

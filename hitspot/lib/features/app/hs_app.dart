@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
-import 'package:hitspot/main.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/utils/pickers/hs_pickers.dart';

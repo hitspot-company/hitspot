@@ -165,14 +165,17 @@ class HSBoardsRepository {
   }
 
   // READ ALL USER BOARDS
-  Future<List<HSBoard>> fetchUserBoards(HSUser? user, String? userID) async {
+  Future<List<HSBoard>> fetchUserBoards(
+      HSUser? user, String? userID, int batchOffset, int batchSize) async {
     assert(user != null || userID != null, "User or userID must be provided");
     try {
-      final fetchedBoards = await _supabase
-          .from(_boards)
-          .select()
-          .eq("created_by", user?.uid ?? userID!)
-          .range(0, 10);
+      final uid = user?.uid ?? userID!;
+      final List<Map<String, dynamic>> fetchedBoards =
+          await _supabase.rpc("fetch_user_boards", params: {
+        "user_id": uid,
+        "batch_offset": batchOffset,
+        "batch_size": batchSize,
+      });
       return fetchedBoards.map((e) => HSBoard.deserialize(e)).toList();
     } catch (_) {
       throw HSBoardException(
@@ -198,12 +201,12 @@ class HSBoardsRepository {
       [int batchSize = 20, int batchOffset = 0]) async {
     try {
       final bid = board?.id ?? boardID!;
-      final List fetchedSpots = await _supabase.rpc('boards_fetch_board_spots',
-          params: {
-            'board_id_input': bid,
-            "batch_size": batchSize,
-            "batch_offset": batchOffset
-          });
+      final List<Map<String, dynamic>> fetchedSpots = await _supabase
+          .rpc('boards_fetch_board_spots', params: {
+        'board_id_input': bid,
+        "batch_size": batchSize,
+        "batch_offset": batchOffset
+      });
       HSDebugLogger.logSuccess("Fetched spots of board: $fetchedSpots");
       final List<HSSpot> ret = [];
       for (var i = 0; i < fetchedSpots.length; i++) {
