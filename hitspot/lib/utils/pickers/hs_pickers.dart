@@ -142,13 +142,15 @@ class HSPickers {
     final ImageCropper cropper = ImageCropper();
     ret = await cropper.cropImage(
       aspectRatio: cropAspectRatio,
-      // cropStyle: cropStyle ?? CropStyle.rectangle,
       sourcePath: sourcePath,
       uiSettings: [
         IOSUiSettings(
-          title: 'Board Image',
           aspectRatioLockEnabled: true,
+          cropStyle: cropStyle ?? CropStyle.rectangle,
         ),
+        AndroidUiSettings(
+          cropStyle: cropStyle ?? CropStyle.rectangle,
+        )
       ],
     );
     return ret;
