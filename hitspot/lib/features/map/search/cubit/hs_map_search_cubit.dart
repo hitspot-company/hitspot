@@ -36,16 +36,22 @@ class HSMapSearchCubit extends Cubit<HsMapSearchState> {
     return (state.spots);
   }
 
-  Future<void> fetchBoards() async {
-    final query = state.query;
-    // ADD DEBOUNCE
-    final List<Map<String, dynamic>> fetchedBoards = await supabase
-        .from('boards')
-        .select()
-        .textSearch('title', "$query:*")
-        .limit(20);
-    emit(state.copyWith(
-        boards: fetchedBoards.map(HSBoard.deserialize).toList()));
+  Future<List<HSBoard>> fetchBoards() async {
+    try {
+      final query = state.query;
+      // ADD DEBOUNCE
+      final List<Map<String, dynamic>> fetchedBoards = await supabase
+          .from('boards')
+          .select()
+          .textSearch('title', "$query:*")
+          .limit(20);
+      emit(state.copyWith(
+          boards: fetchedBoards.map(HSBoard.deserialize).toList()));
+      return (state.boards);
+    } catch (e) {
+      HSDebugLogger.logError("Error $e");
+      return [];
+    }
   }
 
   Future<void> _fetchUsers() async {

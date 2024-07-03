@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
@@ -75,7 +76,8 @@ class MapSearchDelegate extends SearchDelegate<String> {
             child: TabBarView(
               children: [
                 _FetchedSpotsPage(mapSearchCubit: mapSearchCubit, query: query),
-                Container(color: Colors.amber),
+                _FetchedBoardsPage(
+                    mapSearchCubit: mapSearchCubit, query: query),
               ],
             ),
           ),
@@ -135,9 +137,13 @@ class _FetchedSpotsPage extends StatelessWidget {
           return const HSLoadingIndicator();
         }
         final List<HSSpot> spots = snapshot.data ?? [];
-        if (spots.isEmpty) {}
-        return ListView.separated(
-          separatorBuilder: (context, index) => const Gap(16.0),
+        if (spots.isEmpty) {
+          return Text("No spots found for $query", textAlign: TextAlign.center);
+        }
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
           itemCount: spots.length,
           itemBuilder: (BuildContext context, int index) {
             return HSBetterSpotTile(
@@ -145,8 +151,41 @@ class _FetchedSpotsPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               borderRadius: BorderRadius.circular(20.0),
               spot: spots[index],
-              height: 120,
             );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _FetchedBoardsPage extends StatelessWidget {
+  const _FetchedBoardsPage({required this.mapSearchCubit, required this.query});
+
+  final HSMapSearchCubit mapSearchCubit;
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    mapSearchCubit.updateQuery(query);
+    return FutureBuilder<List<HSBoard>>(
+      future: mapSearchCubit.fetchBoards(),
+      builder: (BuildContext context, AsyncSnapshot<List<HSBoard>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const HSLoadingIndicator();
+        }
+        final List<HSBoard> boards = snapshot.data ?? [];
+        if (boards.isEmpty) {
+          return Text("No boards found for $query",
+              textAlign: TextAlign.center);
+        }
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
+          itemCount: boards.length,
+          itemBuilder: (BuildContext context, int index) {
+            return HSBoardTile(board: boards[index]);
           },
         );
       },
