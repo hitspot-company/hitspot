@@ -237,4 +237,10 @@ class HSLocationRepository {
   //   var bytes = await image.toByteData(format: ui.ImageByteFormat.png);
   //   return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   // }
+
+  Future<void> animateCameraToNewLatLng(
+      Completer<GoogleMapController> mapController, LatLng location) async {
+    final GoogleMapController controller = await mapController.future;
+    controller.animateCamera(CameraUpdate.newLatLng(location));
+  }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/search/view/search_page.dart';
+import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
+import 'package:hitspot/features/search/view/main_search_delegate.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
 class HSSearchBar extends StatelessWidget {
@@ -21,7 +23,10 @@ class HSSearchBar extends StatelessWidget {
         ),
         fillColor: appTheme.textfieldFillColor,
         hintText: "Search...",
-        onTap: () => navi.pushPage(page: const SearchPage()),
+        onTap: () => showSearch(
+            context: context,
+            delegate: MainSearchDelegate(
+                BlocProvider.of<HSMainSearchCubit>(context))),
       ),
     );
   }

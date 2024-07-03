@@ -91,24 +91,9 @@ class HomePage extends StatelessWidget {
                   ),
                   centerTitle: true,
                 ),
-                if (trendingBoards.isNotEmpty)
-                  SliverMainAxisGroup(
-                    slivers: [
-                      const Gap(32.0).toSliver,
-                      Text("Trending Boards", style: textTheme.headlineMedium)
-                          .toSliver,
-                      const Gap(16.0).toSliver,
-                      SliverToBoxAdapter(
-                        child: _TrendingBoardsBuilder(
-                          isLoading: isLoading,
-                          trendingBoards: trendingBoards,
-                        ),
-                      ),
-                    ],
-                  ),
                 const Gap(32.0).toSliver,
                 SizedBox(
-                  height: 140,
+                  height: 160,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16.0),
                     child: BlocSelector<HSHomeCubit, HSHomeState, Position?>(
@@ -137,6 +122,21 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ).toSliver,
+                if (trendingBoards.isNotEmpty)
+                  SliverMainAxisGroup(
+                    slivers: [
+                      const Gap(32.0).toSliver,
+                      Text("Trending Boards", style: textTheme.headlineMedium)
+                          .toSliver,
+                      const Gap(16.0).toSliver,
+                      SliverToBoxAdapter(
+                        child: _TrendingBoardsBuilder(
+                          isLoading: isLoading,
+                          trendingBoards: trendingBoards,
+                        ),
+                      ),
+                    ],
+                  ),
                 const Gap(32.0).toSliver,
                 if (!isLoading && homeCubit.state.nearbySpots.isNotEmpty)
                   SliverMainAxisGroup(

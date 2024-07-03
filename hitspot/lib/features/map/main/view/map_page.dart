@@ -5,8 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
-import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
-import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -96,6 +94,11 @@ class MapPage extends StatelessWidget {
                 child: BlocSelector<HSMapCubit, HSMapState, List<HSSpot>>(
                   selector: (state) => state.spotsInView,
                   builder: (context, spots) {
+                    if (spots.isEmpty) {
+                      return const Center(
+                        child: Text("No spots in the area."),
+                      );
+                    }
                     return ListView.separated(
                       shrinkWrap: true,
                       physics: const ClampingScrollPhysics(),
@@ -124,34 +127,32 @@ class MapPage extends StatelessWidget {
               color: currentTheme.scaffoldBackgroundColor,
               child: Center(
                 child: SafeArea(
-                    child:
-                        BlocSelector<HSMapCubit, HSMapState, ExpansionStatus>(
-                  selector: (state) => state.sheetExpansionStatus,
-                  builder: (context, state) {
-                    late final IconData icon;
-                    late final String? titleText;
-                    if (mapCubit.sheetStatus == ExpansionStatus.expanded) {
-                      icon = FontAwesomeIcons.xmark;
-                      titleText = "Fetched Spots";
-                    } else {
-                      icon = FontAwesomeIcons.arrowLeft;
-                    }
-                    return HSAppBar(
-                      enableDefaultBackButton: true,
-                      defaultBackButtonCallback: mapCubit.defaultButtonCallback,
-                      right: IconButton(
-                        icon: const Icon(FontAwesomeIcons.magnifyingGlass),
-                        onPressed: () => showSearch(
-                          context: context,
-                          delegate: MapSearchDelegate(
-                            BlocProvider.of<HSMapSearchCubit>(context),
-                          ),
+                  child: BlocSelector<HSMapCubit, HSMapState, ExpansionStatus>(
+                    selector: (state) => state.sheetExpansionStatus,
+                    builder: (context, state) {
+                      late final IconData icon;
+                      late final String? titleText;
+                      if (mapCubit.sheetStatus == ExpansionStatus.expanded) {
+                        icon = FontAwesomeIcons.xmark;
+                        titleText = "Fetched Spots";
+                      } else {
+                        icon = FontAwesomeIcons.arrowLeft;
+                        titleText = "";
+                      }
+                      return HSAppBar(
+                        enableDefaultBackButton: true,
+                        defaultBackButtonCallback:
+                            mapCubit.defaultButtonCallback,
+                        titleText: titleText,
+                        right: IconButton(
+                          icon: const Icon(FontAwesomeIcons.magnifyingGlass),
+                          onPressed: () => mapCubit.searchLocation(context),
                         ),
-                      ),
-                      defaultButtonBackIcon: icon,
-                    );
-                  },
-                )),
+                        defaultButtonBackIcon: icon,
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),

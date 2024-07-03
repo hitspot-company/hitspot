@@ -1,32 +1,21 @@
 part of 'hs_map_search_cubit.dart';
 
-final class HsMapSearchState extends Equatable {
-  const HsMapSearchState({
-    this.query = "",
-    this.spots = const [],
-    this.boards = const [],
-    this.users = const [],
-  });
+final class HSMapSearchState extends Equatable {
+  const HSMapSearchState({this.predictions = const [], this.query = ""});
 
+  final List<HSPrediction> predictions;
   final String query;
-  final List<HSSpot> spots;
-  final List<HSBoard> boards;
-  final List<HSUser> users;
 
   @override
-  List<Object> get props => [query, spots, boards, users];
+  List<Object> get props => [predictions, query];
 
-  HsMapSearchState copyWith({
+  HSMapSearchState copyWith({
+    List<HSPrediction>? predictions,
     String? query,
-    List<HSSpot>? spots,
-    List<HSBoard>? boards,
-    List<HSUser>? users,
   }) {
-    return HsMapSearchState(
+    return HSMapSearchState(
+      predictions: predictions ?? this.predictions,
       query: query ?? this.query,
-      spots: spots ?? this.spots,
-      boards: boards ?? this.boards,
-      users: users ?? this.users,
     );
   }
 }
