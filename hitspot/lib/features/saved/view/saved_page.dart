@@ -111,10 +111,11 @@ class SavedPage extends StatelessWidget {
                   if (savedCubit.state.ownBoards.isEmpty)
                     SliverMainAxisGroup(
                       slivers: [
-                        const Center(child: Text('No boards.'))
-                            .animate()
-                            .fadeIn(duration: 300.ms, delay: 500.ms)
-                            .slideY(begin: 0.2, end: 0)
+                        const Center(child: Text('No boards.')).toSliver,
+                        const Gap(16.0).toSliver,
+                        HSButton(
+                                onPressed: navi.toCreateBoard,
+                                child: const Text("Create Board"))
                             .toSliver,
                       ],
                     )
