@@ -55,6 +55,7 @@ class _FirstPage extends StatelessWidget {
           maxLength: 64,
           onChanged: createSpotCubit.updateTitle,
           hintText: createSpotCubit.titleHint,
+          initialValue: createSpotCubit.titleInitialValue,
         ),
         const Gap(8.0),
         HSFormButtonsRow(
@@ -90,6 +91,7 @@ class _SecondPage extends StatelessWidget {
           autocorrect: false,
           onChanged: createSpotCubit.updateDescription,
           hintText: createSpotCubit.descriptionHint,
+          initialValue: createSpotCubit.descriptionInitialValue,
           maxLength: 512,
           maxLines: 8,
         ),

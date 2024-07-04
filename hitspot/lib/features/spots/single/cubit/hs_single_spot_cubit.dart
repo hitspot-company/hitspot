@@ -139,7 +139,6 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
                 ...boards.map(
                   (e) => HSModalBottomSheetItem(
                     title: e.title!,
-                    iconData: FontAwesomeIcons.a,
                     onTap: () => _addToBoard(e),
                   ),
                 ),
@@ -168,8 +167,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
                 title: "Edit",
                 iconData: FontAwesomeIcons.penToSquare,
                 onTap: () => navi.pushPage(
-                  page: CreateSpotProvider(prototype: state.spot),
-                ),
+                    page: CreateSpotProvider(prototype: state.spot)),
               ),
             HSModalBottomSheetItem(
               title: "Add to Board",
@@ -261,13 +259,13 @@ class HSModalBottomSheetItem extends StatelessWidget {
     this.leftPadding = 16.0,
     this.height = 60.0,
     required this.title,
-    required this.iconData,
+    this.iconData,
   });
 
   final VoidCallback? onTap;
   final double borderRadius, leftPadding, height;
   final String title;
-  final IconData iconData;
+  final IconData? iconData;
 
   @override
   Widget build(BuildContext context) {
@@ -281,20 +279,26 @@ class HSModalBottomSheetItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           onTap: onTap ?? () {},
           child: SizedBox(
-              height: height,
-              width: screenWidth,
-              child: Padding(
-                padding: EdgeInsets.only(left: leftPadding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(iconData),
-                    const Gap(16.0),
-                    Text(title, style: const TextStyle(fontSize: 16.0)),
-                  ],
-                ),
-              )),
+            height: height,
+            width: screenWidth,
+            child: Padding(
+              padding: EdgeInsets.only(left: leftPadding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (iconData != null)
+                    Row(
+                      children: [
+                        Icon(iconData),
+                        const Gap(16.0),
+                      ],
+                    ),
+                  Text(title, style: const TextStyle(fontSize: 16.0)),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

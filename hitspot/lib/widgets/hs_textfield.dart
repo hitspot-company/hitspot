@@ -44,7 +44,7 @@ class HSTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       autocorrect: autocorrect,
       controller: controller,
       focusNode: focusNode,
@@ -57,6 +57,7 @@ class HSTextField extends StatelessWidget {
       onTap: onTap,
       readOnly: readOnly,
       autofocus: autofocus,
+      initialValue: initialValue,
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText,
@@ -77,13 +78,13 @@ class HSTextField extends StatelessWidget {
   factory HSTextField.filled(
       {Key? key,
       String? hintText,
+      String? initialValue,
       TextEditingController? controller,
       Color? fillColor,
       Function(String)? onChanged,
       Widget? suffixIcon,
       bool autofocus = false,
       bool? autocorrect,
-      String? initialValue,
       bool readOnly = false,
       VoidCallback? onTap,
       int maxLines = 1,

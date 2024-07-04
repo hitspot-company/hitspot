@@ -25,11 +25,14 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
   final _locationRepository = app.locationRepository;
   String get titleHint =>
       state.title.isEmpty ? "The best spot on earth..." : state.title;
+  String? get titleInitialValue => state.title.isEmpty ? null : state.title;
   final HSDatabaseRepsitory _databaseRepository = app.databaseRepository;
   final TextEditingController categoriesController = TextEditingController();
 
   String get descriptionHint =>
       state.description.isEmpty ? "Writings on the wall..." : state.description;
+  String? get descriptionInitialValue =>
+      state.description.isEmpty ? null : state.description;
 
   void unfocus() => HSScaffold.hideInput();
 
