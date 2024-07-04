@@ -1,7 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +25,7 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:reorderable_grid/reorderable_grid.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -177,6 +180,19 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 ),
               ),
+              const Gap(24.0).toSliver,
+              if (isLoading)
+                const HSShimmerBox(width: 60, height: 70.0).toSliverBox
+              else
+                SliverMainAxisGroup(
+                  slivers: [
+                    Text("Description", style: textTheme.headlineSmall)
+                        .toSliver,
+                    Text("${board?.description}",
+                            style: textTheme.bodyMedium!.hintify)
+                        .toSliver,
+                  ],
+                ),
               const Gap(24.0).toSliver,
               SliverToBoxAdapter(
                 child: ReorderableListView.builder(

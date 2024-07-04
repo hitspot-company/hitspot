@@ -163,11 +163,12 @@ class HSSpotsRepository {
 
   Future<HSSpot> fetchSpotWithAuthor(HSSpot? spot, String? spotID) async {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");
+    assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
       final sid = spot?.sid ?? spotID!;
       final fetchedSpot =
           await _supabase.rpc('spots_fetch_spot_with_author', params: {
-        'spotsid': sid,
+        'spotsid': spot != null ? spot.sid : spotID,
       });
       HSDebugLogger.logInfo("Fetched spot with author: ${fetchedSpot}");
       return HSSpot.deserializeWithAuthor(fetchedSpot.first);

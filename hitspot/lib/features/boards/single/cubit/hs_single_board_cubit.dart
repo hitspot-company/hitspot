@@ -114,9 +114,6 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
       List<HSSpot> spots, int oldIndex, int newIndex) async {
     try {
       emit(state.copyWith(status: HSSingleBoardStatus.updating));
-      if (oldIndex < newIndex) {
-        newIndex -= 1;
-      }
 
       final HSSpot spot = state.spots.removeAt(oldIndex);
       state.spots.insert(newIndex, spot);
