@@ -34,7 +34,7 @@ class HSSpotTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ??
           (spot?.sid != null ? () => navi.toSpot(sid: spot!.sid!) : null),
-      onLongPress: () => onLongPress != null ? onLongPress!(spot!) : null,
+      onPanEnd: (drag) => onLongPress != null ? onLongPress!(spot!) : null,
       child: Column(
         children: [
           CachedNetworkImage(

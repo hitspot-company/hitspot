@@ -17,7 +17,7 @@ class SingleBoardProvider extends StatelessWidget {
         boardID: boardID,
         title: title,
       ),
-      child: const SingleBoardPage(),
+      child: SingleBoardPage(),
     );
   }
 }

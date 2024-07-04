@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,10 +22,12 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:reorderable_grid/reorderable_grid.dart';
 
 class SingleBoardPage extends StatelessWidget {
-  const SingleBoardPage({super.key});
+  SingleBoardPage({super.key});
 
+  ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     final singleBoardCubit = BlocProvider.of<HSSingleBoardCubit>(context);
@@ -54,6 +58,7 @@ class SingleBoardPage extends StatelessWidget {
             onPressed: () => HSDebugLogger.logInfo("Creating trip!"),
           ),
           body: CustomScrollView(
+            controller: _scrollController,
             slivers: [
               if (board?.image != null)
                 HSSimpleSliverAppBar(
@@ -114,19 +119,27 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 ),
               const Gap(24.0).toSliver,
-              SliverMasonryGrid.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                childCount: spots.length,
-                itemBuilder: (context, index) {
-                  return HSSpotTile(
-                    onLongPress: singleBoardCubit.onLongPress,
-                    index: index,
-                    spot: spots[index],
-                    extent: (index % 3 + 2) * 70.0 + 70.0,
-                  );
-                },
+              SliverToBoxAdapter(
+                child: ReorderableListView.builder(
+                  scrollController: _scrollController,
+                  shrinkWrap: true,
+                  itemCount: spots.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      key: ValueKey(index),
+                      child: HSSpotTile(
+                        onLongPress: singleBoardCubit.onLongPress,
+                        index: index,
+                        spot: spots[index],
+                        extent: (index % 3 + 2) * 70.0 + 70.0,
+                      ),
+                    );
+                  },
+                  onReorder: (int oldIndex, int newIndex) {
+                    singleBoardCubit.reorderSpots(spots, oldIndex, newIndex);
+                  },
+                ),
               ),
             ],
           ),

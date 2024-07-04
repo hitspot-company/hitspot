@@ -12,6 +12,9 @@ class HSSpot {
   final List<String>? images, tags;
   final HSUser? author;
 
+  // BOARDS RELATED
+  final int? spotIndex;
+
   const HSSpot({
     this.sid,
     this.address,
@@ -30,6 +33,7 @@ class HSSpot {
     this.latitude,
     this.longitude,
     this.images,
+    this.spotIndex,
   });
 
   HSSpot copyWith({
@@ -50,6 +54,7 @@ class HSSpot {
     List<String>? images,
     List<String>? tags,
     HSUser? author,
+    int? spotIndex,
   }) {
     return HSSpot(
       sid: sid ?? this.sid,
@@ -69,6 +74,7 @@ class HSSpot {
       images: images ?? this.images,
       tags: tags ?? this.tags,
       author: author ?? this.author,
+      spotIndex: spotIndex ?? this.spotIndex,
     );
   }
 
@@ -105,6 +111,7 @@ class HSSpot {
       address: data['address'],
       latitude: data['lat'] ?? data['latitude'],
       longitude: data['long'] ?? data['longitude'],
+      spotIndex: data['spot_index'],
     );
   }
 
