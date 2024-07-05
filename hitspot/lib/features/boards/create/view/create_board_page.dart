@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/boards/create/cubit/hs_create_board_cubit.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -246,15 +244,10 @@ class _SecondPage extends StatelessWidget {
             onPressed: _addBoardCubit.prevPage,
             child: const Text("Back"),
           ),
-          right: BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
-            selector: (state) => state.color != null && state.image.isNotEmpty,
-            builder: (context, valid) {
-              return HSFormButton(
-                onPressed: valid ? _addBoardCubit.nextPage : null,
-                icon: const Icon(FontAwesomeIcons.arrowRight),
-                child: const Text("Visibility"),
-              );
-            },
+          right: HSFormButton(
+            onPressed: _addBoardCubit.nextPage,
+            icon: const Icon(FontAwesomeIcons.arrowRight),
+            child: const Text("Visibility"),
           ),
         ),
       ],

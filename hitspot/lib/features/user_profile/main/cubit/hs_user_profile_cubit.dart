@@ -9,28 +9,37 @@ part 'hs_user_profile_state.dart';
 
 class HSUserProfileCubit extends Cubit<HSUserProfileState> {
   HSUserProfileCubit(this.userID) : super(const HSUserProfileState()) {
-    _fetchUserData();
+    _init();
   }
 
   late final bool isOwnProfile;
   final String userID;
   final _databaseRepository = app.databaseRepository;
 
+  Future<void> refresh() async {
+    emit(state.copyWith(status: HSUserProfileStatus.loading));
+    await Future.delayed(const Duration(seconds: 1));
+    await _fetchUserData();
+  }
+
+  Future<void> _init() async {
+    emit(state.copyWith(status: HSUserProfileStatus.loading));
+    if (userID == currentUser.uid) {
+      isOwnProfile = true;
+    } else {
+      isOwnProfile = false;
+    }
+    await _fetchUserData();
+  }
+
   Future<void> _fetchUserData() async {
     try {
-      emit(state.copyWith(status: HSUserProfileStatus.loading));
-      if (userID == currentUser.uid) {
-        isOwnProfile = true;
-      } else {
-        isOwnProfile = false;
-      }
       final user = await app.databaseRepository.userRead(userID: userID);
       final List<HSSpot> userSpots =
           await _databaseRepository.spotfetchUserSpots(user: user);
       final List<HSBoard> userBoards =
           await _databaseRepository.boardFetchUserBoards(user: user);
-
-      HSDebugLogger.logSuccess("Fetched user spots: ${userSpots.length}");
+      HSDebugLogger.logSuccess("Fetched user boards: ${userBoards.length}");
       final bool? isFollowed = await app.databaseRepository
           .userIsUserFollowed(followerID: currentUser.uid, followedID: userID);
       HSDebugLogger.logSuccess("Fetched following: $isFollowed");

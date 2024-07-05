@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -14,7 +15,6 @@ import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
-import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -39,7 +39,6 @@ class SingleBoardPage extends StatelessWidget {
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
-            titleText: state.board?.title ?? "",
             right: IconButton(
               onPressed: () => HSDebugLogger.logInfo("More"),
               icon: const Icon(
@@ -64,6 +63,28 @@ class SingleBoardPage extends StatelessWidget {
                     color: board?.color,
                   ),
                 ),
+              const SliverToBoxAdapter(child: Gap(16.0)),
+              if (isLoading)
+                const HSShimmerBox(width: 60, height: 60.0).toSliverBox
+              else
+                SliverToBoxAdapter(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AutoSizeText(
+                      board!.title!,
+                      style: const TextStyle(
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                    ),
+                    Text(
+                      board.description!,
+                      style: const TextStyle(color: Colors.grey),
+                    )
+                  ],
+                )),
               const SliverToBoxAdapter(child: Gap(16.0)),
               HSSimpleSliverAppBar(
                 child: Column(
@@ -100,19 +121,6 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 ),
               ),
-              const Gap(24.0).toSliver,
-              if (isLoading)
-                const HSShimmerBox(width: 60, height: 70.0).toSliverBox
-              else
-                SliverMainAxisGroup(
-                  slivers: [
-                    Text("Description", style: textTheme.headlineSmall)
-                        .toSliver,
-                    Text("${board?.description}",
-                            style: textTheme.bodyMedium!.hintify)
-                        .toSliver,
-                  ],
-                ),
               const Gap(24.0).toSliver,
               SliverMasonryGrid.count(
                 crossAxisCount: 2,

@@ -13,8 +13,6 @@ import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
-import 'package:hitspot/widgets/hs_spot_tile.dart';
-import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -31,196 +29,203 @@ class UserProfilePage extends StatelessWidget {
       builder: (context, state) {
         final HSUser? user = userProfileCubit.state.user;
         final bool loading = state.status == HSUserProfileStatus.loading;
-        return HSScaffold(
-          appBar: HSAppBar(
-            enableDefaultBackButton: true,
-            right: IconButton(
-              onPressed: navi.toSettings,
-              icon: const Icon(
-                FontAwesomeIcons.ellipsisVertical,
+        return RefreshIndicator.adaptive(
+          onRefresh: userProfileCubit.refresh,
+          child: HSScaffold(
+            appBar: HSAppBar(
+              enableDefaultBackButton: true,
+              right: IconButton(
+                onPressed: navi.toSettings,
+                icon: const Icon(
+                  FontAwesomeIcons.ellipsisVertical,
+                ),
               ),
             ),
-          ),
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                surfaceTintColor: const Color.fromARGB(0, 97, 51, 51),
-                expandedHeight: 140.0,
-                automaticallyImplyLeading: false,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Row(
-                    children: [
-                      Expanded(
-                        child: HSUserAvatar(
-                          loading: loading,
-                          radius: 70.0,
-                          iconSize: 50,
-                          imageUrl: user?.avatarUrl,
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  surfaceTintColor: const Color.fromARGB(0, 97, 51, 51),
+                  expandedHeight: 140.0,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: HSUserAvatar(
+                              loading: loading,
+                              radius: 70.0,
+                              iconSize: 50,
+                              imageUrl: user?.avatarUrl,
+                            ),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: loading
-                            ? const HSShimmer(
-                                child: HSShimmerSkeleton(
-                                  height: 60,
-                                  width: 100,
+                        Expanded(
+                          child: loading
+                              ? const HSShimmer(
+                                  child:
+                                      HSShimmerSkeleton(height: 60, width: 100),
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${user?.name}",
+                                      style: textTheme.headlineSmall!.hintify,
+                                    ),
+                                    Text("@${user?.username}",
+                                        style: textTheme.headlineLarge),
+                                  ],
                                 ),
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "${user?.name}",
-                                    style: textTheme.headlineSmall!.hintify,
-                                  ),
-                                  Text("@${user?.username}",
-                                      style: textTheme.headlineLarge),
-                                ],
-                              ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(
-                child: Gap(16.0),
-              ),
-              if (loading)
-                HSShimmerBox(width: screenWidth, height: 60).toSliverBox,
-              if (!loading && user?.biogram != null)
-                SliverMainAxisGroup(
-                  slivers: [
-                    const HSUserProfileHeadline(title: "About Me"),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                        child: Text(
-                          user?.biogram ?? "",
-                          style: textTheme.titleSmall,
                         ),
-                      ),
-                    )
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
-              const SliverToBoxAdapter(
-                child: Gap(16.0),
-              ),
-              SliverAppBar(
-                surfaceTintColor: Colors.transparent,
-                expandedHeight: 100.0,
-                floating: true,
-                snap: false,
-                pinned: false,
-                automaticallyImplyLeading: false,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Column(
-                    children: [
-                      BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
-                        builder: (context, state) {
-                          return Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Expanded(
-                                  child: HSUserProfileStatsChip(
-                                label: "Followers",
-                                value: user?.followers,
-                                loading: loading,
-                              )),
-                              Expanded(
-                                  child: HSUserProfileStatsChip(
-                                label: "Following",
-                                value: user?.following,
-                                loading: loading,
-                              )),
-                              Expanded(
-                                  child: HSUserProfileStatsChip(
-                                label: "Spots",
-                                value: user?.spots,
-                                loading: loading,
-                              )),
-                            ],
-                          );
-                        },
-                      ),
+                const SliverToBoxAdapter(
+                  child: Gap(16.0),
+                ),
+                if (loading)
+                  HSShimmerBox(width: screenWidth, height: 60).toSliverBox,
+                if (!loading && user?.biogram != null)
+                  SliverMainAxisGroup(
+                    slivers: [
+                      const HSUserProfileHeadline(title: "About Me"),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                          child: Text(
+                            user?.biogram ?? "",
+                            style: textTheme.titleSmall,
+                          ),
+                        ),
+                      )
                     ],
                   ),
+                const SliverToBoxAdapter(
+                  child: Gap(16.0),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 50.0,
-                  child: _UserProfileActionButton(
-                      isLoading: loading, userProfileCubit: userProfileCubit),
-                ),
-              ),
-              if (loading)
-                SliverMainAxisGroup(slivers: [
-                  const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 16.0,
+                SliverAppBar(
+                  surfaceTintColor: Colors.transparent,
+                  expandedHeight: 100.0,
+                  floating: true,
+                  snap: false,
+                  pinned: false,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Column(
+                      children: [
+                        BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
+                          builder: (context, state) {
+                            return Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                    child: HSUserProfileStatsChip(
+                                  label: "Followers",
+                                  value: user?.followers,
+                                  loading: loading,
+                                )),
+                                Expanded(
+                                    child: HSUserProfileStatsChip(
+                                  label: "Following",
+                                  value: user?.following,
+                                  loading: loading,
+                                )),
+                                Expanded(
+                                    child: HSUserProfileStatsChip(
+                                  label: "Spots",
+                                  value: user?.spots,
+                                  loading: loading,
+                                )),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  SliverGrid.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 12.0,
-                      crossAxisSpacing: 12.0,
-                    ),
-                    itemCount: 12,
-                    itemBuilder: (BuildContext context, int index) {
-                      return const HSShimmerBox(width: 10, height: 10);
-                    },
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 50.0,
+                    child: _UserProfileActionButton(
+                        isLoading: loading, userProfileCubit: userProfileCubit),
                   ),
-                ])
-              else
-                SliverMainAxisGroup(
-                  slivers: [
-                    const Gap(24.0).toSliver,
-                    const HSUserProfileHeadline(title: "Spots"),
-                    const Gap(24.0).toSliver,
+                ),
+                if (loading)
+                  SliverMainAxisGroup(slivers: [
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 16.0,
+                      ),
+                    ),
                     SliverGrid.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         mainAxisSpacing: 12.0,
                         crossAxisSpacing: 12.0,
-                        mainAxisExtent: 140.0,
                       ),
-                      itemCount: state.spots.length,
+                      itemCount: 12,
                       itemBuilder: (BuildContext context, int index) {
-                        final HSSpot spot = state.spots[index];
-                        return GestureDetector(
-                          onTap: () => navi.toSpot(sid: spot.sid!),
-                          child: CachedNetworkImage(
-                            imageUrl: spot.images!.first,
-                            progressIndicatorBuilder:
-                                (context, url, progress) =>
-                                    const HSShimmerBox(width: 60, height: 60),
-                            imageBuilder: (context, imageProvider) => Column(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
+                        return const HSShimmerBox(width: 10, height: 10);
+                      },
+                    ),
+                  ])
+                else
+                  SliverMainAxisGroup(
+                    slivers: [
+                      const Gap(24.0).toSliver,
+                      const HSUserProfileHeadline(title: "Spots"),
+                      const Gap(24.0).toSliver,
+                      SliverGrid.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 12.0,
+                          crossAxisSpacing: 12.0,
+                          mainAxisExtent: 140.0,
+                        ),
+                        itemCount: state.spots.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final HSSpot spot = state.spots[index];
+                          return GestureDetector(
+                            onTap: () => navi.toSpot(sid: spot.sid!),
+                            child: CachedNetworkImage(
+                              imageUrl: spot.images!.first,
+                              progressIndicatorBuilder:
+                                  (context, url, progress) =>
+                                      const HSShimmerBox(width: 60, height: 60),
+                              imageBuilder: (context, imageProvider) => Column(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                const Gap(8.0),
-                                AutoSizeText(spot.title!, maxLines: 2),
-                              ],
+                                  const Gap(8.0),
+                                  AutoSizeText(spot.title!, maxLines: 2),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
         );
       },

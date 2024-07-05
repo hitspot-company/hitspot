@@ -39,6 +39,7 @@ class HomePage extends StatelessWidget {
                 SliverAppBar(
                   automaticallyImplyLeading: false,
                   surfaceTintColor: Colors.transparent,
+                  titleSpacing: 0.0,
                   title: Align(
                     alignment: Alignment.centerLeft,
                     child: Image.asset(
@@ -63,6 +64,7 @@ class HomePage extends StatelessWidget {
                   automaticallyImplyLeading: false,
                   surfaceTintColor: Colors.transparent,
                   centerTitle: false,
+                  titleSpacing: 0.0,
                   title: Text.rich(
                       TextSpan(
                         text: "Hello ",
@@ -83,12 +85,11 @@ class HomePage extends StatelessWidget {
                   child: Gap(16.0),
                 ),
                 const SliverAppBar(
+                  titleSpacing: 0.0,
                   automaticallyImplyLeading: false,
                   surfaceTintColor: Colors.transparent,
                   stretch: true,
-                  title: HSSearchBar(
-                    height: 52.0,
-                  ),
+                  title: HSSearchBar(height: 52.0),
                   centerTitle: true,
                 ),
                 const Gap(32.0).toSliver,
