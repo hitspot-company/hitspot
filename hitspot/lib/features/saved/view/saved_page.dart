@@ -112,11 +112,6 @@ class SavedPage extends StatelessWidget {
                     SliverMainAxisGroup(
                       slivers: [
                         const Center(child: Text('No boards.')).toSliver,
-                        const Gap(16.0).toSliver,
-                        HSButton(
-                                onPressed: navi.toCreateBoard,
-                                child: const Text("Create Board"))
-                            .toSliver,
                       ],
                     )
                   else
