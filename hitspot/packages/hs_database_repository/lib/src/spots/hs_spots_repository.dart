@@ -362,4 +362,16 @@ class HSSpotsRepository {
       throw Exception("Error fetching user spots: $_");
     }
   }
+
+  Future<HSSpot> fetchTopSpotWithTag(String tag) async {
+    try {
+      final List<Map<String, dynamic>> fetchedSpot =
+          await _supabase.rpc('spots_fetch_top_spot_with_tag', params: {
+        'tag': tag,
+      });
+      return HSSpot.deserialize(fetchedSpot.first);
+    } catch (_) {
+      throw Exception("Error fetching top spot with tag: $_");
+    }
+  }
 }

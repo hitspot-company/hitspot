@@ -15,6 +15,7 @@ import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
+import 'package:hitspot/features/tags/explore/view/tags_explore_provider.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
@@ -94,6 +95,11 @@ class HSNavigation {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/tags_explore/:tag',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
         path: "/protected",
         redirect: _protectedRedirect,
         routes: [
@@ -144,6 +150,10 @@ class HSNavigation {
                 path: 'saved',
                 builder: (context, state) => const SavedProvider(),
               ),
+              GoRoute(
+                  path: 'tags_explore/:tag',
+                  builder: (context, state) =>
+                      TagsExploreProvider(tag: state.pathParameters['tag']!)),
             ],
           ),
         ],
@@ -215,6 +225,7 @@ class HSNavigation {
   dynamic toCreateSpot() => router.push('/create_spot');
   dynamic toSpotsMap(Position? initialPosition) =>
       pushPage(page: MapProvider(initialCameraPosition: initialPosition));
+  dynamic toTagsExplore(String tag) => router.push('/tags_explore/$tag');
   dynamic toSpot(
           {required String sid,
           String? authorID,

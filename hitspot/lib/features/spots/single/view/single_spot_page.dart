@@ -231,9 +231,12 @@ class _TagsBuilder extends StatelessWidget {
           child: Wrap(
             children: tags
                 .map(
-                  (tag) => Chip(
-                    side: BorderSide.none,
-                    label: Text("#${tag.value}"),
+                  (tag) => GestureDetector(
+                    onTap: () => navi.toTagsExplore(tag.value!),
+                    child: Chip(
+                      side: BorderSide.none,
+                      label: Text("#${tag.value}"),
+                    ),
                   ),
                 )
                 .toList(),

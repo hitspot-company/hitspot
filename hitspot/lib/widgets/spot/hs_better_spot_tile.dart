@@ -15,6 +15,7 @@ class HSBetterSpotTile extends StatelessWidget {
       this.borderRadius,
       this.padding,
       this.onTap,
+      this.child,
       this.onLongPress});
 
   final HSSpot? spot;
@@ -23,6 +24,7 @@ class HSBetterSpotTile extends StatelessWidget {
   final BorderRadius? borderRadius;
   final EdgeInsets? padding;
   final Function(HSSpot?)? onTap, onLongPress;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -61,12 +63,15 @@ class HSBetterSpotTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned(
-                  bottom: 8.0,
-                  left: 16.0,
-                  child: Text(spot!.title!,
-                      style: textTheme.headlineSmall!.colorify(Colors.white)),
-                ),
+                if (child == null)
+                  Positioned(
+                    bottom: 8.0,
+                    left: 16.0,
+                    child: Text(spot!.title!,
+                        style: textTheme.headlineSmall!.colorify(Colors.white)),
+                  )
+                else
+                  child!
               ],
             ),
           ),

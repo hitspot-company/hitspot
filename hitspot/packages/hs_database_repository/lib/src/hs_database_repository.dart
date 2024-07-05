@@ -211,6 +211,9 @@ class HSDatabaseRepsitory {
           int batchSize = 20}) async =>
       await _spotsRepository.userBoards(user, userID, batchOffset, batchSize);
 
+  Future<HSSpot> spotFetchTopSpotWithTag(String tag) async =>
+      await _spotsRepository.fetchTopSpotWithTag(tag);
+
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);
   Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>
