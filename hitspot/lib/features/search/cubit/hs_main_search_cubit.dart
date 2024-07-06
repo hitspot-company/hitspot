@@ -36,6 +36,20 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
     return (state.spots);
   }
 
+  Future<List<HSTag>> fetchTags() async {
+    try {
+      final query = state.query;
+      // ADD DEBOUNCE
+      final List<HSTag> fetchedTags =
+          await app.databaseRepository.tagSearch(query: query);
+      emit(state.copyWith(tags: fetchedTags));
+      return state.tags;
+    } catch (e) {
+      HSDebugLogger.logError("Error $e");
+      return [];
+    }
+  }
+
   Future<List<HSBoard>> fetchBoards() async {
     try {
       final query = state.query;

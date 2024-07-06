@@ -37,7 +37,7 @@ class MainSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Column(
         children: [
           const Gap(16.0),
@@ -47,6 +47,7 @@ class MainSearchDelegate extends SearchDelegate<String> {
             tabs: [
               Tab(text: 'Spots', icon: Icon(FontAwesomeIcons.mapPin)),
               Tab(text: 'Boards', icon: Icon(FontAwesomeIcons.solidSquare)),
+              Tab(text: 'Tags', icon: Icon(FontAwesomeIcons.hashtag)),
             ],
           ),
           const Gap(16.0),
@@ -56,6 +57,7 @@ class MainSearchDelegate extends SearchDelegate<String> {
                 _FetchedSpotsPage(mapSearchCubit: mapSearchCubit, query: query),
                 _FetchedBoardsPage(
                     mapSearchCubit: mapSearchCubit, query: query),
+                _FetchedTagsPage(mapSearchCubit: mapSearchCubit, query: query),
               ],
             ),
           ),
@@ -164,6 +166,43 @@ class _FetchedBoardsPage extends StatelessWidget {
           itemCount: boards.length,
           itemBuilder: (BuildContext context, int index) {
             return HSBoardTile(board: boards[index]);
+          },
+        );
+      },
+    );
+  }
+}
+
+class _FetchedTagsPage extends StatelessWidget {
+  const _FetchedTagsPage({required this.mapSearchCubit, required this.query});
+
+  final HSMainSearchCubit mapSearchCubit;
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    mapSearchCubit.updateQuery(query);
+    return FutureBuilder<List<HSTag>>(
+      future: mapSearchCubit.fetchTags(),
+      builder: (BuildContext context, AsyncSnapshot<List<HSTag>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const HSLoadingIndicator();
+        }
+        final List<HSTag> tags = snapshot.data ?? [];
+        if (tags.isEmpty) {
+          return Text("No tags found for $query", textAlign: TextAlign.center);
+        }
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
+          itemCount: tags.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              onTap: () => navi.toTagsExplore(tags[index].value!),
+              title: Text(tags[index].value!),
+              leading: const Icon(FontAwesomeIcons.hashtag),
+            );
           },
         );
       },
