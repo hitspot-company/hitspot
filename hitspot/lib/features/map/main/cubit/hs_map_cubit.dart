@@ -154,4 +154,25 @@ class HSMapCubit extends Cubit<HSMapState> {
       HSDebugLogger.logError("Error fetching locations: $e");
     }
   }
+
+  Future<void> updateInfoWindowsWithMarkers(CameraPosition pos) async {
+    if (state.infoWindowProvider.showInfoWindowData) {
+      final GoogleMapController cont = await controller.future;
+      final infoWindow = await state.infoWindowProvider
+          .updateInfoWindow(cont, latLng: pos.target);
+      emit(state.copyWith(infoWindowProvider: infoWindow));
+    }
+  }
+
+  void updateInfoWindowVisibility(bool visibility,
+      [bool ignoreAutomaticMovement = true]) {
+    final infoWindow = state.infoWindowProvider.updateVisibility(visibility);
+    emit(state.copyWith(infoWindowProvider: infoWindow));
+  }
+
+  void hideInfoWindow() {
+    // clearSelectedSpot();
+    final infoWindow = state.infoWindowProvider.updateVisibility(false);
+    emit(state.copyWith(infoWindowProvider: infoWindow));
+  }
 }

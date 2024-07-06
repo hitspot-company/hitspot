@@ -345,4 +345,11 @@ class _TopBar extends StatelessWidget {
       ),
     );
   }
+
+  // _getMapHeight() {
+  //   RenderBox? renderBoxRed =
+  //       _keyGoogleMap?.currentContext?.findRenderObject() as RenderBox?;
+  //   final size = renderBoxRed?.size;
+  //   return size?.height;
+  // }
 }
