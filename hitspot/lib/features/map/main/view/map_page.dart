@@ -13,6 +13,7 @@ import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:newton_particles/newton_particles.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});
@@ -122,40 +123,57 @@ class MapPage extends StatelessWidget {
                     itemBuilder: (BuildContext context, int index) {
                       final spot = spots[index];
                       if (spot.sid == selectedSpot?.sid) {
-                        return Container(
-                          // padding: padding,
-                          // height: height,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14.0),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.white,
-                                Colors.blue.shade100,
-                                Colors.blue,
-                                Colors.blue.shade200,
-                              ],
-                              stops: [0.1, 0.3, 0.7, 0.9],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 3,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // changes position of shadow
+                        return SizedBox(
+                          height: 200.0,
+                          width: screenWidth,
+                          child: Newton(
+                            activeEffects: [
+                              PulseEffect(
+                                particleConfiguration: ParticleConfiguration(
+                                  shape: CircleShape(),
+                                  size: const Size(5, 5),
+                                  color: const SingleParticleColor(
+                                      color: Colors.white),
+                                ),
+                                effectConfiguration:
+                                    const EffectConfiguration(),
                               ),
                             ],
                           ),
-                          child: HSBetterSpotTile(
-                            onTap: (p0) => navi.toSpot(sid: p0!.sid!),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            borderRadius: BorderRadius.circular(20.0),
-                            spot: spots[index],
-                            height: 120,
-                          ),
+                          // child: Stack(
+                          //   // fit: StackFit.expand,
+                          //   children: [
+                          //     SizedBox(
+                          //       height: 140.0,
+                          //       width: screenWidth,
+                          //       child: Center(
+                          //         child: Newton(
+                          //           child: HSBetterSpotTile(
+                          //             onTap: (p0) => navi.toSpot(sid: p0!.sid!),
+                          //             padding: const EdgeInsets.symmetric(
+                          //                 horizontal: 16.0, vertical: 8.0),
+                          //             borderRadius: BorderRadius.circular(20.0),
+                          //             spot: spots[index],
+                          //             height: 120,
+                          //           ),
+                          //           activeEffects: [
+                          //             PulseEffect(
+                          //               particleConfiguration:
+                          //                   ParticleConfiguration(
+                          //                 shape: CircleShape(),
+                          //                 size: const Size(5, 5),
+                          //                 color: const SingleParticleColor(
+                          //                     color: Colors.white),
+                          //               ),
+                          //               effectConfiguration:
+                          //                   const EffectConfiguration(),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
                         );
                       }
                       return HSBetterSpotTile(
