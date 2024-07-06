@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
+import 'package:hitspot/widgets/map/hs_spot_info_window.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -18,17 +18,15 @@ part 'hs_map_state.dart';
 class HSMapCubit extends Cubit<HSMapState> {
   HSMapCubit(this._initialCameraPosition) : super(const HSMapState()) {
     init();
-    // clusterManager = app.locationRepository.initializeClusterManager(
-    //     [], (mark) => HSDebugLogger.logInfo("Cluster tapped"));
   }
 
+  final GlobalKey mapKey = GlobalKey();
   final _databaseRepository = app.databaseRepository;
   final Position? _initialCameraPosition;
   final Completer<GoogleMapController> controller = Completer();
   GlobalKey<ExpandableBottomSheetState> sheetKey = GlobalKey();
   ExpansionStatus get sheetStatus =>
       sheetKey.currentState?.expansionStatus ?? ExpansionStatus.contracted;
-  // late final clusterManager;
 
   Future<void> init() async {
     try {
@@ -65,8 +63,8 @@ class HSMapCubit extends Cubit<HSMapState> {
       );
       HSDebugLogger.logSuccess("Fetched: ${spots.length} spots");
       spots.removeWhere((e) => state.spotsInView.contains(e));
-      placeMarkers();
       emit(state.copyWith(spotsInView: spots, status: HSMapStatus.success));
+      placeMarkers();
     } catch (e) {
       HSDebugLogger.logError("Error fetching spots: $e");
     }
@@ -80,37 +78,64 @@ class HSMapCubit extends Cubit<HSMapState> {
   void onCameraIdle() async {
     final bounds =
         await controller.future.then((value) => value.getVisibleRegion());
+    if (state.infoWindowProvider.showOnIdle) {
+      updateInfoWindowVisibility(true);
+    }
+    toggleIsMoving(false);
     emit(state.copyWith(status: HSMapStatus.fetchingSpots, bounds: bounds));
     fetchSpots();
   }
 
   void placeMarkers() {
     final List<HSSpot> spots = state.spotsInView;
-    // List<Marker> markers = spots
-    //     .map((e) => Marker(
-    //         markerId: MarkerId(e.sid!),
-    //         position: LatLng(e.latitude!, e.longitude!)))
-    //     .toList();
-    List<Marker> markers =
-        app.assets.generateMarkers(spots, state.currentPosition?.toLatLng);
-    HSDebugLogger.logInfo("Placing ${markers.length} markers");
-    markers.forEach((e) => HSDebugLogger.logInfo("Marker: ${e.anchor}"));
+    List<Marker> markers = app.assets.generateMarkers(
+        spots, state.currentPosition?.toLatLng, onMarkerTapped);
     emit(state.copyWith(markersInView: markers));
   }
 
+  void toggleIsMoving([bool? isMoving]) {
+    emit(state.copyWith(isMoving: isMoving ?? !state.isMoving));
+  }
+
+  void onMarkerTapped(HSSpot spot) {
+    animateCamera(LatLng(spot.latitude!, spot.longitude!));
+    setSelectedSpot(spot);
+    if (sheetStatus == ExpansionStatus.contracted) {
+      sheetKey.currentState?.expand();
+    }
+  }
+
   void updateSheetExpansionStatus() => emit(state.copyWith(
-      sheetExpansionStatus: sheetKey.currentState?.expansionStatus));
+      sheetExpansionStatus: sheetKey.currentState?.expansionStatus,
+      selectedSpot: state.selectedSpot));
+
+  void closeSheet() {
+    if (sheetKey.currentState?.expansionStatus == ExpansionStatus.expanded) {
+      sheetKey.currentState?.contract();
+    }
+  }
+
+  void setSelectedSpot(HSSpot spot) {
+    emit(state.copyWith(selectedSpot: spot));
+  }
+
+  void clearSelectedSpot() {
+    emit(state.copyWith(selectedSpot: const HSSpot()));
+  }
 
   void defaultButtonCallback() {
     if (sheetKey.currentState?.expansionStatus == ExpansionStatus.contracted) {
       navi.pop();
       return;
     }
-    sheetKey.currentState?.contract();
+    closeSheet();
   }
 
-  void animateCamera(LatLng newLatLng) =>
-      app.locationRepository.animateCameraToNewLatLng(controller, newLatLng);
+  Future<void> animateCamera(LatLng newLatLng) async {
+    toggleIsMoving();
+    await app.locationRepository
+        .animateCameraToNewLatLng(controller, newLatLng);
+  }
 
   Future<void> searchLocation(BuildContext context) async {
     try {
@@ -132,5 +157,26 @@ class HSMapCubit extends Cubit<HSMapState> {
     } catch (e) {
       HSDebugLogger.logError("Error fetching locations: $e");
     }
+  }
+
+  Future<void> updateInfoWindowsWithMarkers(CameraPosition pos) async {
+    if (state.infoWindowProvider.showInfoWindowData) {
+      final GoogleMapController cont = await controller.future;
+      final infoWindow = await state.infoWindowProvider
+          .updateInfoWindow(cont, latLng: pos.target);
+      emit(state.copyWith(infoWindowProvider: infoWindow));
+    }
+  }
+
+  void updateInfoWindowVisibility(bool visibility,
+      [bool ignoreAutomaticMovement = true]) {
+    final infoWindow = state.infoWindowProvider.updateVisibility(visibility);
+    emit(state.copyWith(infoWindowProvider: infoWindow));
+  }
+
+  void hideInfoWindow() {
+    // clearSelectedSpot();
+    final infoWindow = state.infoWindowProvider.updateVisibility(false);
+    emit(state.copyWith(infoWindowProvider: infoWindow));
   }
 }

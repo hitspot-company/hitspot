@@ -7,9 +7,11 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/map/hs_spot_info_window.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 class MapPage extends StatelessWidget {
@@ -27,7 +29,6 @@ class MapPage extends StatelessWidget {
       topSafe: false,
       bottomSafe: false,
       body: Stack(
-        fit: StackFit.expand,
         children: [
           ExpandableBottomSheet(
             key: mapCubit.sheetKey,
@@ -37,35 +38,41 @@ class MapPage extends StatelessWidget {
             background: BlocSelector<HSMapCubit, HSMapState, List<Marker>>(
               selector: (state) => state.markersInView,
               builder: (context, markersInView) => GoogleMap(
+                key: mapCubit.mapKey,
                 initialCameraPosition: CameraPosition(
                   zoom: 16.0,
                   target: mapCubit.state.cameraPosition!,
                 ),
                 onMapCreated: mapCubit.onMapCreated,
-                myLocationButtonEnabled: false,
                 onCameraIdle: mapCubit.onCameraIdle,
                 markers: Set.from(markersInView),
+                onCameraMove: (CameraPosition position) {
+                  mapCubit.hideInfoWindow();
+                  mapCubit.toggleIsMoving(true);
+                },
+                onTap: (LatLng latLng) => mapCubit.hideInfoWindow(),
               ),
             ),
-            persistentHeader: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                color: currentTheme.scaffoldBackgroundColor,
-              ),
-              height: persistentHeaderHeight,
-              width: screenWidth,
-              child: BlocBuilder<HSMapCubit, HSMapState>(
-                buildWhen: (previous, current) =>
-                    previous.spotsInView != current.spotsInView ||
-                    previous.status != current.status,
-                builder: (context, state) {
-                  final int spotsCount = state.spotsInView.length;
-                  final bool isLoading =
-                      state.status == HSMapStatus.fetchingSpots;
-                  return Center(
+            persistentHeader: BlocBuilder<HSMapCubit, HSMapState>(
+              buildWhen: (previous, current) =>
+                  previous.spotsInView != current.spotsInView ||
+                  previous.status != current.status ||
+                  previous.isMoving != current.isMoving,
+              builder: (context, state) {
+                final int spotsCount = state.spotsInView.length;
+                final bool isLoading =
+                    state.status == HSMapStatus.fetchingSpots;
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    color: currentTheme.scaffoldBackgroundColor,
+                  ),
+                  height: persistentHeaderHeight,
+                  width: screenWidth,
+                  child: Center(
                     child: Column(
                       children: [
                         const Padding(
@@ -84,40 +91,85 @@ class MapPage extends StatelessWidget {
                               style: textTheme.headlineSmall),
                       ],
                     ),
+                  ),
+                );
+              },
+            ),
+            expandableContent: Container(
+              height: expandedHeight - persistentHeaderHeight,
+              color: currentTheme.scaffoldBackgroundColor,
+              child: BlocBuilder<HSMapCubit, HSMapState>(
+                buildWhen: (previous, current) =>
+                    previous.spotsInView != current.spotsInView ||
+                    previous.selectedSpot != current.selectedSpot,
+                builder: (context, state) {
+                  final spots = state.spotsInView;
+                  final selectedSpot = state.selectedSpot;
+                  HSDebugLogger.logInfo(
+                      "Selected spot changed: ${selectedSpot?.title}");
+                  if (spots.isEmpty) {
+                    return const Center(
+                      child: Text("No spots in the area."),
+                    );
+                  }
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const ClampingScrollPhysics(),
+                    itemCount: spots.length,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Gap(16.0);
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      final spot = spots[index];
+                      if (spot.sid == selectedSpot?.sid) {
+                        return Container(
+                          // padding: padding,
+                          // height: height,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14.0),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white,
+                                Colors.blue.shade100,
+                                Colors.blue,
+                                Colors.blue.shade200,
+                              ],
+                              stops: [0.1, 0.3, 0.7, 0.9],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 3,
+                                blurRadius: 7,
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child: HSBetterSpotTile(
+                            onTap: (p0) => navi.toSpot(sid: p0!.sid!),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            borderRadius: BorderRadius.circular(20.0),
+                            spot: spots[index],
+                            height: 120,
+                          ),
+                        );
+                      }
+                      return HSBetterSpotTile(
+                        onTap: (p0) => navi.toSpot(sid: p0!.sid!),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        borderRadius: BorderRadius.circular(20.0),
+                        spot: spots[index],
+                        height: 120,
+                      );
+                    },
                   );
                 },
               ),
             ),
-            expandableContent: Container(
-                height: expandedHeight - persistentHeaderHeight,
-                color: currentTheme.scaffoldBackgroundColor,
-                child: BlocSelector<HSMapCubit, HSMapState, List<HSSpot>>(
-                  selector: (state) => state.spotsInView,
-                  builder: (context, spots) {
-                    if (spots.isEmpty) {
-                      return const Center(
-                        child: Text("No spots in the area."),
-                      );
-                    }
-                    return ListView.separated(
-                      shrinkWrap: true,
-                      physics: const ClampingScrollPhysics(),
-                      itemCount: spots.length,
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const Gap(16.0);
-                      },
-                      itemBuilder: (BuildContext context, int index) {
-                        return HSBetterSpotTile(
-                          onTap: (p0) => navi.toSpot(sid: p0!.sid!),
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                          spot: spots[index],
-                          height: 120,
-                        );
-                      },
-                    );
-                  },
-                )),
           ),
           Positioned(
             top: 0.0,
@@ -160,4 +212,11 @@ class MapPage extends StatelessWidget {
       ),
     );
   }
+
+  // _getMapHeight() {
+  //   RenderBox? renderBoxRed =
+  //       _keyGoogleMap?.currentContext?.findRenderObject() as RenderBox?;
+  //   final size = renderBoxRed?.size;
+  //   return size?.height;
+  // }
 }

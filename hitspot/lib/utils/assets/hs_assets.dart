@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:hitspot/widgets/map/hs_spot_info_window.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'dart:ui' as ui;
@@ -53,7 +52,8 @@ class HSAssets {
     }
   }
 
-  List<Marker> generateMarkers(List<HSSpot> spots, LatLng? currentPosition) {
+  List<Marker> generateMarkers(List<HSSpot> spots, LatLng? currentPosition,
+      [Function(HSSpot)? onTap]) {
     List<Marker> generatedMapMarkers = [];
     spots.forEach(
       (element) {
@@ -64,6 +64,9 @@ class HSAssets {
             markerId: MarkerId(element.hashCode.toString()),
             icon: dis < 0.6 ? _spotMarker : _spotMarker, // TODO: Change
             position: LatLng(element.latitude!, element.longitude!),
+            onTap: () {
+              if (onTap != null) onTap(element);
+            },
           ),
         );
       },

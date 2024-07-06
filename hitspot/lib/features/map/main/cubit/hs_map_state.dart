@@ -10,7 +10,10 @@ final class HSMapState extends Equatable {
     this.currentPosition,
     this.cameraPosition,
     this.bounds,
+    this.isMoving = false,
+    this.selectedSpot,
     this.sheetExpansionStatus = ExpansionStatus.contracted,
+    this.infoWindowProvider = const HSInfoWindowProvider(),
   });
 
   final HSMapStatus status;
@@ -20,6 +23,9 @@ final class HSMapState extends Equatable {
   final LatLng? cameraPosition;
   final LatLngBounds? bounds;
   final ExpansionStatus sheetExpansionStatus;
+  final HSInfoWindowProvider infoWindowProvider;
+  final bool isMoving;
+  final HSSpot? selectedSpot;
 
   @override
   List<Object?> get props => [
@@ -30,6 +36,9 @@ final class HSMapState extends Equatable {
         bounds,
         markersInView,
         sheetExpansionStatus,
+        infoWindowProvider,
+        isMoving,
+        selectedSpot,
       ];
 
   HSMapState copyWith({
@@ -40,7 +49,24 @@ final class HSMapState extends Equatable {
     LatLngBounds? bounds,
     List<Marker>? markersInView,
     ExpansionStatus? sheetExpansionStatus,
+    HSInfoWindowProvider? infoWindowProvider,
+    bool? isMoving,
+    HSSpot? selectedSpot,
   }) {
+    HSDebugLogger.logInfo('HSMapState.copyWith');
+    HSDebugLogger.logInfo("""
+RECEIVED VALUES (CHANGES):
+spotsInView: ${spotsInView != null && spotsInView != this.spotsInView}
+status: ${status != null && status != this.status}
+currentPosition: ${currentPosition != null && currentPosition != this.currentPosition}
+cameraPosition: ${cameraPosition != null && cameraPosition != this.cameraPosition}
+bounds: ${bounds != null && bounds != this.bounds}
+markersInView: ${markersInView != null && markersInView != this.markersInView}
+sheetExpansionStatus: ${sheetExpansionStatus != null && sheetExpansionStatus != this.sheetExpansionStatus}
+infoWindowProvider: ${infoWindowProvider != null && infoWindowProvider != this.infoWindowProvider}
+isMoving: ${isMoving != null && isMoving != this.isMoving}
+selectedSpot: ${selectedSpot != null && selectedSpot != this.selectedSpot} -> $selectedSpot
+""");
     return HSMapState(
       spotsInView: spotsInView ?? this.spotsInView,
       markersInView: markersInView ?? this.markersInView,
@@ -49,6 +75,11 @@ final class HSMapState extends Equatable {
       cameraPosition: cameraPosition ?? this.cameraPosition,
       bounds: bounds ?? this.bounds,
       sheetExpansionStatus: sheetExpansionStatus ?? this.sheetExpansionStatus,
+      infoWindowProvider: infoWindowProvider ?? this.infoWindowProvider,
+      isMoving: isMoving ?? this.isMoving,
+      selectedSpot: selectedSpot?.title == null
+          ? null
+          : selectedSpot ?? this.selectedSpot,
     );
   }
 }

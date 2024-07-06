@@ -20,24 +20,28 @@ class _HSSpotInfoWindowState extends State<HSSpotInfoWindow> {
     return SizedBox(
       width: screenWidth,
       child: InkWell(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          onTap: () {},
-          child: Column(children: <Widget>[
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onTap: () {},
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
             Container(
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius:
-                      BorderRadius.all(Radius.circular(screenWidth / 7)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: widget.spot.likesCount! > 10
-                            ? Colors.green
-                            : Colors.red,
-                        spreadRadius: 5,
-                        blurRadius: 8,
-                        offset: const Offset(0, 0))
-                  ]),
+                color: Colors.white,
+                borderRadius:
+                    BorderRadius.all(Radius.circular(screenWidth / 7)),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.spot.likesCount! > 10
+                        ? Colors.green
+                        : Colors.red,
+                    spreadRadius: 5,
+                    blurRadius: 8,
+                    offset: const Offset(0, 0),
+                  )
+                ],
+              ),
               child: ClipRRect(
                 child: CircleAvatar(
                   radius: screenWidth / 7,
@@ -48,38 +52,38 @@ class _HSSpotInfoWindowState extends State<HSSpotInfoWindow> {
             ),
             const Gap(16.0),
             Card(
-                margin: EdgeInsets.symmetric(horizontal: 8.0),
-                elevation: 8.0,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Text(
-                          widget.spot.title!,
-                          // style: TextStyle(
-                          //     fontWeight: FontSizeConstants.fontWeightBold,
-                          //     fontSize: FontSizeConstants.fontSize14,
-                          //     color: Colors.blue)
-                        ),
-                      ),
-                      // PharmacyRatingWidget(
-                      //     onRatingTap: () {}, initRating: widget.model.rating),
-                      // Padding(
-                      //     padding: const EdgeInsets.symmetric(
-                      //         vertical: SpaceConstants.spacing10,
-                      //         horizontal: SpaceConstants.spacing10),
-                      //     child: Text(widget.model.vicinity,
-                      //         style: TextStyle(
-                      //           fontWeight:
-                      //               FontSizeConstants.fontWeightSemiBold,
-                      //           fontSize: FontSizeConstants.fontSize12,
-                      //         )))
-                    ])),
+              margin: const EdgeInsets.symmetric(horizontal: 8.0),
+              elevation: 8.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(widget.spot.title!,
+                        style: textTheme.headlineSmall),
+                  ),
+                  Container(
+                    height: 100,
+                    width: 200,
+                    color: Colors.white,
+                    child: Center(
+                      child: Text("Likes count: ${widget.spot.likesCount}"),
+                    ),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 8.0),
+                      child: Text(widget.spot.author?.username ?? "",
+                          style: textTheme.bodyMedium))
+                ],
+              ),
+            ),
             CustomPaint(
                 painter: TriangleAnchorShape(),
-                child: Container(width: 250, height: 300))
-          ])),
+                child: const SizedBox(width: 25, height: 30))
+          ],
+        ),
+      ),
     );
   }
 }
@@ -123,66 +127,115 @@ class TriangleAnchorShape extends CustomPainter {
   }
 }
 
-class InfoWindowProvider extends ChangeNotifier {
-  bool showInfoWindow = false;
-  bool _tempHidden = false;
-  double? leftMargin;
-  double? topMargin;
-  double? bottomMargin;
-  double _infoWindowWidth = 400;
-  double _markerOffset = 0;
-  LatLng? location;
-  double totalHeight = 0;
+class HSInfoWindowProvider {
+  final bool showInfoWindow, tempHidden, showOnIdle;
+  final double? leftMargin, topMargin, bottomMargin;
+  final double infoWindowWidth, markerOffset;
+  final LatLng? location;
+  final double totalHeight;
+  final HSSpot? spot;
 
-  void rebuildInfoWindow() {
-    notifyListeners();
+  const HSInfoWindowProvider({
+    this.showInfoWindow = false,
+    this.tempHidden = false,
+    this.leftMargin,
+    this.topMargin,
+    this.bottomMargin,
+    this.infoWindowWidth = 400,
+    this.markerOffset = 0,
+    this.location,
+    this.totalHeight = 0,
+    this.spot,
+    this.showOnIdle = false,
+  });
+
+  HSInfoWindowProvider copyWith({
+    bool? showInfoWindow,
+    bool? tempHidden,
+    double? leftMargin,
+    double? topMargin,
+    double? bottomMargin,
+    double? infoWindowWidth,
+    double? markerOffset,
+    LatLng? location,
+    double? totalHeight,
+    HSSpot? spot,
+    bool? showOnIdle,
+  }) {
+    return HSInfoWindowProvider(
+      showInfoWindow: showInfoWindow ?? this.showInfoWindow,
+      tempHidden: tempHidden ?? this.tempHidden,
+      leftMargin: leftMargin ?? this.leftMargin,
+      topMargin: topMargin ?? this.topMargin,
+      bottomMargin: bottomMargin ?? this.bottomMargin,
+      infoWindowWidth: infoWindowWidth ?? this.infoWindowWidth,
+      markerOffset: markerOffset ?? this.markerOffset,
+      location: location ?? this.location,
+      totalHeight: totalHeight ?? this.totalHeight,
+      spot: spot ?? this.spot,
+      showOnIdle: showOnIdle ?? this.showOnIdle,
+    );
   }
 
-  void updateWidth(double width) {
-    _infoWindowWidth = width;
+  HSInfoWindowProvider updateVisibilityOnIdle(bool visibility) {
+    return copyWith(showOnIdle: visibility);
   }
 
-  void updateHeight(double updateHeight) {
+  HSInfoWindowProvider updateWidth(double width) {
+    return copyWith(infoWindowWidth: width);
+  }
+
+  HSInfoWindowProvider updateSpot(HSSpot spot) {
+    return copyWith(spot: spot);
+  }
+
+  HSInfoWindowProvider updateHeight(double updateHeight) {
     if (totalHeight == 0) {
-      totalHeight = updateHeight;
+      return copyWith(totalHeight: updateHeight);
     }
+    return this;
   }
 
-  void updateOffset(double offset) {
-    _markerOffset = offset;
+  HSInfoWindowProvider updateOffset(double offset) {
+    return copyWith(markerOffset: offset);
   }
 
-  void updateVisibility(bool visibility) {
-    showInfoWindow = visibility;
+  HSInfoWindowProvider updateVisibility(bool visibility) {
+    return copyWith(showInfoWindow: visibility);
   }
 
-  void updateInfoWindow(BuildContext context, GoogleMapController controller,
+  Future<HSInfoWindowProvider> updateInfoWindow(GoogleMapController controller,
       {LatLng? latLng}) async {
     if (latLng != null) {
-      location = latLng;
+      return copyWith(location: latLng);
     }
     if (location != null) {
       ScreenCoordinate screenCoordinate =
           await controller.getScreenCoordinate(location!);
       double devicePixelRatio =
-          Platform.isAndroid ? MediaQuery.of(context).devicePixelRatio : 1.0;
+          // Platform.isAndroid ? MediaQuery.of(context).devicePixelRatio :
+          1.0;
       double left = (screenCoordinate.x.toDouble() / devicePixelRatio) -
-          (_infoWindowWidth / 2);
+          (infoWindowWidth / 2);
       double top =
-          (screenCoordinate.y.toDouble() / devicePixelRatio) - _markerOffset;
+          (screenCoordinate.y.toDouble() / devicePixelRatio) - markerOffset;
 
-      bottomMargin = (totalHeight + 10) -
+      final bm = (totalHeight + 10) -
           (screenCoordinate.y.toDouble() / devicePixelRatio);
 
       debugPrint("===> margin $bottomMargin total height $totalHeight");
-      _tempHidden = false;
-      leftMargin = left;
-      topMargin = top;
+      return copyWith(
+        tempHidden: false,
+        leftMargin: left,
+        topMargin: top,
+        bottomMargin: bm,
+      );
     }
+    return this;
   }
 
   bool get showInfoWindowData =>
-      (showInfoWindow == true && _tempHidden == false) ? true : false;
+      (showInfoWindow == true && tempHidden == false) ? true : false;
 
   double? get leftMarginData => leftMargin;
 
@@ -190,15 +243,17 @@ class InfoWindowProvider extends ChangeNotifier {
 
   double? get topMarginData => topMargin;
 
-  void resetInfoWindowProvider() {
-    showInfoWindow = false;
-    _tempHidden = false;
-    leftMargin = 0.0;
-    topMargin = 0.0;
-    bottomMargin = 0.0;
-    _infoWindowWidth = 400;
-    _markerOffset = 0;
-    location = null;
-    totalHeight = 0;
+  HSInfoWindowProvider resetInfoWindowProvider() {
+    return const HSInfoWindowProvider(
+      showInfoWindow: false,
+      tempHidden: false,
+      leftMargin: 0.0,
+      topMargin: 0.0,
+      bottomMargin: 0.0,
+      infoWindowWidth: 400,
+      markerOffset: 0,
+      location: null,
+      totalHeight: 0,
+    );
   }
 }
