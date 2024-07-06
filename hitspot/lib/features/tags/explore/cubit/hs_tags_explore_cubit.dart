@@ -15,11 +15,16 @@ class HsTagsExploreCubit extends Cubit<HsTagsExploreState> {
 
   void initialize() async {
     HSDebugLogger.logInfo('HsTagsExploreCubit: initialize');
-    emit(state.copyWith(status: HSTagsExploreStatus.loading));
+    emit(state.copyWith(status: HSTagsExploreStatus.loadingTopSpot));
     await Future.delayed(const Duration(seconds: 1));
     final HSSpot topSpot =
         await app.databaseRepository.spotFetchTopSpotWithTag(tag);
     HSDebugLogger.logSuccess("Fetched top spot: $topSpot");
-    emit(state.copyWith(status: HSTagsExploreStatus.loaded, topSpot: topSpot));
+    emit(state.copyWith(
+        status: HSTagsExploreStatus.loadingSpots, topSpot: topSpot));
+    final List<HSSpot> topSpots =
+        await app.databaseRepository.tagFetchTopSpots(tag: tag);
+    HSDebugLogger.logSuccess("Fetched top spots: $topSpots");
+    emit(state.copyWith(status: HSTagsExploreStatus.loaded, spots: topSpots));
   }
 }

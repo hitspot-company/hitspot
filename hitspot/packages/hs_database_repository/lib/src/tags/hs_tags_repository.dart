@@ -109,6 +109,23 @@ class HSTagsRepository {
     }
   }
 
+  Future<List<HSSpot>> fetchTopSpots(
+      String tag, int batchSize, int batchOffset) async {
+    try {
+      final List<Map<String, dynamic>> response =
+          await _supabase.rpc('spots_fetch_spots_with_tag', params: {
+        "tag": tag,
+        "batch_size": batchSize,
+        "batch_offset": batchOffset,
+      });
+      HSDebugLogger.logSuccess("Fetched : $response");
+      final List<HSSpot> spots = response.map(HSSpot.deserialize).toList();
+      return spots;
+    } catch (_) {
+      throw Exception("Error reading spot tags: $_");
+    }
+  }
+
   Future<List<HSTag>> search(
       String query, int batchOffset, int batchSize) async {
     try {

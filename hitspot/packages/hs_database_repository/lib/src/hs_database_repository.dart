@@ -231,7 +231,6 @@ class HSDatabaseRepsitory {
       await _tagsRepository.deleteSpot(tag);
   Future<bool> tagExists({required String tagValue}) async =>
       await _tagsRepository.tagExists(tagValue);
-
   Future<List<HSTag>> tagFetchSpotTags({HSSpot? spot, String? spotID}) async =>
       await _tagsRepository.fetchSpotTags(spot, spotID);
   Future<List<HSTag>> tagSearch(
@@ -239,4 +238,10 @@ class HSDatabaseRepsitory {
           int batchOffset = 0,
           int batchSize = 20}) async =>
       _tagsRepository.search(query, batchOffset, batchSize);
+
+  Future<List<HSSpot>> tagFetchTopSpots(
+          {required String tag,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _tagsRepository.fetchTopSpots(tag, batchSize, batchOffset);
 }

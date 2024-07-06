@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
+import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -85,11 +86,15 @@ class HSMapCubit extends Cubit<HSMapState> {
 
   void placeMarkers() {
     final List<HSSpot> spots = state.spotsInView;
-    List<Marker> markers = spots
-        .map((e) => Marker(
-            markerId: MarkerId(e.sid!),
-            position: LatLng(e.latitude!, e.longitude!)))
-        .toList();
+    // List<Marker> markers = spots
+    //     .map((e) => Marker(
+    //         markerId: MarkerId(e.sid!),
+    //         position: LatLng(e.latitude!, e.longitude!)))
+    //     .toList();
+    List<Marker> markers =
+        app.assets.generateMarkers(spots, state.currentPosition?.toLatLng);
+    HSDebugLogger.logInfo("Placing ${markers.length} markers");
+    markers.forEach((e) => HSDebugLogger.logInfo("Marker: ${e.anchor}"));
     emit(state.copyWith(markersInView: markers));
   }
 
