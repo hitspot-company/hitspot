@@ -97,6 +97,7 @@ class HSMapCubit extends Cubit<HSMapState> {
   void onMarkerTapped(HSSpot spot) {
     animateCamera(LatLng(spot.latitude!, spot.longitude!));
     setSelectedSpot(spot);
+    closeSheet();
   }
 
   void updateSheetExpansionStatus() => emit(state.copyWith(
@@ -114,7 +115,7 @@ class HSMapCubit extends Cubit<HSMapState> {
   }
 
   void clearSelectedSpot() {
-    emit(state.copyWith(selectedSpot: const HSSpot()));
+    emit(state.copyWith(selectedSpot: const HSSpot(sid: "clear")));
   }
 
   void defaultButtonCallback() {

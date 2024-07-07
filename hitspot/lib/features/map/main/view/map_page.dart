@@ -1,5 +1,6 @@
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -43,6 +44,7 @@ class MapPage extends StatelessWidget {
                   selector: (state) => state.markersInView,
                   builder: (context, markersInView) => GoogleMap(
                     // style: TODO: Implement style like this,
+                    fortyFiveDegreeImageryEnabled: true,
                     key: mapCubit.mapKey,
                     initialCameraPosition: CameraPosition(
                       zoom: 16.0,
@@ -56,6 +58,7 @@ class MapPage extends StatelessWidget {
                     onCameraMove: (CameraPosition position) {
                       mapCubit.toggleIsMoving(true);
                     },
+                    onTap: (argument) => mapCubit.clearSelectedSpot(),
                   ),
                 ),
                 persistentHeader: _PersistentHeader(
@@ -69,6 +72,15 @@ class MapPage extends StatelessWidget {
             },
           ),
           _TopBar(appBarHeight: appBarHeight),
+          BlocSelector<HSMapCubit, HSMapState, HSSpot?>(
+            selector: (state) => state.currentlySelectedSpot,
+            builder: (context, spot) {
+              if (spot != null) {
+                return const _InfoWindow();
+              }
+              return const SizedBox();
+            },
+          )
         ],
       ),
     );
@@ -87,6 +99,9 @@ class _ExpandableContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isSelected) {
+      return const SizedBox();
+    }
     return Container(
       height: expandedHeight - persistentHeaderHeight,
       color: currentTheme.scaffoldBackgroundColor,
@@ -192,16 +207,20 @@ class _InfoWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mapCubit = BlocProvider.of<HSMapCubit>(context);
-
     return Positioned(
-      bottom: 16.0,
+      bottom: 32.0,
       left: 16.0,
       right: 16.0,
-      child: Container(
-        color: Colors.white,
-        height: 100,
+      child: HSBetterSpotTile(
+        borderRadius: BorderRadius.circular(14.0),
+        spot: mapCubit.state.currentlySelectedSpot!,
+        onTap: (p0) => navi.toSpot(sid: p0!.sid!),
+        height: 120.0,
       ),
-    );
+    )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slide(duration: 100.ms, begin: const Offset(0, 1));
   }
 }
 

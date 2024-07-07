@@ -71,7 +71,7 @@ final class HSMapState extends Equatable {
   }
 
   HSSpot? getSelectedSpot(HSSpot? spot) {
-    if (spot != null && spot.title == null) return null;
+    if (spot != null && spot.sid == "clear") return const HSSpot();
     return spot;
   }
 }
