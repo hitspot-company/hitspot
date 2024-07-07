@@ -8,6 +8,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
+import 'package:hitspot/features/map/clustered/view/clustered_map_page.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -34,6 +35,80 @@ class HomePage extends StatelessWidget {
     final homeCubit = BlocProvider.of<HSHomeCubit>(context);
     Completer<GoogleMapController> mapController = homeCubit.mapController;
     return HSScaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => navi.pushPage(
+            page: const MapPage(
+          spots: [
+            HSSpot(
+              latitude: 40.7128,
+              longitude: -74.0060,
+              geohash: "dr5reg",
+              title: "New York City",
+            ),
+            HSSpot(
+              latitude: 40.7128,
+              longitude: -74.0760,
+              geohash: "dr5reg",
+              title: "New Yoooork",
+            ),
+            HSSpot(
+              latitude: 51.5074,
+              longitude: -0.1278,
+              geohash: "gcpvj",
+              title: "London",
+            ),
+            HSSpot(
+              latitude: 35.6762,
+              longitude: 139.6503,
+              geohash: "xn76ur",
+              title: "Tokyo",
+            ),
+            HSSpot(
+              latitude: -33.8688,
+              longitude: 151.2093,
+              geohash: "r3gx2f",
+              title: "Sydney",
+            ),
+            HSSpot(
+              latitude: 48.8566,
+              longitude: 2.3522,
+              geohash: "u09tvw",
+              title: "Paris",
+            ),
+            HSSpot(
+              latitude: 37.7749,
+              longitude: -122.4194,
+              geohash: "9q8yyk",
+              title: "San Francisco",
+            ),
+            HSSpot(
+              latitude: 55.7558,
+              longitude: 37.6173,
+              geohash: "ucfu9v",
+              title: "Moscow",
+            ),
+            HSSpot(
+              latitude: -22.9068,
+              longitude: -43.1729,
+              geohash: "75cjm",
+              title: "Rio de Janeiro",
+            ),
+            HSSpot(
+              latitude: 1.3521,
+              longitude: 103.8198,
+              geohash: "w21z7",
+              title: "Singapore",
+            ),
+            HSSpot(
+              latitude: 25.2048,
+              longitude: 55.2708,
+              geohash: "thrn1",
+              title: "Dubai",
+            ),
+          ],
+        )),
+        child: const Icon(Icons.add),
+      ),
       defaultBottombarEnabled: true,
       body: BlocSelector<HSHomeCubit, HSHomeState, HSHomeStatus>(
         selector: (state) => state.status,

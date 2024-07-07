@@ -225,6 +225,27 @@ class _FetchedSpotsPage extends StatelessWidget {
   }
 }
 
+class _AnimatedSpotTile extends StatelessWidget {
+  const _AnimatedSpotTile({required this.spot, required this.index});
+
+  final HSSpot spot;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return HSBetterSpotTile(
+      onTap: (p0) => navi.toSpot(sid: p0!.sid!),
+      padding: const EdgeInsets.all(8.0),
+      borderRadius: BorderRadius.circular(20.0),
+      spot: spot,
+    ).animate().fadeIn(duration: 300.ms, delay: (50 * index).ms).scale(
+        begin: const Offset(0.8, 0.8),
+        end: const Offset(1, 1),
+        duration: 300.ms,
+        curve: Curves.easeOutQuad);
+  }
+}
+
 class _FetchedBoardsPage extends StatelessWidget {
   const _FetchedBoardsPage({required this.mapSearchCubit, required this.query});
 
