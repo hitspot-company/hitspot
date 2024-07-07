@@ -26,19 +26,13 @@ class SingleSpotPage extends StatelessWidget {
     return HSScaffold(
       appBar: HSAppBar(
         enableDefaultBackButton: true,
-        right: BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
-          selector: (state) => state.isAuthor,
-          builder: (context, isAuthor) {
-            if (!isAuthor) return const SizedBox();
-            return IconButton(
-              icon: const Icon(FontAwesomeIcons.ellipsisVertical),
-              onPressed: singleSpotCubit.showBottomSheet,
-            )
-                .animate()
-                .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1));
-          },
-        ),
+        right: IconButton(
+          icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+          onPressed: singleSpotCubit.showBottomSheet,
+        ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut).scale(
+              begin: const Offset(0.8, 0.8),
+              end: const Offset(1, 1),
+            ),
       ),
       body: BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
         buildWhen: (previous, current) =>

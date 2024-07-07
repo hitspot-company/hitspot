@@ -182,11 +182,12 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
               title: "Share",
               onTap: shareSpot,
             ),
-            HSModalBottomSheetItem(
-              iconData: FontAwesomeIcons.trashCan,
-              title: "Delete",
-              onTap: _deleteSpot,
-            ),
+            if (state.isAuthor)
+              HSModalBottomSheetItem(
+                iconData: FontAwesomeIcons.trashCan,
+                title: "Delete",
+                onTap: _deleteSpot,
+              ),
             const SizedBox(
               height: 20.0,
             ),
