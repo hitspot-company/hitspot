@@ -8,6 +8,7 @@ import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
 import 'package:hitspot/widgets/board/hs_board_card.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';

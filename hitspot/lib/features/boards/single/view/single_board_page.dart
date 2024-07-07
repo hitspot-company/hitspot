@@ -25,6 +25,8 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:reorderable_grid/reorderable_grid.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
@@ -108,6 +110,13 @@ class SingleBoardPage extends StatelessWidget {
                     color: board?.color,
                   ),
                 ),
+              // .animate()
+              // .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+              // .scale(
+              //   begin: const Offset(0.8, 0.8),
+              //   end: const Offset(1, 1),
+              // )
+              // .toSliver,
               const SliverToBoxAdapter(child: Gap(16.0)),
               if (isLoading)
                 const HSShimmerBox(width: 60, height: 60.0)
