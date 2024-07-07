@@ -27,7 +27,7 @@ class HSUserAvatar extends StatelessWidget {
       return CircleAvatar(
         backgroundColor: currentTheme.highlightColor,
         radius: radius,
-        child: child,
+        child: Center(child: child),
       );
     } else if (loading) {
       return HSShimmer(

@@ -11,7 +11,7 @@ final class HSMapState extends Equatable {
     this.cameraPosition,
     this.bounds,
     this.isMoving = false,
-    this.selectedSpot,
+    this.selectedSpot = const HSSpot(),
     this.sheetExpansionStatus = ExpansionStatus.contracted,
     this.infoWindowProvider = const HSInfoWindowProvider(),
   });
@@ -25,7 +25,10 @@ final class HSMapState extends Equatable {
   final ExpansionStatus sheetExpansionStatus;
   final HSInfoWindowProvider infoWindowProvider;
   final bool isMoving;
-  final HSSpot? selectedSpot;
+  final HSSpot selectedSpot;
+
+  HSSpot? get currentlySelectedSpot =>
+      selectedSpot.title == null ? null : selectedSpot;
 
   @override
   List<Object?> get props => [
@@ -53,20 +56,6 @@ final class HSMapState extends Equatable {
     bool? isMoving,
     HSSpot? selectedSpot,
   }) {
-    HSDebugLogger.logInfo('HSMapState.copyWith');
-    HSDebugLogger.logInfo("""
-RECEIVED VALUES (CHANGES):
-spotsInView: ${spotsInView != null && spotsInView != this.spotsInView}
-status: ${status != null && status != this.status}
-currentPosition: ${currentPosition != null && currentPosition != this.currentPosition}
-cameraPosition: ${cameraPosition != null && cameraPosition != this.cameraPosition}
-bounds: ${bounds != null && bounds != this.bounds}
-markersInView: ${markersInView != null && markersInView != this.markersInView}
-sheetExpansionStatus: ${sheetExpansionStatus != null && sheetExpansionStatus != this.sheetExpansionStatus}
-infoWindowProvider: ${infoWindowProvider != null && infoWindowProvider != this.infoWindowProvider}
-isMoving: ${isMoving != null && isMoving != this.isMoving}
-selectedSpot: ${selectedSpot != null && selectedSpot != this.selectedSpot} -> $selectedSpot
-""");
     return HSMapState(
       spotsInView: spotsInView ?? this.spotsInView,
       markersInView: markersInView ?? this.markersInView,
@@ -77,9 +66,12 @@ selectedSpot: ${selectedSpot != null && selectedSpot != this.selectedSpot} -> $s
       sheetExpansionStatus: sheetExpansionStatus ?? this.sheetExpansionStatus,
       infoWindowProvider: infoWindowProvider ?? this.infoWindowProvider,
       isMoving: isMoving ?? this.isMoving,
-      selectedSpot: selectedSpot?.title == null
-          ? null
-          : selectedSpot ?? this.selectedSpot,
+      selectedSpot: getSelectedSpot(selectedSpot) ?? this.selectedSpot,
     );
+  }
+
+  HSSpot? getSelectedSpot(HSSpot? spot) {
+    if (spot != null && spot.title == null) return null;
+    return spot;
   }
 }

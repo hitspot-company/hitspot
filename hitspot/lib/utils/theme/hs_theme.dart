@@ -47,6 +47,7 @@ final class HSTheme {
       Completer<GoogleMapController> controller) async {
     if (await app.themeRepository.isDark()) {
       controller.future.then((value) {
+        // GoogleMap.style(mapStyle)
         value.setMapStyle(mapStyle);
       });
     }

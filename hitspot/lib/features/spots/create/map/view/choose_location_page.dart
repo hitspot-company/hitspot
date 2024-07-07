@@ -47,11 +47,12 @@ class _MapAndSearchBar extends StatelessWidget {
             GoogleMap(
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
-              onMapCreated: (GoogleMapController controller) {
+              onMapCreated: (GoogleMapController controller) async {
                 if (mapController.isCompleted) {
                   mapController = Completer<GoogleMapController>();
                 }
                 mapController.complete(controller);
+                await app.theme.applyMapDarkStyle(mapController);
               },
               initialCameraPosition: CameraPosition(
                 target: state.userLocation.toLatLng,

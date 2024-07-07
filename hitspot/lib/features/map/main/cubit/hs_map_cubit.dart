@@ -78,9 +78,6 @@ class HSMapCubit extends Cubit<HSMapState> {
   void onCameraIdle() async {
     final bounds =
         await controller.future.then((value) => value.getVisibleRegion());
-    if (state.infoWindowProvider.showOnIdle) {
-      updateInfoWindowVisibility(true);
-    }
     toggleIsMoving(false);
     emit(state.copyWith(status: HSMapStatus.fetchingSpots, bounds: bounds));
     fetchSpots();
@@ -100,9 +97,6 @@ class HSMapCubit extends Cubit<HSMapState> {
   void onMarkerTapped(HSSpot spot) {
     animateCamera(LatLng(spot.latitude!, spot.longitude!));
     setSelectedSpot(spot);
-    if (sheetStatus == ExpansionStatus.contracted) {
-      sheetKey.currentState?.expand();
-    }
   }
 
   void updateSheetExpansionStatus() => emit(state.copyWith(
@@ -157,26 +151,5 @@ class HSMapCubit extends Cubit<HSMapState> {
     } catch (e) {
       HSDebugLogger.logError("Error fetching locations: $e");
     }
-  }
-
-  Future<void> updateInfoWindowsWithMarkers(CameraPosition pos) async {
-    if (state.infoWindowProvider.showInfoWindowData) {
-      final GoogleMapController cont = await controller.future;
-      final infoWindow = await state.infoWindowProvider
-          .updateInfoWindow(cont, latLng: pos.target);
-      emit(state.copyWith(infoWindowProvider: infoWindow));
-    }
-  }
-
-  void updateInfoWindowVisibility(bool visibility,
-      [bool ignoreAutomaticMovement = true]) {
-    final infoWindow = state.infoWindowProvider.updateVisibility(visibility);
-    emit(state.copyWith(infoWindowProvider: infoWindow));
-  }
-
-  void hideInfoWindow() {
-    // clearSelectedSpot();
-    final infoWindow = state.infoWindowProvider.updateVisibility(false);
-    emit(state.copyWith(infoWindowProvider: infoWindow));
   }
 }

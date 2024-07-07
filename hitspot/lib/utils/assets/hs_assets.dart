@@ -27,14 +27,11 @@ class HSAssets {
   static const String mapDotGreen = "$mapIconsPath/dot_green.svg";
   static const String mapDotBlue = "$mapIconsPath/dot_blue.svg";
   late final BitmapDescriptor _spotMarker;
-  final int markerSizeMedium = 24;
+  final int markerSizeMedium = 16;
 
   void _initialiseMarkerBitmap() async {
     await _bitmapDescriptorFromSvgAsset(mapDotBlue, markerSizeMedium)
         .then((value) => _spotMarker = value);
-    // await _bitmapDescriptorFromSvgAsset(
-    //         context, FileConstants.icFarPharmacyMarker, markerSizeMedium)
-    // .then((value) => _farPharmacyMarker = value);
   }
 
   Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
