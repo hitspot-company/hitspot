@@ -9,8 +9,10 @@ import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -49,7 +51,8 @@ class MapPage extends StatelessWidget {
                     key: mapCubit.mapKey,
                     initialCameraPosition: CameraPosition(
                       zoom: 16.0,
-                      target: mapCubit.state.cameraPosition ?? LatLng(0.0, 0.0),
+                      target: mapCubit.state.cameraPosition ??
+                          const LatLng(0.0, 0.0),
                     ),
                     onMapCreated: mapCubit.onMapCreated,
                     myLocationButtonEnabled: false,
@@ -208,18 +211,66 @@ class _InfoWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mapCubit = BlocProvider.of<HSMapCubit>(context);
+    final spot = mapCubit.state.currentlySelectedSpot;
+    final selectedSpot = spot?.copyWith(tags: ['hello', 'world']);
     return Positioned(
-      bottom: 32.0,
-      left: 16.0,
-      right: 16.0,
-      child: HSBetterSpotTile(
-        borderRadius: BorderRadius.circular(14.0),
-        spot: mapCubit.state.currentlySelectedSpot!,
-        onTap: (p0) => navi.pushTransition(
-            PageTransitionType.scale, SingleSpotProvider(spotID: p0!.sid!)),
-        height: 120.0,
-      ),
-    )
+            bottom: 32.0,
+            left: 16.0,
+            right: 16.0,
+            child: GestureDetector(
+              onTap: () => navi.pushTransition(
+                  PageTransitionType.rightToLeftWithFade,
+                  SingleSpotProvider(spotID: selectedSpot.sid!)),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14.0),
+                  color: app.currentTheme.scaffoldBackgroundColor,
+                ),
+                child: Column(
+                  children: [
+                    HSBetterSpotTile(
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(14.0),
+                          bottom: Radius.circular(14.0)),
+                      spot: selectedSpot,
+                      height: 120.0,
+                    ),
+                    const Gap(8.0),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: screenWidth,
+                            child: Wrap(
+                              children: selectedSpot!.tags!
+                                  .map((tag) => Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Text("#$tag")))
+                                  .toList(),
+                            ),
+                          ),
+                          const Gap(8.0),
+                          SizedBox(
+                            width: screenWidth,
+                            child: HsUserTile(
+                              user: selectedSpot?.author ??
+                                  const HSUser(
+                                      username: "Hello world",
+                                      name: "Name",
+                                      avatarUrl: "https://picsum.photos/200",
+                                      uid: "123"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ))
         .animate()
         .fadeIn(duration: 400.ms)
         .slide(duration: 100.ms, begin: const Offset(0, 1));
@@ -228,48 +279,56 @@ class _InfoWindow extends StatelessWidget {
 
 class _TopBar extends StatelessWidget {
   const _TopBar({super.key, this.appBarHeight = 120.0});
-
   final double appBarHeight;
 
   @override
   Widget build(BuildContext context) {
     final mapCubit = BlocProvider.of<HSMapCubit>(context);
+
     return Positioned(
       top: 0.0,
       child: Container(
         width: screenWidth,
         height: appBarHeight,
         decoration: BoxDecoration(
-          color: currentTheme.scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(14),
-            bottomRight: Radius.circular(14),
-          ),
+          color: app.currentTheme.scaffoldBackgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: SafeArea(
           child: BlocSelector<HSMapCubit, HSMapState, ExpansionStatus>(
             selector: (state) => state.sheetExpansionStatus,
             builder: (context, state) {
-              late final IconData icon;
-              late final String? titleText;
-              if (mapCubit.sheetStatus == ExpansionStatus.expanded) {
-                icon = FontAwesomeIcons.xmark;
-                titleText = "Fetched Spots";
-              } else {
-                icon = FontAwesomeIcons.arrowLeft;
-                titleText = "";
-              }
+              final isExpanded =
+                  mapCubit.sheetStatus == ExpansionStatus.expanded;
+              final icon = isExpanded ? Icons.close : Icons.arrow_back_ios;
+              final titleText = isExpanded ? "Fetched Spots" : "";
+
               return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: HSAppBar(
-                  enableDefaultBackButton: true,
-                  defaultBackButtonCallback: mapCubit.defaultButtonCallback,
-                  titleText: titleText,
-                  right: IconButton(
-                    icon: const Icon(FontAwesomeIcons.magnifyingGlass),
-                    onPressed: () => mapCubit.searchLocation(context),
-                  ),
-                  defaultButtonBackIcon: icon,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(icon, color: Colors.white),
+                      onPressed: mapCubit.defaultButtonCallback,
+                    ).animate().fade(),
+                    if (titleText.isNotEmpty)
+                      Text(
+                        titleText,
+                        style: textTheme.headlineSmall,
+                      ).animate().fade(),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () => mapCubit.searchLocation(context),
+                    ),
+                  ],
                 ),
               );
             },

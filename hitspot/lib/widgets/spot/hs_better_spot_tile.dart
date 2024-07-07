@@ -33,46 +33,50 @@ class HSBetterSpotTile extends StatelessWidget {
     }
     return Padding(
       padding: padding ?? const EdgeInsets.all(0.0),
-      child: GestureDetector(
-        onTap: () {
-          if (onTap != null) onTap!(spot);
-        },
-        onLongPress: () {
-          if (onLongPress != null) onLongPress!(spot);
-        },
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: ClipRRect(
-            borderRadius: borderRadius ?? BorderRadius.circular(0.0),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                HSImage(imageUrl: spot!.images!.first),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomLeft,
-                      end: Alignment.topRight,
-                      stops: const [0.0, .3, 1.0],
-                      colors: [
-                        Colors.black,
-                        Colors.black.withOpacity(.6),
-                        Colors.transparent
-                      ],
+      child: AbsorbPointer(
+        absorbing: onTap == null && onLongPress == null,
+        child: GestureDetector(
+          onTap: () {
+            if (onTap != null) onTap!(spot);
+          },
+          onLongPress: () {
+            if (onLongPress != null) onLongPress!(spot);
+          },
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: ClipRRect(
+              borderRadius: borderRadius ?? BorderRadius.circular(0.0),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  HSImage(imageUrl: spot!.images!.first),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                        stops: const [0.0, .3, 1.0],
+                        colors: [
+                          Colors.black,
+                          Colors.black.withOpacity(.6),
+                          Colors.transparent
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                if (child == null)
-                  Positioned(
-                    bottom: 8.0,
-                    left: 16.0,
-                    child: Text(spot!.title!,
-                        style: textTheme.headlineSmall!.colorify(Colors.white)),
-                  )
-                else
-                  child!
-              ],
+                  if (child == null)
+                    Positioned(
+                      bottom: 8.0,
+                      left: 16.0,
+                      child: Text(spot!.title!,
+                          style:
+                              textTheme.headlineSmall!.colorify(Colors.white)),
+                    )
+                  else
+                    child!
+                ],
+              ),
             ),
           ),
         ),
