@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
@@ -11,12 +12,18 @@ part 'hs_main_search_state.dart';
 class HSMainSearchCubit extends Cubit<HSMainSearchState> {
   HSMainSearchCubit() : super(const HSMainSearchState());
 
-  void updateQuery(String val) => emit(state.copyWith(query: val));
+  Timer? _debounce;
+
+  void updateQuery(String val) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () async {
+      emit(state.copyWith(query: val, users: await fetchPredictions()));
+    });
+  }
 
   Future<List<HSSpot>> fetchSpots() async {
     try {
       final query = state.query;
-      // ADD DEBOUNCE
       final List<Map<String, dynamic>> fetchedSpots = await supabase
           .from('spots')
           .select()
@@ -39,7 +46,6 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
   Future<List<HSTag>> fetchTags() async {
     try {
       final query = state.query;
-      // ADD DEBOUNCE
       final List<HSTag> fetchedTags =
           await app.databaseRepository.tagSearch(query: query);
       emit(state.copyWith(tags: fetchedTags));
@@ -53,7 +59,6 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
   Future<List<HSBoard>> fetchBoards() async {
     try {
       final query = state.query;
-      // ADD DEBOUNCE
       final List<Map<String, dynamic>> fetchedBoards = await supabase
           .from('boards')
           .select()
@@ -69,20 +74,34 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
   }
 
   Future<void> _fetchUsers() async {
-    final query = state.query;
-    // ADD DEBOUNCE
-    final List<Map<String, dynamic>> fetchedUsers = await supabase
-        .from('users')
-        .select()
-        .textSearch('fts', "$query:*")
-        .limit(20);
-    emit(state.copyWith(users: fetchedUsers.map(HSUser.deserialize).toList()));
+    try {
+      final query = state.query;
+      final List<Map<String, dynamic>> fetchedUsers = await supabase
+          .from('users')
+          .select()
+          .textSearch('fts', "$query:*")
+          .limit(20);
+      emit(
+          state.copyWith(users: fetchedUsers.map(HSUser.deserialize).toList()));
+    } catch (e) {
+      emit(state.copyWith(users: []));
+      HSDebugLogger.logError("Error $e");
+    }
   }
 
   Future<List<HSUser>> fetchPredictions() async {
     if (state.query.isNotEmpty) {
-      await _fetchUsers();
+      if (_debounce?.isActive ?? false) _debounce!.cancel();
+      _debounce = Timer(const Duration(milliseconds: 300), () async {
+        await _fetchUsers();
+      });
     }
     return (state.users);
+  }
+
+  @override
+  Future<void> close() {
+    _debounce?.cancel();
+    return super.close();
   }
 }
