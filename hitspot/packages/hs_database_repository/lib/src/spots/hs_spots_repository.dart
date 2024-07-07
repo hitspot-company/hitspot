@@ -170,7 +170,7 @@ class HSSpotsRepository {
           await _supabase.rpc('spots_fetch_spot_with_author', params: {
         'spotsid': sid,
       });
-      return HSSpotsUtils.deserializeSpotWithAuthor(fetchedSpot.first);
+      return HSSpot.deserializeWithAuthor(fetchedSpot.first);
     } catch (_) {
       throw Exception("Could not fetch spot with author: $_");
     }

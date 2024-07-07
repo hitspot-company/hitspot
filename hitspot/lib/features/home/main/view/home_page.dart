@@ -137,6 +137,7 @@ class HomePage extends StatelessWidget {
                                   app.theme.applyMapDarkStyle(mapController);
                                 },
                                 myLocationButtonEnabled: false,
+                                myLocationEnabled: true,
                                 initialCameraPosition: const CameraPosition(
                                   zoom: 16.0,
                                   target: LatLng(0, 0),

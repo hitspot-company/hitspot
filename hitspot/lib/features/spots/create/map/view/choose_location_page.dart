@@ -8,6 +8,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 import '../../../../../widgets/hs_textfield.dart';
@@ -202,8 +203,8 @@ class _BottomBar extends StatelessWidget {
                               leading: const Icon(Icons.place),
                               title: AutoSizeText(prediction.description,
                                   maxLines: 1,
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600)),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600)),
                               onTap: () => chooseLocationCubit
                                   .onPredictionSelected(prediction),
                             );

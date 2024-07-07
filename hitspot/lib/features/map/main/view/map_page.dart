@@ -80,7 +80,7 @@ class MapPage extends StatelessWidget {
             selector: (state) => state.currentlySelectedSpot,
             builder: (context, spot) {
               if (spot != null) {
-                return const _InfoWindow();
+                return _InfoWindow(spot: spot);
               }
               return const SizedBox();
             },
@@ -206,13 +206,13 @@ class _PersistentHeader extends StatelessWidget {
 }
 
 class _InfoWindow extends StatelessWidget {
-  const _InfoWindow({super.key});
+  const _InfoWindow({super.key, required this.spot});
+
+  final HSSpot spot;
 
   @override
   Widget build(BuildContext context) {
-    final mapCubit = BlocProvider.of<HSMapCubit>(context);
-    final spot = mapCubit.state.currentlySelectedSpot;
-    final selectedSpot = spot?.copyWith(tags: ['hello', 'world']);
+    final selectedSpot = spot.copyWith(tags: ['hello', 'world']);
     return Positioned(
             bottom: 32.0,
             left: 16.0,
