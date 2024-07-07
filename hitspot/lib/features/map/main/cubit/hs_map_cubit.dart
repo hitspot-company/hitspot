@@ -86,7 +86,8 @@ class HSMapCubit extends Cubit<HSMapState> {
   void placeMarkers() {
     final List<HSSpot> spots = state.spotsInView;
     List<Marker> markers = app.assets.generateMarkers(
-        spots, state.currentPosition?.toLatLng, onMarkerTapped);
+        spots, state.currentPosition?.toLatLng,
+        onTap: onMarkerTapped, selectedSpotID: state.selectedSpot.sid);
     emit(state.copyWith(markersInView: markers));
   }
 
@@ -98,6 +99,7 @@ class HSMapCubit extends Cubit<HSMapState> {
     animateCamera(LatLng(spot.latitude!, spot.longitude!), zoom: 19.0);
     setSelectedSpot(spot);
     closeSheet();
+    placeMarkers();
   }
 
   void updateSheetExpansionStatus() => emit(state.copyWith(

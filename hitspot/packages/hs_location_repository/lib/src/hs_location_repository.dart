@@ -3,15 +3,13 @@ import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-// import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart'
-// as gmcm;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hs_location_repository/src/models/hs_place_details.dart';
 import 'package:hs_location_repository/src/models/hs_prediction.dart';
-// import 'package:hs_location_repository/src/models/hs_spot_with_cluster_item.dart'
-// as gm;
 import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:uuid/uuid.dart';
+
+enum HSSpotMarkerType { verified, unverified, selected }
 
 class HSLocationRepository {
   HSLocationRepository(String googleMapsApiKey, String placesApiKey) {

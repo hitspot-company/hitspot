@@ -2,8 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'dart:ui' as ui;
 
@@ -22,16 +23,22 @@ class HSAssets {
   // MAP MARKERS
   static const String mapIconsPath = "assets/map";
   static const String mapPin = "$mapIconsPath/pin.svg";
-  static const String mapDotRed = "$mapIconsPath/dot_red.svg";
-  static const String mapDotYellow = "$mapIconsPath/dot_yellow.svg";
-  static const String mapDotGreen = "$mapIconsPath/dot_green.svg";
-  static const String mapDotBlue = "$mapIconsPath/dot_blue.svg";
-  late final BitmapDescriptor _spotMarker;
-  final int markerSizeMedium = 16;
+  static const String dotSelected = "$mapIconsPath/dot_selected.svg";
+  static const String dotVerified = "$mapIconsPath/dot_verified.svg";
+  static const String dotUnverified = "$mapIconsPath/dot_unverified.svg";
+
+  late final BitmapDescriptor _unverifiedMarker,
+      _verifiedMarker,
+      _selectedMarker;
+  final int markerSizeMedium = 20;
 
   void _initialiseMarkerBitmap() async {
-    await _bitmapDescriptorFromSvgAsset(mapDotBlue, markerSizeMedium)
-        .then((value) => _spotMarker = value);
+    await _bitmapDescriptorFromSvgAsset(dotVerified, markerSizeMedium)
+        .then((value) => _verifiedMarker = value);
+    await _bitmapDescriptorFromSvgAsset(dotUnverified, markerSizeMedium)
+        .then((value) => _unverifiedMarker = value);
+    await _bitmapDescriptorFromSvgAsset(dotSelected, markerSizeMedium)
+        .then((value) => _selectedMarker = value);
   }
 
   Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
@@ -49,8 +56,19 @@ class HSAssets {
     }
   }
 
+  BitmapDescriptor _getSpotMarker(HSSpot spot, {bool isSelected = false}) {
+    if (spot.likesCount! > 10) {
+      return _verifiedMarker;
+    } else if (isSelected) {
+      return _selectedMarker;
+    }
+    return _unverifiedMarker;
+  }
+
   Marker createSpotMarker(HSSpot spot,
-      {LatLng? currentPosition, Function(HSSpot spot)? onTap}) {
+      {LatLng? currentPosition,
+      Function(HSSpot spot)? onTap,
+      HSSpotMarkerType type = HSSpotMarkerType.unverified}) {
     late final double dis;
     if (currentPosition != null) {
       dis = calculateDistance(currentPosition.latitude,
@@ -60,7 +78,7 @@ class HSAssets {
     }
     return Marker(
       markerId: MarkerId(spot.hashCode.toString()),
-      icon: dis < 0.6 ? _spotMarker : _spotMarker, // TODO: Change
+      icon: _getSpotMarker(spot, isSelected: type == HSSpotMarkerType.selected),
       position: LatLng(spot.latitude!, spot.longitude!),
       onTap: () {
         if (onTap != null) onTap(spot);
@@ -69,42 +87,57 @@ class HSAssets {
   }
 
   List<Marker> generateMarkers(List<HSSpot> spots, LatLng? currentPosition,
-      [Function(HSSpot)? onTap]) {
+      {Function(HSSpot)? onTap, String? selectedSpotID}) {
     List<Marker> generatedMapMarkers = [];
     for (var i = 0; i < spots.length; i++) {
+      final type = selectedSpotID == spots[i].sid
+          ? HSSpotMarkerType.selected
+          : HSSpotMarkerType.unverified;
+      HSDebugLogger.logInfo("Type : $type");
       generatedMapMarkers.add(createSpotMarker(spots[i],
-          currentPosition: currentPosition, onTap: onTap));
+          currentPosition: currentPosition, onTap: onTap, type: type));
     }
     return generatedMapMarkers;
   }
 
   static Future<ui.Image> getImageFromSvg(
       String path, double width, double height,
-      {ColorFilter? colorFilter}) async {
+      {ColorFilter? colorFilter, double scale = 3.0}) async {
+    // Load SVG data from asset
     String data = await rootBundle.loadString(path);
 
-    // Get the properly scaled image
+    // Parse the SVG data and get the picture
     final SvgStringLoader svgStringLoader = SvgStringLoader(data);
     final PictureInfo pictureInfo = await vg.loadPicture(svgStringLoader, null);
     final ui.Picture picture = pictureInfo.picture;
+
+    // Create a PictureRecorder and Canvas to draw the SVG
     ui.PictureRecorder recorder = ui.PictureRecorder();
-    ui.Canvas canvas =
-        Canvas(recorder, Rect.fromPoints(Offset.zero, Offset(width, height)));
-    canvas.scale(
-        width / pictureInfo.size.width, height / pictureInfo.size.height);
+    double scaledWidth = width * scale;
+    double scaledHeight = height * scale;
+    ui.Canvas canvas = Canvas(recorder,
+        Rect.fromPoints(Offset.zero, Offset(scaledWidth, scaledHeight)));
+
+    // Scale the canvas to fit the SVG properly
+    canvas.scale(scaledWidth / pictureInfo.size.width,
+        scaledHeight / pictureInfo.size.height);
     canvas.drawPicture(picture);
-    final ui.Image colorlessImage =
-        await recorder.endRecording().toImage(width.ceil(), height.ceil());
+
+    // Generate the colorless image
+    final ui.Image colorlessImage = await recorder
+        .endRecording()
+        .toImage(scaledWidth.ceil(), scaledHeight.ceil());
     pictureInfo.picture.dispose();
 
     if (colorFilter == null) {
-      return colorlessImage;
+      // Scale the high-resolution image down to the desired size
+      return await _resizeImage(colorlessImage, width, height);
     }
 
     // Apply color filter if necessary
     recorder = ui.PictureRecorder();
-    canvas =
-        Canvas(recorder, Rect.fromPoints(Offset.zero, Offset(width, height)));
+    canvas = Canvas(recorder,
+        Rect.fromPoints(Offset.zero, Offset(scaledWidth, scaledHeight)));
     Paint paint = Paint();
     paint.colorFilter = colorFilter;
 
@@ -121,9 +154,28 @@ class HSAssets {
             colorlessImage.width.toDouble(), colorlessImage.height.toDouble()));
 
     canvas.drawImageRect(colorlessImage, sourceRect, rect, paint);
-    final ui.Image image =
-        await recorder.endRecording().toImage(width.ceil(), height.ceil());
-    return image;
+    final ui.Image filteredImage = await recorder
+        .endRecording()
+        .toImage(scaledWidth.ceil(), scaledHeight.ceil());
+
+    // Scale the filtered image down to the desired size
+    return await _resizeImage(filteredImage, width, height);
+  }
+
+  // Helper function to resize an image
+  static Future<ui.Image> _resizeImage(
+      ui.Image image, double targetWidth, double targetHeight) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final paint = Paint();
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Rect.fromLTWH(0, 0, targetWidth, targetHeight),
+      paint,
+    );
+    final picture = recorder.endRecording();
+    return await picture.toImage(targetWidth.ceil(), targetHeight.ceil());
   }
 
   double calculateDistance(lat1, lon1, lat2, lon2) {
