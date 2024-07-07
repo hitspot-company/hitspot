@@ -149,7 +149,7 @@ class HSMapCubit extends Cubit<HSMapState> {
         final HSPlaceDetails location = await app.locationRepository
             .fetchPlaceDetails(placeID: prediction.placeID);
         app.locationRepository.animateCameraToNewLatLng(
-            controller, LatLng(location.latitude, location.longitude));
+            controller, LatLng(location.latitude, location.longitude), 14);
       }
     } catch (e) {
       HSDebugLogger.logError("Error fetching locations: $e");

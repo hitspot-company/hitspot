@@ -5,8 +5,10 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/single/view/single_board_page.dart';
 import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -182,10 +184,10 @@ class HSBoardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      width: screenWidth,
+      height: 100.0,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -194,39 +196,39 @@ class HSBoardTile extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Container(
-            width: 80,
-            height: height - 16,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: Colors.grey[300],
-            ),
-            child: board.image != null
-                ? Image.network(
-                    board.image!,
-                    fit: BoxFit.cover,
-                  )
-                : const Icon(
-                    Icons.image,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
+          HSImage(
+            imageUrl: board.image,
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          const Gap(16),
-          Expanded(
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                stops: const [0.0, .5, 1.0],
+                colors: [
+                  Colors.black,
+                  Colors.black.withOpacity(.8),
+                  Colors.black.withOpacity(.4),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 8.0,
+            left: 16.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   board.title!,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.headlineMedium,
                   maxLines: 2,
                 ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
-                const Gap(8),
                 Text(
                   board.description!,
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -234,12 +236,53 @@ class HSBoardTile extends StatelessWidget {
                 ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
               ],
             ),
-          ),
-          const Icon(Icons.arrow_forward_ios, size: 16)
-              .animate()
-              .fadeIn(duration: 300.ms, delay: 300.ms),
+          )
         ],
       ),
+      // child: Row(
+      //   children: [
+      //     Container(
+      //       width: 80,
+      //       height: height - 16,
+      //       decoration: BoxDecoration(
+      //         borderRadius: BorderRadius.circular(8.0),
+      //         color: Colors.grey[300],
+      //       ),
+      //       child: board.image != null
+      //           ?
+      //           : const Icon(
+      //               Icons.image,
+      //               size: 40,
+      //               color: Colors.grey,
+      //             ),
+      //     ),
+      //     const Gap(16),
+      //     Expanded(
+      //       child: Column(
+      //         crossAxisAlignment: CrossAxisAlignment.start,
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         children: [
+      //           Text(
+      //             board.title!,
+      //             style: Theme.of(context).textTheme.titleMedium,
+      //             overflow: TextOverflow.ellipsis,
+      //             maxLines: 2,
+      //           ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
+      //           const Gap(8),
+      //           Text(
+      //             board.description!,
+      //             style: Theme.of(context).textTheme.bodyMedium,
+      //             overflow: TextOverflow.ellipsis,
+      //           ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
+      //         ],
+      //       ),
+      //     ),
+      //     const Icon(Icons.arrow_forward_ios, size: 16)
+      //         .animate()
+      //         .fadeIn(duration: 300.ms, delay: 300.ms),
+
+      // ],
+      // ),
     );
   }
 }

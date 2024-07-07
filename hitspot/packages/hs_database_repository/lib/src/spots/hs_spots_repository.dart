@@ -329,16 +329,16 @@ class HSSpotsRepository {
     double maxLong,
   ) async {
     try {
-      final data = await _supabase.rpc('spots_fetch_spots_in_view', params: {
+      final List<Map<String, dynamic>> data =
+          await _supabase.rpc('spots_fetch_spots_in_view', params: {
         'min_lat': minLat,
         'min_long': minLong,
         'max_lat': maxLat,
         'max_long': maxLong,
       });
-      final List<HSSpot> spots = (data as List<dynamic>).map((e) {
-        final spot = HSSpot.deserialize(e);
-        return spot.copyWith(images: [e['thumbnail']]);
-      }).toList();
+      final List<HSSpot> spots =
+          data.map(HSSpot.deserializeWithAuthor).toList();
+
       return spots;
     } catch (_) {
       throw Exception("Error fetching spots in view: $_");

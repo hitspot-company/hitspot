@@ -245,10 +245,15 @@ class _InfoWindow extends StatelessWidget {
                           SizedBox(
                             width: screenWidth,
                             child: Wrap(
-                              children: selectedSpot!.tags!
+                              children: selectedSpot.tags!
                                   .map((tag) => Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Text("#$tag")))
+                                      padding:
+                                          const EdgeInsets.only(right: 4.0),
+                                      child: Card(
+                                          child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text("#$tag"),
+                                      ))))
                                   .toList(),
                             ),
                           ),
@@ -256,12 +261,7 @@ class _InfoWindow extends StatelessWidget {
                           SizedBox(
                             width: screenWidth,
                             child: HsUserTile(
-                              user: selectedSpot?.author ??
-                                  const HSUser(
-                                      username: "Hello world",
-                                      name: "Name",
-                                      avatarUrl: "https://picsum.photos/200",
-                                      uid: "123"),
+                              user: selectedSpot.author!,
                             ),
                           ),
                         ],
