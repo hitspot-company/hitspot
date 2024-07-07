@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
+import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -13,6 +14,7 @@ import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:page_transition/page_transition.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});
@@ -34,7 +36,6 @@ class MapPage extends StatelessWidget {
             selector: (state) => state.currentlySelectedSpot,
             builder: (context, selectedSpot) {
               final isSelected = selectedSpot != null;
-              HSDebugLogger.logInfo("IS SELECTED: $isSelected");
               return ExpandableBottomSheet(
                 key: mapCubit.sheetKey,
                 enableToggle: true,
@@ -214,7 +215,8 @@ class _InfoWindow extends StatelessWidget {
       child: HSBetterSpotTile(
         borderRadius: BorderRadius.circular(14.0),
         spot: mapCubit.state.currentlySelectedSpot!,
-        onTap: (p0) => navi.toSpot(sid: p0!.sid!),
+        onTap: (p0) => navi.pushTransition(
+            PageTransitionType.scale, SingleSpotProvider(spotID: p0!.sid!)),
         height: 120.0,
       ),
     )
@@ -244,21 +246,22 @@ class _TopBar extends StatelessWidget {
             bottomRight: Radius.circular(14),
           ),
         ),
-        child: Center(
-          child: SafeArea(
-            child: BlocSelector<HSMapCubit, HSMapState, ExpansionStatus>(
-              selector: (state) => state.sheetExpansionStatus,
-              builder: (context, state) {
-                late final IconData icon;
-                late final String? titleText;
-                if (mapCubit.sheetStatus == ExpansionStatus.expanded) {
-                  icon = FontAwesomeIcons.xmark;
-                  titleText = "Fetched Spots";
-                } else {
-                  icon = FontAwesomeIcons.arrowLeft;
-                  titleText = "";
-                }
-                return HSAppBar(
+        child: SafeArea(
+          child: BlocSelector<HSMapCubit, HSMapState, ExpansionStatus>(
+            selector: (state) => state.sheetExpansionStatus,
+            builder: (context, state) {
+              late final IconData icon;
+              late final String? titleText;
+              if (mapCubit.sheetStatus == ExpansionStatus.expanded) {
+                icon = FontAwesomeIcons.xmark;
+                titleText = "Fetched Spots";
+              } else {
+                icon = FontAwesomeIcons.arrowLeft;
+                titleText = "";
+              }
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: HSAppBar(
                   enableDefaultBackButton: true,
                   defaultBackButtonCallback: mapCubit.defaultButtonCallback,
                   titleText: titleText,
@@ -267,9 +270,9 @@ class _TopBar extends StatelessWidget {
                     onPressed: () => mapCubit.searchLocation(context),
                   ),
                   defaultButtonBackIcon: icon,
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

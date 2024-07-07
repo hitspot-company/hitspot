@@ -7,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
+import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_image.dart';
@@ -17,6 +18,7 @@ import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:page_transition/page_transition.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -104,19 +106,28 @@ class HomePage extends StatelessWidget {
                           homeCubit.animateCameraToNewLatLng(
                               currentPosition.toLatLng);
                         }
-                        return GoogleMap(
-                          onTap: (latLng) => navi.toSpotsMap(currentPosition),
-                          onMapCreated: (GoogleMapController controller) {
-                            if (mapController.isCompleted) {
-                              mapController = Completer<GoogleMapController>();
-                            }
-                            mapController.complete(controller);
-                            app.theme.applyMapDarkStyle(mapController);
-                          },
-                          myLocationButtonEnabled: false,
-                          initialCameraPosition: const CameraPosition(
-                            zoom: 16.0,
-                            target: LatLng(0, 0),
+                        return GestureDetector(
+                          onTap: () => navi.pushTransition(
+                            PageTransitionType.fade,
+                            MapProvider(initialCameraPosition: currentPosition),
+                          ),
+                          child: AbsorbPointer(
+                            absorbing: true,
+                            child: GoogleMap(
+                              onMapCreated: (GoogleMapController controller) {
+                                if (mapController.isCompleted) {
+                                  mapController =
+                                      Completer<GoogleMapController>();
+                                }
+                                mapController.complete(controller);
+                                app.theme.applyMapDarkStyle(mapController);
+                              },
+                              myLocationButtonEnabled: false,
+                              initialCameraPosition: const CameraPosition(
+                                zoom: 16.0,
+                                target: LatLng(0, 0),
+                              ),
+                            ),
                           ),
                         );
                       },

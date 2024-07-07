@@ -20,6 +20,7 @@ import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_pro
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:page_transition/page_transition.dart';
 
 class HSNavigation {
   HSNavigation._privateConstructor();
@@ -35,6 +36,16 @@ class HSNavigation {
         MaterialPageRoute(builder: (_) => page),
       );
   dynamic push(String location) => router.push(location);
+  dynamic pushTransition(PageTransitionType transition, Widget page) =>
+      router.configuration.navigatorKey.currentState!.push(
+        PageTransition(
+            curve: Curves.easeIn,
+            type: transition,
+            child: page,
+            duration: const Duration(milliseconds: 350),
+            reverseDuration: const Duration(milliseconds: 350),
+            alignment: Alignment.bottomCenter),
+      );
 
   final GoRouter router = GoRouter(
     initialLocation: "/splash",

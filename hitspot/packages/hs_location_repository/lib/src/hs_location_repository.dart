@@ -219,8 +219,14 @@ class HSLocationRepository {
   // }
 
   Future<void> animateCameraToNewLatLng(
-      Completer<GoogleMapController> mapController, LatLng location) async {
+      Completer<GoogleMapController> mapController, LatLng location,
+      [double? zoom]) async {
     final GoogleMapController controller = await mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLng(location));
+    controller.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        location,
+        zoom ?? await controller.getZoomLevel(),
+      ),
+    );
   }
 }

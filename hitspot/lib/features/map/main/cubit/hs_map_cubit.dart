@@ -95,7 +95,7 @@ class HSMapCubit extends Cubit<HSMapState> {
   }
 
   void onMarkerTapped(HSSpot spot) {
-    animateCamera(LatLng(spot.latitude!, spot.longitude!));
+    animateCamera(LatLng(spot.latitude!, spot.longitude!), zoom: 19.0);
     setSelectedSpot(spot);
     closeSheet();
   }
@@ -126,10 +126,10 @@ class HSMapCubit extends Cubit<HSMapState> {
     closeSheet();
   }
 
-  Future<void> animateCamera(LatLng newLatLng) async {
-    toggleIsMoving();
+  Future<void> animateCamera(LatLng newLatLng, {double? zoom}) async {
+    toggleIsMoving(true);
     await app.locationRepository
-        .animateCameraToNewLatLng(controller, newLatLng);
+        .animateCameraToNewLatLng(controller, newLatLng, zoom);
   }
 
   Future<void> searchLocation(BuildContext context) async {
