@@ -18,6 +18,7 @@ import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -60,7 +61,9 @@ class UserProfilePage extends StatelessWidget {
                               radius: 70.0,
                               iconSize: 50,
                               imageUrl: user?.avatarUrl,
-                            ),
+                            ).animate().fadeIn(duration: 300.ms).scale(
+                                begin: const Offset(0.95, 0.95),
+                                end: const Offset(1, 1)),
                           ),
                         ),
                         Expanded(
@@ -68,16 +71,25 @@ class UserProfilePage extends StatelessWidget {
                               ? const HSShimmer(
                                   child:
                                       HSShimmerSkeleton(height: 60, width: 100),
-                                )
+                                ).animate().fadeIn(duration: 300.ms).scale(
+                                  begin: const Offset(0.95, 0.95),
+                                  end: const Offset(1, 1))
                               : Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
                                       "${user?.name}",
                                       style: textTheme.headlineSmall!.hintify,
-                                    ),
+                                    ).animate().fadeIn(duration: 300.ms).scale(
+                                        begin: const Offset(0.95, 0.95),
+                                        end: const Offset(1, 1)),
                                     Text("@${user?.username}",
-                                        style: textTheme.headlineLarge),
+                                            style: textTheme.headlineLarge)
+                                        .animate()
+                                        .fadeIn(duration: 300.ms)
+                                        .scale(
+                                            begin: const Offset(0.95, 0.95),
+                                            end: const Offset(1, 1)),
                                   ],
                                 ),
                         ),
@@ -89,7 +101,13 @@ class UserProfilePage extends StatelessWidget {
                   child: Gap(16.0),
                 ),
                 if (loading)
-                  HSShimmerBox(width: screenWidth, height: 60).toSliverBox,
+                  HSShimmerBox(width: screenWidth, height: 60)
+                      .animate()
+                      .fadeIn(duration: 300.ms)
+                      .scale(
+                          begin: const Offset(0.95, 0.95),
+                          end: const Offset(1, 1))
+                      .toSliver,
                 if (!loading && user?.biogram != null)
                   SliverMainAxisGroup(
                     slivers: [
@@ -100,7 +118,9 @@ class UserProfilePage extends StatelessWidget {
                           child: Text(
                             user?.biogram ?? "",
                             style: textTheme.titleSmall,
-                          ),
+                          ).animate().fadeIn(duration: 300.ms).scale(
+                              begin: const Offset(0.95, 0.95),
+                              end: const Offset(1, 1)),
                         ),
                       )
                     ],
@@ -128,19 +148,25 @@ class UserProfilePage extends StatelessWidget {
                                   label: "Followers",
                                   value: user?.followers,
                                   loading: loading,
-                                )),
+                                ).animate().fadeIn(duration: 300.ms).scale(
+                                        begin: const Offset(0.95, 0.95),
+                                        end: const Offset(1, 1))),
                                 Expanded(
                                     child: HSUserProfileStatsChip(
                                   label: "Following",
                                   value: user?.following,
                                   loading: loading,
-                                )),
+                                ).animate().fadeIn(duration: 300.ms).scale(
+                                        begin: const Offset(0.95, 0.95),
+                                        end: const Offset(1, 1))),
                                 Expanded(
                                     child: HSUserProfileStatsChip(
                                   label: "Spots",
                                   value: user?.spots,
                                   loading: loading,
-                                )),
+                                ).animate().fadeIn(duration: 300.ms).scale(
+                                        begin: const Offset(0.95, 0.95),
+                                        end: const Offset(1, 1))),
                               ],
                             );
                           },
@@ -153,7 +179,13 @@ class UserProfilePage extends StatelessWidget {
                   child: SizedBox(
                     height: 50.0,
                     child: _UserProfileActionButton(
-                        isLoading: loading, userProfileCubit: userProfileCubit),
+                            isLoading: loading,
+                            userProfileCubit: userProfileCubit)
+                        .animate()
+                        .fadeIn(duration: 300.ms)
+                        .scale(
+                            begin: const Offset(0.95, 0.95),
+                            end: const Offset(1, 1)),
                   ),
                 ),
                 if (loading)
@@ -172,7 +204,12 @@ class UserProfilePage extends StatelessWidget {
                       ),
                       itemCount: 12,
                       itemBuilder: (BuildContext context, int index) {
-                        return const HSShimmerBox(width: 10, height: 10);
+                        return const HSShimmerBox(width: 10, height: 10)
+                            .animate()
+                            .fadeIn(duration: 300.ms)
+                            .scale(
+                                begin: const Offset(0.95, 0.95),
+                                end: const Offset(1, 1));
                       },
                     ),
                   ])
@@ -199,37 +236,88 @@ class UserProfilePage extends StatelessWidget {
                               imageUrl: spot.images!.first,
                               progressIndicatorBuilder:
                                   (context, url, progress) =>
-                                      const HSShimmerBox(width: 60, height: 60),
+                                      const HSShimmerBox(width: 60, height: 60)
+                                          .animate()
+                                          .fadeIn(duration: 300.ms)
+                                          .scale(
+                                              begin: const Offset(0.95, 0.95),
+                                              end: const Offset(1, 1)),
                               imageBuilder: (context, imageProvider) => Column(
                                 children: [
                                   Expanded(
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
+                                        borderRadius: BorderRadius.circular(10),
                                         image: DecorationImage(
                                           image: imageProvider,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
-                                    ),
+                                    ).animate().fadeIn(duration: 300.ms).scale(
+                                        begin: const Offset(0.95, 0.95),
+                                        end: const Offset(1, 1)),
                                   ),
-                                  const Gap(8.0),
-                                  AutoSizeText(spot.title!, maxLines: 2),
+                                  const Gap(12),
+                                  AutoSizeText(
+                                    spot.title!,
+                                    style: textTheme.bodyMedium,
+                                    minFontSize: 12.0,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ).animate().fadeIn(duration: 300.ms).scale(
+                                      begin: const Offset(0.95, 0.95),
+                                      end: const Offset(1, 1)),
                                 ],
                               ),
                             ),
                           );
                         },
-                      ),
+                      )
                     ],
-                  ),
+                  )
               ],
             ),
           ),
         );
       },
     );
+  }
+}
+
+class _UserProfileActionButton extends StatelessWidget {
+  const _UserProfileActionButton({
+    required this.isLoading,
+    required this.userProfileCubit,
+  });
+
+  final bool isLoading;
+  final HSUserProfileCubit userProfileCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const SizedBox(
+        height: 8.0,
+        width: 8.0,
+        child: CircularProgressIndicator.adaptive(),
+      );
+    }
+    final user = userProfileCubit.state.user;
+    return HSButton(
+      child: Text(
+        "Add a Spot",
+      ),
+      onPressed: () async {
+        // final bool? created = await navi.toCreateSpot(
+        //     user: user, source: HSSpotCreateSource.userProfile);
+        // if (created == true && context.mounted) {
+        //   userProfileCubit.refresh();
+        // }
+      },
+    )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
   }
 }
 
@@ -262,41 +350,41 @@ class HSUserProfileStatsChip extends StatelessWidget {
   }
 }
 
-class _UserProfileActionButton extends StatelessWidget {
-  const _UserProfileActionButton(
-      {required this.isLoading, required this.userProfileCubit});
+// class _UserProfileActionButton extends StatelessWidget {
+//   const _UserProfileActionButton(
+//       {required this.isLoading, required this.userProfileCubit});
 
-  final bool isLoading;
-  final HSUserProfileCubit userProfileCubit;
+//   final bool isLoading;
+//   final HSUserProfileCubit userProfileCubit;
 
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const HSShimmer(
-        child: HSShimmerSkeleton(
-          borderRadius: 8.0,
-          child: Opacity(
-              opacity: 0.0,
-              child: HSButton(
-                child: Text("data"),
-              )),
-        ),
-      );
-    }
-    if (userProfileCubit.isOwnProfile) {
-      return HSButton.outlined(
-          onPressed: navi.toEditProfile, child: const Text("Edit Profile"));
-    } else {
-      if (userProfileCubit.state.isFollowed == true) {
-        return HSButton.outlined(
-            borderRadius: 6.0,
-            onPressed: userProfileCubit.followUser,
-            child: const Text("Unfollow"));
-      } else {
-        return HSButton(
-            onPressed: userProfileCubit.followUser,
-            child: const Text("Follow"));
-      }
-    }
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     if (isLoading) {
+//       return const HSShimmer(
+//         child: HSShimmerSkeleton(
+//           borderRadius: 8.0,
+//           child: Opacity(
+//               opacity: 0.0,
+//               child: HSButton(
+//                 child: Text("data"),
+//               )),
+//         ),
+//       );
+//     }
+//     if (userProfileCubit.isOwnProfile) {
+//       return HSButton.outlined(
+//           onPressed: navi.toEditProfile, child: const Text("Edit Profile"));
+//     } else {
+//       if (userProfileCubit.state.isFollowed == true) {
+//         return HSButton.outlined(
+//             borderRadius: 6.0,
+//             onPressed: userProfileCubit.followUser,
+//             child: const Text("Unfollow"));
+//       } else {
+//         return HSButton(
+//             onPressed: userProfileCubit.followUser,
+//             child: const Text("Follow"));
+//       }
+//     }
+//   }
+// }

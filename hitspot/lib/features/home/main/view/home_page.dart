@@ -20,6 +20,8 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
 
+import 'package:flutter_animate/flutter_animate.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -49,7 +51,10 @@ class HomePage extends StatelessWidget {
                       height: 30,
                       alignment: Alignment.centerLeft,
                     ),
-                  ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms)
+                      .slideX(begin: -0.2, end: 0),
                   actions: <Widget>[
                     IconButton(
                       icon: HSUserAvatar(
@@ -57,7 +62,10 @@ class HomePage extends StatelessWidget {
                       onPressed: () => navi.toUser(
                         userID: currentUser.uid!,
                       ),
-                    ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 300.ms)
+                        .slideX(begin: 0.2, end: 0),
                   ],
                   floating: true,
                   pinned: true,
@@ -68,84 +76,100 @@ class HomePage extends StatelessWidget {
                   centerTitle: false,
                   titleSpacing: 0.0,
                   title: Text.rich(
-                      TextSpan(
-                        text: "Hello ",
-                        children: [
-                          TextSpan(
-                              text: currentUser.username,
-                              style: textTheme.headlineMedium),
-                          TextSpan(
-                              text: " ,\nWhere would you like to go?",
-                              style: textTheme.headlineLarge!.hintify),
-                        ],
-                      ),
-                      style: textTheme.headlineMedium!.hintify),
+                    TextSpan(
+                      text: "Hello ",
+                      children: [
+                        TextSpan(
+                            text: currentUser.username,
+                            style: textTheme.headlineMedium),
+                        TextSpan(
+                            text: " ,\nWhere would you like to go?",
+                            style: textTheme.headlineLarge!.hintify),
+                      ],
+                    ),
+                    style: textTheme.headlineMedium!.hintify,
+                  )
+                      .animate()
+                      .fadeIn(duration: 400.ms)
+                      .slideY(begin: 0.2, end: 0),
                   floating: true,
                   pinned: true,
                 ),
                 const SliverToBoxAdapter(
                   child: Gap(16.0),
                 ),
-                const SliverAppBar(
-                  titleSpacing: 0.0,
-                  automaticallyImplyLeading: false,
-                  surfaceTintColor: Colors.transparent,
-                  stretch: true,
-                  title: HSSearchBar(height: 52.0),
-                  centerTitle: true,
+                SliverToBoxAdapter(
+                  child: HSSearchBar(height: 52.0)
+                      .animate()
+                      .fadeIn(duration: 500.ms)
+                      .scale(
+                          begin: const Offset(0.95, 0.95),
+                          end: const Offset(1, 1)),
                 ),
                 const Gap(32.0).toSliver,
-                SizedBox(
-                  height: 160,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: BlocSelector<HSHomeCubit, HSHomeState, Position?>(
-                      selector: (state) => state.currentPosition,
-                      builder: (context, currentPosition) {
-                        if (currentPosition != null) {
-                          homeCubit.animateCameraToNewLatLng(
-                              currentPosition.toLatLng);
-                        }
-                        return GestureDetector(
-                          onTap: () => navi.pushTransition(
-                            PageTransitionType.fade,
-                            MapProvider(initialCameraPosition: currentPosition),
-                          ),
-                          child: AbsorbPointer(
-                            absorbing: true,
-                            child: GoogleMap(
-                              onMapCreated: (GoogleMapController controller) {
-                                if (mapController.isCompleted) {
-                                  mapController =
-                                      Completer<GoogleMapController>();
-                                }
-                                mapController.complete(controller);
-                                app.theme.applyMapDarkStyle(mapController);
-                              },
-                              myLocationButtonEnabled: false,
-                              initialCameraPosition: const CameraPosition(
-                                zoom: 16.0,
-                                target: LatLng(0, 0),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 160,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: BlocSelector<HSHomeCubit, HSHomeState, Position?>(
+                        selector: (state) => state.currentPosition,
+                        builder: (context, currentPosition) {
+                          if (currentPosition != null) {
+                            homeCubit.animateCameraToNewLatLng(
+                                currentPosition.toLatLng);
+                          }
+                          return GestureDetector(
+                            onTap: () => navi.pushTransition(
+                              PageTransitionType.fade,
+                              MapProvider(
+                                  initialCameraPosition: currentPosition),
+                            ),
+                            child: AbsorbPointer(
+                              absorbing: true,
+                              child: GoogleMap(
+                                onMapCreated: (GoogleMapController controller) {
+                                  if (mapController.isCompleted) {
+                                    mapController =
+                                        Completer<GoogleMapController>();
+                                  }
+                                  mapController.complete(controller);
+                                  app.theme.applyMapDarkStyle(mapController);
+                                },
+                                myLocationButtonEnabled: false,
+                                initialCameraPosition: const CameraPosition(
+                                  zoom: 16.0,
+                                  target: LatLng(0, 0),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ).toSliver,
+                  )
+                      .animate()
+                      .fadeIn(duration: 600.ms)
+                      .slideY(begin: 0.2, end: 0),
+                ),
                 if (trendingBoards.isNotEmpty)
                   SliverMainAxisGroup(
                     slivers: [
                       const Gap(32.0).toSliver,
                       Text("Trending Boards", style: textTheme.headlineMedium)
+                          .animate()
+                          .fadeIn(duration: 700.ms)
+                          .slideX(begin: -0.2, end: 0)
                           .toSliver,
                       const Gap(16.0).toSliver,
                       SliverToBoxAdapter(
                         child: _TrendingBoardsBuilder(
                           isLoading: isLoading,
                           trendingBoards: trendingBoards,
-                        ),
+                        )
+                            .animate()
+                            .fadeIn(duration: 800.ms)
+                            .slideX(begin: 0.2, end: 0),
                       ),
                     ],
                   ),
@@ -153,9 +177,16 @@ class HomePage extends StatelessWidget {
                 if (!isLoading && homeCubit.state.nearbySpots.isNotEmpty)
                   SliverMainAxisGroup(
                     slivers: [
-                      Text("Nearby Spots", style: textTheme.headlineMedium)
-                          .toSliver,
-                      const Gap(16.0).toSliver,
+                      SliverToBoxAdapter(
+                        child: Text("Nearby Spots",
+                                style: textTheme.headlineMedium)
+                            .animate()
+                            .fadeIn(duration: 900.ms)
+                            .slideX(begin: -0.2, end: 0),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: Gap(16.0),
+                      ),
                       BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
                         selector: (state) => state.nearbySpots,
                         builder: (context, nearbySpots) => HSSpotsGrid(
@@ -168,7 +199,11 @@ class HomePage extends StatelessWidget {
                     ],
                   )
                 else
-                  HSSpotsGrid.loading(isSliver: true),
+                  SliverAnimatedOpacity(
+                    opacity: 1.0,
+                    duration: const Duration(milliseconds: 1000),
+                    sliver: HSSpotsGrid.loading(isSliver: true),
+                  ),
               ],
             ),
           );
@@ -202,7 +237,10 @@ class _TrendingBoardsBuilder extends StatelessWidget {
         itemCount: isLoading ? 16 : trendingBoards.length,
         itemBuilder: (context, index) {
           if (isLoading) {
-            return HSShimmerBox(width: (index % 3 + 2) * 60, height: null);
+            return HSShimmerBox(width: (index % 3 + 2) * 60, height: null)
+                .animate()
+                .fadeIn(duration: 300.ms, delay: (index * 100).ms)
+                .shimmer(duration: 1500.ms, color: Colors.white24);
           }
           final board = trendingBoards[index];
           return GestureDetector(
@@ -210,7 +248,8 @@ class _TrendingBoardsBuilder extends StatelessWidget {
             child: HSBoardTile(
               board: board,
               width: (index % 3 + 2) * 80,
-            ),
+            ).animate().fadeIn(duration: 300.ms, delay: (index * 100).ms).scale(
+                begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
           );
         },
       ),
@@ -241,24 +280,10 @@ class HSBoardTile extends StatelessWidget {
           imageUrl: board.image,
           opacity: .8,
         ),
-        // Positioned(
-        //   bottom: 8.0,
-        //   left: 16.0,
-        //   right: 16.0,
-        //   child: ClipRRect(
-        //     borderRadius: BorderRadius.circular(8.0),
-        //     child: Container(
-        //       color: Colors.white,
-        //       padding: const EdgeInsets.all(4.0),
-        //       child: AutoSizeText(
-        //         board.title!,
-        //         style: textTheme.headlineMedium,
-        //         maxLines: 1,
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
-    );
+    )
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .shimmer(duration: 2000.ms, color: Colors.white24)
+        .then(delay: 2000.ms);
   }
 }

@@ -23,7 +23,11 @@ class ChooseLocationPage extends StatelessWidget {
       topSafe: false,
       body: Stack(
         fit: StackFit.expand,
-        children: [_MapAndSearchBar(), const _Pin(), const _BottomBar()],
+        children: [
+          _MapAndSearchBar(),
+          const _Pin(),
+          const _BottomBar(),
+        ],
       ),
     );
   }
@@ -131,29 +135,31 @@ class _BottomBar extends StatelessWidget {
             child: Column(
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 16.0),
                   child: HSTextField.filled(
                     focusNode: chooseLocationCubit.searchNode,
                     hintText: address,
                     controller: chooseLocationCubit.searchController,
-                    suffixIcon: const Icon(Icons.location_pin),
+                    suffixIcon: const Icon(Icons.search),
                   ),
                 ),
                 if (!isSearching)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      TextButton(
-                        onPressed: chooseLocationCubit.cancel,
-                        child: const Text("Cancel"),
-                      ),
-                      TextButton(
-                        onPressed: chooseLocationCubit.submit,
-                        child: const Text("Select"),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: chooseLocationCubit.cancel,
+                          child: const Text("Cancel"),
+                        ),
+                        ElevatedButton(
+                          onPressed: chooseLocationCubit.submit,
+                          child: const Text("Select"),
+                        ),
+                      ],
+                    ),
                   ),
                 if (isSearching)
                   Expanded(
@@ -187,15 +193,17 @@ class _BottomBar extends StatelessWidget {
                           itemCount: predictions.length,
                           separatorBuilder: (BuildContext context, int index) {
                             return const SizedBox(
-                              height: 20.0,
+                              height: 10.0,
                             );
                           },
                           itemBuilder: (BuildContext context, int index) {
                             final HSPrediction prediction = predictions[index];
                             return ListTile(
-                              leading: const Icon(FontAwesomeIcons.mapPin),
+                              leading: const Icon(Icons.place),
                               title: AutoSizeText(prediction.description,
-                                  maxLines: 1),
+                                  maxLines: 1,
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w600)),
                               onTap: () => chooseLocationCubit
                                   .onPredictionSelected(prediction),
                             );
