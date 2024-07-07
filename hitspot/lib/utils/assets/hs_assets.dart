@@ -69,13 +69,6 @@ class HSAssets {
       {LatLng? currentPosition,
       Function(HSSpot spot)? onTap,
       HSSpotMarkerType type = HSSpotMarkerType.unverified}) {
-    late final double dis;
-    if (currentPosition != null) {
-      dis = calculateDistance(currentPosition.latitude,
-          currentPosition.longitude, spot.latitude, spot.longitude);
-    } else {
-      dis = 0.0;
-    }
     return Marker(
       markerId: MarkerId(spot.hashCode.toString()),
       icon: _getSpotMarker(spot, isSelected: type == HSSpotMarkerType.selected),

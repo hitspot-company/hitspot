@@ -30,17 +30,20 @@ class UserProfilePage extends StatelessWidget {
       builder: (context, state) {
         final HSUser? user = userProfileCubit.state.user;
         final bool loading = state.status == HSUserProfileStatus.loading;
+        final bool ownProfile = userProfileCubit.isOwnProfile;
         return RefreshIndicator.adaptive(
           onRefresh: userProfileCubit.refresh,
           child: HSScaffold(
             appBar: HSAppBar(
               enableDefaultBackButton: true,
-              right: IconButton(
-                onPressed: navi.toSettings,
-                icon: const Icon(
-                  FontAwesomeIcons.ellipsisVertical,
-                ),
-              ),
+              right: ownProfile
+                  ? IconButton(
+                      onPressed: navi.toSettings,
+                      icon: const Icon(
+                        FontAwesomeIcons.ellipsisVertical,
+                      ),
+                    )
+                  : null,
             ),
             body: CustomScrollView(
               slivers: [

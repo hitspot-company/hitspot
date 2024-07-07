@@ -5,6 +5,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
+import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -83,10 +84,25 @@ class MainSearchDelegate extends SearchDelegate<String> {
                   child: SizedBox(
                     width: screenWidth,
                     child: ListView.separated(
-                      separatorBuilder: (context, index) => const Divider(),
+                      separatorBuilder: (context, index) => const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Divider(
+                          thickness: .1,
+                          color: Colors.grey,
+                        ),
+                      ),
                       itemCount: users.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return HsUserTile(user: users[index]);
+                        final user = users[index];
+                        return ListTile(
+                          onTap: () => navi.toUser(userID: user.uid!),
+                          title: Text(user.username!),
+                          subtitle: Text(user.name!),
+                          leading: HSUserAvatar(
+                            radius: 24.0,
+                            imageUrl: user.avatarUrl,
+                          ),
+                        );
                       },
                     ),
                   ),
