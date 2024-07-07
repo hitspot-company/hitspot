@@ -16,6 +16,7 @@ import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:page_transition/page_transition.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});
