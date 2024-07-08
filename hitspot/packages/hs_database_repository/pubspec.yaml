@@ -12,4 +12,5 @@ dependencies:
     path: ../hs_debug_logger
   hs_authentication_repository:
     path: ../hs_authentication_repository
+  infinite_scroll_pagination: ^4.0.0
 

@@ -1,7 +1,10 @@
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/spots/multiple/view/multiple_spots_provider.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
@@ -24,7 +27,9 @@ class UserProfilePage extends StatelessWidget {
           length: 2,
           child: HSScaffold(
             sidePadding: 0.0,
-            body: NestedScrollView(
+            body: ExtendedNestedScrollView(
+              onlyOneScrollInBody: true,
+              floatHeaderSlivers: false,
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return [
@@ -196,18 +201,36 @@ class _SpotsList extends StatelessWidget {
         final spots = state.spots;
         final bool isFetchingMore =
             state.status == HSUserProfileStatus.loadingMoreSpots;
-        return GridView.builder(
-          shrinkWrap: true,
-          controller: userProfileCubit.spotsScrollController,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemCount: spots.length,
-          itemBuilder: (BuildContext context, int index) {
-            return AnimatedSpotTile(spot: spots[index], index: index);
-          },
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GridView.builder(
+              shrinkWrap: true,
+              controller: userProfileCubit.spotsScrollController,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: spots.length + (isFetchingMore ? 1 : 0),
+              itemBuilder: (BuildContext context, int index) {
+                if (index == spots.length) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return AnimatedSpotTile(spot: spots[index], index: index);
+              },
+            ),
+            const Gap(16.0),
+            SizedBox(
+              width: screenWidth / 1.5,
+              child: HSButton(
+                child: const Text("More"),
+                onPressed: () => navi.pushPage(
+                  page: MultipleSpotsProvider(userID: userProfileCubit.userID),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -229,13 +252,11 @@ class _BoardsList extends StatelessWidget {
         final bool isFetchingMore =
             state.status == HSUserProfileStatus.loadingMoreBoards;
         return ListView.builder(
-          controller: userProfileCubit.spotsScrollController,
-          itemCount: state.boards.length + 1,
+          controller: userProfileCubit.boardsScrollController,
+          itemCount: state.boards.length + (isFetchingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == state.boards.length) {
-              return isFetchingMore
-                  ? const Center(child: CircularProgressIndicator())
-                  : const SizedBox();
+              return const Center(child: CircularProgressIndicator());
             }
             final board = state.boards[index];
             return ListTile(

@@ -24,41 +24,85 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
 
   @override
   Future<void> close() {
+    _spotsScrollController.removeListener(_onSpotsScroll);
+    _boardsScrollController.removeListener(_onBoardsScroll);
     _spotsScrollController.dispose();
     _boardsScrollController.dispose();
     return super.close();
   }
 
   void _onSpotsScroll() {
-    HSDebugLogger.logInfo(
-        "Spots Scroll: ${_spotsScrollController.position.pixels}");
-    if (_spotsScrollController.position.pixels ==
-            _spotsScrollController.position.maxScrollExtent &&
+    if (_spotsScrollController.position.pixels >=
+            _spotsScrollController.position.maxScrollExtent - 200 &&
         state.status != HSUserProfileStatus.loadingMoreSpots) {
       _loadMoreSpots();
     }
   }
 
   void _onBoardsScroll() {
-    if (_boardsScrollController.position.pixels ==
-            _boardsScrollController.position.maxScrollExtent &&
+    if (_boardsScrollController.position.pixels >=
+            _boardsScrollController.position.maxScrollExtent - 200 &&
         state.status != HSUserProfileStatus.loadingMoreBoards) {
       _loadMoreBoards();
     }
   }
 
   Future<void> _loadMoreSpots() async {
+    // if (state.hasReachedMaxSpots) return;
+
     HSDebugLogger.logInfo("Fetching more spots...");
     emit(state.copyWith(status: HSUserProfileStatus.loadingMoreSpots));
-    await Future.delayed(const Duration(seconds: 1));
-    emit(state.copyWith(status: HSUserProfileStatus.loaded));
+
+    try {
+      final newSpots = await _databaseRepository.spotfetchUserSpots(
+        user: state.user!,
+        // startAfter: state.spots.last,
+        // limit: 10,
+      );
+
+      if (newSpots.isEmpty) {
+        emit(state.copyWith(
+          status: HSUserProfileStatus.loaded,
+          // hasReachedMaxSpots: true,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: HSUserProfileStatus.loaded,
+          spots: List.of(state.spots)..addAll(newSpots),
+        ));
+      }
+    } catch (e) {
+      HSDebugLogger.logError("Error loading more spots: $e");
+      emit(state.copyWith(status: HSUserProfileStatus.error));
+    }
   }
 
   Future<void> _loadMoreBoards() async {
     HSDebugLogger.logInfo("Fetching more boards...");
     emit(state.copyWith(status: HSUserProfileStatus.loadingMoreBoards));
-    await Future.delayed(const Duration(seconds: 1));
-    emit(state.copyWith(status: HSUserProfileStatus.loaded));
+
+    try {
+      final newBoards = await _databaseRepository.boardFetchUserBoards(
+        user: state.user!,
+        // startAfter: state.boards.last,
+        // limit: 10,
+      );
+
+      if (newBoards.isEmpty) {
+        emit(state.copyWith(
+          status: HSUserProfileStatus.loaded,
+          // hasReachedMaxBoards: true,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: HSUserProfileStatus.loaded,
+          boards: List.of(state.boards)..addAll(newBoards),
+        ));
+      }
+    } catch (e) {
+      HSDebugLogger.logError("Error loading more boards: $e");
+      emit(state.copyWith(status: HSUserProfileStatus.error));
+    }
   }
 
   Future<void> refresh() async {
@@ -68,10 +112,10 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
   }
 
   Future<void> _init() async {
-    _spotsScrollController.addListener(() {
-      HSDebugLogger.logInfo("INFO");
-    });
+    _spotsScrollController.addListener(_onSpotsScroll);
     _boardsScrollController.addListener(_onBoardsScroll);
+    emit(state.copyWith(status: HSUserProfileStatus.loading));
+
     emit(state.copyWith(status: HSUserProfileStatus.loading));
     if (userID == currentUser.uid) {
       isOwnProfile = true;
