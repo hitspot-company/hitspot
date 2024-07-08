@@ -88,6 +88,12 @@ class MainSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     mapSearchCubit.updateQuery(query);
+    if (query.isEmpty) {
+      return _TrendingSpotsPage(
+        mapSearchCubit: mapSearchCubit,
+        query: query,
+      );
+    }
     return BlocSelector<HSMainSearchCubit, HSMainSearchState, List<HSUser>>(
       selector: (state) => state.users,
       builder: (context, fetchedUsers) {
@@ -113,10 +119,36 @@ class MainSearchDelegate extends SearchDelegate<String> {
             ),
           ],
         );
-        // default:
-        //   return const HSLoadingIndicator()
-        //       .animate()
-        //       .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
+      },
+    );
+  }
+}
+
+class _TrendingSpotsPage extends StatelessWidget {
+  const _TrendingSpotsPage({required this.mapSearchCubit, required this.query});
+
+  final HSMainSearchCubit mapSearchCubit;
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<HSSpot> spots = mapSearchCubit.state.trendingSpots;
+    if (spots.isEmpty) {
+      return Text("No spots found for $query", textAlign: TextAlign.center)
+          .animate()
+          .fadeIn(duration: 300.ms)
+          .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1));
+    }
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        // childAspectRatio: 1,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: spots.length,
+      itemBuilder: (BuildContext context, int index) {
+        return _AnimatedSpotTile(spot: spots[index], index: index);
       },
     );
   }

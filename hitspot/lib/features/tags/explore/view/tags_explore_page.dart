@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/tags/explore/cubit/hs_tags_explore_cubit.dart';
+import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -16,12 +17,12 @@ class TagsExplorePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tagsExploreCubit = BlocProvider.of<HsTagsExploreCubit>(context);
+    final tagsExploreCubit = BlocProvider.of<HSTagsExploreCubit>(context);
     return HSScaffold(
       appBar: HSAppBar(
         enableDefaultBackButton: true,
       ),
-      body: BlocSelector<HsTagsExploreCubit, HsTagsExploreState,
+      body: BlocSelector<HSTagsExploreCubit, HSTagsExploreState,
           HSTagsExploreStatus>(
         selector: (state) => state.status,
         builder: (context, state) {
@@ -121,11 +122,12 @@ class _AnimatedTopSpot extends StatelessWidget {
             .fadeIn(duration: 400.ms, curve: Curves.easeInOut)
             .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
         const Gap(8.0),
-        Text(
-          "${topSpot.title} by @${topSpot.author?.username}",
-          style: const TextStyle(color: Colors.grey),
-          textAlign: TextAlign.center,
-        )
+        HSTextPrompt(
+                prompt: "@${topSpot.author?.username}'s ",
+                pressableText: topSpot.title!,
+                promptColor: app.theme.mainColor,
+                textStyle: textTheme.bodyMedium,
+                onTap: () => navi.toSpot(sid: topSpot.sid!))
             .animate()
             .fadeIn(duration: 300.ms, delay: 200.ms)
             .slideY(begin: 0.2, end: 0),

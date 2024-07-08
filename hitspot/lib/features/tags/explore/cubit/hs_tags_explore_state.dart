@@ -8,8 +8,8 @@ enum HSTagsExploreStatus {
   error
 }
 
-final class HsTagsExploreState extends Equatable {
-  const HsTagsExploreState({
+final class HSTagsExploreState extends Equatable {
+  const HSTagsExploreState({
     this.status = HSTagsExploreStatus.initial,
     this.topSpot = const HSSpot(),
     this.spots = const [],
@@ -26,12 +26,12 @@ final class HsTagsExploreState extends Equatable {
         spots,
       ];
 
-  HsTagsExploreState copyWith({
+  HSTagsExploreState copyWith({
     HSTagsExploreStatus? status,
     HSSpot? topSpot,
     List<HSSpot>? spots,
   }) {
-    return HsTagsExploreState(
+    return HSTagsExploreState(
       status: status ?? this.status,
       topSpot: topSpot ?? this.topSpot,
       spots: spots ?? this.spots,

@@ -214,6 +214,14 @@ class HSDatabaseRepsitory {
   Future<HSSpot> spotFetchTopSpotWithTag(String tag) async =>
       await _spotsRepository.fetchTopSpotWithTag(tag);
 
+  Future<List<HSSpot>> spotFetchTrendingSpots(
+          {int batchSize = 20,
+          int batchOffset = 0,
+          double? lat,
+          double? long}) async =>
+      await _spotsRepository.fetchTrendingSpots(
+          batchSize, batchOffset, lat, long);
+
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);
   Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>

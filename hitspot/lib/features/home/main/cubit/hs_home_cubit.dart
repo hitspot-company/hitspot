@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/main.dart';
+import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -50,19 +50,21 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       final long = currentPosition.longitude;
       final List<HSSpot> nearbySpots = await app.databaseRepository
           .spotFetchSpotsWithinRadius(lat: lat, long: long);
-      final List<HSSpot> ret = [];
-      for (var i = 0; i < nearbySpots.length; i++) {
-        ret.add(
-          nearbySpots[i].copyWith(
-            author: await app.databaseRepository
-                .userRead(userID: nearbySpots[i].createdBy),
-          ),
-        );
-      }
-      emit(state.copyWith(nearbySpots: ret, currentPosition: currentPosition));
+      placeMarkers();
+      emit(state.copyWith(
+          nearbySpots: nearbySpots, currentPosition: currentPosition));
     } catch (_) {
       HSDebugLogger.logError("Error fetching nearby spots: $_");
     }
+  }
+
+  void placeMarkers() {
+    final List<HSSpot> spots = state.nearbySpots;
+    List<Marker> markers = app.assets.generateMarkers(
+      spots,
+      state.currentPosition?.toLatLng,
+    );
+    emit(state.copyWith(markers: markers));
   }
 
   Future<void> animateCameraToNewLatLng(LatLng location) async {

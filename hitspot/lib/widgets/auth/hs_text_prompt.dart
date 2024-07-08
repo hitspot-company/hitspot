@@ -11,6 +11,7 @@ class HSTextPrompt extends StatelessWidget {
     required this.promptColor,
     required this.onTap,
     this.textAlign = TextAlign.center,
+    this.textStyle,
   });
 
   final String prompt;
@@ -18,6 +19,7 @@ class HSTextPrompt extends StatelessWidget {
   final Color promptColor;
   final TextAlign textAlign;
   final VoidCallback onTap;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class HSTextPrompt extends StatelessWidget {
       child: Text.rich(
         TextSpan(
           text: prompt,
-          style: app.textTheme.bodySmall!.hintify,
+          style: textStyle ?? app.textTheme.bodySmall!.hintify,
           children: [
             TextSpan(
               text: pressableText,

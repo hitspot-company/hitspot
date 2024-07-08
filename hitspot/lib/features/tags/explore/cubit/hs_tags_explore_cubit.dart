@@ -6,8 +6,8 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 part 'hs_tags_explore_state.dart';
 
-class HsTagsExploreCubit extends Cubit<HsTagsExploreState> {
-  HsTagsExploreCubit(this.tag) : super(const HsTagsExploreState()) {
+class HSTagsExploreCubit extends Cubit<HSTagsExploreState> {
+  HSTagsExploreCubit(this.tag) : super(const HSTagsExploreState()) {
     initialize();
   }
 

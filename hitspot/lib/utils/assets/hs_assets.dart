@@ -86,7 +86,6 @@ class HSAssets {
       final type = selectedSpotID == spots[i].sid
           ? HSSpotMarkerType.selected
           : HSSpotMarkerType.unverified;
-      HSDebugLogger.logInfo("Type : $type");
       generatedMapMarkers.add(createSpotMarker(spots[i],
           currentPosition: currentPosition, onTap: onTap, type: type));
     }

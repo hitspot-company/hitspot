@@ -7,7 +7,6 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
-import 'package:hitspot/features/map/clustered/view/clustered_map_page.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -112,43 +111,50 @@ class HomePage extends StatelessWidget {
                   child: SizedBox(
                     height: 160,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16.0),
-                      child: BlocSelector<HSHomeCubit, HSHomeState, Position?>(
-                        selector: (state) => state.currentPosition,
-                        builder: (context, currentPosition) {
-                          if (currentPosition != null) {
-                            homeCubit.animateCameraToNewLatLng(
-                                currentPosition.toLatLng);
-                          }
-                          return GestureDetector(
-                            onTap: () => navi.pushTransition(
-                              PageTransitionType.fade,
-                              MapProvider(
-                                  initialCameraPosition: currentPosition),
-                            ),
-                            child: AbsorbPointer(
-                              absorbing: true,
-                              child: GoogleMap(
-                                onMapCreated: (GoogleMapController controller) {
-                                  if (mapController.isCompleted) {
-                                    mapController =
-                                        Completer<GoogleMapController>();
-                                  }
-                                  mapController.complete(controller);
-                                  app.theme.applyMapDarkStyle(mapController);
-                                },
-                                myLocationButtonEnabled: false,
-                                myLocationEnabled: true,
-                                initialCameraPosition: const CameraPosition(
-                                  zoom: 16.0,
-                                  target: LatLng(0, 0),
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: BlocBuilder<HSHomeCubit, HSHomeState>(
+                          buildWhen: (previous, current) =>
+                              previous.currentPosition !=
+                                  current.currentPosition ||
+                              previous.markers != current.markers,
+                          builder: (context, state) {
+                            final Position? currentPosition =
+                                state.currentPosition;
+                            final Set<Marker> markers = state.markers.toSet();
+                            if (currentPosition != null) {
+                              homeCubit.animateCameraToNewLatLng(
+                                  currentPosition.toLatLng);
+                            }
+                            return GestureDetector(
+                              onTap: () => navi.pushTransition(
+                                PageTransitionType.fade,
+                                MapProvider(
+                                    initialCameraPosition: currentPosition),
+                              ),
+                              child: AbsorbPointer(
+                                absorbing: true,
+                                child: GoogleMap(
+                                  onMapCreated:
+                                      (GoogleMapController controller) {
+                                    if (mapController.isCompleted) {
+                                      mapController =
+                                          Completer<GoogleMapController>();
+                                    }
+                                    mapController.complete(controller);
+                                    app.theme.applyMapDarkStyle(mapController);
+                                  },
+                                  myLocationButtonEnabled: false,
+                                  myLocationEnabled: true,
+                                  initialCameraPosition: const CameraPosition(
+                                    zoom: 16.0,
+                                    target: LatLng(0, 0),
+                                  ),
+                                  markers: markers,
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                            );
+                          },
+                        )),
                   )
                       .animate()
                       .fadeIn(duration: 600.ms)
@@ -289,8 +295,5 @@ class HSBoardTile extends StatelessWidget {
         ),
       ],
     );
-    // .animate(onPlay: (controller) => controller.repeat(reverse: true))
-    // .shimmer(duration: 2000.ms, color: Colors.white24)
-    // .then(delay: 2000.ms);
   }
 }

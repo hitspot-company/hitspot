@@ -11,7 +11,7 @@ class TagsExploreProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HsTagsExploreCubit(tag),
+      create: (context) => HSTagsExploreCubit(tag),
       child: const TagsExplorePage(),
     );
   }

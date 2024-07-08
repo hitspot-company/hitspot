@@ -10,15 +10,34 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 part 'hs_main_search_state.dart';
 
 class HSMainSearchCubit extends Cubit<HSMainSearchState> {
-  HSMainSearchCubit() : super(const HSMainSearchState());
+  HSMainSearchCubit() : super(const HSMainSearchState()) {
+    _init();
+  }
 
   Timer? _debounce;
+  final _databaseRepository = app.databaseRepository;
+
+  void _init() {
+    fetchTrendingSpots();
+  }
 
   void updateQuery(String val) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () async {
       emit(state.copyWith(query: val, users: await fetchPredictions()));
     });
+  }
+
+  Future<List<HSSpot>> fetchTrendingSpots() async {
+    try {
+      final List<HSSpot> fetchedSpots =
+          await _databaseRepository.spotFetchTrendingSpots();
+      emit(state.copyWith(trendingSpots: fetchedSpots));
+    } catch (e) {
+      HSDebugLogger.logError("Error $e");
+      return [];
+    }
+    return (state.trendingSpots);
   }
 
   Future<List<HSSpot>> fetchSpots() async {
