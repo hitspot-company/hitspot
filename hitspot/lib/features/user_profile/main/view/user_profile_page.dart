@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -27,6 +28,8 @@ class UserProfilePage extends StatelessWidget {
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
+                scrolledUnderElevation: 0.0,
+                surfaceTintColor: Colors.transparent,
                 expandedHeight: 300.0,
                 pinned: true,
                 stretch: true,
@@ -53,11 +56,36 @@ class UserProfilePage extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodyMedium,
                         ).animate().fadeIn(duration: 300.ms),
                       const SizedBox(height: 24),
-                      _buildContentSection(
-                          context, "Spots", loading, userProfileCubit),
+                      if (userProfileCubit.state.spots.isNotEmpty)
+                        _buildContentSection(
+                            context, "Spots", loading, userProfileCubit),
                       const SizedBox(height: 24),
-                      _buildContentSection(
-                          context, "Boards", loading, userProfileCubit),
+                      if (userProfileCubit.state.boards.isNotEmpty)
+                        _buildContentSection(
+                            context, "Boards", loading, userProfileCubit),
+                      if (userProfileCubit.state.spots.isEmpty &&
+                          userProfileCubit.state.boards.isEmpty &&
+                          !loading)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  FontAwesomeIcons.xmark,
+                                  size: 64,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No spots or boards yet',
+                                  style: textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ).animate().fadeIn(duration: 300.ms),
                     ],
                   ),
                 ),
@@ -112,7 +140,10 @@ class UserProfilePage extends StatelessWidget {
                       fontSize: 24, fontWeight: FontWeight.bold),
                 ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
               if (loading)
-                const HSShimmerBox(width: 150, height: 20)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: const HSShimmerBox(width: 150, height: 20),
+                )
               else
                 Text(
                   '@${user?.username ?? ''}',
@@ -161,6 +192,28 @@ class _SpotsList extends StatelessWidget {
     }
 
     final spots = userProfileCubit.state.spots;
+    if (spots.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.location_on,
+                size: 64,
+                color: Colors.grey,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'The user has no spots',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -267,6 +320,29 @@ class _BoardsList extends StatelessWidget {
     }
 
     final boards = userProfileCubit.state.boards;
+    if (boards.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.library_books,
+                size: 64,
+                color: Colors.grey,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'The user has no boards',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -303,43 +379,55 @@ class _BoardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: HSImage(
-                imageUrl: board.image,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              board.image != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: HSImage(
+                        imageUrl: board.image,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : const SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: Icon(
+                        FontAwesomeIcons.layerGroup,
+                        size: 32.0,
+                      ),
+                    ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      board.title!,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      board.description!,
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    board.title!,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    '10 spots',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -362,23 +450,22 @@ class _UserDataBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
         child: const HSShimmerBox(
           width: double.infinity,
-          height: 50,
+          height: 60,
         ),
       );
     }
 
     return Container(
-      // padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
         color: app.currentTheme.primaryColor,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildDataItem('214', 'posts'),
-          _buildDataItem('13k', 'followers'),
-          _buildDataItem('134', 'following'),
+          _buildDataItem('${user?.spots}', 'spots'),
+          _buildDataItem('${user?.followers}', 'followers'),
+          _buildDataItem('${user?.following}', 'following'),
         ],
       ),
     );

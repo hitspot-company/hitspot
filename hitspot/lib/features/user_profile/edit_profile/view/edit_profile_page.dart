@@ -144,7 +144,7 @@ class _TextEditPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HSTextField(
+    return HSTextField.filled(
       onTap: () => _toEdit(context.read<EditProfileCubit>()),
       suffixIcon: const Opacity(
         opacity: 0.0,

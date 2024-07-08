@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -8,6 +9,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -212,64 +214,59 @@ class _InfoWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedSpot = spot.copyWith(tags: ['hello', 'world']);
     return Positioned(
             bottom: 32.0,
             left: 16.0,
             right: 16.0,
             child: GestureDetector(
-              onTap: () => navi.pushTransition(
-                  PageTransitionType.rightToLeftWithFade,
-                  SingleSpotProvider(spotID: selectedSpot.sid!)),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14.0),
-                  color: app.currentTheme.scaffoldBackgroundColor,
-                ),
-                child: Column(
-                  children: [
-                    HSBetterSpotTile(
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(14.0),
-                          bottom: Radius.circular(14.0)),
-                      spot: selectedSpot,
-                      height: 120.0,
-                    ),
-                    const Gap(8.0),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: screenWidth,
-                            child: Wrap(
-                              children: selectedSpot.tags!
-                                  .map((tag) => Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 4.0),
-                                      child: Card(
-                                          child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text("#$tag"),
-                                      ))))
-                                  .toList(),
-                            ),
+              onTap: () => navi.toSpot(sid: spot.sid!),
+              child: SizedBox(
+                height: 240.0,
+                width: screenWidth,
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16)),
+                          child: HSImage(
+                            imageUrl: spot.images!.first,
+                            fit: BoxFit.cover,
                           ),
-                          const Gap(8.0),
-                          SizedBox(
-                            width: screenWidth,
-                            child: HsUserTile(
-                              user: selectedSpot.author!,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              spot.title!,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            AutoSizeText(
+                              "${spot.likesCount} likes • ${spot.commentsCount} comments",
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.grey),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ).animate().fadeIn(duration: 300.ms),
             ))
         .animate()
         .fadeIn(duration: 400.ms)
@@ -308,7 +305,6 @@ class _TopBar extends StatelessWidget {
                   mapCubit.sheetStatus == ExpansionStatus.expanded;
               final icon = isExpanded ? Icons.close : Icons.arrow_back_ios;
               final titleText = isExpanded ? "Fetched Spots" : "";
-
               return Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
