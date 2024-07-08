@@ -8,7 +8,6 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
-import 'package:hitspot/features/map/clustered/view/clustered_map_page.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
