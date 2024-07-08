@@ -1,6 +1,14 @@
 part of 'hs_user_profile_cubit.dart';
 
-enum HSUserProfileStatus { initial, loading, following, loaded, error }
+enum HSUserProfileStatus {
+  initial,
+  loading,
+  following,
+  loaded,
+  error,
+  loadingMoreSpots,
+  loadingMoreBoards
+}
 
 final class HSUserProfileState extends Equatable {
   const HSUserProfileState({

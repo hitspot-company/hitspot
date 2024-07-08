@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +7,7 @@ import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
+import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 class UserProfilePage extends StatelessWidget {
@@ -20,124 +20,125 @@ class UserProfilePage extends StatelessWidget {
       builder: (context, state) {
         final HSUser? user = userProfileCubit.state.user;
         final bool loading = state.status == HSUserProfileStatus.loading;
-        return HSScaffold(
-          sidePadding: 0.0,
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 300.0,
-                pinned: true,
-                stretch: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: loading
-                      ? const HSShimmerBox(width: double.infinity, height: 300)
-                      : HSImage(
-                          imageUrl: user?.avatarUrl,
-                          color: Colors.amber, // TODO; Change to some gradient
-                        ).animate().fadeIn(duration: 300.ms),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            if (loading)
-                              const HSShimmerBox(width: 200, height: 30)
-                            else
-                              Text(
-                                user?.name ?? '',
-                                style: textTheme.headlineMedium,
-                              )
-                                  .animate()
-                                  .fadeIn(duration: 300.ms)
-                                  .slideY(begin: 0.2, end: 0),
-                            if (loading)
-                              const HSShimmerBox(width: 150, height: 20)
-                            else
-                              Text(
-                                '@${user?.username ?? ''}',
-                                style: textTheme.titleMedium,
-                              )
-                                  .animate()
-                                  .fadeIn(duration: 300.ms)
-                                  .slideY(begin: 0.2, end: 0),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            if (loading)
-                              const HSShimmerBox(width: 200, height: 30)
-                            else
-                              _UserProfileActionButton(
-                                  isLoading: loading,
-                                  userProfileCubit: userProfileCubit),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SliverPadding(
-                  padding: const EdgeInsets.all(16.0),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _UserDataBar(loading: loading, user: user)
-                                .animate()
-                                .fadeIn(duration: 300.ms)
-                                .slideY(begin: 0.2, end: 0),
-                            const SizedBox(height: 16),
-                            if (loading)
-                              const HSShimmerBox(width: 250, height: 20)
-                            else
-                              Text(
-                                'linkedin.com/in/marysnyder14',
-                                style: textTheme.bodyMedium
-                                    ?.copyWith(color: Colors.blue),
-                              ).animate().fadeIn(duration: 300.ms),
-                            const SizedBox(height: 8),
-                            if (loading)
-                              Column(
-                                children: List.generate(
-                                    3,
-                                    (_) => const HSShimmerBox(
-                                        width: double.infinity, height: 15)),
-                              )
-                            else
-                              Text(
-                                'Product designer at @airbnb with a love for exploring the great outdoors. Creating beautiful interfaces and seamless user experiences is my jam!',
-                                style: textTheme.bodyMedium,
-                              ).animate().fadeIn(duration: 300.ms),
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildContentItem('194', 'photos', loading),
-                                _buildContentItem('15', 'videos', loading),
-                                _buildContentItem('9', 'stories', loading),
-                                _buildContentItem('85', 'tags', loading),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+        return DefaultTabController(
+          length: 2,
+          child: HSScaffold(
+            sidePadding: 0.0,
+            body: NestedScrollView(
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    expandedHeight: 300.0,
+                    pinned: true,
+                    stretch: true,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: _background(loading, user?.avatarUrl),
                     ),
-                  ))
-            ],
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (loading)
+                                      const HSShimmerBox(width: 200, height: 30)
+                                    else
+                                      Text(
+                                        user?.name ?? '',
+                                        style: textTheme.headlineMedium,
+                                      )
+                                          .animate()
+                                          .fadeIn(duration: 300.ms)
+                                          .slideY(begin: 0.2, end: 0),
+                                    if (loading)
+                                      const HSShimmerBox(width: 150, height: 20)
+                                    else
+                                      Text(
+                                        '@${user?.username ?? ''}',
+                                        style: textTheme.titleMedium,
+                                      )
+                                          .animate()
+                                          .fadeIn(duration: 300.ms)
+                                          .slideY(begin: 0.2, end: 0),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: _UserProfileActionButton(
+                                  isLoading: loading,
+                                  userProfileCubit: userProfileCubit,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _UserDataBar(loading: loading, user: user)
+                              .animate()
+                              .fadeIn(duration: 300.ms)
+                              .slideY(begin: 0.2, end: 0),
+                          const SizedBox(height: 16),
+                          if (!loading)
+                            Text(
+                              'Product designer at @airbnb with a love for exploring the great outdoors. Creating beautiful interfaces and seamless user experiences is my jam!',
+                              style: textTheme.bodyMedium,
+                            ).animate().fadeIn(duration: 300.ms),
+                          const SizedBox(height: 16),
+                          const TabBar(
+                            tabs: [
+                              Tab(text: 'Spots'),
+                              Tab(text: 'Boards'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ];
+              },
+              body: TabBarView(
+                children: [
+                  _SpotsList(userProfileCubit: userProfileCubit),
+                  _BoardsList(userProfileCubit: userProfileCubit),
+                ],
+              ),
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _background(bool isLoading, String? userAvatar) {
+    if (isLoading) {
+      return const HSShimmerBox(width: double.infinity, height: 300);
+    } else if (userAvatar != null) {
+      return HSImage(
+        imageUrl: userAvatar,
+      ).animate().fadeIn(duration: 300.ms);
+    }
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            app.theme.mainColor.withOpacity(0.9),
+            app.theme.mainColor.withOpacity(0.6),
+            app.theme.mainColor.withOpacity(0.4),
+            app.theme.mainColor.withOpacity(0.2),
+            app.currentTheme.scaffoldBackgroundColor.withOpacity(0.2),
+          ],
+          stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+        ),
+      ),
     );
   }
 
@@ -177,6 +178,74 @@ class UserProfilePage extends StatelessWidget {
         .animate()
         .fadeIn(duration: 300.ms)
         .scale(begin: const Offset(0.95, 0.95), end: const Offset(1.0, 1.0));
+  }
+}
+
+class _SpotsList extends StatelessWidget {
+  const _SpotsList({required this.userProfileCubit});
+
+  final HSUserProfileCubit userProfileCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
+      builder: (context, state) {
+        if (state.status == HSUserProfileStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final spots = state.spots;
+        final bool isFetchingMore =
+            state.status == HSUserProfileStatus.loadingMoreSpots;
+        return GridView.builder(
+          shrinkWrap: true,
+          controller: userProfileCubit.spotsScrollController,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: spots.length,
+          itemBuilder: (BuildContext context, int index) {
+            return AnimatedSpotTile(spot: spots[index], index: index);
+          },
+        );
+      },
+    );
+  }
+}
+
+class _BoardsList extends StatelessWidget {
+  const _BoardsList({required this.userProfileCubit});
+
+  final HSUserProfileCubit userProfileCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
+      builder: (context, state) {
+        if (state.status == HSUserProfileStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final bool isFetchingMore =
+            state.status == HSUserProfileStatus.loadingMoreBoards;
+        return ListView.builder(
+          controller: userProfileCubit.spotsScrollController,
+          itemCount: state.boards.length + 1,
+          itemBuilder: (context, index) {
+            if (index == state.boards.length) {
+              return isFetchingMore
+                  ? const Center(child: CircularProgressIndicator())
+                  : const SizedBox();
+            }
+            final board = state.boards[index];
+            return ListTile(
+              title: Text(board.title ?? ''),
+              // Add more board details here
+            );
+          },
+        );
+      },
+    );
   }
 }
 
