@@ -64,9 +64,9 @@ class MainSearchDelegate extends SearchDelegate<String> {
             labelColor: app.theme.mainColor,
             unselectedLabelColor: Colors.grey,
             tabs: const [
-              Tab(text: 'Spots', icon: Icon(FontAwesomeIcons.mapPin)),
-              Tab(text: 'Boards', icon: Icon(FontAwesomeIcons.solidSquare)),
-              Tab(text: 'Tags', icon: Icon(FontAwesomeIcons.hashtag)),
+              Tab(text: 'Spots'),
+              Tab(text: 'Boards'),
+              Tab(text: 'Tags'),
             ],
           ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
           const Gap(16.0),
@@ -142,7 +142,6 @@ class _TrendingSpotsPage extends StatelessWidget {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        // childAspectRatio: 1,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
@@ -188,6 +187,12 @@ class _FetchedSpotsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     mapSearchCubit.updateQuery(query);
+    if (query.isEmpty) {
+      return _TrendingSpotsPage(
+        mapSearchCubit: mapSearchCubit,
+        query: query,
+      );
+    }
     return FutureBuilder<List<HSSpot>>(
       future: mapSearchCubit.fetchSpots(),
       builder: (BuildContext context, AsyncSnapshot<List<HSSpot>> snapshot) {
@@ -200,8 +205,7 @@ class _FetchedSpotsPage extends StatelessWidget {
         if (spots.isEmpty) {
           return Text("No spots found for $query", textAlign: TextAlign.center)
               .animate()
-              .fadeIn(duration: 300.ms)
-              .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1));
+              .fadeIn(duration: 300.ms);
         }
         return GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -233,11 +237,7 @@ class _AnimatedSpotTile extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       borderRadius: BorderRadius.circular(20.0),
       spot: spot,
-    ).animate().fadeIn(duration: 300.ms, delay: (50 * index).ms).scale(
-        begin: const Offset(0.8, 0.8),
-        end: const Offset(1, 1),
-        duration: 300.ms,
-        curve: Curves.easeOutQuad);
+    ).animate().fadeIn(duration: 300.ms, delay: (50 * index).ms);
   }
 }
 
@@ -262,8 +262,7 @@ class _FetchedBoardsPage extends StatelessWidget {
         if (boards.isEmpty) {
           return Text("No boards found for $query", textAlign: TextAlign.center)
               .animate()
-              .fadeIn(duration: 300.ms)
-              .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1));
+              .fadeIn(duration: 300.ms);
         }
         return GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -322,12 +321,11 @@ class _FetchedTagsPage extends StatelessWidget {
         if (tags.isEmpty) {
           return Text("No tags found for $query", textAlign: TextAlign.center)
               .animate()
-              .fadeIn(duration: 300.ms)
-              .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1));
+              .fadeIn(duration: 300.ms);
         }
         return GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+            crossAxisCount: 3,
             childAspectRatio: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
@@ -357,7 +355,7 @@ class _AnimatedTagTile extends StatelessWidget {
         onTap: () => navi.toTagsExplore(tag.value!),
         child: Center(
           child: ListTile(
-            title: Text('#${tag.value!}',
+            title: Text(tag.value!,
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             leading: const Icon(FontAwesomeIcons.hashtag),
           ),
@@ -370,226 +368,3 @@ class _AnimatedTagTile extends StatelessWidget {
         curve: Curves.easeOutQuad);
   }
 }
-
-// class MainSearchDelegate extends SearchDelegate<String> {
-//   MainSearchDelegate(this.mapSearchCubit);
-//   final HSMainSearchCubit mapSearchCubit;
-
-//   @override
-//   List<Widget> buildActions(BuildContext context) {
-//     return [
-//       IconButton(
-//         icon: const Icon(Icons.clear),
-//         onPressed: () {
-//           query = '';
-//         },
-//       ),
-//     ];
-//   }
-
-//   @override
-//   Widget buildLeading(BuildContext context) {
-//     return IconButton(
-//       icon: const Icon(Icons.arrow_back),
-//       onPressed: () => close(context, ""),
-//     );
-//   }
-
-//   @override
-//   Widget buildResults(BuildContext context) {
-//     return DefaultTabController(
-//       length: 3,
-//       child: Column(
-//         children: [
-//           const Gap(16.0),
-//           const TabBar(
-//             dividerHeight: 0.0,
-//             indicatorColor: Colors.transparent,
-//             tabs: [
-//               Tab(text: 'Spots', icon: Icon(FontAwesomeIcons.mapPin)),
-//               Tab(text: 'Boards', icon: Icon(FontAwesomeIcons.solidSquare)),
-//               Tab(text: 'Tags', icon: Icon(FontAwesomeIcons.hashtag)),
-//             ],
-//           ),
-//           const Gap(16.0),
-//           Expanded(
-//             child: TabBarView(
-//               children: [
-//                 _FetchedSpotsPage(mapSearchCubit: mapSearchCubit, query: query),
-//                 _FetchedBoardsPage(
-//                     mapSearchCubit: mapSearchCubit, query: query),
-//                 _FetchedTagsPage(mapSearchCubit: mapSearchCubit, query: query),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget buildSuggestions(BuildContext context) {
-//     mapSearchCubit.updateQuery(query);
-//     return FutureBuilder<List<HSUser>>(
-//       future: mapSearchCubit.fetchPredictions(),
-//       initialData: const [],
-//       builder: (BuildContext context, AsyncSnapshot<List<HSUser>> snapshot) {
-//         switch (snapshot.connectionState) {
-//           case ConnectionState.done:
-//             final List<HSUser> users = snapshot.data!;
-//             return Column(
-//               children: [
-//                 const Gap(16.0),
-//                 Expanded(
-//                   child: SizedBox(
-//                     width: screenWidth,
-//                     child: ListView.separated(
-//                       separatorBuilder: (context, index) => const Padding(
-//                         padding: EdgeInsets.symmetric(horizontal: 8.0),
-//                         child: Divider(
-//                           thickness: .1,
-//                           color: Colors.grey,
-//                         ),
-//                       ),
-//                       itemCount: users.length,
-//                       itemBuilder: (BuildContext context, int index) {
-//                         final user = users[index];
-//                         return ListTile(
-//                           onTap: () => navi.toUser(userID: user.uid!),
-//                           title: Text(user.username!),
-//                           subtitle: Text(user.name!),
-//                           leading: HSUserAvatar(
-//                             radius: 24.0,
-//                             imageUrl: user.avatarUrl,
-//                           ),
-//                         )
-//                             .animate()
-//                             .fadeIn(duration: 300.ms, delay: (50 * index).ms)
-//                             .slideX(
-//                                 begin: -0.2,
-//                                 end: 0,
-//                                 duration: 300.ms,
-//                                 delay: (50 * index).ms,
-//                                 curve: Curves.easeOutQuad);
-//                       },
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             );
-//           default:
-//             return const HSLoadingIndicator();
-//         }
-//       },
-//     );
-//   }
-// }
-
-// class _FetchedSpotsPage extends StatelessWidget {
-//   const _FetchedSpotsPage({required this.mapSearchCubit, required this.query});
-
-//   final HSMainSearchCubit mapSearchCubit;
-//   final String query;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     mapSearchCubit.updateQuery(query);
-//     return FutureBuilder<List<HSSpot>>(
-//       future: mapSearchCubit.fetchSpots(),
-//       builder: (BuildContext context, AsyncSnapshot<List<HSSpot>> snapshot) {
-//         if (snapshot.connectionState != ConnectionState.done) {
-//           return const HSLoadingIndicator();
-//         }
-//         final List<HSSpot> spots = snapshot.data ?? [];
-//         if (spots.isEmpty) {
-//           return Text("No spots found for $query", textAlign: TextAlign.center);
-//         }
-//         return GridView.builder(
-//           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//             crossAxisCount: 2,
-//           ),
-//           itemCount: spots.length,
-//           itemBuilder: (BuildContext context, int index) {
-//             return HSBetterSpotTile(
-//               onTap: (p0) => navi.toSpot(sid: p0!.sid!),
-//               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-//               borderRadius: BorderRadius.circular(20.0),
-//               spot: spots[index],
-//             );
-//           },
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class _FetchedBoardsPage extends StatelessWidget {
-//   const _FetchedBoardsPage({required this.mapSearchCubit, required this.query});
-
-//   final HSMainSearchCubit mapSearchCubit;
-//   final String query;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     mapSearchCubit.updateQuery(query);
-//     return FutureBuilder<List<HSBoard>>(
-//       future: mapSearchCubit.fetchBoards(),
-//       builder: (BuildContext context, AsyncSnapshot<List<HSBoard>> snapshot) {
-//         if (snapshot.connectionState != ConnectionState.done) {
-//           return const HSLoadingIndicator();
-//         }
-//         final List<HSBoard> boards = snapshot.data ?? [];
-//         if (boards.isEmpty) {
-//           return Text("No boards found for $query",
-//               textAlign: TextAlign.center);
-//         }
-//         return GridView.builder(
-//           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//             crossAxisCount: 2,
-//           ),
-//           itemCount: boards.length,
-//           itemBuilder: (BuildContext context, int index) {
-//             return HSBoardTile(board: boards[index]);
-//           },
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class _FetchedTagsPage extends StatelessWidget {
-//   const _FetchedTagsPage({required this.mapSearchCubit, required this.query});
-
-//   final HSMainSearchCubit mapSearchCubit;
-//   final String query;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     mapSearchCubit.updateQuery(query);
-//     return FutureBuilder<List<HSTag>>(
-//       future: mapSearchCubit.fetchTags(),
-//       builder: (BuildContext context, AsyncSnapshot<List<HSTag>> snapshot) {
-//         if (snapshot.connectionState != ConnectionState.done) {
-//           return const HSLoadingIndicator();
-//         }
-//         final List<HSTag> tags = snapshot.data ?? [];
-//         if (tags.isEmpty) {
-//           return Text("No tags found for $query", textAlign: TextAlign.center);
-//         }
-//         return GridView.builder(
-//           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//             crossAxisCount: 2,
-//           ),
-//           itemCount: tags.length,
-//           itemBuilder: (BuildContext context, int index) {
-//             return ListTile(
-//               onTap: () => navi.toTagsExplore(tags[index].value!),
-//               title: Text(tags[index].value!),
-//               leading: const Icon(FontAwesomeIcons.hashtag),
-//             );
-//           },
-//         );
-//       },
-//     );
-//   }
-// }
