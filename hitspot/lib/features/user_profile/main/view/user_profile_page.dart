@@ -421,7 +421,7 @@ class _BoardCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       board.description!,
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
                 ),

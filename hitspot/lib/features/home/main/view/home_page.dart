@@ -10,6 +10,7 @@ import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
+import 'package:hitspot/widgets/board/hs_board_card.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_search_bar.dart';
@@ -258,11 +259,11 @@ class _TrendingBoardsBuilder extends StatelessWidget {
           final board = trendingBoards[index];
           return GestureDetector(
             onTap: () => navi.toBoard(boardID: board.id!, title: board.title),
-            child: HSBoardTile(
-              board: board,
-              width: (index % 3 + 2) * 80,
-            ).animate().fadeIn(duration: 300.ms, delay: (index * 100).ms).scale(
-                begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
+            child: HSBoardCard(board: board, width: (index % 3 + 2) * 80)
+                .animate()
+                .fadeIn(duration: 300.ms, delay: (index * 100).ms)
+                .scale(
+                    begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
           );
         },
       ),
