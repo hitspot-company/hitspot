@@ -75,7 +75,7 @@ class _FirstPage extends StatelessWidget {
                 state.birthday.error == null && state.birthday.isValid,
             builder: (context, isValid) {
               return HSFormButton(
-                icon: const Icon(FontAwesomeIcons.arrowRight),
+                icon: nextIcon,
                 onPressed: isValid ? _completeProfileCubit.nextPage : null,
                 child: const Text("Next"),
               );

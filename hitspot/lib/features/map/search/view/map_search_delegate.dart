@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -22,7 +23,7 @@ class MapSearchDelegate extends SearchDelegate<HSPrediction> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back),
+      icon: backIcon,
       onPressed: () => close(
           context, HSPrediction(description: "", placeID: "", reference: "")),
     );
@@ -65,6 +66,29 @@ class MapSearchDelegate extends SearchDelegate<HSPrediction> {
   @override
   Widget buildSuggestions(BuildContext context) {
     mapSearchCubit.updateQuery(query);
+    if (query.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search,
+              size: 64,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Enter a location to search",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return FutureBuilder<List<HSPrediction>>(
       future: mapSearchCubit.fetchPredictions(),
       builder:

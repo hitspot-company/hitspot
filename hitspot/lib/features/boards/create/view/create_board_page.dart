@@ -109,7 +109,7 @@ class _FirstPage extends StatelessWidget {
             final bool valid =
                 state.title.isNotEmpty && state.description.isNotEmpty;
             return HSFormButton(
-              icon: const Icon(FontAwesomeIcons.arrowRight),
+              icon: nextIcon,
               onPressed: valid ? _addBoardCubit.nextPage : null,
               child: const Text("Customize"),
             );
@@ -246,7 +246,7 @@ class _SecondPage extends StatelessWidget {
           ),
           right: HSFormButton(
             onPressed: _addBoardCubit.nextPage,
-            icon: const Icon(FontAwesomeIcons.arrowRight),
+            icon: nextIcon,
             child: const Text("Visibility"),
           ),
         ),

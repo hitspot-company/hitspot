@@ -303,7 +303,7 @@ class _TopBar extends StatelessWidget {
             builder: (context, state) {
               final isExpanded =
                   mapCubit.sheetStatus == ExpansionStatus.expanded;
-              final icon = isExpanded ? Icons.close : Icons.arrow_back_ios;
+              final icon = isExpanded ? Icons.close : backIcon.icon;
               final titleText = isExpanded ? "Fetched Spots" : "";
               return Padding(
                 padding:

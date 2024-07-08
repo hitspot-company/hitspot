@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +10,6 @@ import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
-import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -47,7 +47,7 @@ class MainSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back),
+      icon: backIcon,
       onPressed: () => close(context, ""),
     ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut);
   }
@@ -307,17 +307,20 @@ class _FetchedTagsPage extends StatelessWidget {
               .animate()
               .fadeIn(duration: 300.ms);
         }
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            childAspectRatio: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 2.5,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+            ),
+            itemCount: tags.length,
+            itemBuilder: (BuildContext context, int index) {
+              return _AnimatedTagTile(tag: tags[index], index: index);
+            },
           ),
-          itemCount: tags.length,
-          itemBuilder: (BuildContext context, int index) {
-            return _AnimatedTagTile(tag: tags[index], index: index);
-          },
         );
       },
     );
@@ -339,8 +342,9 @@ class _AnimatedTagTile extends StatelessWidget {
         onTap: () => navi.toTagsExplore(tag.value!),
         child: Center(
           child: ListTile(
-            title: Text(tag.value!,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: AutoSizeText(tag.value!,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                maxLines: 1),
             leading: const Icon(FontAwesomeIcons.hashtag),
           ),
         ),

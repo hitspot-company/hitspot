@@ -55,10 +55,9 @@ class HSAppBar extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.all(0.0),
+                  padding: const EdgeInsets.all(0.0),
                   onPressed: defaultBackButtonCallback ?? app.navigation.pop,
-                  icon:
-                      Icon(defaultButtonBackIcon ?? FontAwesomeIcons.arrowLeft),
+                  icon: Icon(defaultButtonBackIcon ?? backIcon.icon),
                 ),
               ),
             if (left != null)

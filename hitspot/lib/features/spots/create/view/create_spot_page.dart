@@ -63,7 +63,7 @@ class _FirstPage extends StatelessWidget {
             selector: (state) => state.title.isNotEmpty,
             builder: (context, isValid) {
               return HSFormButton(
-                icon: const Icon(FontAwesomeIcons.arrowRight),
+                icon: backIcon,
                 onPressed: isValid ? createSpotCubit.nextPage : null,
                 child: const Text("Description"),
               );
@@ -105,7 +105,7 @@ class _SecondPage extends StatelessWidget {
             selector: (state) => state.description.isNotEmpty,
             builder: (context, isValid) {
               return HSFormButton(
-                icon: const Icon(FontAwesomeIcons.arrowRight),
+                icon: backIcon,
                 onPressed: isValid ? createSpotCubit.nextPage : null,
                 child: const Text("Categories"),
               );

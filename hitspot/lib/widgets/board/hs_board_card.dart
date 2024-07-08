@@ -21,28 +21,19 @@ class HSBoardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> children = [
-      board.image != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: HSImage(
-                imageUrl: board.image,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-              ),
-            )
-          : const SizedBox(
-              width: 80,
-              height: 80,
-              child: Icon(
-                FontAwesomeIcons.layerGroup,
-                size: 32.0,
-              ),
-            ),
+      const SizedBox(
+        width: 80,
+        height: 80,
+        child: Icon(
+          FontAwesomeIcons.layerGroup,
+          size: 32.0,
+        ),
+      ),
       const SizedBox(width: 16),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               board.title!,
@@ -50,7 +41,7 @@ class HSBoardCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            if (layout == HSBoardCardLayout.list) const SizedBox(height: 4),
             if (layout == HSBoardCardLayout.list)
               Text(
                 board.description!,
