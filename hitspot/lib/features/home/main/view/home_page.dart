@@ -17,6 +17,7 @@ import 'package:hitspot/widgets/hs_search_bar.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
+import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
@@ -185,32 +186,36 @@ class HomePage extends StatelessWidget {
                     ],
                   ),
                 const Gap(32.0).toSliver,
-                if (!isLoading && homeCubit.state.nearbySpots.isNotEmpty)
-                  SliverMainAxisGroup(
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Text("Nearby Spots",
-                                style: textTheme.headlineMedium)
-                            .animate()
-                            .animate()
-                            .fadeIn(duration: 500.ms)
-                            .scale(
-                                begin: const Offset(0.95, 0.95),
-                                end: const Offset(1, 1)),
-                      ),
-                      const SliverToBoxAdapter(
-                        child: Gap(16.0),
-                      ),
-                      BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
-                        selector: (state) => state.nearbySpots,
-                        builder: (context, nearbySpots) => HSSpotsGrid(
-                          spots: nearbySpots,
-                          isSliver: true,
-                          mainAxisSpacing: 16.0,
-                          crossAxisSpacing: 16.0,
-                        ),
-                      ),
-                    ],
+                if (!isLoading)
+                  BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
+                    selector: (state) => state.nearbySpots,
+                    builder: (context, nearbySpots) {
+                      if (nearbySpots.isEmpty) {
+                        return const SizedBox().toSliver;
+                      }
+                      return SliverMainAxisGroup(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: Text("Nearby Spots",
+                                    style: textTheme.headlineMedium)
+                                .animate()
+                                .fadeIn(duration: 500.ms)
+                                .scale(
+                                    begin: const Offset(0.95, 0.95),
+                                    end: const Offset(1, 1)),
+                          ),
+                          const SliverToBoxAdapter(
+                            child: Gap(16.0),
+                          ),
+                          HSSpotsGrid(
+                            spots: nearbySpots,
+                            isSliver: true,
+                            mainAxisSpacing: 16.0,
+                            crossAxisSpacing: 16.0,
+                          ),
+                        ],
+                      );
+                    },
                   )
                 else
                   SliverAnimatedOpacity(
@@ -218,11 +223,57 @@ class HomePage extends StatelessWidget {
                     duration: const Duration(milliseconds: 1000),
                     sliver: HSSpotsGrid.loading(isSliver: true),
                   ),
+                _TrendingSpotsBuilder(cubit: homeCubit),
               ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _TrendingSpotsBuilder extends StatelessWidget {
+  const _TrendingSpotsBuilder({required this.cubit});
+
+  final HSHomeCubit cubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
+      selector: (state) => state.trendingSpots,
+      builder: (context, state) {
+        final List<HSSpot> spots = cubit.state.trendingSpots;
+        if (spots.isEmpty) {
+          return const SizedBox().toSliver;
+        }
+
+        return SliverMainAxisGroup(
+          slivers: [
+            Text("Trending Spots", style: textTheme.headlineMedium)
+                .animate()
+                .fadeIn(duration: 500.ms)
+                .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1))
+                .toSliver,
+            const Text("This week's best picks")
+                .animate()
+                .fadeIn(duration: 500.ms)
+                .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1))
+                .toSliver,
+            SliverGrid.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: spots.length,
+              itemBuilder: (BuildContext context, int index) {
+                return AnimatedSpotTile(spot: spots[index], index: index);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

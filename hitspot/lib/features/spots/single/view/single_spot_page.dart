@@ -9,6 +9,7 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_image_full_screen_page.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -25,29 +26,59 @@ class SingleSpotPage extends StatelessWidget {
     final singleSpotCubit = BlocProvider.of<HSSingleSpotCubit>(context);
     return HSScaffold(
       appBar: HSAppBar(
-        enableDefaultBackButton: true,
-        right: IconButton(
-          icon: const Icon(FontAwesomeIcons.ellipsisVertical),
-          onPressed: singleSpotCubit.showBottomSheet,
-        ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut).scale(
-              begin: const Offset(0.8, 0.8),
-              end: const Offset(1, 1),
-            ),
-      ),
+          enableDefaultBackButton: true,
+          right: BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
+            selector: (state) => state.status == HSSingleSpotStatus.error,
+            builder: (context, hasError) {
+              return IconButton(
+                icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+                onPressed: hasError ? null : singleSpotCubit.showBottomSheet,
+              )
+                  .animate()
+                  .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                  .scale(
+                    begin: const Offset(0.8, 0.8),
+                    end: const Offset(1, 1),
+                  );
+            },
+          )),
       body: BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
         buildWhen: (previous, current) =>
             previous.status != current.status || previous.spot != current.spot,
         builder: (context, state) {
           final status = state.status;
+          if (status == HSSingleSpotStatus.error) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48)
+                      .animate()
+                      .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                      .scale(
+                          begin: const Offset(0.8, 0.8),
+                          end: const Offset(1, 1)),
+                  const Gap(16),
+                  Text(
+                    'Something went wrong.',
+                    style: textTheme.headlineSmall,
+                  ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
+                  const Gap(16),
+                  HSButton(
+                    onPressed: () {},
+                    child: const Text("Retry"),
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 200.ms)
+                      .slideY(begin: 0.2, end: 0),
+                ],
+              ),
+            );
+          }
           if (status == HSSingleSpotStatus.loading) {
             return const HSLoadingIndicator()
                 .animate()
                 .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
-          } else if (status == HSSingleSpotStatus.error) {
-            return const Center(child: Text('Error fetching spot'))
-                .animate()
-                .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                .slide(begin: const Offset(0, 0.1), end: const Offset(0, 0));
           }
           final spot = singleSpotCubit.state.spot;
           final imagesCount = spot.images?.length ?? 0;

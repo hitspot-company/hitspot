@@ -24,6 +24,7 @@ class UserProfilePage extends StatelessWidget {
         final HSUser? user = userProfileCubit.state.user;
         final bool loading = state.status == HSUserProfileStatus.loading;
         return HSScaffold(
+          topSafe: false,
           sidePadding: 0.0,
           body: CustomScrollView(
             slivers: [
@@ -52,14 +53,14 @@ class UserProfilePage extends StatelessWidget {
                       const SizedBox(height: 16),
                       if (!loading)
                         Text(
-                          'Product designer at @airbnb with a love for exploring the great outdoors. Creating beautiful interfaces and seamless user experiences is my jam!',
+                          user?.biogram ?? '',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ).animate().fadeIn(duration: 300.ms),
-                      const SizedBox(height: 24),
+                      if (userProfileCubit.state.spots.isNotEmpty)
+                        const SizedBox(height: 24),
                       if (userProfileCubit.state.spots.isNotEmpty)
                         _buildContentSection(
                             context, "Spots", loading, userProfileCubit),
-                      const SizedBox(height: 24),
                       if (userProfileCubit.state.boards.isNotEmpty)
                         _buildContentSection(
                             context, "Boards", loading, userProfileCubit),
@@ -110,10 +111,10 @@ class UserProfilePage extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.blue.withOpacity(0.9),
-            Colors.blue.withOpacity(0.6),
-            Colors.blue.withOpacity(0.4),
-            Colors.blue.withOpacity(0.2),
+            app.theme.mainColor.withOpacity(0.9),
+            app.theme.mainColor.withOpacity(0.6),
+            app.theme.mainColor.withOpacity(0.4),
+            app.theme.mainColor.withOpacity(0.2),
             Colors.white.withOpacity(0.2),
           ],
           stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
@@ -129,7 +130,7 @@ class UserProfilePage extends StatelessWidget {
       children: [
         Expanded(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (loading)
                 const HSShimmerBox(width: 200, height: 30)
@@ -140,9 +141,9 @@ class UserProfilePage extends StatelessWidget {
                       fontSize: 24, fontWeight: FontWeight.bold),
                 ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
               if (loading)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: const HSShimmerBox(width: 150, height: 20),
+                const Padding(
+                  padding: EdgeInsets.only(top: 8.0),
+                  child: HSShimmerBox(width: 150, height: 20),
                 )
               else
                 Text(
@@ -152,9 +153,11 @@ class UserProfilePage extends StatelessWidget {
             ],
           ),
         ),
-        _UserProfileActionButton(
-          isLoading: loading,
-          userProfileCubit: userProfileCubit,
+        Expanded(
+          child: _UserProfileActionButton(
+            isLoading: loading,
+            userProfileCubit: userProfileCubit,
+          ),
         ),
       ],
     );
@@ -169,7 +172,6 @@ class UserProfilePage extends StatelessWidget {
           title,
           style: Theme.of(context).textTheme.headlineMedium,
         ).animate().fadeIn(duration: 300.ms),
-        const SizedBox(height: 16),
         if (title == "Spots")
           _SpotsList(userProfileCubit: userProfileCubit, loading: loading)
         else

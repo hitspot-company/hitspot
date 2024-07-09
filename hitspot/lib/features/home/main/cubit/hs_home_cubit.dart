@@ -18,6 +18,7 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   late final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
   Completer<GoogleMapController> get mapController => _mapController;
+  final _databaseRepository = app.databaseRepository;
 
   Future<void> _fetchInitial() async {
     try {
@@ -29,8 +30,11 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       if (permission) {
         await _fetchNearbySpots();
       }
+      final List<HSSpot> trendingSpots = await _fetchTrendingSpots();
       emit(state.copyWith(
-          status: HSHomeStatus.idle, tredingBoards: tredingBoards));
+          status: HSHomeStatus.idle,
+          tredingBoards: tredingBoards,
+          trendingSpots: trendingSpots));
     } catch (_) {
       HSDebugLogger.logError("Error fetching initial data: $_");
     }
@@ -55,6 +59,19 @@ class HSHomeCubit extends Cubit<HSHomeState> {
           nearbySpots: nearbySpots, currentPosition: currentPosition));
     } catch (_) {
       HSDebugLogger.logError("Error fetching nearby spots: $_");
+    }
+  }
+
+  Future<List<HSSpot>> _fetchTrendingSpots() async {
+    try {
+      final List<HSSpot> fetchedSpots =
+          await _databaseRepository.spotFetchTrendingSpots();
+      fetchedSpots
+          .removeWhere((element) => state.nearbySpots.contains(element));
+      return fetchedSpots;
+    } catch (e) {
+      HSDebugLogger.logError("Error $e");
+      return [];
     }
   }
 
