@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
+import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
@@ -109,6 +112,25 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
     final String address = await _locationRepository.getAddress(
         location!.latitude, location.longitude);
     navi.pop(state.selectedLocation!.copyWith(address: address));
+  }
+
+  Future<void> searchLocation(BuildContext context) async {
+    try {
+      final mapSearchCubit = BlocProvider.of<HSMapSearchCubit>(context);
+      final HSPrediction? prediction = await showSearch(
+        context: context,
+        delegate: MapSearchDelegate(mapSearchCubit),
+      );
+      // Fetched properly
+      if (prediction != null && prediction.placeID.isNotEmpty) {
+        final HSPlaceDetails location = await app.locationRepository
+            .fetchPlaceDetails(placeID: prediction.placeID);
+        app.locationRepository.animateCameraToNewLatLng(
+            mapController, LatLng(location.latitude, location.longitude), 14);
+      }
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching locations: $e");
+    }
   }
 
   void cancel() => navi.pop(null);
