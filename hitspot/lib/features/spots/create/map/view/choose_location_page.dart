@@ -83,6 +83,7 @@ class _AnimatedPin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<HSChooseLocationCubit>(context);
     return BlocBuilder<HSChooseLocationCubit, HSChooseLocationState>(
       builder: (context, state) {
         final LatLng latlng = LatLng(state.selectedLocation?.latitude ?? 0.0,
@@ -95,12 +96,10 @@ class _AnimatedPin extends StatelessWidget {
             color: appTheme.mainColor,
             size: 32.0,
           )
-              .animate(
-                onPlay: (controller) => controller.repeat(reverse: true),
-              )
+              .animate()
               .scale(
                 begin: const Offset(1, 1),
-                end: const Offset(1.1, 1.1),
+                end: const Offset(1.2, 1.2),
                 duration: const Duration(milliseconds: 300),
               )
               .then()
@@ -110,7 +109,7 @@ class _AnimatedPin extends StatelessWidget {
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               )
-              .animate(target: isIdle ? 0.0 : 1.0)
+              .animate(target: isIdle ? 1.0 : 0.0)
               .scaleXY(
                 begin: 1.0,
                 end: 0.9,

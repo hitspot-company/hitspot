@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,6 +26,7 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
     });
   }
 
+  late final AnimationController animationController;
   Timer? _debounce;
   final Position userLocation;
   final HSLocationRepository _locationRepository = app.locationRepository;
@@ -40,6 +39,10 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
 
   void onCameraMovement(LatLng newLocation) {
     emit(state.copyWith(cameraLocation: newLocation));
+  }
+
+  void initAnimationController(AnimationController controller) {
+    animationController = controller;
   }
 
   void onCameraIdle() async {
