@@ -66,8 +66,14 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     try {
       final List<HSSpot> fetchedSpots =
           await _databaseRepository.spotFetchTrendingSpots();
-      fetchedSpots
-          .removeWhere((element) => state.nearbySpots.contains(element));
+      fetchedSpots.removeWhere((e) => state.nearbySpots.contains(e));
+      for (var i = 0; i < fetchedSpots.length; i++) {
+        for (var j = 0; j < state.nearbySpots.length; j++) {
+          if (state.nearbySpots[j].sid == fetchedSpots[i].sid) {
+            fetchedSpots.removeAt(i);
+          }
+        }
+      }
       return fetchedSpots;
     } catch (e) {
       HSDebugLogger.logError("Error $e");

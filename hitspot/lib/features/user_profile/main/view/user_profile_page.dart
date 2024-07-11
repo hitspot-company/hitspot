@@ -28,67 +28,34 @@ class UserProfilePage extends StatelessWidget {
           sidePadding: 0.0,
           body: CustomScrollView(
             slivers: [
-              SliverAppBar(
-                scrolledUnderElevation: 0.0,
-                surfaceTintColor: Colors.transparent,
-                expandedHeight: 300.0,
-                pinned: true,
-                stretch: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _background(loading, user?.avatarUrl),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildUserInfo(loading, user, userProfileCubit),
-                      const SizedBox(height: 16),
-                      _UserDataBar(loading: loading, user: user)
-                          .animate()
-                          .fadeIn(duration: 300.ms)
-                          .slideY(begin: 0.2, end: 0),
-                      const SizedBox(height: 16),
-                      if (!loading)
-                        Text(
-                          user?.biogram ?? '',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ).animate().fadeIn(duration: 300.ms),
-                      if (userProfileCubit.state.spots.isNotEmpty)
-                        const SizedBox(height: 24),
-                      if (userProfileCubit.state.spots.isNotEmpty)
-                        _buildContentSection(
-                            context, "Spots", loading, userProfileCubit),
-                      if (userProfileCubit.state.boards.isNotEmpty)
-                        _buildContentSection(
-                            context, "Boards", loading, userProfileCubit),
-                      if (userProfileCubit.state.spots.isEmpty &&
-                          userProfileCubit.state.boards.isEmpty &&
-                          !loading)
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  FontAwesomeIcons.xmark,
-                                  size: 64,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'No spots or boards yet',
-                                  style: textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ).animate().fadeIn(duration: 300.ms),
-                    ],
-                  ),
+              _buildSliverAppBar(loading, user?.avatarUrl),
+              SliverPadding(
+                padding: const EdgeInsets.all(16.0),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _buildUserInfo(context, loading, user, userProfileCubit),
+                    const SizedBox(height: 16),
+                    _UserDataBar(loading: loading, user: user)
+                        .animate()
+                        .fadeIn(duration: 300.ms)
+                        .slideY(begin: 0.2, end: 0),
+                    const SizedBox(height: 16),
+                    if (!loading)
+                      Text(
+                        user?.biogram ?? '',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ).animate().fadeIn(duration: 300.ms),
+                    const SizedBox(height: 24),
+                    _buildContentSection(
+                        context, "Spots", loading, userProfileCubit),
+                    const SizedBox(height: 24),
+                    _buildContentSection(
+                        context, "Boards", loading, userProfileCubit),
+                    if (userProfileCubit.state.spots.isEmpty &&
+                        userProfileCubit.state.boards.isEmpty &&
+                        !loading)
+                      _buildEmptyContent(context),
+                  ]),
                 ),
               ),
             ],
@@ -98,9 +65,22 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
+  Widget _buildSliverAppBar(bool isLoading, String? userAvatar) {
+    return SliverAppBar(
+      scrolledUnderElevation: 0.0,
+      surfaceTintColor: Colors.transparent,
+      expandedHeight: 250.0,
+      pinned: true,
+      stretch: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: _background(isLoading, userAvatar),
+      ),
+    );
+  }
+
   Widget _background(bool isLoading, String? userAvatar) {
     if (isLoading) {
-      return const HSShimmerBox(width: double.infinity, height: 300);
+      return const HSShimmerBox(width: double.infinity, height: 250);
     } else if (userAvatar != null) {
       return HSImage(
         imageUrl: userAvatar,
@@ -125,39 +105,35 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildUserInfo(bool loading, HSUser? user, userProfileCubit) {
-    return Row(
+  Widget _buildUserInfo(BuildContext context, bool loading, HSUser? user,
+      HSUserProfileCubit userProfileCubit) {
+    return Column(
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (loading)
-                const HSShimmerBox(width: 200, height: 30)
-              else
-                Text(
-                  user?.name ?? '',
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
-                ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
-              if (loading)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: HSShimmerBox(width: 150, height: 20),
-                )
-              else
-                Text(
-                  '@${user?.username ?? ''}',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
-            ],
-          ),
-        ),
-        Expanded(
-          child: _UserProfileActionButton(
-            isLoading: loading,
-            userProfileCubit: userProfileCubit,
-          ),
+        if (loading)
+          const HSShimmerBox(width: 200, height: 30)
+        else
+          Text(
+            user?.name ?? '',
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(fontWeight: FontWeight.bold),
+          ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+        const SizedBox(height: 4),
+        if (loading)
+          const HSShimmerBox(width: 150, height: 20)
+        else
+          Text(
+            '@${user?.username ?? ''}',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(color: Colors.grey),
+          ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+        const SizedBox(height: 16),
+        _UserProfileActionButton(
+          isLoading: loading,
+          userProfileCubit: userProfileCubit,
         ),
       ],
     );
@@ -165,19 +141,52 @@ class UserProfilePage extends StatelessWidget {
 
   Widget _buildContentSection(BuildContext context, String title, bool loading,
       HSUserProfileCubit userProfileCubit) {
+    if (title == "Spots" && userProfileCubit.state.spots.isEmpty) {
+      return const SizedBox();
+    }
+    if (title == "Boards" && userProfileCubit.state.boards.isEmpty) {
+      return const SizedBox();
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: Theme.of(context).textTheme.headlineSmall,
         ).animate().fadeIn(duration: 300.ms),
+        const SizedBox(height: 16),
         if (title == "Spots")
           _SpotsList(userProfileCubit: userProfileCubit, loading: loading)
         else
           _BoardsList(userProfileCubit: userProfileCubit, loading: loading),
       ],
     );
+  }
+
+  Widget _buildEmptyContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              FontAwesomeIcons.xmark,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No spots or boards yet',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 300.ms);
   }
 }
 
@@ -509,6 +518,7 @@ class _UserProfileActionButton extends StatelessWidget {
 
     return SizedBox(
       height: 50.0,
+      width: screenWidth,
       child: HSButton(
         onPressed:
             ownProfile ? navi.toEditProfile : userProfileCubit.followUser,
