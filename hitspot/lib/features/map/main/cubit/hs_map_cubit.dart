@@ -72,7 +72,7 @@ class HSMapCubit extends Cubit<HSMapState> {
 
   void onMapCreated(GoogleMapController cont) async {
     controller.complete(cont);
-    await app.theme.applyMapDarkStyle(controller);
+    // await app.theme.applyMapDarkStyle(controller);
   }
 
   void onCameraIdle() async {

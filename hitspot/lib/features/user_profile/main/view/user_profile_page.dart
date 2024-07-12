@@ -154,7 +154,6 @@ class UserProfilePage extends StatelessWidget {
           title,
           style: Theme.of(context).textTheme.headlineSmall,
         ).animate().fadeIn(duration: 300.ms),
-        const SizedBox(height: 16),
         if (title == "Spots")
           _SpotsList(userProfileCubit: userProfileCubit, loading: loading)
         else
@@ -274,6 +273,7 @@ class _SpotCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => navi.toSpot(sid: spot.sid!),
       child: Card(
+        margin: const EdgeInsets.all(0),
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Column(

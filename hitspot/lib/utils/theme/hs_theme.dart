@@ -52,6 +52,8 @@ final class HSTheme {
       });
     }
   }
+
+  String get mapStyleDark => _mapStyleString;
 }
 
 extension TextStyleAltering on TextStyle {

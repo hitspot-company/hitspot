@@ -3,22 +3,16 @@ import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
-import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
-import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
-import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:page_transition/page_transition.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});
@@ -48,7 +42,7 @@ class MapPage extends StatelessWidget {
                 background: BlocSelector<HSMapCubit, HSMapState, List<Marker>>(
                   selector: (state) => state.markersInView,
                   builder: (context, markersInView) => GoogleMap(
-                    // style: TODO: Implement style like this,
+                    style: app.theme.mapStyleDark,
                     fortyFiveDegreeImageryEnabled: true,
                     key: mapCubit.mapKey,
                     initialCameraPosition: CameraPosition(
@@ -268,6 +262,33 @@ class _InfoWindow extends StatelessWidget {
                 ),
               ).animate().fadeIn(duration: 300.ms),
             ))
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slide(duration: 100.ms, begin: const Offset(0, 1));
+  }
+}
+
+class _CreateSpotPrompt extends StatelessWidget {
+  const _CreateSpotPrompt({super.key, required this.spot});
+
+  final HSSpot spot;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 32.0,
+      left: 16.0,
+      right: 16.0,
+      child: GestureDetector(
+        onTap: () => navi.toSpot(sid: spot.sid!),
+        child: SizedBox(
+            height: 240.0,
+            width: screenWidth,
+            child: Container(
+              color: Colors.white,
+            )).animate().fadeIn(duration: 300.ms),
+      ),
+    )
         .animate()
         .fadeIn(duration: 400.ms)
         .slide(duration: 100.ms, begin: const Offset(0, 1));
