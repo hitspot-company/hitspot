@@ -40,10 +40,7 @@ class HSUserAvatar extends StatelessWidget {
       return CircleAvatar(
         radius: radius,
         child: Center(
-          child: Icon(
-            FontAwesomeIcons.solidUser,
-            size: iconSize,
-          ),
+          child: Icon(FontAwesomeIcons.solidUser, size: iconSize),
         ),
       );
     } else {

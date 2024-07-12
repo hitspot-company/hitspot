@@ -1,4 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:avatar_stack/avatar_stack.dart';
+import 'package:avatar_stack/positions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -100,13 +102,6 @@ class SingleBoardPage extends StatelessWidget {
                     color: board?.color,
                   ),
                 ),
-              // .animate()
-              // .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-              // .scale(
-              //   begin: const Offset(0.8, 0.8),
-              //   end: const Offset(1, 1),
-              // )
-              // .toSliver,
               const SliverToBoxAdapter(child: Gap(16.0)),
               if (isLoading)
                 const HSShimmerBox(width: 60, height: 60.0)
@@ -140,26 +135,18 @@ class SingleBoardPage extends StatelessWidget {
                 )),
               const SliverToBoxAdapter(child: Gap(16.0)),
               HSSimpleSliverAppBar(
+                height: 100.0,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        HSUserAvatar(radius: 24.0, imageUrl: author?.avatarUrl),
-                        const Gap(16.0),
-                        if (isLoading)
-                          const HSShimmerBox(width: 120, height: 30.0)
-                              .animate()
-                              .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                        else
-                          Text(
-                            author?.username ?? "",
-                            style: textTheme.headlineLarge,
-                          )
-                              .animate()
-                              .fadeIn(duration: 300.ms, delay: 300.ms)
-                              .slideY(begin: 0.2, end: 0),
+                        _AvatarStack(
+                            height: 80.0,
+                            collaborators:
+                                singleBoardCubit.state.board?.collaborators ??
+                                    []),
                         const Spacer(),
                         if (isLoading)
                           const HSShimmerBox(width: 120, height: 30.0)
@@ -213,6 +200,72 @@ class SingleBoardPage extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _AvatarStack extends StatelessWidget {
+  const _AvatarStack(
+      {required this.collaborators, this.height = 80.0, this.width});
+  final List<HSUser>? collaborators;
+  final double height;
+  final double? width;
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = RestrictedPositions(
+      maxCoverage: .7,
+      minCoverage: .3,
+      align: StackAlign.left,
+    );
+    if (collaborators == null) {
+      return const SizedBox();
+    }
+    return SizedBox(
+      height: height,
+      width: width ?? screenWidth / 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: WidgetStack(
+              positions: settings,
+              stackedWidgets: [
+                for (var n = 0; n < collaborators!.length; n++)
+                  HSUserAvatar(
+                      radius: 30.0, imageUrl: collaborators![n].avatarUrl),
+              ],
+              buildInfoWidget: (surplus) {
+                return Center(
+                  child: Text(
+                    '+$surplus',
+                    style: textTheme.headlineMedium,
+                  ),
+                );
+              },
+            ),
+          ),
+          AutoSizeText(usernames, textAlign: TextAlign.left, maxLines: 1),
+        ],
+      ),
+    );
+  }
+
+  String get usernames {
+    if (collaborators == null || collaborators!.isEmpty) {
+      return "";
+    }
+    final count = collaborators!.length > 5 ? 4 : collaborators!.length - 1;
+    int index;
+    String ret = '';
+    for (index = 0; index < count; index++) {
+      HSDebugLogger.logInfo("Index: $index - count: $count");
+      ret +=
+          "${collaborators![index].username!}${index < count - 1 ? ', ' : ' '}";
+    }
+    // if (index < co)
+    ret += "and ${collaborators![index].username!}";
+    HSDebugLogger.logInfo("RET 2: $ret");
+    return ret;
   }
 }
 

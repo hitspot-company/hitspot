@@ -81,6 +81,7 @@ dependencies:
   newton_particles: ^0.1.8
   page_transition: ^2.1.0
   extended_nested_scroll_view: ^6.2.1
+  avatar_stack: ^1.2.0
 
 dev_dependencies:
   flutter_test:
