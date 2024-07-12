@@ -96,10 +96,6 @@ class HSDatabaseRepsitory {
           {HSBoard? board, String? boardID}) async =>
       await _boardsRepository.fetchBoardSpots(board, boardID);
 
-  Future<List<HSUser>> boardFetchBoardCollaborators(
-          {HSBoard? board, String? boardID}) async =>
-      await _boardsRepository.fetchBoardCollaborators(board, boardID);
-
   Future<void> boardAddSpot(
           {HSBoard? board,
           String? boardID,
@@ -125,6 +121,18 @@ class HSDatabaseRepsitory {
   }) async =>
       await _boardsRepository.fetchUserBoards(
           user, userID, batchOffset, batchSize);
+
+  Future<List<HSUser>> boardFetchCollaborators(
+          {HSBoard? board,
+          String? boardID,
+          int batchOffset = 0,
+          int batchSize = 20}) async =>
+      _boardsRepository.fetchCollaborators(
+        board,
+        boardID,
+        batchOffset,
+        batchSize,
+      );
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);

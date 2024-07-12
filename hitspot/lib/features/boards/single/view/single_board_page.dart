@@ -38,6 +38,37 @@ class SingleBoardPage extends StatelessWidget {
         final HSBoard? board = state.board;
         final List<HSSpot> spots = state.spots;
         HSDebugLogger.logInfo("Updated, spots_count: ${spots.length}");
+        if (state.status == HSSingleBoardStatus.error) {
+          return HSScaffold(
+            appBar: HSAppBar(enableDefaultBackButton: true),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48)
+                      .animate()
+                      .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                      .scale(
+                          begin: const Offset(0.8, 0.8),
+                          end: const Offset(1, 1)),
+                  const Gap(16),
+                  Text(
+                    'Something went wrong.',
+                    style: textTheme.headlineSmall,
+                  ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
+                  const Gap(16),
+                  HSButton(
+                    onPressed: () {},
+                    child: const Text("Retry"),
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 200.ms)
+                      .slideY(begin: 0.2, end: 0),
+                ],
+              ),
+            ),
+          );
+        }
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,

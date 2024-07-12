@@ -72,6 +72,11 @@ class UserProfilePage extends StatelessWidget {
       expandedHeight: 250.0,
       pinned: true,
       stretch: true,
+      actions: [
+        IconButton.filledTonal(
+            onPressed: navi.toSettings,
+            icon: const Icon(FontAwesomeIcons.gears))
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: _background(isLoading, userAvatar),
       ),

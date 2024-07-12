@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 typedef BoardID = String;
 

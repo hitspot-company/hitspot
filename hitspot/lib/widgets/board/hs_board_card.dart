@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
@@ -41,12 +42,13 @@ class HSBoardCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            if (layout == HSBoardCardLayout.list) const SizedBox(height: 4),
-            if (layout == HSBoardCardLayout.list)
-              Text(
-                board.description!,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
+            // if (layout == HSBoardCardLayout.list) const SizedBox(height: 4),
+            // if (layout == HSBoardCardLayout.list)
+            //   AutoSizeText(
+            //     board.description!,
+            //     style: const TextStyle(fontSize: 14, color: Colors.grey),
+            //     maxLines: 2,
+            //   ),
           ],
         ),
       ),
