@@ -1,4 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:avatar_stack/avatar_stack.dart';
+import 'package:avatar_stack/positions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_stack/avatar_stack.dart';
@@ -110,13 +112,6 @@ class SingleBoardPage extends StatelessWidget {
                     color: board?.color,
                   ),
                 ),
-              // .animate()
-              // .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-              // .scale(
-              //   begin: const Offset(0.8, 0.8),
-              //   end: const Offset(1, 1),
-              // )
-              // .toSliver,
               const SliverToBoxAdapter(child: Gap(16.0)),
               if (isLoading)
                 const HSShimmerBox(width: 60, height: 60.0)
