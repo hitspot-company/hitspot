@@ -6,6 +6,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
+import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
@@ -39,8 +40,11 @@ class HomePage extends StatelessWidget {
         builder: (context, status) {
           final isLoading = status == HSHomeStatus.loading;
           final trendingBoards = homeCubit.state.tredingBoards;
-          return RefreshIndicator.adaptive(
+          return RefreshIndicator(
             onRefresh: homeCubit.handleRefresh,
+            color: HSTheme.instance.mainColor,
+            backgroundColor: Colors.white,
+            strokeWidth: 3.0,
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
