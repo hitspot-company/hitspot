@@ -212,7 +212,7 @@ class HSBoardsRepository {
         spots.add(spot);
       }
 
-      // Sort the list of spots by spot_index
+      // Sort the list of spots by spot index
       spots.sort((a, b) => a.spotIndex ?? 0.compareTo(b.spotIndex ?? 0));
 
       // Spot index is no longer needed, proceed without it
