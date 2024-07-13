@@ -335,25 +335,6 @@ class HSBoardsRepository {
       throw Exception("Error updating spots: $_");
     }
   }
-
-  Future<List<HSUser>> fetchCollaborators(
-      HSBoard? board, String? boardID, int? batchOffset, int? batchSize) async {
-    final bid = board?.id ?? boardID;
-    try {
-      assert(board != null || boardID != null,
-          "Either the board or the boardID has to be provided.");
-      final List<Map<String, dynamic>> fetchedCollaborators =
-          await _supabase.rpc('boards_fetch_board_collaborators', params: {
-        "requested_board_id": bid,
-        "batch_offset": batchOffset,
-        "batch_size": batchSize,
-      });
-      return fetchedCollaborators.map(HSUser.deserialize).toList();
-    } catch (_) {
-      HSDebugLogger.logError("Failed to fetch board: ($bid) collaborators: $_");
-      throw Exception("Failed to fetch board: ($bid) collaborators");
-    }
-  }
 }
 
 enum HSBoardSaveState { saved, updating, notSaved }

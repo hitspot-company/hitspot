@@ -10,6 +10,7 @@ import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
+import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 

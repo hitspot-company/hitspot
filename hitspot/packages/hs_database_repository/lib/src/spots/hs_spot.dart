@@ -118,8 +118,6 @@ class HSSpot {
       images:
           (data['images'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
       spotIndex: data['spot_index'],
-      images:
-          (data['images'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
     );
   }
 

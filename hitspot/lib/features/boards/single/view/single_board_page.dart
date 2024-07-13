@@ -1,14 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:avatar_stack/avatar_stack.dart';
-import 'package:avatar_stack/positions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
@@ -29,14 +23,11 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:reorderable_grid/reorderable_grid.dart';
-
-import 'package:flutter_animate/flutter_animate.dart';
 
 class SingleBoardPage extends StatelessWidget {
   SingleBoardPage({super.key});
 
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     final singleBoardCubit = BlocProvider.of<HSSingleBoardCubit>(context);

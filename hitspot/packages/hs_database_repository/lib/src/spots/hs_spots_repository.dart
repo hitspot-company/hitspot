@@ -363,25 +363,6 @@ class HSSpotsRepository {
     }
   }
 
-  Future<List<HSBoard>> userBoards(
-      HSUser? user, String? userID, int batchOffset, int batchSize) async {
-    try {
-      assert(user != null || userID != null, "User or userID must be provided");
-      final uid = user?.uid ?? userID!;
-      final data = await _supabase.rpc('fetch_user_boards', params: {
-        'user_id': uid,
-        'batch_offset': batchOffset,
-        'batch_size': batchSize,
-      });
-      final List<HSBoard> boards =
-          (data as List<dynamic>).map((e) => HSBoard.deserialize(e)).toList();
-      return boards;
-    } catch (_) {
-      throw Exception("Error fetching user spots: $_");
-    }
-  }
-<<<<<<< HEAD
-
   Future<HSSpot> fetchTopSpotWithTag(String tag) async {
     try {
       final List<Map<String, dynamic>> fetchedSpot =
@@ -409,6 +390,4 @@ class HSSpotsRepository {
       throw Exception("Error fetching trending spots: $_");
     }
   }
-=======
->>>>>>> 2f3e318 ([WT][Backend] Implement interfaces to interact with database functions)
 }
