@@ -162,6 +162,7 @@ class HSSpotsRepository {
   }
 
   Future<HSSpot> fetchSpotWithAuthor(HSSpot? spot, String? spotID) async {
+    assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
       final sid = spot?.sid ?? spotID!;
       final fetchedSpot =

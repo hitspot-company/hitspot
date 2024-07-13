@@ -117,6 +117,15 @@ class HSDatabaseRepsitory {
           String? spotID}) async =>
       await _boardsRepository.removeSpot(board, boardID, spot, spotID);
 
+  Future<void> boardUpdateSpotIndex(
+          {HSBoard? board,
+          String? boardID,
+          String? spotID,
+          HSSpot? spot,
+          required int newIndex}) async =>
+      await _boardsRepository.updateSpotIndex(
+          board, boardID, spot, spotID, newIndex);
+
   Future<List<HSBoard>> boardFetchUserBoards({
     HSUser? user,
     String? userID,
