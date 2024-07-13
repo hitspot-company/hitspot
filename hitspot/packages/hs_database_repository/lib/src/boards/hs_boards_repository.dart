@@ -205,13 +205,25 @@ class HSBoardsRepository {
             "batch_offset": batchOffset
           });
       HSDebugLogger.logSuccess("Fetched spots of board: $fetchedSpots");
-      final List<HSSpot> ret = [];
-      for (var i = 0; i < fetchedSpots.length; i++) {
-        final spot = HSSpot.deserialize(fetchedSpots[i]);
-        ret.add(await HSDatabaseRepsitory(_supabase)
-            .spotfetchSpotWithAuthor(spot: spot));
+
+      final List<HSSpot> spots = [];
+      for (var spotData in fetchedSpots) {
+        final spot = HSSpot.deserialize(spotData);
+        spots.add(spot);
       }
-      return ret;
+
+      // Sort the list of spots by spot index
+      spots.sort((a, b) => a.spotIndex ?? 0.compareTo(b.spotIndex ?? 0));
+
+      // Spot index is no longer needed, proceed without it
+      final List<HSSpot> sortedSpotsWithDetails = [];
+      for (var spot in spots) {
+        final detailedSpot = await HSDatabaseRepsitory(_supabase)
+            .spotfetchSpotWithAuthor(spot: spot, spotID: spot.sid);
+        sortedSpotsWithDetails.add(detailedSpot);
+      }
+
+      return sortedSpotsWithDetails;
     } catch (_) {
       throw HSBoardException(
           type: HSBoardExceptionType.read, details: _.toString());
@@ -281,6 +293,24 @@ class HSBoardsRepository {
       });
     } catch (_) {
       throw Exception("Error adding spot: $_");
+    }
+  }
+
+  Future<void> updateSpotIndex(HSBoard? board, String? boardID, HSSpot? spot,
+      String? spotID, int newIndex) async {
+    try {
+      assert(board != null || boardID != null,
+          "Board or boardID must be provided");
+
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+
+      await _supabase.rpc('boards_update_spot_index', params: {
+        "board_id_input": board?.id ?? boardID!,
+        "spot_id_input": spot?.sid ?? spotID!,
+        "new_index_input": newIndex,
+      });
+    } catch (_) {
+      throw Exception("Error updating spots: $_");
     }
   }
 }

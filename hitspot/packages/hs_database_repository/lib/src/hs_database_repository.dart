@@ -117,12 +117,22 @@ class HSDatabaseRepsitory {
           String? addedByID}) async =>
       await _boardsRepository.addSpot(
           board, boardID, spot, spotID, addedBy, addedByID);
+
   Future<void> boardRemoveSpot(
           {HSBoard? board,
           String? boardID,
           HSSpot? spot,
           String? spotID}) async =>
       await _boardsRepository.removeSpot(board, boardID, spot, spotID);
+
+  Future<void> boardUpdateSpotIndex(
+          {HSBoard? board,
+          String? boardID,
+          String? spotID,
+          HSSpot? spot,
+          required int newIndex}) async =>
+      await _boardsRepository.updateSpotIndex(
+          board, boardID, spot, spotID, newIndex);
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);

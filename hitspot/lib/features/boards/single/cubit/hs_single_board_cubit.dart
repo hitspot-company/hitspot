@@ -108,4 +108,30 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
       HSDebugLogger.logError(_.toString());
     }
   }
+
+  Future<void> reorderSpots(
+      List<HSSpot> spots, int oldIndex, int newIndex) async {
+    try {
+      emit(state.copyWith(status: HSSingleBoardStatus.updating));
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
+
+      final HSSpot spot = state.spots.removeAt(oldIndex);
+      state.spots.insert(newIndex, spot);
+
+      for (var spot in spots) {
+        await app.databaseRepository.boardUpdateSpotIndex(
+            boardID: boardID, spotID: spot.sid!, newIndex: spots.indexOf(spot));
+      }
+
+      emit(state.copyWith(
+        status: HSSingleBoardStatus.idle,
+        spots: state.spots,
+        board: state.board!,
+      ));
+    } catch (_) {
+      HSDebugLogger.logError(_.toString());
+    }
+  }
 }
