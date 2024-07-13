@@ -48,7 +48,6 @@ class UserProfilePage extends StatelessWidget {
                     const SizedBox(height: 24),
                     _buildContentSection(
                         context, "Spots", loading, userProfileCubit),
-                    const SizedBox(height: 24),
                     _buildContentSection(
                         context, "Boards", loading, userProfileCubit),
                     if (userProfileCubit.state.spots.isEmpty &&
@@ -152,20 +151,9 @@ class UserProfilePage extends StatelessWidget {
     if (title == "Boards" && userProfileCubit.state.boards.isEmpty) {
       return const SizedBox();
     }
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Text(
-        //   title,
-        //   style: Theme.of(context).textTheme.headlineSmall,
-        // ).animate().fadeIn(duration: 300.ms),
-        if (title == "Spots")
-          _SpotsList(userProfileCubit: userProfileCubit, loading: loading)
-        else
-          _BoardsList(userProfileCubit: userProfileCubit, loading: loading),
-      ],
-    );
+    return title == "Spots"
+        ? _SpotsList(userProfileCubit: userProfileCubit, loading: loading)
+        : _BoardsList(userProfileCubit: userProfileCubit, loading: loading);
   }
 
   Widget _buildEmptyContent(BuildContext context) {

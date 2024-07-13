@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
+import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
@@ -31,10 +33,14 @@ class MapPage extends StatelessWidget {
       bottomSafe: false,
       body: Stack(
         children: [
-          BlocSelector<HSMapCubit, HSMapState, HSSpot?>(
-            selector: (state) => state.currentlySelectedSpot,
-            builder: (context, selectedSpot) {
-              final isSelected = selectedSpot != null;
+          BlocBuilder<HSMapCubit, HSMapState>(
+            // selector: (state) => state.currentlySelectedSpot,
+            buildWhen: (previous, current) =>
+                previous.selectedSpot != current.selectedSpot ||
+                previous.spotsInView != current.spotsInView,
+            builder: (context, currentState) {
+              final isSelected = currentState.currentlySelectedSpot != null;
+              final isEmpty = currentState.spotsInView.isEmpty;
               return ExpandableBottomSheet(
                 key: mapCubit.sheetKey,
                 enableToggle: true,
@@ -86,8 +92,7 @@ class MapPage extends StatelessWidget {
 
 class _ExpandableContent extends StatelessWidget {
   const _ExpandableContent(
-      {super.key,
-      required this.isSelected,
+      {required this.isSelected,
       required this.expandedHeight,
       required this.persistentHeaderHeight});
 
@@ -142,9 +147,7 @@ class _ExpandableContent extends StatelessWidget {
 
 class _PersistentHeader extends StatelessWidget {
   const _PersistentHeader(
-      {super.key,
-      required this.isSelected,
-      required this.persistentHeaderHeight});
+      {required this.isSelected, required this.persistentHeaderHeight});
 
   final bool isSelected;
   final double persistentHeaderHeight;
@@ -186,6 +189,8 @@ class _PersistentHeader extends StatelessWidget {
                 const Gap(4.0),
                 if (isLoading)
                   const HSShimmerBox(width: 128, height: 24.0)
+                else if (state.spotsInView.isEmpty)
+                  const _CreateSpotPrompt()
                 else
                   Text("Found $spotsCount spots",
                       style: textTheme.headlineSmall),
@@ -199,7 +204,7 @@ class _PersistentHeader extends StatelessWidget {
 }
 
 class _InfoWindow extends StatelessWidget {
-  const _InfoWindow({super.key, required this.spot});
+  const _InfoWindow({required this.spot});
 
   final HSSpot spot;
 
@@ -266,34 +271,23 @@ class _InfoWindow extends StatelessWidget {
 }
 
 class _CreateSpotPrompt extends StatelessWidget {
-  const _CreateSpotPrompt({super.key, required this.spot});
-
-  final HSSpot spot;
+  const _CreateSpotPrompt();
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 32.0,
-      left: 16.0,
-      right: 16.0,
-      child: GestureDetector(
-        onTap: () => navi.toSpot(sid: spot.sid!),
-        child: SizedBox(
-            height: 240.0,
-            width: screenWidth,
-            child: Container(
-              color: Colors.white,
-            )).animate().fadeIn(duration: 300.ms),
-      ),
-    )
+    return HSTextPrompt(
+            prompt: "No spots in the area.\n",
+            pressableText: "CREATE",
+            promptColor: app.theme.mainColor,
+            textStyle: textTheme.labelMedium,
+            onTap: navi.toCreateSpot)
         .animate()
-        .fadeIn(duration: 400.ms)
-        .slide(duration: 100.ms, begin: const Offset(0, 1));
+        .fadeIn(duration: 400.ms);
   }
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({super.key, this.appBarHeight = 120.0});
+  const _TopBar({this.appBarHeight = 120.0});
   final double appBarHeight;
 
   @override
