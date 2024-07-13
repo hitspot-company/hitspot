@@ -153,12 +153,13 @@ class UserProfilePage extends StatelessWidget {
       return const SizedBox();
     }
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ).animate().fadeIn(duration: 300.ms),
+        // Text(
+        //   title,
+        //   style: Theme.of(context).textTheme.headlineSmall,
+        // ).animate().fadeIn(duration: 300.ms),
         if (title == "Spots")
           _SpotsList(userProfileCubit: userProfileCubit, loading: loading)
         else
@@ -234,8 +235,8 @@ class _SpotsList extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        crossAxisSpacing: 12, // Reduced from 16 to 12
+        mainAxisSpacing: 12, // Reduced from 16 to 12
         childAspectRatio: 0.8,
       ),
       itemCount: spots.length,
@@ -278,7 +279,6 @@ class _SpotCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => navi.toSpot(sid: spot.sid!),
       child: Card(
-        margin: const EdgeInsets.all(0),
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Column(
@@ -365,7 +365,7 @@ class _BoardsList extends StatelessWidget {
       itemCount: boards.length,
       itemBuilder: (context, index) {
         final board = boards[index];
-        return SizedBox(height: 100.0, child: _BoardCard(board: board));
+        return SizedBox(height: 90.0, child: _BoardCard(board: board));
       },
     ).animate().fadeIn(duration: 300.ms);
   }

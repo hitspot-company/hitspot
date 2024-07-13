@@ -143,15 +143,15 @@ class SingleBoardPage extends StatelessWidget {
                     Row(
                       children: [
                         _AvatarStack(
-                            height: 80.0,
+                            height: 50.0,
                             collaborators:
                                 singleBoardCubit.state.board?.collaborators ??
                                     []),
                         const Spacer(),
                         if (isLoading)
-                          const HSShimmerBox(width: 120, height: 30.0)
-                              .animate()
-                              .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                          const Expanded(
+                            child: HSShimmerBox(width: 60, height: 60.0),
+                          )
                         else
                           _SaveActionButton(
                             status: state.status,
@@ -244,29 +244,21 @@ class _AvatarStack extends StatelessWidget {
               },
             ),
           ),
-          AutoSizeText(usernames, textAlign: TextAlign.left, maxLines: 1),
+          // AutoSizeText(usernames, textAlign: TextAlign.left, maxLines: 1),
         ],
       ),
     );
   }
 
-  String get usernames {
-    if (collaborators == null || collaborators!.isEmpty) {
-      return "";
-    }
-    final count = collaborators!.length > 5 ? 4 : collaborators!.length - 1;
-    int index;
-    String ret = '';
-    for (index = 0; index < count; index++) {
-      HSDebugLogger.logInfo("Index: $index - count: $count");
-      ret +=
-          "${collaborators![index].username!}${index < count - 1 ? ', ' : ' '}";
-    }
-    // if (index < co)
-    ret += "and ${collaborators![index].username!}";
-    HSDebugLogger.logInfo("RET 2: $ret");
-    return ret;
-  }
+  // String get usernames {
+  //   if (collaborators == null || collaborators!.isEmpty) {
+  //     return "";
+  //   }
+  //   final count = collaborators!.length > 5 ? 4 : collaborators!.length - 1;
+  //   final names = collaborators!.sublist(0, count).map((e) => e.username);
+  //   final res = names.join(", ");
+  //   if (count > 0) res += " and ${collaborators!.length - count} others";
+  // }
 }
 
 class HSSimpleSliverAppBar extends StatelessWidget {

@@ -14,6 +14,7 @@ import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
@@ -267,6 +268,7 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HSDebugLogger.logInfo("Author: ${singleSpotCubit.state.spot.author}");
     return Row(
       children: [
         HsUserTile(

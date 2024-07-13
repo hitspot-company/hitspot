@@ -16,6 +16,7 @@ import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_search_bar.dart';
 import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -134,26 +135,17 @@ class HomePage extends StatelessWidget {
                                     initialCameraPosition: currentPosition),
                               ),
                               child: AbsorbPointer(
-                                absorbing: true,
-                                child: GoogleMap(
-                                  onMapCreated:
-                                      (GoogleMapController controller) {
-                                    if (mapController.isCompleted) {
-                                      mapController =
-                                          Completer<GoogleMapController>();
-                                    }
-                                    mapController.complete(controller);
-                                    app.theme.applyMapDarkStyle(mapController);
-                                  },
-                                  myLocationButtonEnabled: false,
-                                  myLocationEnabled: true,
-                                  initialCameraPosition: const CameraPosition(
-                                    zoom: 16.0,
-                                    target: LatLng(0, 0),
-                                  ),
-                                  markers: markers,
-                                ),
-                              ),
+                                  absorbing: true,
+                                  child: HSGoogleMap(
+                                    onMapCreated:
+                                        (GoogleMapController controller) {
+                                      if (mapController.isCompleted) {
+                                        mapController =
+                                            Completer<GoogleMapController>();
+                                      }
+                                      mapController.complete(controller);
+                                    },
+                                  )),
                             );
                           },
                         )),

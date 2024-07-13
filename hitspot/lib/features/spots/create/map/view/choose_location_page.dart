@@ -10,6 +10,7 @@ import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 class ChooseLocationPage extends StatelessWidget {
@@ -48,10 +49,7 @@ class _MapAndSearchBar extends StatelessWidget {
             chooseLocationCubit.mapController;
         return Stack(
           children: [
-            GoogleMap(
-              style: app.theme.mapStyleDark,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
+            HSGoogleMap(
               onMapCreated: (GoogleMapController controller) async {
                 if (mapController.isCompleted) {
                   mapController = Completer<GoogleMapController>();
@@ -69,7 +67,6 @@ class _MapAndSearchBar extends StatelessWidget {
                 _searchBarController.text = "";
                 chooseLocationCubit.searchNode.unfocus();
               },
-              mapType: MapType.normal,
             ),
           ],
         );

@@ -8,7 +8,7 @@ class HSSpotsUtils {
       "biogram": data["user_biogram"],
       "email": data["user_email"],
       "name": data["user_name"],
-      "avatarUrl": data["user_avatar_url"],
+      "avatar_url": data["user_avatar_url"],
       "username": data["user_username"],
       "followers": data["user_followers_count"],
       "following": data["user_following_count"],

@@ -8,6 +8,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -40,27 +41,23 @@ class MapPage extends StatelessWidget {
                 onIsContractedCallback: mapCubit.updateSheetExpansionStatus,
                 onIsExtendedCallback: mapCubit.updateSheetExpansionStatus,
                 background: BlocSelector<HSMapCubit, HSMapState, List<Marker>>(
-                  selector: (state) => state.markersInView,
-                  builder: (context, markersInView) => GoogleMap(
-                    style: app.theme.mapStyleDark,
-                    fortyFiveDegreeImageryEnabled: true,
-                    key: mapCubit.mapKey,
-                    initialCameraPosition: CameraPosition(
-                      zoom: 16.0,
-                      target: mapCubit.state.cameraPosition ??
-                          const LatLng(0.0, 0.0),
-                    ),
-                    onMapCreated: mapCubit.onMapCreated,
-                    myLocationButtonEnabled: false,
-                    myLocationEnabled: true,
-                    onCameraIdle: mapCubit.onCameraIdle,
-                    markers: Set.from(markersInView),
-                    onCameraMove: (CameraPosition position) {
-                      mapCubit.toggleIsMoving(true);
-                    },
-                    onTap: (argument) => mapCubit.clearSelectedSpot(),
-                  ),
-                ),
+                    selector: (state) => state.markersInView,
+                    builder: (context, markersInView) => HSGoogleMap(
+                          fortyFiveDegreeImageryEnabled: true,
+                          key: mapCubit.mapKey,
+                          initialCameraPosition: CameraPosition(
+                            zoom: 16.0,
+                            target: mapCubit.state.cameraPosition ??
+                                const LatLng(0.0, 0.0),
+                          ),
+                          onMapCreated: mapCubit.onMapCreated,
+                          onCameraIdle: mapCubit.onCameraIdle,
+                          markers: Set.from(markersInView),
+                          onCameraMove: (CameraPosition position) {
+                            mapCubit.toggleIsMoving(true);
+                          },
+                          onTap: (argument) => mapCubit.clearSelectedSpot(),
+                        )),
                 persistentHeader: _PersistentHeader(
                     isSelected: isSelected,
                     persistentHeaderHeight: persistentHeaderHeight),
