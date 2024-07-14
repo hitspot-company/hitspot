@@ -121,8 +121,7 @@ class HSNavigation {
       ),
       GoRoute(
         path: '/invite/:boardId',
-        redirect: (context, state) =>
-            '/protected/home?from=${state.matchedLocation}',
+        redirect: (context, state) => '/protected/home?from=${state.uri}',
       ),
       GoRoute(
         path: "/protected",

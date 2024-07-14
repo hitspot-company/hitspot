@@ -135,8 +135,13 @@ class HSDatabaseRepsitory {
       await _boardsRepository.fetchUserBoards(
           user, userID, batchOffset, batchSize);
 
-  Future<String> boardGenerateBoardInvitation(String boardId) async =>
+  Future<String> boardGenerateBoardInvitation(
+          {required String boardId}) async =>
       await _boardsRepository.generateBoardInvitation(boardId);
+
+  Future<bool> boardCheckIfInvitationIsValid(
+          {required String boardId, required String token}) async =>
+      await _boardsRepository.checkIfInvitationIsValid(boardId, token);
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);

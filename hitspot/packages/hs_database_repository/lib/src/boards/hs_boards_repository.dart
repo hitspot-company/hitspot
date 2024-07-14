@@ -346,14 +346,25 @@ class HSBoardsRepository {
       });
 
       // Generate the magic link
-      final magicLink =
-          'app.hitspot://invitation-callback/$boardId/invite?token=$token';
+      final magicLink = 'app.hitspot://invite/$boardId?token=$token';
 
       HSDebugLogger.logSuccess('Generated new invitation: $magicLink');
       return magicLink;
     } catch (error) {
       HSDebugLogger.logError('Error generating invitation: $error');
       throw error;
+    }
+  }
+
+  Future<bool> checkIfInvitationIsValid(String boardId, String token) async {
+    try {
+      return await _supabase.rpc('check_board_invitation', params: {
+        'board_id': boardId,
+        'token': token,
+      });
+    } catch (error) {
+      HSDebugLogger.logError('Error checking invitation: $error');
+      return false;
     }
   }
 }

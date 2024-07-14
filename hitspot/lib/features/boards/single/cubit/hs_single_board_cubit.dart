@@ -141,8 +141,8 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
     try {
       assert(boardId != null, 'Board ID cannot be null');
 
-      final magicLink =
-          await app.databaseRepository.boardGenerateBoardInvitation(boardId!);
+      final magicLink = await app.databaseRepository
+          .boardGenerateBoardInvitation(boardId: boardId!);
 
       final String shareText =
           'Join our board collaboration! Click this link to accept the invitation: $magicLink';
