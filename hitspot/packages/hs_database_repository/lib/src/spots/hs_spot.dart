@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/src/utils/utils.dart';
 
 class HSSpot {
   final String? sid, title, description, geohash, createdBy, address;
@@ -97,6 +100,7 @@ class HSSpot {
 
   static HSSpot deserialize(Map<String, dynamic> data) {
     return HSSpot(
+      author: _deserializeUser(data),
       sid: data['id'],
       title: data['title'],
       description: data['description'],
@@ -111,12 +115,37 @@ class HSSpot {
       address: data['address'],
       latitude: data['lat'] ?? data['latitude'],
       longitude: data['long'] ?? data['longitude'],
+      images:
+          (data['images'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
       spotIndex: data['spot_index'],
     );
+  }
+
+  static HSSpot deserializeWithAuthor(Map<String, dynamic> data) {
+    return HSSpotsUtils.deserializeSpotWithAuthor(data);
   }
 
   @override
   String toString() {
     return 'HSSpot{sid: $sid, title: $title, description: $description, geohash: $geohash, createdBy: $createdBy, likesCount: $likesCount, commentsCount: $commentsCount, savesCount: $savesCount, tripsCount: $tripsCount, boardsCount: $boardsCount, latitude: $latitude, longitude: $longitude, tags: $tags, images: $images, author: $author, address: $address, sharesCount: $sharesCount}';
+  }
+
+  static bool _containsUserData(Map<String, dynamic> data) {
+    return (data.keys.where((e) => e.contains("user_")).toList().isNotEmpty);
+  }
+
+  static HSUser? _deserializeUser(Map<String, dynamic> data) {
+    if (!_containsUserData(data)) return null;
+    return HSUser(
+      uid: data['user_id'],
+      email: data['user_email'],
+      name: data['user_name'],
+      avatarUrl: data['user_photoURL'],
+      biogram: data['user_bio'],
+      followers: data['user_followers_count'],
+      following: data['user_following_count'],
+      spots: data['user_spots_count'],
+      boards: data['user_boards_count'],
+    );
   }
 }

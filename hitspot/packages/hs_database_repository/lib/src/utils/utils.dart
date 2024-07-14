@@ -4,11 +4,11 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 class HSSpotsUtils {
   static HSSpot deserializeSpotWithAuthor(Map<String, dynamic> data) {
     HSUser author = HSUser.deserialize({
-      "uid": data["user_id"],
+      "id": data["user_id"],
       "biogram": data["user_biogram"],
       "email": data["user_email"],
       "name": data["user_name"],
-      "avatarUrl": data["user_avatar_url"],
+      "avatar_url": data["user_avatar_url"],
       "username": data["user_username"],
       "followers": data["user_followers_count"],
       "following": data["user_following_count"],

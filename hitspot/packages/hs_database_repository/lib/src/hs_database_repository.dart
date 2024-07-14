@@ -1,12 +1,8 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/boards/hs_board.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
-import 'package:hs_database_repository/src/spots/hs_spot.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
-import 'package:hs_database_repository/src/tags/hs_tag.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
-import 'package:hs_database_repository/src/users/hs_users_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
@@ -89,10 +85,6 @@ class HSDatabaseRepsitory {
           {HSBoard? board, String? boardID, HSUser? user, String? userID}) =>
       _boardsRepository.saveUnsave(board, boardID, user, userID);
 
-  Future<List<HSBoard>> boardFetchUserBoards(
-          {HSUser? user, String? userID}) async =>
-      await _boardsRepository.fetchUserBoards(user, userID);
-
   Future<List<HSBoard>> boardFetchSavedBoards(
           {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchSavedBoards(user, userID);
@@ -133,6 +125,15 @@ class HSDatabaseRepsitory {
           required int newIndex}) async =>
       await _boardsRepository.updateSpotIndex(
           board, boardID, spot, spotID, newIndex);
+
+  Future<List<HSBoard>> boardFetchUserBoards({
+    HSUser? user,
+    String? userID,
+    int batchOffset = 0,
+    int batchSize = 20,
+  }) async =>
+      await _boardsRepository.fetchUserBoards(
+          user, userID, batchOffset, batchSize);
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);
@@ -187,6 +188,19 @@ class HSDatabaseRepsitory {
           {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
       await _spotsRepository.saveUnsave(spot, spotID, user, userID);
 
+  Future<List<HSSpot>> spotFetchSpotsInView({
+    required double minLat,
+    required double minLong,
+    required double maxLat,
+    required double maxLong,
+  }) async =>
+      await _spotsRepository.fetchInView(
+        minLat,
+        minLong,
+        maxLat,
+        maxLong,
+      );
+
   /// Fetches the spots that belong to the user of given UID and are visible to the requester.
   ///
   /// The requester can be the user themselves or another user.
@@ -206,6 +220,17 @@ class HSDatabaseRepsitory {
           int batchSize = 20}) async =>
       await _spotsRepository.userBoards(user, userID, batchOffset, batchSize);
 
+  Future<HSSpot> spotFetchTopSpotWithTag(String tag) async =>
+      await _spotsRepository.fetchTopSpotWithTag(tag);
+
+  Future<List<HSSpot>> spotFetchTrendingSpots(
+          {int batchSize = 20,
+          int batchOffset = 0,
+          double? lat,
+          double? long}) async =>
+      await _spotsRepository.fetchTrendingSpots(
+          batchSize, batchOffset, lat, long);
+
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);
   Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>
@@ -223,7 +248,17 @@ class HSDatabaseRepsitory {
       await _tagsRepository.deleteSpot(tag);
   Future<bool> tagExists({required String tagValue}) async =>
       await _tagsRepository.tagExists(tagValue);
-
   Future<List<HSTag>> tagFetchSpotTags({HSSpot? spot, String? spotID}) async =>
       await _tagsRepository.fetchSpotTags(spot, spotID);
+  Future<List<HSTag>> tagSearch(
+          {required String query,
+          int batchOffset = 0,
+          int batchSize = 20}) async =>
+      _tagsRepository.search(query, batchOffset, batchSize);
+
+  Future<List<HSSpot>> tagFetchTopSpots(
+          {required String tag,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _tagsRepository.fetchTopSpots(tag, batchSize, batchOffset);
 }

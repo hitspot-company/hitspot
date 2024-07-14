@@ -4,13 +4,14 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-
-import '../../../../../widgets/hs_textfield.dart';
 
 class ChooseLocationPage extends StatelessWidget {
   const ChooseLocationPage({super.key});
@@ -23,7 +24,11 @@ class ChooseLocationPage extends StatelessWidget {
       topSafe: false,
       body: Stack(
         fit: StackFit.expand,
-        children: [_MapAndSearchBar(), const _Pin(), const _BottomBar()],
+        children: [
+          _MapAndSearchBar(),
+          const _AnimatedPin(),
+          const _BottomBar(),
+        ],
       ),
     );
   }
@@ -44,10 +49,8 @@ class _MapAndSearchBar extends StatelessWidget {
             chooseLocationCubit.mapController;
         return Stack(
           children: [
-            GoogleMap(
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              onMapCreated: (GoogleMapController controller) {
+            HSGoogleMap(
+              onMapCreated: (GoogleMapController controller) async {
                 if (mapController.isCompleted) {
                   mapController = Completer<GoogleMapController>();
                 }
@@ -64,7 +67,6 @@ class _MapAndSearchBar extends StatelessWidget {
                 _searchBarController.text = "";
                 chooseLocationCubit.searchNode.unfocus();
               },
-              mapType: MapType.normal,
             ),
           ],
         );
@@ -73,25 +75,50 @@ class _MapAndSearchBar extends StatelessWidget {
   }
 }
 
-class _Pin extends StatelessWidget {
-  const _Pin();
+class _AnimatedPin extends StatelessWidget {
+  const _AnimatedPin();
 
   @override
   Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<HSChooseLocationCubit>(context);
     return BlocBuilder<HSChooseLocationCubit, HSChooseLocationState>(
       builder: (context, state) {
         final LatLng latlng = LatLng(state.selectedLocation?.latitude ?? 0.0,
             state.selectedLocation?.longitude ?? 0.0);
         final isIdle = state.cameraLocation == latlng;
+
         return Center(
-          child: Padding(
-            padding: EdgeInsets.only(bottom: isIdle ? 36.0 : 32.0),
-            child: Icon(
-              FontAwesomeIcons.mapPin,
-              color: appTheme.mainColor,
-              size: isIdle ? 28.0 : 36.0,
-            ),
-          ),
+          child: Icon(
+            FontAwesomeIcons.mapPin,
+            color: appTheme.mainColor,
+            size: 32.0,
+          )
+              .animate()
+              .scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.2, 1.2),
+                duration: const Duration(milliseconds: 300),
+              )
+              .then()
+              .moveY(
+                begin: 0,
+                end: -10,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              )
+              .animate(target: isIdle ? 1.0 : 0.0)
+              .scaleXY(
+                begin: 1.0,
+                end: 0.9,
+                duration: const Duration(milliseconds: 150),
+              )
+              .then()
+              .moveY(
+                begin: 0,
+                end: 5,
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.bounceOut,
+              ),
         );
       },
     );
@@ -99,7 +126,7 @@ class _Pin extends StatelessWidget {
 }
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({super.key});
+  const _BottomBar();
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +143,8 @@ class _BottomBar extends StatelessWidget {
           final bool isSearching = state.isSearching;
           final double searchBarHeight =
               !isSearching ? 180.0 : screenHeight - 100.0;
-          return AnimatedContainer(
+
+          return Container(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(20),
@@ -124,88 +152,51 @@ class _BottomBar extends StatelessWidget {
               color: currentTheme.scaffoldBackgroundColor,
             ),
             width: screenWidth,
-            curve: Curves.easeIn,
-            duration: const Duration(milliseconds: 250),
             height: searchBarHeight,
             child: Column(
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 16.0),
                   child: HSTextField.filled(
-                    focusNode: chooseLocationCubit.searchNode,
                     hintText: address,
-                    controller: chooseLocationCubit.searchController,
-                    suffixIcon: const Icon(Icons.location_pin),
+                    suffixIcon: const Icon(Icons.search),
+                    readOnly: true,
+                    onTap: () => chooseLocationCubit.searchLocation(context),
                   ),
                 ),
-                if (!isSearching)
-                  Row(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
                     children: [
-                      TextButton(
+                      ElevatedButton(
                         onPressed: chooseLocationCubit.cancel,
                         child: const Text("Cancel"),
                       ),
-                      TextButton(
+                      ElevatedButton(
                         onPressed: chooseLocationCubit.submit,
                         child: const Text("Select"),
                       ),
                     ],
                   ),
-                if (isSearching)
-                  Expanded(
-                    child: BlocBuilder<HSChooseLocationCubit,
-                        HSChooseLocationState>(
-                      buildWhen: (previous, current) =>
-                          previous.predictions != current.predictions ||
-                          previous.status != current.status,
-                      builder: (context, state) {
-                        final List<HSPrediction> predictions =
-                            state.predictions;
-                        final isFetching = state.status ==
-                            HSChooseLocationStatus.fetchingPredictions;
-                        if (isFetching) {
-                          return const Align(
-                            alignment: Alignment.topCenter,
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 16.0),
-                              child: HSLoadingIndicator(enableCenter: false),
-                            ),
-                          );
-                        }
-                        if (predictions.isEmpty) {
-                          return Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Text(chooseLocationCubit.query.isEmpty
-                                  ? "Search for a place..."
-                                  : "No predictions found"));
-                        }
-                        return ListView.separated(
-                          itemCount: predictions.length,
-                          separatorBuilder: (BuildContext context, int index) {
-                            return const SizedBox(
-                              height: 20.0,
-                            );
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            final HSPrediction prediction = predictions[index];
-                            return ListTile(
-                              leading: const Icon(FontAwesomeIcons.mapPin),
-                              title: AutoSizeText(prediction.description,
-                                  maxLines: 1),
-                              onTap: () => chooseLocationCubit
-                                  .onPredictionSelected(prediction),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                ),
               ],
             ),
-          );
+          )
+              .animate(target: isSearching ? 1 : 0)
+              // .slideY(
+              //   duration: const Duration(milliseconds: 300),
+              //   curve: Curves.easeInOut,
+              //   begin: 180.0,
+              //   end: screenHeight - 100.0,
+              // )
+              .slideY(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                begin: 0,
+                end: -0.5,
+              );
         },
       ),
     );

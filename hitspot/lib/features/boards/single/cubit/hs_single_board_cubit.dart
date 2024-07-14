@@ -29,10 +29,11 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
           await app.databaseRepository.boardRead(boardID: boardID);
       final HSUser author =
           await app.databaseRepository.userRead(userID: board.createdBy);
-
       final collaborators = await app.databaseRepository
-          .boardFetchBoardCollaborators(board: board, boardID: boardID);
-
+          .boardFetchBoardCollaborators(board: board, boardID: boardID)
+        ..add(author);
+      HSDebugLogger.logSuccess(
+          "Fetched collaborators of board: $collaborators");
       final bool isBoardSaved = await app.databaseRepository
           .boardIsBoardSaved(boardID: boardID, user: currentUser);
       final bool isEditor = await app.databaseRepository
@@ -41,7 +42,7 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
           await app.databaseRepository.boardFetchBoardSpots(boardID: boardID);
       emit(state.copyWith(
           status: HSSingleBoardStatus.idle,
-          board: board,
+          board: board.copyWith(collaborators: collaborators),
           spots: spots,
           author: author,
           isBoardSaved: isBoardSaved,

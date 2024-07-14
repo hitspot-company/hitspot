@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
+import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -58,8 +59,8 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
 
   Future<void> likeDislikeSpot() async {
     try {
-      emit(state.copyWith(status: HSSingleSpotStatus.liking));
-      await Future.delayed(const Duration(seconds: 1));
+      // emit(state.copyWith(status: HSSingleSpotStatus.liking));
+      // await Future.delayed(const Duration(seconds: 1));
       final bool isSpotLiked = await _databaseRepository.spotLikeDislike(
           spotID: spotID, userID: currentUser.uid);
       emit(state.copyWith(
@@ -72,7 +73,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
   Future<void> saveUnsaveSpot() async {
     try {
       emit(state.copyWith(status: HSSingleSpotStatus.saving));
-      await Future.delayed(const Duration(seconds: 1));
+      // await Future.delayed(const Duration(seconds: 1));
       final bool isSpotSaved = await _databaseRepository.spotSaveUnsave(
           spotID: spotID, userID: currentUser.uid);
       emit(state.copyWith(
@@ -112,25 +113,38 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     try {
       await showCupertinoModalBottomSheet(
         context: app.context,
-        builder: (context) => SingleChildScrollView(
-          controller: ModalScrollController.of(context),
-          child: Column(
-            children: [
-              const Gap(16.0),
-              Text(
-                "Choose a board",
-                style: textTheme.headlineMedium,
-              ),
-              const Gap(16.0),
-              ...boards.map(
-                (e) => HSModalBottomSheetItem(
-                  title: e.title!,
-                  iconData: FontAwesomeIcons.a,
-                  onTap: () => _addToBoard(e),
+        duration: const Duration(milliseconds: 200),
+        builder: (context) => Material(
+          color: Colors.transparent,
+          child: SingleChildScrollView(
+            controller: ModalScrollController.of(context),
+            child: Column(
+              children: [
+                const Gap(16.0),
+                Text(
+                  "Choose a board",
+                  style: textTheme.headlineMedium,
                 ),
-              ),
-              const Gap(32.0),
-            ],
+                const Gap(16.0),
+                if (boards.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: HSTextPrompt(
+                      prompt: "You don't have any boards yet.",
+                      pressableText: "\nCreate",
+                      promptColor: appTheme.mainColor,
+                      onTap: navi.toCreateBoard,
+                    ),
+                  ),
+                ...boards.map(
+                  (e) => HSModalBottomSheetItem(
+                    title: e.title!,
+                    onTap: () => _addToBoard(e),
+                  ),
+                ),
+                const Gap(32.0),
+              ],
+            ),
           ),
         ),
       );
@@ -153,8 +167,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
                 title: "Edit",
                 iconData: FontAwesomeIcons.penToSquare,
                 onTap: () => navi.pushPage(
-                  page: CreateSpotProvider(prototype: state.spot),
-                ),
+                    page: CreateSpotProvider(prototype: state.spot)),
               ),
             HSModalBottomSheetItem(
               title: "Add to Board",
@@ -169,11 +182,12 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
               title: "Share",
               onTap: shareSpot,
             ),
-            HSModalBottomSheetItem(
-              iconData: FontAwesomeIcons.trashCan,
-              title: "Delete",
-              onTap: _deleteSpot,
-            ),
+            if (state.isAuthor)
+              HSModalBottomSheetItem(
+                iconData: FontAwesomeIcons.trashCan,
+                title: "Delete",
+                onTap: _deleteSpot,
+              ),
             const SizedBox(
               height: 20.0,
             ),
@@ -246,13 +260,13 @@ class HSModalBottomSheetItem extends StatelessWidget {
     this.leftPadding = 16.0,
     this.height = 60.0,
     required this.title,
-    required this.iconData,
+    this.iconData,
   });
 
   final VoidCallback? onTap;
   final double borderRadius, leftPadding, height;
   final String title;
-  final IconData iconData;
+  final IconData? iconData;
 
   @override
   Widget build(BuildContext context) {
@@ -266,20 +280,26 @@ class HSModalBottomSheetItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           onTap: onTap ?? () {},
           child: SizedBox(
-              height: height,
-              width: screenWidth,
-              child: Padding(
-                padding: EdgeInsets.only(left: leftPadding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(iconData),
-                    const Gap(16.0),
-                    Text(title, style: const TextStyle(fontSize: 16.0)),
-                  ],
-                ),
-              )),
+            height: height,
+            width: screenWidth,
+            child: Padding(
+              padding: EdgeInsets.only(left: leftPadding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (iconData != null)
+                    Row(
+                      children: [
+                        Icon(iconData),
+                        const Gap(16.0),
+                      ],
+                    ),
+                  Text(title, style: const TextStyle(fontSize: 16.0)),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

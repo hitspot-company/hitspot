@@ -20,11 +20,12 @@ class HsUserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: GestureDetector(
-        onTap: onTap ?? () => navi.toUser(userID: user.uid!),
+    return GestureDetector(
+      onTap: onTap ?? () => navi.toUser(userID: user.uid!),
+      child: SizedBox(
+        height: height,
         child: Row(
+          mainAxisSize: MainAxisSize.max,
           children: [
             HSUserAvatar(
               radius: avatarRadius,

@@ -1,6 +1,8 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spot.dart';
+import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -96,29 +98,25 @@ class HSSpotsRepository {
       HSDebugLogger.logError(_.toString());
       throw Exception("Error fetching nearby spots: $_");
     }
-
-    // TODO: Add map view with clustering (https://pub.dev/packages/google_maps_cluster_manager)
   }
 
   Future<List<HSSpot>> fetchSpotsWithinRadius(double lat, double long,
       [double? radius]) async {
     const double DEFAULT_RADIUS = 1000 * 50; // 50km
     try {
-      final data =
+      final List<Map<String, dynamic>> data =
           await _supabase.rpc('spots_fetch_spots_within_radius', params: {
-        'lat': lat,
-        'long': long,
-        'radius': radius ?? DEFAULT_RADIUS,
+        'p_lat': lat,
+        'p_long': long,
+        'p_radius': radius ?? DEFAULT_RADIUS,
       });
-      HSDebugLogger.logInfo(data.toString());
-      final List<HSSpot> spots = (data as List<dynamic>).map((e) {
-        print(data);
-        return HSSpot.deserialize(e);
-      }).toList();
-      for (var i = 0; i < spots.length; i++) {
-        final spot = await _composeSpotWithImages(spots[i]);
-        spots[i] = spot;
-      }
+
+      final List<HSSpot> spots =
+          data.map(HSSpot.deserializeWithAuthor).toList();
+      // for (var i = 0; i < spots.length; i++) {
+      //   final spot = await _composeSpotWithImages(spots[i]);
+      //   spots[i] = spot;
+      // }
       return (spots);
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -166,11 +164,13 @@ class HSSpotsRepository {
   Future<HSSpot> fetchSpotWithAuthor(HSSpot? spot, String? spotID) async {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
+      final sid = spot?.sid ?? spotID!;
       final fetchedSpot =
           await _supabase.rpc('spots_fetch_spot_with_author', params: {
-        'spotsid': spot != null ? spot.sid : spotID,
+        'spotsid': sid,
       });
-      return HSSpotsUtils.deserializeSpotWithAuthor(fetchedSpot.first);
+      HSDebugLogger.logInfo("Fetched spot with author: ${fetchedSpot}");
+      return HSSpot.deserializeWithAuthor(fetchedSpot.first);
     } catch (_) {
       throw Exception("Could not fetch spot with author: $_");
     }
@@ -337,6 +337,57 @@ class HSSpotsRepository {
       return boards;
     } catch (_) {
       throw Exception("Error fetching user spots: $_");
+    }
+  }
+
+  Future<List<HSSpot>> fetchInView(
+    double minLat,
+    double minLong,
+    double maxLat,
+    double maxLong,
+  ) async {
+    try {
+      final List<Map<String, dynamic>> data =
+          await _supabase.rpc('spots_fetch_spots_in_view', params: {
+        'min_lat': minLat,
+        'min_long': minLong,
+        'max_lat': maxLat,
+        'max_long': maxLong,
+      });
+      final List<HSSpot> spots =
+          data.map(HSSpot.deserializeWithAuthor).toList();
+
+      return spots;
+    } catch (_) {
+      throw Exception("Error fetching spots in view: $_");
+    }
+  }
+
+  Future<HSSpot> fetchTopSpotWithTag(String tag) async {
+    try {
+      final List<Map<String, dynamic>> fetchedSpot =
+          await _supabase.rpc('spots_fetch_top_spot_with_tag', params: {
+        'tag': tag,
+      });
+      return HSSpot.deserializeWithAuthor(fetchedSpot.first);
+    } catch (_) {
+      throw Exception("Error fetching top spot with tag: $_");
+    }
+  }
+
+  Future<List<HSSpot>> fetchTrendingSpots(
+      int? batchSize, int? batchOffset, double? lat, double? long) async {
+    try {
+      final List<Map<String, dynamic>> fetchedSpots =
+          await _supabase.rpc('spots_fetch_trending_spots', params: {
+        'batch_size': batchSize,
+        'batch_offset': batchOffset,
+        'user_lat': lat,
+        'user_long': long,
+      });
+      return fetchedSpots.map(HSSpot.deserializeWithAuthor).toList();
+    } catch (_) {
+      throw Exception("Error fetching trending spots: $_");
     }
   }
 }

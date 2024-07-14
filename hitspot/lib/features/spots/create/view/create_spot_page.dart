@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:choice/choice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -56,6 +55,7 @@ class _FirstPage extends StatelessWidget {
           maxLength: 64,
           onChanged: createSpotCubit.updateTitle,
           hintText: createSpotCubit.titleHint,
+          initialValue: createSpotCubit.titleInitialValue,
         ),
         const Gap(8.0),
         HSFormButtonsRow(
@@ -63,7 +63,7 @@ class _FirstPage extends StatelessWidget {
             selector: (state) => state.title.isNotEmpty,
             builder: (context, isValid) {
               return HSFormButton(
-                icon: const Icon(FontAwesomeIcons.arrowRight),
+                icon: nextIcon,
                 onPressed: isValid ? createSpotCubit.nextPage : null,
                 child: const Text("Description"),
               );
@@ -91,6 +91,7 @@ class _SecondPage extends StatelessWidget {
           autocorrect: false,
           onChanged: createSpotCubit.updateDescription,
           hintText: createSpotCubit.descriptionHint,
+          initialValue: createSpotCubit.descriptionInitialValue,
           maxLength: 512,
           maxLines: 8,
         ),
@@ -104,7 +105,7 @@ class _SecondPage extends StatelessWidget {
             selector: (state) => state.description.isNotEmpty,
             builder: (context, isValid) {
               return HSFormButton(
-                icon: const Icon(FontAwesomeIcons.arrowRight),
+                icon: nextIcon,
                 onPressed: isValid ? createSpotCubit.nextPage : null,
                 child: const Text("Categories"),
               );
@@ -127,6 +128,7 @@ class _ThirdPage extends StatelessWidget {
       caption: "Select categories that best describe your spot.",
       children: [
         HSTextField.filled(
+          controller: createSpotCubit.categoriesController,
           onChanged: createSpotCubit.updateTagsQuery,
           hintText: "Search for category...",
           suffixIcon: const Icon(FontAwesomeIcons.magnifyingGlass),

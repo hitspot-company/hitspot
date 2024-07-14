@@ -1,8 +1,16 @@
+import 'dart:async';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
-import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_location_repository/src/models/hs_place_details.dart';
+import 'package:hs_location_repository/src/models/hs_prediction.dart';
 import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:uuid/uuid.dart';
+
+enum HSSpotMarkerType { verified, unverified, selected }
 
 class HSLocationRepository {
   HSLocationRepository(String googleMapsApiKey, String placesApiKey) {
@@ -181,5 +189,36 @@ class HSLocationRepository {
         title: title,
         description: description,
         mapType: preferredMapType);
+  }
+
+  double distanceBetween(
+      {HSSpot? spot1,
+      HSSpot? spot2,
+      double? lat1,
+      double? lat2,
+      double? long1,
+      double? long2}) {
+    assert(spot1 != null || (lat1 != null && long1 != null),
+        "Either spot1 or lat1 and long1 are required");
+
+    assert(spot2 != null || (lat2 != null && long2 != null),
+        "Either spot2 or lat2 and long2 are required");
+    final startLat = lat1 ?? spot1!.latitude!;
+    final startLong = long1 ?? spot1!.longitude!;
+    final endLat = lat2 ?? spot2!.latitude!;
+    final endLong = long2 ?? spot2!.longitude!;
+    return Geolocator.distanceBetween(startLat, startLong, endLat, endLong);
+  }
+
+  Future<void> animateCameraToNewLatLng(
+      Completer<GoogleMapController> mapController, LatLng location,
+      [double? zoom]) async {
+    final GoogleMapController controller = await mapController.future;
+    controller.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        location,
+        zoom ?? await controller.getZoomLevel(),
+      ),
+    );
   }
 }

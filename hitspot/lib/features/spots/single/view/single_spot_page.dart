@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -8,11 +9,15 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_image_full_screen_page.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+
+import 'package:flutter_animate/flutter_animate.dart';
 
 class SingleSpotPage extends StatelessWidget {
   const SingleSpotPage({super.key});
@@ -22,29 +27,59 @@ class SingleSpotPage extends StatelessWidget {
     final singleSpotCubit = BlocProvider.of<HSSingleSpotCubit>(context);
     return HSScaffold(
       appBar: HSAppBar(
-        enableDefaultBackButton: true,
-        right: BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
-          selector: (state) => state.isAuthor,
-          builder: (context, isAuthor) {
-            if (!isAuthor) return const SizedBox();
-            return IconButton(
-              icon: const Icon(
-                FontAwesomeIcons.ellipsisVertical,
-              ),
-              onPressed: singleSpotCubit.showBottomSheet,
-            );
-          },
-        ),
-      ),
+          enableDefaultBackButton: true,
+          right: BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
+            selector: (state) => state.status == HSSingleSpotStatus.error,
+            builder: (context, hasError) {
+              return IconButton(
+                icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+                onPressed: hasError ? null : singleSpotCubit.showBottomSheet,
+              )
+                  .animate()
+                  .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                  .scale(
+                    begin: const Offset(0.8, 0.8),
+                    end: const Offset(1, 1),
+                  );
+            },
+          )),
       body: BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
         buildWhen: (previous, current) =>
             previous.status != current.status || previous.spot != current.spot,
         builder: (context, state) {
           final status = state.status;
+          if (status == HSSingleSpotStatus.error) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48)
+                      .animate()
+                      .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                      .scale(
+                          begin: const Offset(0.8, 0.8),
+                          end: const Offset(1, 1)),
+                  const Gap(16),
+                  Text(
+                    'Something went wrong.',
+                    style: textTheme.headlineSmall,
+                  ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
+                  const Gap(16),
+                  HSButton(
+                    onPressed: () {},
+                    child: const Text("Retry"),
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 200.ms)
+                      .slideY(begin: 0.2, end: 0),
+                ],
+              ),
+            );
+          }
           if (status == HSSingleSpotStatus.loading) {
-            return const HSLoadingIndicator();
-          } else if (status == HSSingleSpotStatus.error) {
-            return const Center(child: Text('Error fetching spot'));
+            return const HSLoadingIndicator()
+                .animate()
+                .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
           }
           final spot = singleSpotCubit.state.spot;
           final imagesCount = spot.images?.length ?? 0;
@@ -53,9 +88,13 @@ class SingleSpotPage extends StatelessWidget {
               Text(
                 "${spot.title}",
                 style: textTheme.displayMedium,
-              ).toSliver,
+              )
+                  .animate()
+                  .fadeIn(duration: 300.ms, delay: 100.ms)
+                  .slideY(begin: 0.2, end: 0)
+                  .toSliver,
               const Gap(24.0).toSliver,
-              _ImageTile(
+              _AnimatedImageTile(
                 imageUrl: spot.images!.first,
               ).toSliver,
               const Gap(16.0).toSliver,
@@ -63,73 +102,35 @@ class SingleSpotPage extends StatelessWidget {
                 "${spot.address}",
                 style: const TextStyle(fontSize: 14.0, color: Colors.grey),
                 maxLines: 2,
-              ).toSliver,
-
-              const _TagsBuilder().toSliver,
+              )
+                  .animate()
+                  .fadeIn(duration: 300.ms, delay: 200.ms)
+                  .slideY(begin: 0.2, end: 0)
+                  .toSliver,
+              const _AnimatedTagsBuilder().toSliver,
               const Gap(32.0).toSliver,
               Text(spot.description!, style: const TextStyle(fontSize: 16.0))
+                  .animate()
+                  .fadeIn(duration: 300.ms, delay: 300.ms)
+                  .slideY(begin: 0.2, end: 0)
                   .toSliver,
               const Gap(32.0).toSliver,
-              Row(
-                children: [
-                  HsUserTile(
-                    user: spot.author!,
-                  ),
-                  Expanded(
-                      child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      GestureDetector(
-                        onTap: singleSpotCubit.likeDislikeSpot,
-                        child: BlocSelector<HSSingleSpotCubit,
-                            HSSingleSpotState, bool>(
-                          selector: (state) => state.isSpotLiked,
-                          builder: (context, isSpotLiked) {
-                            if (singleSpotCubit.state.status ==
-                                HSSingleSpotStatus.liking) {
-                              return const HSLoadingIndicator(size: 24.0);
-                            }
-                            if (isSpotLiked) {
-                              return Icon(FontAwesomeIcons.solidHeart,
-                                  color: appTheme.mainColor);
-                            }
-                            return const Icon(FontAwesomeIcons.heart);
-                          },
-                        ),
-                      ),
-                      const Icon(FontAwesomeIcons.comment),
-                      GestureDetector(
-                        onTap: singleSpotCubit.saveUnsaveSpot,
-                        child: BlocSelector<HSSingleSpotCubit,
-                            HSSingleSpotState, bool>(
-                          selector: (state) => state.isSpotSaved,
-                          builder: (context, isSpotSaved) {
-                            if (singleSpotCubit.state.status ==
-                                HSSingleSpotStatus.saving) {
-                              return const HSLoadingIndicator(size: 24.0);
-                            }
-                            if (isSpotSaved) {
-                              return Icon(FontAwesomeIcons.solidBookmark,
-                                  color: appTheme.mainColor);
-                            }
-                            return const Icon(FontAwesomeIcons.bookmark);
-                          },
-                        ),
-                      ),
-                    ],
-                  )),
-                ],
-              ).toSliver,
+              _AnimatedUserAndActionBar(singleSpotCubit: singleSpotCubit)
+                  .toSliver,
               const Gap(32.0).toSliver,
-              // TODO: Style the map in dark colors
-              _MapView(singleSpotCubit: singleSpotCubit).toSliver,
+              _AnimatedMapView(singleSpotCubit: singleSpotCubit).toSliver,
               const Gap(32.0).toSliver,
               SliverList.separated(
                 itemCount: imagesCount - 1,
                 separatorBuilder: (context, index) => const Gap(16.0),
-                itemBuilder: (context, index) => _ImageTile(
+                itemBuilder: (context, index) => _AnimatedImageTile(
                   imageUrl: spot.images![index + 1],
-                ),
+                )
+                    .animate()
+                    .fadeIn(duration: 300.ms, delay: (400 + index * 100).ms)
+                    .scale(
+                        begin: const Offset(0.95, 0.95),
+                        end: const Offset(1, 1)),
               ),
               const Gap(32.0).toSliver,
             ],
@@ -140,8 +141,8 @@ class SingleSpotPage extends StatelessWidget {
   }
 }
 
-class _ImageTile extends StatelessWidget {
-  const _ImageTile({required this.imageUrl, this.height = 300.0});
+class _AnimatedImageTile extends StatelessWidget {
+  const _AnimatedImageTile({required this.imageUrl, this.height = 300.0});
 
   final String imageUrl;
   final double height;
@@ -160,14 +161,15 @@ class _ImageTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.0),
         ),
       ),
-    );
+    )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
   }
 }
 
-class _MapView extends StatelessWidget {
-  const _MapView({
-    required this.singleSpotCubit,
-  });
+class _AnimatedMapView extends StatelessWidget {
+  const _AnimatedMapView({required this.singleSpotCubit});
 
   final HSSingleSpotCubit singleSpotCubit;
 
@@ -184,6 +186,8 @@ class _MapView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: GoogleMap(
+                onMapCreated: (controller) =>
+                    controller.setMapStyle(appTheme.mapStyle),
                 onTap: (argument) => app.locationRepository.launchMaps(
                   coords: spotLocation,
                   description: singleSpotCubit.state.spot.address!,
@@ -205,7 +209,10 @@ class _MapView extends StatelessWidget {
                 myLocationButtonEnabled: false,
               ),
             ),
-          );
+          )
+              .animate()
+              .fadeIn(duration: 300.ms, delay: 500.ms)
+              .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
         }
         return const SizedBox();
       },
@@ -213,8 +220,8 @@ class _MapView extends StatelessWidget {
   }
 }
 
-class _TagsBuilder extends StatelessWidget {
-  const _TagsBuilder({super.key});
+class _AnimatedTagsBuilder extends StatelessWidget {
+  const _AnimatedTagsBuilder({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -228,16 +235,122 @@ class _TagsBuilder extends StatelessWidget {
           padding: const EdgeInsets.only(top: 16.0),
           child: Wrap(
             children: tags
-                .map(
-                  (tag) => Chip(
-                    side: BorderSide.none,
-                    label: Text("#${tag.value}"),
-                  ),
-                )
+                .asMap()
+                .map((index, tag) => MapEntry(
+                      index,
+                      GestureDetector(
+                        onTap: () => navi.toTagsExplore(tag.value!),
+                        child: Chip(
+                          side: BorderSide.none,
+                          label: Text("#${tag.value}"),
+                        ),
+                      )
+                          .animate()
+                          .fadeIn(
+                              duration: 300.ms, delay: (200 + index * 50).ms)
+                          .scale(
+                              begin: const Offset(0.9, 0.9),
+                              end: const Offset(1, 1)),
+                    ))
+                .values
                 .toList(),
           ),
         );
       },
+    );
+  }
+}
+
+class _AnimatedUserAndActionBar extends StatelessWidget {
+  const _AnimatedUserAndActionBar({required this.singleSpotCubit});
+
+  final HSSingleSpotCubit singleSpotCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    HSDebugLogger.logInfo("Author: ${singleSpotCubit.state.spot.author}");
+    return Row(
+      children: [
+        HsUserTile(
+          user: singleSpotCubit.state.spot.author!,
+        )
+            .animate()
+            .fadeIn(duration: 300.ms, delay: 400.ms)
+            .slideX(begin: -0.2, end: 0),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _AnimatedActionButton(
+                onTap: singleSpotCubit.likeDislikeSpot,
+                selector: (state) => state.isSpotLiked,
+                activeIcon: FontAwesomeIcons.solidHeart,
+                inactiveIcon: FontAwesomeIcons.heart,
+                loadingStatus: HSSingleSpotStatus.liking,
+                delay: 450.ms,
+              ),
+              Icon(FontAwesomeIcons.comment)
+                  .animate()
+                  .fadeIn(duration: 300.ms, delay: 500.ms)
+                  .scale(
+                      begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
+              _AnimatedActionButton(
+                onTap: singleSpotCubit.saveUnsaveSpot,
+                selector: (state) => state.isSpotSaved,
+                activeIcon: FontAwesomeIcons.solidBookmark,
+                inactiveIcon: FontAwesomeIcons.bookmark,
+                loadingStatus: HSSingleSpotStatus.saving,
+                delay: 550.ms,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AnimatedActionButton extends StatelessWidget {
+  const _AnimatedActionButton({
+    required this.onTap,
+    required this.selector,
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.loadingStatus,
+    required this.delay,
+  });
+
+  final VoidCallback onTap;
+  final bool Function(HSSingleSpotState) selector;
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+  final HSSingleSpotStatus loadingStatus;
+  final Duration delay;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact(); // Adds slight vibration
+        onTap();
+      },
+      child: BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
+        selector: selector,
+        builder: (context, isActive) {
+          return Icon(
+            isActive ? activeIcon : inactiveIcon,
+            color: isActive ? appTheme.mainColor : null,
+          )
+              .animate(
+                onPlay: (controller) => controller.forward(),
+              )
+              .fadeIn(duration: 300.ms, delay: delay)
+              .scale(
+                begin: const Offset(0.8, 0.8),
+                end: const Offset(1, 1),
+              );
+        },
+      ),
     );
   }
 }

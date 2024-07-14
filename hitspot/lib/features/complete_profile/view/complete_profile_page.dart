@@ -61,7 +61,7 @@ class _FirstPage extends StatelessWidget {
             text: "Welcome to Hitspot!",
             headlineType: HSFormHeadlineType.display),
         HSFormCaption(
-            text: "Hi ${currentUser?.email}!\nPlease complete your profile."),
+            text: "Hi ${currentUser.email}!\nPlease complete your profile."),
         const Gap(16.0),
         const HSFormHeadline(text: "Birthday"),
         const HSFormCaption(text: "You have to be at least 16 to use Hitspot"),
@@ -75,7 +75,7 @@ class _FirstPage extends StatelessWidget {
                 state.birthday.error == null && state.birthday.isValid,
             builder: (context, isValid) {
               return HSFormButton(
-                icon: const Icon(FontAwesomeIcons.arrowRight),
+                icon: nextIcon,
                 onPressed: isValid ? _completeProfileCubit.nextPage : null,
                 child: const Text("Next"),
               );
@@ -287,7 +287,7 @@ class _UsernameInput extends StatelessWidget {
     );
   }
 
-  Icon get _getPrefixIcon {
+  Icon? get _getPrefixIcon {
     final usernameValidationState =
         _completeProfileCubit.state.usernameValidationState;
     switch (usernameValidationState) {
@@ -296,7 +296,7 @@ class _UsernameInput extends StatelessWidget {
       case HSUsernameValidationState.unavailable:
         return const Icon(FontAwesomeIcons.xmark, color: Colors.red);
       default:
-        return const Icon(FontAwesomeIcons.question);
+        return null;
     }
   }
 
