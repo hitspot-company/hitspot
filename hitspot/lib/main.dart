@@ -25,6 +25,7 @@ Future<void> main() async {
   final HSAuthenticationRepository authenticationRepository =
       HSAuthenticationRepository(supabase);
   final HSThemeRepository themeRepository = HSThemeRepository.instance;
+
   runApp(MyApp(
     authenticationRepository: authenticationRepository,
     themeRepository: themeRepository,

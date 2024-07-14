@@ -10,6 +10,7 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:share_plus/share_plus.dart';
 
 part 'hs_single_board_state.dart';
 
@@ -133,6 +134,22 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
       ));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
+    }
+  }
+
+  Future<void> shareInvitation(String? boardId) async {
+    try {
+      assert(boardId != null, 'Board ID cannot be null');
+
+      final magicLink =
+          await app.databaseRepository.boardGenerateBoardInvitation(boardId!);
+
+      final String shareText =
+          'Join our board collaboration! Click this link to accept the invitation: $magicLink';
+
+      await Share.share(shareText, subject: 'Board Collaboration Invitation');
+    } catch (error) {
+      HSDebugLogger.logError('Error sharing invitation: $error');
     }
   }
 }

@@ -167,6 +167,10 @@ class SingleBoardPage extends StatelessWidget {
                               .fadeIn(duration: 300.ms, delay: 400.ms)
                               .slideY(begin: 0.2, end: 0),
                         IconButton(
+                            onPressed: () =>
+                                singleBoardCubit.shareInvitation(board?.id),
+                            icon: const Icon(FontAwesomeIcons.userPlus)),
+                        IconButton(
                           onPressed: () => HSDebugLogger.logInfo("Share"),
                           icon: const Icon(
                             FontAwesomeIcons.arrowUpRightFromSquare,

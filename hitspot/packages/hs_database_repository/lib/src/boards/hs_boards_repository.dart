@@ -2,6 +2,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class HSBoardsRepository {
   const HSBoardsRepository(this._supabase, this._boards);
@@ -314,6 +315,45 @@ class HSBoardsRepository {
       });
     } catch (_) {
       throw Exception("Error updating spots: $_");
+    }
+  }
+
+  Future<String> generateBoardInvitation(String boardId) async {
+    try {
+      late String token;
+      bool isUnique = false;
+
+      // Generate a unique token and ensure it's not already in the database
+      while (!isUnique) {
+        token = Uuid().v4();
+
+        final existingInvitation = await _supabase
+            .from('board_invitations')
+            .select()
+            .eq('token', token)
+            .maybeSingle();
+
+        if (existingInvitation == null) {
+          isUnique = true;
+        }
+      }
+
+      // Store the invitation details
+      await _supabase.from('board_invitations').insert({
+        'board_id': boardId,
+        'token': token,
+        'expires_at': DateTime.now().add(Duration(days: 7)).toIso8601String(),
+      });
+
+      // Generate the magic link
+      final magicLink =
+          'app.hitspot://invitation-callback/$boardId/invite?token=$token';
+
+      HSDebugLogger.logSuccess('Generated new invitation: $magicLink');
+      return magicLink;
+    } catch (error) {
+      HSDebugLogger.logError('Error generating invitation: $error');
+      throw error;
     }
   }
 }

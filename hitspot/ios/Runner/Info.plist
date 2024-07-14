@@ -51,6 +51,8 @@
 				<key>CFBundleURLSchemes</key>
 				<array>
 					<string>hitspot.app</string>
+					<string>app.hitspot</string>
+
 				</array>
 			</dict>
 			<!-- Google Sign-in Section -->
