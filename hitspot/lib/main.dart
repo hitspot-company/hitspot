@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -79,6 +80,9 @@ class MyApp extends StatelessWidget {
                   HSThemeBloc(themeRepository)..add(HSInitialThemeSetEvent())),
           BlocProvider(
             create: (_) => HSMainSearchCubit(),
+          ),
+          BlocProvider(
+            create: (_) => HSConnectivityLocationBloc(),
           )
         ],
         child: BlocListener<HSAuthenticationBloc, HSAuthenticationState>(
