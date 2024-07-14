@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -26,7 +27,7 @@ class HsBoardInvitationCubit extends Cubit<HSBoardInvitationState> {
 
       // Check if invitation is valid
       bool isValid = await _databaseRepsitory.boardCheckIfInvitationIsValid(
-          boardId: boardId, token: token);
+          boardId: boardId, token: token, userId: HSApp().currentUser.uid!);
       if (!isValid) {
         emit(state.copyWith(
             error: 'Invalid board ID or token',
@@ -67,9 +68,8 @@ class HsBoardInvitationCubit extends Cubit<HSBoardInvitationState> {
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      // Add the user to the board
-
-      // Mark the invitation as used
+      await _databaseRepsitory.boardAddCollaborator(
+          boardId: boardId, userId: HSApp().currentUser.uid!);
 
       emit(state.copyWith(isLoading: false, isAccepted: true));
     } catch (e) {

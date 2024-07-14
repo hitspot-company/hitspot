@@ -30,7 +30,7 @@ class BoardInvitationPage extends StatelessWidget {
         body: BlocConsumer<HsBoardInvitationCubit, HSBoardInvitationState>(
           listener: (context, state) {
             if (state.isAccepted) {
-              app.navigation.push('/board/$boardId');
+              app.navigation.router.go('/board/$boardId');
             }
           },
           builder: (context, state) {

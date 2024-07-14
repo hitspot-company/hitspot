@@ -140,8 +140,14 @@ class HSDatabaseRepsitory {
       await _boardsRepository.generateBoardInvitation(boardId);
 
   Future<bool> boardCheckIfInvitationIsValid(
-          {required String boardId, required String token}) async =>
-      await _boardsRepository.checkIfInvitationIsValid(boardId, token);
+          {required String boardId,
+          required String token,
+          required String userId}) async =>
+      await _boardsRepository.checkIfInvitationIsValid(boardId, token, userId);
+
+  Future<void> boardAddCollaborator(
+          {required String boardId, required String userId}) async =>
+      await _boardsRepository.addCollaborator(boardId, userId);
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);

@@ -356,15 +356,32 @@ class HSBoardsRepository {
     }
   }
 
-  Future<bool> checkIfInvitationIsValid(String boardId, String token) async {
+  Future<bool> checkIfInvitationIsValid(
+      String boardId, String token, String userId) async {
     try {
       return await _supabase.rpc('check_board_invitation', params: {
-        'board_id': boardId,
-        'token': token,
+        'input_board_id': boardId,
+        'input_token': token,
+        'input_user_id': userId
       });
     } catch (error) {
       HSDebugLogger.logError('Error checking invitation: $error');
       return false;
+    }
+  }
+
+  Future<void> addCollaborator(String boardId, String userId) async {
+    try {
+      // Add the user to the board collaborators
+      _supabase.from('boards_permissions').insert({
+        'user_id': userId,
+        'board_id': boardId,
+        'permission_level': 'editor',
+      });
+
+      // TODO: Mark the invitation as used or delete it or decrement invitation count
+    } catch (error) {
+      HSDebugLogger.logError('Error adding collaborator: $error');
     }
   }
 }
