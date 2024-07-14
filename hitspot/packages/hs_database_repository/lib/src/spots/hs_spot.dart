@@ -18,9 +18,6 @@ class HSSpot {
   // BOARDS RELATED
   final int? spotIndex;
 
-  // BOARDS RELATED
-  final int? spotIndex;
-
   const HSSpot({
     this.sid,
     this.address,

@@ -30,7 +30,7 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
       final HSUser author =
           await app.databaseRepository.userRead(userID: board.createdBy);
       final collaborators = await app.databaseRepository
-          .boardFetchCollaborators(board: board, boardID: boardID)
+          .boardFetchBoardCollaborators(board: board, boardID: boardID)
         ..add(author);
       HSDebugLogger.logSuccess(
           "Fetched collaborators of board: $collaborators");
