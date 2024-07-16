@@ -26,28 +26,35 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
   Future<void> _fetchInitial() async {
     try {
       emit(state.copyWith(status: HSSingleBoardStatus.loading));
+
       final HSBoard board =
           await app.databaseRepository.boardRead(boardID: boardID);
+
       final HSUser author =
           await app.databaseRepository.userRead(userID: board.createdBy);
       final collaborators = await app.databaseRepository
-          .boardFetchBoardCollaborators(board: board, boardID: boardID)
-        ..add(author);
-      HSDebugLogger.logSuccess(
-          "Fetched collaborators of board: $collaborators");
+          .boardFetchBoardCollaborators(board: board, boardID: boardID);
+      board.collaborators = collaborators;
+
       final bool isBoardSaved = await app.databaseRepository
           .boardIsBoardSaved(boardID: boardID, user: currentUser);
+
       final bool isEditor = await app.databaseRepository
           .boardIsEditor(boardID: boardID, user: currentUser);
+
+      final bool isOwner = board.createdBy == currentUser.uid;
+
       final List<HSSpot> spots =
           await app.databaseRepository.boardFetchBoardSpots(boardID: boardID);
+
       emit(state.copyWith(
           status: HSSingleBoardStatus.idle,
           board: board.copyWith(collaborators: collaborators),
           spots: spots,
           author: author,
           isBoardSaved: isBoardSaved,
-          isEditor: isEditor));
+          isEditor: isEditor,
+          isOwner: isOwner));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       emit(state.copyWith(status: HSSingleBoardStatus.error));
@@ -150,6 +157,27 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
       await Share.share(shareText, subject: 'Board Collaboration Invitation');
     } catch (error) {
       HSDebugLogger.logError('Error sharing invitation: $error');
+    }
+  }
+
+  Future<void> removeCollaborator(String? boardId, String? userId) async {
+    try {
+      assert(userId != null, 'User ID cannot be null');
+
+      emit(state.copyWith(status: HSSingleBoardStatus.updating));
+
+      await app.databaseRepository
+          .boardRemoveCollaborator(boardId: boardID, userId: userId!);
+
+      state.board!.collaborators!
+          .removeWhere((collaborator) => collaborator.uid == userId);
+
+      emit(state.copyWith(
+        status: HSSingleBoardStatus.idle,
+        board: state.board!,
+      ));
+    } catch (error) {
+      HSDebugLogger.logError('Error removing collaborator: $error');
     }
   }
 }

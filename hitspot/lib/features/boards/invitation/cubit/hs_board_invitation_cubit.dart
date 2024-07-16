@@ -44,6 +44,7 @@ class HsBoardInvitationCubit extends Cubit<HSBoardInvitationState> {
 
       Image? boardImage;
       String? boardAuthor;
+
       if (board.createdBy != null) {
         final author =
             await _databaseRepsitory.userRead(userID: board.createdBy!);

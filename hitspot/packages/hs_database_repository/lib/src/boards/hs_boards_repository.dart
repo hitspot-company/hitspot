@@ -373,15 +373,28 @@ class HSBoardsRepository {
   Future<void> addCollaborator(String boardId, String userId) async {
     try {
       // Add the user to the board collaborators
-      _supabase.from('boards_permissions').insert({
+      final response = await _supabase.from('boards_permissions').insert({
         'user_id': userId,
         'board_id': boardId,
         'permission_level': 'editor',
       });
 
+      HSDebugLogger.logInfo("Adding collaborator: $response");
+
       // TODO: Mark the invitation as used or delete it or decrement invitation count
     } catch (error) {
       HSDebugLogger.logError('Error adding collaborator: $error');
+    }
+  }
+
+  Future<void> removeCollaborator(String boardId, String userId) async {
+    try {
+      await _supabase
+          .from('boards_permissions')
+          .delete()
+          .match({'board_id': boardId, 'user_id': userId});
+    } catch (error) {
+      HSDebugLogger.logError('Error removing collaborator: $error');
     }
   }
 }

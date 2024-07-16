@@ -9,6 +9,7 @@ final class HSSingleBoardState extends Equatable {
     this.author,
     this.isBoardSaved = false,
     this.isEditor = false,
+    this.isOwner = false,
     this.spots = const [],
   });
 
@@ -17,6 +18,8 @@ final class HSSingleBoardState extends Equatable {
   final HSUser? author;
   final bool isBoardSaved;
   final bool isEditor;
+  final bool isOwner;
+
   final List<HSSpot> spots;
 
   @override
@@ -29,6 +32,7 @@ final class HSSingleBoardState extends Equatable {
     HSUser? author,
     bool? isBoardSaved,
     bool? isEditor,
+    bool? isOwner,
     List<HSSpot>? spots,
   }) {
     return HSSingleBoardState(
@@ -36,6 +40,7 @@ final class HSSingleBoardState extends Equatable {
       board: board ?? this.board,
       author: author ?? this.author,
       isEditor: isEditor ?? this.isEditor,
+      isOwner: isOwner ?? this.isOwner,
       isBoardSaved: isBoardSaved ?? this.isBoardSaved,
       spots: spots ?? this.spots,
     );

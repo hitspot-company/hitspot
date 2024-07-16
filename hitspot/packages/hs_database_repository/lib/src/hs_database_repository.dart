@@ -149,6 +149,10 @@ class HSDatabaseRepsitory {
           {required String boardId, required String userId}) async =>
       await _boardsRepository.addCollaborator(boardId, userId);
 
+  Future<void> boardRemoveCollaborator(
+          {required String boardId, required String userId}) async =>
+      await _boardsRepository.removeCollaborator(boardId, userId);
+
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);
 

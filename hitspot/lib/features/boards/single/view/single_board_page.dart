@@ -13,6 +13,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
+import 'package:hitspot/features/search/users/cubit/hs_user_search_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -101,13 +102,57 @@ class SingleBoardPage extends StatelessWidget {
             slivers: [
               if (board?.image != null)
                 HSSimpleSliverAppBar(
-                  height: 120,
-                  child: HSImage(
-                    borderRadius: BorderRadius.circular(14.0),
-                    imageUrl: singleBoardCubit.state.board?.image,
-                    color: board?.color,
-                  ),
-                ),
+                    height: 120,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        HSImage(
+                          borderRadius: BorderRadius.circular(14.0),
+                          imageUrl: singleBoardCubit.state.board?.image,
+                          color: board?.color,
+                        ),
+                        Positioned(
+                          bottom: 8,
+                          left: 8,
+                          child: GestureDetector(
+                              onTap: () =>
+                                  _showCollaboratorsMenu(singleBoardCubit),
+                              child: _buildCollaboratorIcons(
+                                  board?.collaborators)),
+                        ),
+                      ],
+                    )),
+              const SliverToBoxAdapter(child: Gap(16.0)),
+              if (isLoading)
+                const HSShimmerBox(width: 60, height: 60.0)
+                    .animate()
+                    .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                    .toSliver
+              else
+                SliverToBoxAdapter(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AutoSizeText(
+                      board!.title!,
+                      style: const TextStyle(
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                    )
+                        .animate()
+                        .fadeIn(duration: 300.ms, delay: 100.ms)
+                        .slideY(begin: 0.2, end: 0),
+                    Text(
+                      board.description!,
+                      style: const TextStyle(color: Colors.grey),
+                    )
+                        .animate()
+                        .fadeIn(duration: 300.ms, delay: 200.ms)
+                        .slideY(begin: 0.2, end: 0),
+                  ],
+                )),
               const SliverToBoxAdapter(child: Gap(16.0)),
               if (isLoading)
                 const HSShimmerBox(width: 60, height: 60.0)
@@ -166,10 +211,11 @@ class SingleBoardPage extends StatelessWidget {
                               .animate()
                               .fadeIn(duration: 300.ms, delay: 400.ms)
                               .slideY(begin: 0.2, end: 0),
-                        IconButton(
-                            onPressed: () =>
-                                singleBoardCubit.shareInvitation(board?.id),
-                            icon: const Icon(FontAwesomeIcons.userPlus)),
+                        if (state.isOwner)
+                          IconButton(
+                              onPressed: () =>
+                                  singleBoardCubit.shareInvitation(board?.id),
+                              icon: const Icon(FontAwesomeIcons.userPlus)),
                         IconButton(
                           onPressed: () => HSDebugLogger.logInfo("Share"),
                           icon: const Icon(
@@ -345,4 +391,81 @@ class _SaveActionButton extends StatelessWidget {
       icon: icon,
     );
   }
+}
+
+Widget _buildCollaboratorIcons(List<HSUser>? collaborators) {
+  if (collaborators == null || collaborators.isEmpty) {
+    return SizedBox.shrink();
+  }
+
+  // Limit the number of collaborators to show to 5
+  if (collaborators.length > 5) {
+    collaborators = collaborators.sublist(0, 5);
+  }
+
+  return Padding(
+    padding: const EdgeInsets.all(4.0),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        collaborators.length,
+        (index) => Padding(
+          padding: const EdgeInsets.only(right: 18.0),
+          child: Align(
+            widthFactor: 0.7,
+            child: HSUserAvatar(
+                radius: 20.0, imageUrl: collaborators?[index].avatarUrl),
+          ),
+        ),
+      ).reversed.toList(), // Reverse the list to stack from right to left
+    ),
+  );
+}
+
+void _showCollaboratorsMenu(HSSingleBoardCubit singleBoardCubit) {
+  final state = singleBoardCubit.state;
+  if (state.board?.collaborators == null ||
+      state.board?.collaborators?.isEmpty == true) {
+    return;
+  }
+
+  showDialog(
+    context: app.context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Collaborators'),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: state.board?.collaborators
+                    ?.map((collaborator) => ListTile(
+                          leading: HSUserAvatar(
+                              radius: 20.0, imageUrl: collaborator.avatarUrl),
+                          title: Text(collaborator.name ?? ""),
+                          trailing: state.isOwner
+                              ? IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  onPressed: () {
+                                    singleBoardCubit.removeCollaborator(
+                                        state.board?.id, collaborator.uid);
+                                    navi.pop();
+                                  },
+                                )
+                              : const SizedBox.shrink(),
+                        ))
+                    .toList() ??
+                [],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              navi.pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
