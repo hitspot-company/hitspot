@@ -13,7 +13,6 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
-import 'package:hitspot/features/search/users/cubit/hs_user_search_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -154,37 +153,6 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 )),
               const SliverToBoxAdapter(child: Gap(16.0)),
-              if (isLoading)
-                const HSShimmerBox(width: 60, height: 60.0)
-                    .animate()
-                    .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                    .toSliver
-              else
-                SliverToBoxAdapter(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AutoSizeText(
-                      board!.title!,
-                      style: const TextStyle(
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: 100.ms)
-                        .slideY(begin: 0.2, end: 0),
-                    Text(
-                      board.description!,
-                      style: const TextStyle(color: Colors.grey),
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: 200.ms)
-                        .slideY(begin: 0.2, end: 0),
-                  ],
-                )),
-              const SliverToBoxAdapter(child: Gap(16.0)),
               HSSimpleSliverAppBar(
                 height: 100.0,
                 child: Column(
@@ -193,12 +161,20 @@ class SingleBoardPage extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        _AvatarStack(
-                            height: 50.0,
-                            collaborators:
-                                singleBoardCubit.state.board?.collaborators ??
-                                    []),
+                        HSUserAvatar(
+                          radius: 24,
+                          imageUrl: state.author?.avatarUrl,
+                        ),
+                        const Gap(16.0),
+                        if (isLoading)
+                          const HSShimmerBox(width: 120, height: 30.0)
+                        else
+                          Text(
+                            author?.username ?? "",
+                            style: textTheme.headlineLarge,
+                          ),
                         const Spacer(),
+                        Spacer(),
                         if (isLoading)
                           const Expanded(
                             child: HSShimmerBox(width: 60, height: 60.0),

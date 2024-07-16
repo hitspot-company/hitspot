@@ -83,7 +83,6 @@ dependencies:
   extended_nested_scroll_view: ^6.2.1
   avatar_stack: ^1.2.0
   reorderable_grid: ^1.0.10
-  reorderable_grid: ^1.0.10
   uuid: ^4.4.2
   uni_links: ^0.5.1
 
