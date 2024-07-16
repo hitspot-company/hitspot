@@ -320,6 +320,7 @@ class HSBoardsRepository {
 
   Future<String> generateBoardInvitation(String boardId) async {
     try {
+      // TODO: Talk with Kuba about it
       late String token;
       bool isUnique = false;
 
@@ -342,7 +343,7 @@ class HSBoardsRepository {
       await _supabase.from('board_invitations').insert({
         'board_id': boardId,
         'token': token,
-        'expires_at': DateTime.now().add(Duration(days: 7)).toIso8601String(),
+        'expires_at': DateTime.now().add(Duration(hours: 1)).toIso8601String(),
       });
 
       // Generate the magic link
@@ -373,11 +374,13 @@ class HSBoardsRepository {
   Future<void> addCollaborator(String boardId, String userId) async {
     try {
       // Add the user to the board collaborators
-      final response = await _supabase.from('boards_permissions').insert({
-        'user_id': userId,
-        'board_id': boardId,
-        'permission_level': 'editor',
-      });
+      final response = await _supabase
+          .from('boards_permissions')
+          .update({
+            'permission_level': 'editor',
+          })
+          .eq('user_id', userId)
+          .eq('board_id', boardId);
 
       HSDebugLogger.logInfo("Adding collaborator: $response");
 
@@ -395,6 +398,46 @@ class HSBoardsRepository {
           .match({'board_id': boardId, 'user_id': userId});
     } catch (error) {
       HSDebugLogger.logError('Error removing collaborator: $error');
+    }
+  }
+
+  Future<void> addPotentialCollaboratorAsInvited(
+      String boardId, String userId) async {
+    try {
+      // Check if the entry already exists
+      final existingEntry = await _supabase
+          .from('boards_permissions')
+          .select()
+          .eq('user_id', userId)
+          .eq('board_id', boardId)
+          .maybeSingle();
+
+      if (existingEntry == null) {
+        // Insert the new entry if it doesn't exist
+        await _supabase.from('boards_permissions').insert({
+          'user_id': userId,
+          'board_id': boardId,
+          'permission_level': 'invited',
+        });
+      } else {
+        HSDebugLogger.logInfo(
+            'Entry already exists in board_permissions for user $userId and board $boardId');
+      }
+    } catch (error) {
+      HSDebugLogger.logError('Error adding potential collaborator: $error');
+    }
+  }
+
+  Future<void> removePotentialCollaboratorFromInvited(
+      String boardId, String userId) async {
+    try {
+      final response = await _supabase
+          .from('boards_permissions')
+          .delete()
+          .eq('user_id', userId)
+          .eq('board_id', boardId);
+    } catch (error) {
+      HSDebugLogger.logError('Error adding potential collaborator: $error');
     }
   }
 }

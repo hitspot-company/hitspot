@@ -395,12 +395,13 @@ class _SaveActionButton extends StatelessWidget {
 
 Widget _buildCollaboratorIcons(List<HSUser>? collaborators) {
   if (collaborators == null || collaborators.isEmpty) {
-    return SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 
   // Limit the number of collaborators to show to 5
+  late List<HSUser> collaboratorsToShow = collaborators;
   if (collaborators.length > 5) {
-    collaborators = collaborators.sublist(0, 5);
+    collaboratorsToShow = collaborators.sublist(0, 5);
   }
 
   return Padding(
@@ -408,13 +409,13 @@ Widget _buildCollaboratorIcons(List<HSUser>? collaborators) {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(
-        collaborators.length,
+        collaboratorsToShow.length,
         (index) => Padding(
           padding: const EdgeInsets.only(right: 18.0),
           child: Align(
             widthFactor: 0.7,
             child: HSUserAvatar(
-                radius: 20.0, imageUrl: collaborators?[index].avatarUrl),
+                radius: 20.0, imageUrl: collaboratorsToShow[index].avatarUrl),
           ),
         ),
       ).reversed.toList(), // Reverse the list to stack from right to left

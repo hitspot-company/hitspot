@@ -101,7 +101,12 @@ class BoardInvitationPage extends StatelessWidget {
                           width:
                               200, // Adjust this value to your preferred width
                           child: TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: () {
+                              context
+                                  .read<HsBoardInvitationCubit>()
+                                  .declineInvitation();
+                              navi.pop();
+                            },
                             child: Text('Decline'),
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.symmetric(vertical: 12),
