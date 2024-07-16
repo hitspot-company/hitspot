@@ -215,8 +215,6 @@ class HSNavigation {
     final String? path = state.uri.queryParameters['from'];
     final String from = path != null ? "?from=$path" : "";
 
-    HSDebugLogger.logInfo("Redirecting to path: $path");
-
     if (status != HSAuthenticationStatus.authenticated) return "/auth$from";
     return null;
   }
@@ -270,10 +268,8 @@ class HSNavigation {
     uriLinkStream.listen((Uri? uri) {
       if (uri != null) {
         Uri parsedUri = Uri.parse(uri.toString());
-        String fullPath = '/' +
-            parsedUri.authority +
-            parsedUri.path +
-            (uri.hasQuery ? '?${uri.query}' : '');
+        String fullPath =
+            '/${parsedUri.authority}${parsedUri.path}${uri.hasQuery ? '?${uri.query}' : ''}';
 
         HSDebugLogger.logInfo('Received magic link: $fullPath');
         navi.router.push(fullPath);

@@ -111,8 +111,8 @@ class SingleBoardPage extends StatelessWidget {
                           color: board?.color,
                         ),
                         Positioned(
-                          bottom: 8,
-                          left: 8,
+                          bottom: 6,
+                          left: 12,
                           child: GestureDetector(
                               onTap: () =>
                                   _showCollaboratorsMenu(singleBoardCubit),
@@ -374,28 +374,27 @@ Widget _buildCollaboratorIcons(List<HSUser>? collaborators) {
     return const SizedBox.shrink();
   }
 
-  // Limit the number of collaborators to show to 5
+  // Limit the number of collaborators to show to 3
   late List<HSUser> collaboratorsToShow = collaborators;
-  if (collaborators.length > 5) {
-    collaboratorsToShow = collaborators.sublist(0, 5);
+  if (collaborators.length > 3) {
+    collaboratorsToShow = collaborators.sublist(0, 3);
   }
 
   return Padding(
     padding: const EdgeInsets.all(4.0),
     child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        collaboratorsToShow.length,
-        (index) => Padding(
-          padding: const EdgeInsets.only(right: 18.0),
-          child: Align(
-            widthFactor: 0.7,
-            child: HSUserAvatar(
-                radius: 20.0, imageUrl: collaboratorsToShow[index].avatarUrl),
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          collaboratorsToShow.length,
+          (index) => Padding(
+            padding: const EdgeInsets.only(right: 18.0),
+            child: Align(
+              widthFactor: 0.7,
+              child: HSUserAvatar(
+                  radius: 20.0, imageUrl: collaboratorsToShow[index].avatarUrl),
+            ),
           ),
-        ),
-      ).reversed.toList(), // Reverse the list to stack from right to left
-    ),
+        )),
   );
 }
 
@@ -411,7 +410,7 @@ void _showCollaboratorsMenu(HSSingleBoardCubit singleBoardCubit) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text('Collaborators'),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
         content: SingleChildScrollView(
           child: ListBody(
             children: state.board?.collaborators

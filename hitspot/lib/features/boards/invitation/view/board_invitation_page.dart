@@ -96,7 +96,7 @@ class BoardInvitationPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         SizedBox(
                           width:
                               200, // Adjust this value to your preferred width
@@ -154,7 +154,7 @@ class InvalidInvitationPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
             ),
