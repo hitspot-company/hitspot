@@ -50,6 +50,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
 
   void _initializeCreatingSpot() async {
     try {
+      HSDebugLogger.logInfo("Initializing creating spot");
       emit(state.copyWith(
           status: HSCreateSpotStatus.requestingLocationPermission));
       await _requestLocationPermission();
@@ -73,15 +74,8 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
 
   Future<void> _requestLocationPermission() async {
     try {
-      late final Position currentPosition;
-      final bool isPermissionGranted =
-          await _locationRepository.requestLocationPermission();
-      if (!isPermissionGranted) {
-        HSDebugLogger.logInfo("Permission not granted");
-        currentPosition = kDefaultPosition;
-      } else {
-        currentPosition = await _locationRepository.getCurrentLocation();
-      }
+      final Position currentPosition =
+          app.currentPosition ?? await _locationRepository.getCurrentLocation();
       emit(state.copyWith(
           currentLocation: currentPosition,
           status: HSCreateSpotStatus.choosingImages));

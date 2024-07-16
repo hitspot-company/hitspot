@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
 import 'package:geocoding/geocoding.dart';
@@ -220,5 +221,57 @@ class HSLocationRepository {
         zoom ?? await controller.getZoomLevel(),
       ),
     );
+  }
+
+  void zoomOutToFitAllMarkers(
+      GoogleMapController controller, Set<Marker> markers,
+      {Position? currentPosition}) {
+    if (markers.isEmpty) return;
+
+    double minLat;
+    double maxLat;
+    double minLng;
+    double maxLng;
+
+    // Start with the user position
+    if (currentPosition != null) {
+      minLat = currentPosition.latitude;
+      maxLat = currentPosition.latitude;
+      minLng = currentPosition.longitude;
+      maxLng = currentPosition.longitude;
+    } else {
+      minLat = markers.first.position.latitude;
+      maxLat = markers.first.position.latitude;
+      minLng = markers.first.position.longitude;
+      maxLng = markers.first.position.longitude;
+    }
+
+    // Iterate through all markers to find the bounding box
+    for (Marker marker in markers) {
+      minLat = min(minLat, marker.position.latitude);
+      maxLat = max(maxLat, marker.position.latitude);
+      minLng = min(minLng, marker.position.longitude);
+      maxLng = max(maxLng, marker.position.longitude);
+    }
+
+    // Create the bounds
+    LatLngBounds bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+
+    // Create camera update
+    CameraUpdate cameraUpdate =
+        CameraUpdate.newLatLngBounds(bounds, 50.0); // 50 is padding
+
+    // Move camera to fit bounds
+    controller.animateCamera(cameraUpdate);
+    print("Zooming out to fit all markers");
+  }
+
+  void resetPosition(Completer<GoogleMapController> controller,
+      Position currentPosition) async {
+    await animateCameraToNewLatLng(controller,
+        LatLng(currentPosition.latitude, currentPosition.longitude));
   }
 }

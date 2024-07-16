@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:hs_toasts/hs_toasts.dart';
 
 part 'hs_connectivity_event.dart';
 part 'hs_connectivity_state.dart';
@@ -21,8 +24,9 @@ class HSConnectivityLocationBloc
     on<HSConnectivityCheckConnectivityEvent>(_onCheckConnectivity);
     on<HSConnectivityRequestLocationEvent>(_onRequestLocation);
     on<HSConnectivityCheckLocationServiceEvent>(_onCheckLocationService);
-    on<HSConnectivityStartLocationSubscriptionEvent>(
-        _onStartLocationSubscription);
+    on<HSConnectivityLocationChangedEvent>((event, emit) {
+      emit(state.copyWith(location: event.location));
+    });
     on<HSConnectivityStopLocationSubscriptionEvent>(
         _onStopLocationSubscription);
 
@@ -32,8 +36,15 @@ class HSConnectivityLocationBloc
       add(HSConnectivityCheckConnectivityEvent());
     });
 
+    _positionSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      HSDebugLogger.logInfo("Location changed: $position");
+      add(HSConnectivityLocationChangedEvent(position));
+    });
+
     add(HSConnectivityCheckConnectivityEvent());
     add(HSConnectivityCheckLocationServiceEvent());
+    add(HSConnectivityRequestLocationEvent());
   }
 
   Future<void> _onCheckConnectivity(HSConnectivityCheckConnectivityEvent event,
@@ -42,6 +53,9 @@ class HSConnectivityLocationBloc
         await _connectivity.checkConnectivity();
     final bool isConnected = result.contains(ConnectivityResult.wifi) ||
         result.contains(ConnectivityResult.mobile);
+    if (!isConnected && state.isConnected) {
+      app.showToast(toastType: HSToastType.warning, title: "You are offline.");
+    }
     emit(state.copyWith(isConnected: isConnected));
   }
 
@@ -49,13 +63,17 @@ class HSConnectivityLocationBloc
       HSConnectivityCheckLocationServiceEvent event,
       Emitter<HSConnectivityLocationState> emit) async {
     final bool isEnabled = await Geolocator.isLocationServiceEnabled();
-    emit(state.copyWith(isLocationServiceEnabled: isEnabled));
+    if (!emit.isDone) {
+      emit(state.copyWith(isLocationServiceEnabled: isEnabled));
+    }
   }
 
   Future<void> _onRequestLocation(HSConnectivityRequestLocationEvent event,
       Emitter<HSConnectivityLocationState> emit) async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    emit(state.copyWith(isLocationServiceEnabled: serviceEnabled));
+    if (!emit.isDone) {
+      emit(state.copyWith(isLocationServiceEnabled: serviceEnabled));
+    }
 
     if (!serviceEnabled) {
       return;
@@ -75,56 +93,67 @@ class HSConnectivityLocationBloc
 
     try {
       final Position position = await Geolocator.getCurrentPosition();
-      emit(state.copyWith(location: position));
+      if (!emit.isDone) {
+        emit(state.copyWith(location: position));
+      }
     } catch (e) {
       print('Error getting location: $e');
     }
   }
 
-  Future<void> _onStartLocationSubscription(
-      HSConnectivityStartLocationSubscriptionEvent event,
-      Emitter<HSConnectivityLocationState> emit) async {
-    if (state.isLocationSubscriptionActive) {
-      return; // Subscription is already active
-    }
+  // Future<void> _onStartLocationSubscription(
+  //     HSConnectivityStartLocationSubscriptionEvent event,
+  //     Emitter<HSConnectivityLocationState> emit) async {
+  //   if (state.isLocationSubscriptionActive) {
+  //     return;
+  //   }
 
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    emit(state.copyWith(isLocationServiceEnabled: serviceEnabled));
+  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!emit.isDone) {
+  //     emit(state.copyWith(isLocationServiceEnabled: serviceEnabled));
+  //   }
 
-    if (!serviceEnabled) {
-      return;
-    }
+  //   if (!serviceEnabled) {
+  //     return;
+  //   }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return;
-      }
-    }
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       return;
+  //     }
+  //   }
 
-    if (permission == LocationPermission.deniedForever) {
-      return;
-    }
+  //   if (permission == LocationPermission.deniedForever) {
+  //     return;
+  //   }
 
-    _positionSubscription = Geolocator.getPositionStream().listen(
-      (Position position) {
-        emit(state.copyWith(
-            location: position, isLocationSubscriptionActive: true));
-      },
-      onError: (error) {
-        print('Error in location subscription: $error');
-        emit(state.copyWith(isLocationSubscriptionActive: false));
-      },
-    );
-  }
+  //   _positionSubscription = Geolocator.getPositionStream().listen(
+  //     (Position position) {
+  //       HSDebugLogger.logInfo("Location changed: $position");
+  //       if (!emit.isDone) {
+  //         emit(state.copyWith(
+  //             location: position, isLocationSubscriptionActive: true));
+  //       }
+  //     },
+  //     onError: (error) {
+  //       print('Error in location subscription: $error');
+  //       if (!emit.isDone) {
+  //         emit(state.copyWith(isLocationSubscriptionActive: false));
+  //       }
+  //     },
+  //   );
+  // }
 
   Future<void> _onStopLocationSubscription(
       HSConnectivityStopLocationSubscriptionEvent event,
       Emitter<HSConnectivityLocationState> emit) async {
     await _positionSubscription?.cancel();
     _positionSubscription = null;
-    emit(state.copyWith(isLocationSubscriptionActive: false));
+    if (!emit.isDone) {
+      emit(state.copyWith(isLocationSubscriptionActive: false));
+    }
   }
 
   @override

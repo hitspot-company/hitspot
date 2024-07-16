@@ -230,7 +230,7 @@ class _SpotsList extends StatelessWidget {
       itemCount: spots.length,
       itemBuilder: (context, index) {
         final spot = spots[index];
-        return _SpotCard(spot: spot, index: index);
+        return HSSpotCard(spot: spot, index: index);
       },
     ).animate().fadeIn(duration: 300.ms);
   }
@@ -256,11 +256,11 @@ class _SpotsList extends StatelessWidget {
   }
 }
 
-class _SpotCard extends StatelessWidget {
+class HSSpotCard extends StatelessWidget {
   final HSSpot spot;
   final int index;
 
-  const _SpotCard({required this.spot, required this.index});
+  const HSSpotCard({super.key, required this.spot, required this.index});
 
   @override
   Widget build(BuildContext context) {

@@ -37,6 +37,9 @@ class HSMapCubit extends Cubit<HSMapState> {
           _initialCameraPosition.latitude,
           _initialCameraPosition.longitude,
         );
+      } else if (app.currentPosition != null) {
+        cameraPosition = LatLng(
+            app.currentPosition!.latitude, app.currentPosition!.longitude);
       } else {
         cameraPosition =
             const LatLng(60.0, 60.0); // TODO: Change to place with most spots
@@ -84,9 +87,10 @@ class HSMapCubit extends Cubit<HSMapState> {
 
   void placeMarkers() {
     final List<HSSpot> spots = state.spotsInView;
-    List<Marker> markers = app.assets.generateMarkers(
-        spots, state.currentPosition?.toLatLng,
-        onTap: onMarkerTapped, selectedSpotID: state.selectedSpot.sid);
+    List<Marker> markers = app.assets.generateMarkers(spots,
+        currentPosition: state.currentPosition?.toLatLng,
+        onTap: onMarkerTapped,
+        selectedSpotID: state.selectedSpot.sid);
     emit(state.copyWith(markersInView: markers));
   }
 
@@ -171,7 +175,6 @@ class HSMapCubit extends Cubit<HSMapState> {
   }
 
   void hideInfoWindow() {
-    // clearSelectedSpot();
     final infoWindow = state.infoWindowProvider.updateVisibility(false);
     emit(state.copyWith(infoWindowProvider: infoWindow));
   }

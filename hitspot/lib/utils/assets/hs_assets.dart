@@ -79,8 +79,10 @@ class HSAssets {
     );
   }
 
-  List<Marker> generateMarkers(List<HSSpot> spots, LatLng? currentPosition,
-      {Function(HSSpot)? onTap, String? selectedSpotID}) {
+  List<Marker> generateMarkers(List<HSSpot> spots,
+      {LatLng? currentPosition,
+      Function(HSSpot)? onTap,
+      String? selectedSpotID}) {
     List<Marker> generatedMapMarkers = [];
     for (var i = 0; i < spots.length; i++) {
       final type = selectedSpotID == spots[i].sid

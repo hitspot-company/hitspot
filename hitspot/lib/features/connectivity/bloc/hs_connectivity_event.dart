@@ -15,3 +15,9 @@ class HSConnectivityStartLocationSubscriptionEvent
 
 class HSConnectivityStopLocationSubscriptionEvent
     extends HSConnectivityLocationEvent {}
+
+class HSConnectivityLocationChangedEvent extends HSConnectivityLocationEvent {
+  final Position location;
+
+  HSConnectivityLocationChangedEvent(this.location);
+}

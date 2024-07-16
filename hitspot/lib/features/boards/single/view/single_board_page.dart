@@ -13,6 +13,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
+import 'package:hitspot/features/boards/single/map/view/single_board_map_provider.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -192,6 +193,18 @@ class SingleBoardPage extends StatelessWidget {
                               onPressed: () =>
                                   singleBoardCubit.shareInvitation(board?.id),
                               icon: const Icon(FontAwesomeIcons.userPlus)),
+                        IconButton(
+                          onPressed: () => navi.pushPage(
+                            page: SingleBoardMapProvider(
+                                boardID: board!.id!, board: board),
+                          ),
+                          icon: const Icon(
+                            FontAwesomeIcons.map,
+                          ),
+                        )
+                            .animate()
+                            .fadeIn(duration: 300.ms, delay: 500.ms)
+                            .slideY(begin: 0.2, end: 0),
                         IconButton(
                           onPressed: () => HSDebugLogger.logInfo("Share"),
                           icon: const Icon(
