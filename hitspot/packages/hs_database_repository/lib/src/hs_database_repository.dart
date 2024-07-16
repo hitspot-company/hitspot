@@ -1,6 +1,7 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
+import 'package:hs_database_repository/src/recommendation_system/hs_interaction_type.dart';
 import 'package:hs_database_repository/src/recommendation_system/hs_recommendation_system_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
