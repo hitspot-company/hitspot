@@ -2,6 +2,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class HSBoardsRepository {
   const HSBoardsRepository(this._supabase, this._boards);
@@ -314,6 +315,129 @@ class HSBoardsRepository {
       });
     } catch (_) {
       throw Exception("Error updating spots: $_");
+    }
+  }
+
+  Future<String> generateBoardInvitation(String boardId) async {
+    try {
+      // TODO: Talk with Kuba about it
+      late String token;
+      bool isUnique = false;
+
+      // Generate a unique token and ensure it's not already in the database
+      while (!isUnique) {
+        token = Uuid().v4();
+
+        final existingInvitation = await _supabase
+            .from('board_invitations')
+            .select()
+            .eq('token', token)
+            .maybeSingle();
+
+        if (existingInvitation == null) {
+          isUnique = true;
+        }
+      }
+
+      // Store the invitation details
+      await _supabase.from('board_invitations').insert({
+        'board_id': boardId,
+        'token': token,
+        'expires_at': DateTime.now().add(Duration(hours: 1)).toIso8601String(),
+      });
+
+      // Generate the magic link
+      final magicLink = 'app.hitspot://invite/$boardId?token=$token';
+
+      HSDebugLogger.logSuccess('Generated new invitation: $magicLink');
+      return magicLink;
+    } catch (error) {
+      HSDebugLogger.logError('Error generating invitation: $error');
+      throw error;
+    }
+  }
+
+  Future<bool> checkIfInvitationIsValid(
+      String boardId, String token, String userId) async {
+    try {
+      return await _supabase.rpc('check_board_invitation', params: {
+        'input_board_id': boardId,
+        'input_token': token,
+        'input_user_id': userId
+      });
+    } catch (error) {
+      HSDebugLogger.logError('Error checking invitation: $error');
+      return false;
+    }
+  }
+
+  Future<void> addCollaborator(String boardId, String userId) async {
+    try {
+      // Add the user to the board collaborators
+      final response = await _supabase
+          .from('boards_permissions')
+          .update({
+            'permission_level': 'editor',
+          })
+          .eq('user_id', userId)
+          .eq('board_id', boardId);
+
+      HSDebugLogger.logInfo("Adding collaborator: $response");
+
+      // TODO: Mark the invitation as used or delete it or decrement invitation count
+    } catch (error) {
+      HSDebugLogger.logError('Error adding collaborator: $error');
+    }
+  }
+
+  Future<void> removeCollaborator(String boardId, String userId) async {
+    try {
+      await _supabase
+          .from('boards_permissions')
+          .delete()
+          .match({'board_id': boardId, 'user_id': userId});
+    } catch (error) {
+      HSDebugLogger.logError('Error removing collaborator: $error');
+    }
+  }
+
+  Future<void> addPotentialCollaboratorAsInvited(
+      String boardId, String userId) async {
+    try {
+      // Check if the entry already exists
+      final existingEntry = await _supabase
+          .from('boards_permissions')
+          .select()
+          .eq('user_id', userId)
+          .eq('board_id', boardId)
+          .maybeSingle();
+
+      if (existingEntry == null) {
+        // Insert the new entry if it doesn't exist
+        await _supabase.from('boards_permissions').insert({
+          'user_id': userId,
+          'board_id': boardId,
+          'permission_level': 'invited',
+        });
+      } else {
+        HSDebugLogger.logInfo(
+            'Entry already exists in board_permissions for user $userId and board $boardId');
+      }
+    } catch (error) {
+      HSDebugLogger.logError('Error adding potential collaborator: $error');
+    }
+  }
+
+  Future<void> removePotentialCollaboratorFromInvited(
+      String boardId, String userId) async {
+    try {
+      final response = await _supabase
+          .from('boards_permissions')
+          .delete()
+          .eq('user_id', userId)
+          .eq('board_id', boardId);
+    } catch (error) {
+      HSDebugLogger.logError('Error adding potential collaborator: $error');
     }
   }
 }

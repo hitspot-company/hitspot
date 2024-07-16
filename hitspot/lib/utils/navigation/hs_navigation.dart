@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
+import 'package:hitspot/features/boards/invitation/view/board_invitation_page.dart';
 import 'package:hitspot/features/boards/single/view/single_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/home/main/view/home_provider.dart';
@@ -21,11 +24,17 @@ import 'package:hitspot/features/user_profile/main/view/user_profile_provider.da
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hs_toasts/hs_toasts.dart';
+import 'package:uni_links/uni_links.dart';
 
 class HSNavigation {
   HSNavigation._privateConstructor();
   static final HSNavigation _instance = HSNavigation._privateConstructor();
+
   factory HSNavigation() {
+    initMagicLinks();
+
     return _instance;
   }
 
@@ -111,6 +120,10 @@ class HSNavigation {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
+        path: '/invite/:boardId',
+        redirect: (context, state) => '/protected/home?from=${state.uri}',
+      ),
+      GoRoute(
         path: "/protected",
         redirect: _protectedRedirect,
         routes: [
@@ -165,6 +178,11 @@ class HSNavigation {
                   path: 'tags_explore/:tag',
                   builder: (context, state) =>
                       TagsExploreProvider(tag: state.pathParameters['tag']!)),
+              GoRoute(
+                  path: 'invite/:boardId',
+                  builder: (context, state) => BoardInvitationPage(
+                      boardId: state.pathParameters['boardId'] ?? "",
+                      token: state.uri.queryParameters['token'] ?? ""))
             ],
           ),
         ],
@@ -196,6 +214,7 @@ class HSNavigation {
         BlocProvider.of<HSAuthenticationBloc>(_).state.authenticationStatus;
     final String? path = state.uri.queryParameters['from'];
     final String from = path != null ? "?from=$path" : "";
+
     if (status != HSAuthenticationStatus.authenticated) return "/auth$from";
     return null;
   }
@@ -243,4 +262,20 @@ class HSNavigation {
           bool isSubmit = false,
           String? spotID}) =>
       isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
+
+  // Magic links
+  static void initMagicLinks() {
+    uriLinkStream.listen((Uri? uri) {
+      if (uri != null) {
+        Uri parsedUri = Uri.parse(uri.toString());
+        String fullPath =
+            '/${parsedUri.authority}${parsedUri.path}${uri.hasQuery ? '?${uri.query}' : ''}';
+
+        HSDebugLogger.logInfo('Received magic link: $fullPath');
+        navi.router.push(fullPath);
+      }
+    }, onError: (err) {
+      HSDebugLogger.logError("Error listening to magic link: $err");
+    });
+  }
 }

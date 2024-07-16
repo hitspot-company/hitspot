@@ -5,7 +5,7 @@ typedef BoardID = String;
 
 class HSBoard {
   final UserID? createdBy;
-  final List<HSUser>? collaborators;
+  List<HSUser>? collaborators;
   final BoardID? id;
   final String? title, description, image;
   final Color? color;
