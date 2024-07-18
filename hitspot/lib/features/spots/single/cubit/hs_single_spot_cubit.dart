@@ -55,7 +55,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       _databaseRepository.recommendationSystemCaptureEvent(
           userId: app.currentUser.uid ?? "",
           spotId: spot.sid ?? "",
-          event: HSInteractionType.nothing);
+          event: HSInteractionType.viewed);
     } catch (_) {
       HSDebugLogger.logError("Error fetching spot: $_");
       emit(state.copyWith(status: HSSingleSpotStatus.error));
@@ -232,13 +232,17 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
 
   Future<void> shareSpot() async {
     try {
-      await Share.share("https://hitspot.app/spot/${state.spot.sid}",
+      final shareStatus = await Share.share(
+          "https://hitspot.app/spot/${state.spot.sid}",
           subject:
               "Check out this spot: ${state.spot.title} by ${state.spot.author!.username}");
-      _databaseRepository.recommendationSystemCaptureEvent(
-          userId: app.currentUser.uid ?? "",
-          spotId: spotID,
-          event: HSInteractionType.share);
+
+      if (shareStatus.status == ShareResultStatus.success) {
+        _databaseRepository.recommendationSystemCaptureEvent(
+            userId: app.currentUser.uid ?? "",
+            spotId: spotID,
+            event: HSInteractionType.share);
+      }
     } catch (_) {
       HSDebugLogger.logError("Could not share spot: $_");
     }

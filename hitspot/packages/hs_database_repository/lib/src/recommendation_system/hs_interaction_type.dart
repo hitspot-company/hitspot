@@ -1,6 +1,6 @@
 enum HSInteractionType {
   dislike,
-  nothing,
+  viewed,
   unsave,
   like,
   comment,
