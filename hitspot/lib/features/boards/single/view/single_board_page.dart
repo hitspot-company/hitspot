@@ -12,7 +12,6 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
 import 'package:hitspot/features/boards/single/map/view/single_board_map_provider.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
