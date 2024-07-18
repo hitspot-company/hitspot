@@ -153,12 +153,16 @@ class HSDatabaseRepsitory {
           {required String boardId, required String userId}) async =>
       await _boardsRepository.removeCollaborator(boardId, userId);
 
+  Future<HSBoard?> boardFetchBoardForInvitation(
+          {required String boardId}) async =>
+      await _boardsRepository.fetchBoardForInvitation(boardId);
+
   Future<void> boardAddPotentialCollaboratorAsInvited(
           {required String boardId, required String userId}) async =>
       await _boardsRepository.addPotentialCollaboratorAsInvited(
           boardId, userId);
 
-  Future<void> removePotentialCollaboratorFromInvited(
+  Future<void> boardRemovePotentialCollaboratorFromInvited(
           {required String boardId, required String userId}) async =>
       await _boardsRepository.removePotentialCollaboratorFromInvited(
           boardId, userId);

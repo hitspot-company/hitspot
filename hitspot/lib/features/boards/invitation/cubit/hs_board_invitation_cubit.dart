@@ -44,15 +44,20 @@ class HsBoardInvitationCubit extends Cubit<HSBoardInvitationState> {
       emit(state.copyWith(error: ""));
 
       // Read board contents
-      final board = await _databaseRepository.boardRead(boardID: boardId);
-      emit(state.copyWith(board: board));
+      final board = await _databaseRepository.boardFetchBoardForInvitation(
+          boardId: boardId);
+
+      if (board == null) {
+        emit(state.copyWith(error: 'Invalid board ID or token'));
+        return;
+      }
 
       Image? boardImage;
       String? boardAuthor;
 
       if (board.createdBy != null) {
         final author =
-            await _databaseRepository.userRead(userID: board.createdBy!);
+            await _databaseRepository.userRead(userID: board.createdBy);
         boardAuthor = author.username;
       }
 
@@ -62,7 +67,7 @@ class HsBoardInvitationCubit extends Cubit<HSBoardInvitationState> {
 
       emit(state.copyWith(
           isLoading: false,
-          board: board,
+          boardTitle: board.title,
           boardImage: boardImage,
           boardAuthor: boardAuthor));
     } catch (e) {
@@ -86,7 +91,7 @@ class HsBoardInvitationCubit extends Cubit<HSBoardInvitationState> {
   Future<void> declineInvitation() async {
     emit(state.copyWith(isLoading: true, error: null));
 
-    await _databaseRepository.removePotentialCollaboratorFromInvited(
+    await _databaseRepository.boardRemovePotentialCollaboratorFromInvited(
         boardId: boardId, userId: HSApp().currentUser.uid!);
 
     emit(state.copyWith(isLoading: false, error: null));
