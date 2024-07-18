@@ -1,9 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,7 +24,6 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:reorderable_grid/reorderable_grid.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -92,26 +89,13 @@ class SingleBoardPage extends StatelessWidget {
             slivers: [
               if (board?.image != null)
                 HSSimpleSliverAppBar(
-                    height: 120,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        HSImage(
-                          borderRadius: BorderRadius.circular(14.0),
-                          imageUrl: singleBoardCubit.state.board?.image,
-                          color: board?.color,
-                        ),
-                        Positioned(
-                          bottom: 6,
-                          left: 12,
-                          child: GestureDetector(
-                              onTap: () =>
-                                  _showCollaboratorsMenu(singleBoardCubit),
-                              child: _buildCollaboratorIcons(
-                                  board?.collaborators)),
-                        ),
-                      ],
-                    )),
+                  height: 120,
+                  child: HSImage(
+                    borderRadius: BorderRadius.circular(14.0),
+                    imageUrl: singleBoardCubit.state.board?.image,
+                    color: board?.color,
+                  ),
+                ),
               const SliverToBoxAdapter(child: Gap(16.0)),
               if (isLoading)
                 const HSShimmerBox(width: 60, height: 60.0)
@@ -152,20 +136,12 @@ class SingleBoardPage extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        HSUserAvatar(
-                          radius: 24,
-                          imageUrl: state.author?.avatarUrl,
-                        ),
-                        const Gap(16.0),
-                        if (isLoading)
-                          const HSShimmerBox(width: 120, height: 30.0)
-                        else
-                          Text(
-                            author?.username ?? "",
-                            style: textTheme.headlineLarge,
-                          ),
+                        _AvatarStack(
+                            height: 50.0,
+                            collaborators:
+                                singleBoardCubit.state.board?.collaborators ??
+                                    []),
                         const Spacer(),
-                        Spacer(),
                         if (isLoading)
                           const Expanded(
                             child: HSShimmerBox(width: 60, height: 60.0),
@@ -178,11 +154,6 @@ class SingleBoardPage extends StatelessWidget {
                               .animate()
                               .fadeIn(duration: 300.ms, delay: 400.ms)
                               .slideY(begin: 0.2, end: 0),
-                        if (state.isOwner)
-                          IconButton(
-                              onPressed: () =>
-                                  singleBoardCubit.shareInvitation(board?.id),
-                              icon: const Icon(FontAwesomeIcons.userPlus)),
                         IconButton(
                           onPressed: () => navi.pushPage(
                             page: SingleBoardMapProvider(
@@ -209,19 +180,6 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 ),
               ),
-              const Gap(24.0).toSliver,
-              if (isLoading)
-                const HSShimmerBox(width: 60, height: 70.0).toSliverBox
-              else
-                SliverMainAxisGroup(
-                  slivers: [
-                    Text("Description", style: textTheme.headlineSmall)
-                        .toSliver,
-                    Text("${board?.description}",
-                            style: textTheme.bodyMedium!.hintify)
-                        .toSliver,
-                  ],
-                ),
               const Gap(24.0).toSliver,
               SliverToBoxAdapter(
                 child: ReorderableListView.builder(
@@ -360,81 +318,4 @@ class _SaveActionButton extends StatelessWidget {
       icon: icon,
     );
   }
-}
-
-Widget _buildCollaboratorIcons(List<HSUser>? collaborators) {
-  if (collaborators == null || collaborators.isEmpty) {
-    return const SizedBox.shrink();
-  }
-
-  // Limit the number of collaborators to show to 3
-  late List<HSUser> collaboratorsToShow = collaborators;
-  if (collaborators.length > 3) {
-    collaboratorsToShow = collaborators.sublist(0, 3);
-  }
-
-  return Padding(
-    padding: const EdgeInsets.all(4.0),
-    child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(
-          collaboratorsToShow.length,
-          (index) => Padding(
-            padding: const EdgeInsets.only(right: 18.0),
-            child: Align(
-              widthFactor: 0.7,
-              child: HSUserAvatar(
-                  radius: 20.0, imageUrl: collaboratorsToShow[index].avatarUrl),
-            ),
-          ),
-        )),
-  );
-}
-
-void _showCollaboratorsMenu(HSSingleBoardCubit singleBoardCubit) {
-  final state = singleBoardCubit.state;
-  if (state.board?.collaborators == null ||
-      state.board?.collaborators?.isEmpty == true) {
-    return;
-  }
-
-  showDialog(
-    context: app.context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Collaborators'),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: state.board?.collaborators
-                    ?.map((collaborator) => ListTile(
-                          leading: HSUserAvatar(
-                              radius: 20.0, imageUrl: collaborator.avatarUrl),
-                          title: Text(collaborator.name ?? ""),
-                          trailing: state.isOwner
-                              ? IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  onPressed: () {
-                                    singleBoardCubit.removeCollaborator(
-                                        state.board?.id, collaborator.uid);
-                                    navi.pop();
-                                  },
-                                )
-                              : const SizedBox.shrink(),
-                        ))
-                    .toList() ??
-                [],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Close'),
-            onPressed: () {
-              navi.pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
 }
