@@ -29,11 +29,13 @@ class SingleSpotPage extends StatelessWidget {
       appBar: HSAppBar(
           enableDefaultBackButton: true,
           right: BlocSelector<HSSingleSpotCubit, HSSingleSpotState, bool>(
-            selector: (state) => state.status == HSSingleSpotStatus.error,
-            builder: (context, hasError) {
+            selector: (state) =>
+                state.status == HSSingleSpotStatus.error ||
+                state.status == HSSingleSpotStatus.loading,
+            builder: (context, inValid) {
               return IconButton(
                 icon: const Icon(FontAwesomeIcons.ellipsisVertical),
-                onPressed: hasError ? null : singleSpotCubit.showBottomSheet,
+                onPressed: inValid ? null : singleSpotCubit.showBottomSheet,
               )
                   .animate()
                   .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
@@ -268,7 +270,6 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    HSDebugLogger.logInfo("Author: ${singleSpotCubit.state.spot.author}");
     return Row(
       children: [
         HsUserTile(
