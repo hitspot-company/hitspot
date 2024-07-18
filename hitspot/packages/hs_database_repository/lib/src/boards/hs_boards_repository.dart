@@ -187,8 +187,12 @@ class HSBoardsRepository {
   // READ TRENDING BOARDS
   Future<List<HSBoard>> fetchTrendingBoards() async {
     try {
-      final fetchedBoards = await _supabase.from(_boards).select().range(0, 16);
-      return fetchedBoards.map(HSBoard.deserialize).toList();
+      final fetchedBoards =
+          await _supabase.rpc('fetch_trending_boards', params: {
+        'limit_size': 16,
+      });
+      final List<dynamic> boards = fetchedBoards as List<dynamic>;
+      return boards.map((boardData) => HSBoard.deserialize(boardData)).toList();
     } catch (_) {
       throw HSBoardException(
           type: HSBoardExceptionType.read,
@@ -438,6 +442,24 @@ class HSBoardsRepository {
           .eq('board_id', boardId);
     } catch (error) {
       HSDebugLogger.logError('Error adding potential collaborator: $error');
+    }
+  }
+
+  Future<HSBoard?> fetchBoardForInvitation(String boardId) async {
+    try {
+      final board = await _supabase.rpc('fetch_board_details_for_invitation',
+          params: {'input_board_id': boardId});
+
+      HSDebugLogger.logSuccess('Fetched board for invitation: $board');
+
+      return HSBoard(
+          id: boardId,
+          createdBy: board.first['created_by'],
+          image: board.first['image'],
+          title: board.first['title']);
+    } catch (error) {
+      HSDebugLogger.logError('Error fetching board for invitation: $error');
+      return null;
     }
   }
 }

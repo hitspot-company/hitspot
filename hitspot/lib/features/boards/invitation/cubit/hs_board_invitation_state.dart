@@ -4,38 +4,38 @@ class HSBoardInvitationState extends Equatable {
   final bool isLoading;
   final String? error;
   final bool isAccepted;
-  final HSBoard? board;
   final Image? boardImage;
   final String? boardAuthor;
+  final String? boardTitle;
 
   const HSBoardInvitationState({
     this.isLoading = false,
     this.error,
     this.isAccepted = false,
-    this.board,
     this.boardImage,
     this.boardAuthor,
+    this.boardTitle,
   });
 
   HSBoardInvitationState copyWith({
     bool? isLoading,
     String? error,
     bool? isAccepted,
-    HSBoard? board,
     Image? boardImage,
     String? boardAuthor,
+    String? boardTitle,
   }) {
     return HSBoardInvitationState(
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       isAccepted: isAccepted ?? this.isAccepted,
-      board: board ?? this.board,
       boardImage: boardImage ?? this.boardImage,
       boardAuthor: boardAuthor ?? this.boardAuthor,
+      boardTitle: boardTitle ?? this.boardTitle,
     );
   }
 
   @override
   List<Object?> get props =>
-      [isLoading, error, isAccepted, board, boardImage, boardAuthor];
+      [isLoading, error, isAccepted, boardImage, boardAuthor, boardTitle];
 }

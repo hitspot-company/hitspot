@@ -13,7 +13,7 @@ class HSBoardException implements Exception {
   @override
   String toString() {
     return """
-HSAuthenticationException
+HSBoardException
 message: $message
 details: $details
 type: $type
