@@ -53,7 +53,7 @@ class BoardInvitationPage extends StatelessWidget {
                     ),
                   SizedBox(height: 20),
                   Text(
-                    state.board?.title ?? "",
+                    state.boardTitle ?? "",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
