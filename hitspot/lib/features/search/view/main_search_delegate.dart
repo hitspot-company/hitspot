@@ -10,7 +10,6 @@ import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
-import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -149,7 +148,11 @@ class _TrendingSpotsPage extends StatelessWidget {
       ),
       itemCount: spots.length,
       itemBuilder: (BuildContext context, int index) {
-        return AnimatedSpotTile(spot: spots[index], index: index);
+        return AnimatedSpotTile(
+          spot: spots[index],
+          index: index,
+          padding: const EdgeInsets.all(8.0),
+        );
       },
     );
   }
@@ -218,32 +221,15 @@ class _FetchedSpotsPage extends StatelessWidget {
           ),
           itemCount: spots.length,
           itemBuilder: (BuildContext context, int index) {
-            return AnimatedSpotTile(spot: spots[index], index: index);
+            return AnimatedSpotTile(
+              spot: spots[index],
+              index: index,
+              padding: const EdgeInsets.all(16.0),
+            );
           },
         );
       },
     );
-  }
-}
-
-class _AnimatedSpotTile extends StatelessWidget {
-  const _AnimatedSpotTile({required this.spot, required this.index});
-
-  final HSSpot spot;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    return HSBetterSpotTile(
-      onTap: (p0) => navi.toSpot(sid: p0!.sid!),
-      padding: const EdgeInsets.all(8.0),
-      borderRadius: BorderRadius.circular(20.0),
-      spot: spot,
-    ).animate().fadeIn(duration: 300.ms, delay: (50 * index).ms).scale(
-        begin: const Offset(0.8, 0.8),
-        end: const Offset(1, 1),
-        duration: 300.ms,
-        curve: Curves.easeOutQuad);
   }
 }
 
@@ -295,7 +281,7 @@ class _AnimatedBoardTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HSBoardTile(board: board)
+    return HSBoardGridItem(board: board)
         .animate()
         .fadeIn(duration: 300.ms, delay: (50 * index).ms)
         .scale(

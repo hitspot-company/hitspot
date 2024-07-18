@@ -45,6 +45,10 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     await Future.delayed(const Duration(seconds: 2));
     state.copyWith(nearbySpots: [], tredingBoards: []);
     await _fetchInitial();
+    if (state.currentPosition != null) {
+      app.locationRepository.animateCameraToNewLatLng(
+          mapController, state.currentPosition!.toLatLng);
+    }
   }
 
   Future<void> _fetchNearbySpots() async {

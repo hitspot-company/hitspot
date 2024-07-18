@@ -43,10 +43,11 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
   Future<List<HSSpot>> fetchSpots() async {
     try {
       final query = state.query;
+      if (query.isEmpty) return state.spots;
       final List<Map<String, dynamic>> fetchedSpots = await supabase
           .from('spots')
           .select()
-          .textSearch('title', "$query:*")
+          .textSearch('fts', "$query:*")
           .limit(20);
       final List<HSSpot> spotsWithImages = [];
       for (var i = 0; i < fetchedSpots.length; i++) {
@@ -81,7 +82,7 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
       final List<Map<String, dynamic>> fetchedBoards = await supabase
           .from('boards')
           .select()
-          .textSearch('title', "$query:*")
+          .textSearch('fts', "$query:*")
           .limit(20);
       emit(state.copyWith(
           boards: fetchedBoards.map(HSBoard.deserialize).toList()));

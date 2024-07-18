@@ -146,6 +146,9 @@ class _BottombarItem extends StatelessWidget {
   static void _showCreateMenu() {
     showMaterialModalBottomSheet(
       context: app.context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
       builder: (_) => const _CreateMenu(),
     );
   }
@@ -159,18 +162,32 @@ class _CreateMenu extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: SafeArea(
-        child: Container(
-          width: screenWidth,
-          decoration: BoxDecoration(
-            color: app.currentTheme.scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(20.0),
-            ),
-          ),
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(.0, 16.0, .0, 0.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Start creating", style: textTheme.labelLarge),
+              Row(
+                children: [
+                  Expanded(
+                    child: IconButton(
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: navi.pop,
+                        icon: const Icon(FontAwesomeIcons.xmark)),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Center(
+                      child:
+                          Text("Start creating", style: textTheme.labelLarge),
+                    ),
+                  ),
+                  const Expanded(
+                    child: SizedBox(),
+                  ),
+                ],
+              ),
               const Gap(16.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
