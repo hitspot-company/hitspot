@@ -22,7 +22,6 @@ import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -41,7 +40,7 @@ class HomePage extends StatelessWidget {
         selector: (state) => state.status,
         builder: (context, status) {
           final isLoading = status == HSHomeStatus.loading;
-          final trendingBoards = homeCubit.state.tredingBoards;
+          final trendingBoards = homeCubit.state.trendingBoards;
           return RefreshIndicator(
             onRefresh: homeCubit.handleRefresh,
             color: HSTheme.instance.mainColor,
@@ -169,7 +168,6 @@ class HomePage extends StatelessWidget {
                       SliverToBoxAdapter(
                         child: _TrendingBoardsBuilder(
                           isLoading: isLoading,
-                          trendingBoards: trendingBoards,
                         )
                             .animate()
                             .fadeIn(duration: 800.ms)
@@ -273,40 +271,45 @@ class _TrendingSpotsBuilder extends StatelessWidget {
 class _TrendingBoardsBuilder extends StatelessWidget {
   const _TrendingBoardsBuilder({
     super.key,
-    this.height = 300.0,
+    this.height = 160.0,
     required this.isLoading,
-    required this.trendingBoards,
   });
 
   final double height;
   final bool isLoading;
-  final List<HSBoard> trendingBoards;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: trendingBoards.length == 1 ? height / 2 : height,
-      child: MasonryGridView.count(
-        scrollDirection: Axis.horizontal,
-        crossAxisCount: trendingBoards.length == 1 ? 1 : 2,
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
-        itemCount: isLoading ? 16 : trendingBoards.length,
-        itemBuilder: (context, index) {
-          if (isLoading) {
-            return HSShimmerBox(width: (index % 3 + 2) * 60, height: null)
-                .animate()
-                .fadeIn(duration: 300.ms, delay: (index * 100).ms)
-                .shimmer(duration: 1500.ms, color: Colors.white24);
-          }
-          final board = trendingBoards[index];
-          return GestureDetector(
-            onTap: () => navi.toBoard(boardID: board.id!, title: board.title),
-            child: HSBoardCard(board: board, width: (index % 3 + 2) * 80)
-                .animate()
-                .fadeIn(duration: 300.ms, delay: (index * 100).ms)
-                .scale(
-                    begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
+      height: height,
+      child: BlocSelector<HSHomeCubit, HSHomeState, List<HSBoard>>(
+        selector: (state) => state.trendingBoards,
+        builder: (context, trendingBoards) {
+          return MasonryGridView.count(
+            scrollDirection: Axis.horizontal,
+            crossAxisCount: 1,
+            mainAxisSpacing: 8.0,
+            crossAxisSpacing: 8.0,
+            itemCount: isLoading ? 16 : trendingBoards.length,
+            itemBuilder: (context, index) {
+              if (isLoading) {
+                return HSShimmerBox(width: (index % 3 + 2) * 60, height: null)
+                    .animate()
+                    .fadeIn(duration: 300.ms, delay: (index * 100).ms)
+                    .shimmer(duration: 1500.ms, color: Colors.white24);
+              }
+              final board = trendingBoards[index];
+              return GestureDetector(
+                onTap: () =>
+                    navi.toBoard(boardID: board.id!, title: board.title),
+                child: HSBoardCard(board: board, width: (index % 3 + 2) * 80)
+                    .animate()
+                    .fadeIn(duration: 300.ms, delay: (index * 100).ms)
+                    .scale(
+                        begin: const Offset(0.95, 0.95),
+                        end: const Offset(1, 1)),
+              );
+            },
           );
         },
       ),

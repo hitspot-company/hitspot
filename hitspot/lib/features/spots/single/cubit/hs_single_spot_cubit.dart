@@ -7,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
 import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
+import 'package:hitspot/widgets/spot/hs_spot_bottom_sheet.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -83,7 +84,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     }
   }
 
-  Future<List<HSBoard>> fetchUserSpots() async {
+  Future<List<HSBoard>> fetchUserBoards() async {
     try {
       return await _databaseRepository.boardFetchUserBoards(
           user: currentUser, userID: currentUser.uid);
@@ -112,42 +113,10 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
   Future<void> _addToBoardPrompt(List<HSBoard> boards) async {
     try {
       await showCupertinoModalBottomSheet(
-        context: app.context,
-        duration: const Duration(milliseconds: 200),
-        builder: (context) => Material(
-          color: Colors.transparent,
-          child: SingleChildScrollView(
-            controller: ModalScrollController.of(context),
-            child: Column(
-              children: [
-                const Gap(16.0),
-                Text(
-                  "Choose a board",
-                  style: textTheme.headlineMedium,
-                ),
-                const Gap(16.0),
-                if (boards.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: HSTextPrompt(
-                      prompt: "You don't have any boards yet.",
-                      pressableText: "\nCreate",
-                      promptColor: appTheme.mainColor,
-                      onTap: navi.toCreateBoard,
-                    ),
-                  ),
-                ...boards.map(
-                  (e) => HSModalBottomSheetItem(
-                    title: e.title!,
-                    onTap: () => _addToBoard(e),
-                  ),
-                ),
-                const Gap(32.0),
-              ],
-            ),
-          ),
-        ),
-      );
+          context: app.context,
+          duration: const Duration(milliseconds: 200),
+          builder: (context) => HSSpotAddToBoardSheet(
+              spot: state.spot, boards: boards, addToBoard: _addToBoard));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
@@ -156,44 +125,15 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
   Future<void> showBottomSheet() async {
     return showCupertinoModalBottomSheet(
       context: app.context,
-      builder: (context) => Material(
-        color: Colors.transparent,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Gap(8.0),
-            if (state.isAuthor)
-              HSModalBottomSheetItem(
-                title: "Edit",
-                iconData: FontAwesomeIcons.penToSquare,
-                onTap: () => navi.pushPage(
-                    page: CreateSpotProvider(prototype: state.spot)),
-              ),
-            HSModalBottomSheetItem(
-              title: "Add to Board",
-              iconData: FontAwesomeIcons.plus,
-              onTap: () async {
-                final List<HSBoard> boards = await fetchUserSpots();
-                await _addToBoardPrompt(boards);
-              },
-            ),
-            HSModalBottomSheetItem(
-              iconData: FontAwesomeIcons.arrowUpRightFromSquare,
-              title: "Share",
-              onTap: shareSpot,
-            ),
-            if (state.isAuthor)
-              HSModalBottomSheetItem(
-                iconData: FontAwesomeIcons.trashCan,
-                title: "Delete",
-                onTap: _deleteSpot,
-              ),
-            const SizedBox(
-              height: 20.0,
-            ),
-          ],
-        ),
-      ),
+      builder: (context) => HSSpotBottomSheet(
+          isAuthor: state.isAuthor,
+          spot: state.spot,
+          addToBoard: () async {
+            final List<HSBoard> boards = await fetchUserBoards();
+            await _addToBoardPrompt(boards);
+          },
+          shareSpot: shareSpot,
+          deleteSpot: _deleteSpot),
     );
   }
 
