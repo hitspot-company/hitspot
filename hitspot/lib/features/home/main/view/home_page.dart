@@ -6,7 +6,6 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
-import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
@@ -44,14 +43,14 @@ class HomePage extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: homeCubit.handleRefresh,
             color: HSTheme.instance.mainColor,
-            backgroundColor: Colors.white,
+            backgroundColor: app.currentTheme.cardColor,
             strokeWidth: 3.0,
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
                   automaticallyImplyLeading: false,
-                  surfaceTintColor: Colors.transparent,
                   titleSpacing: 0.0,
+                  surfaceTintColor: Colors.transparent,
                   title: Align(
                     alignment: Alignment.centerLeft,
                     child: Image.asset(
