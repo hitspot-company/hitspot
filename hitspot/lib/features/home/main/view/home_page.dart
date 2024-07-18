@@ -213,6 +213,7 @@ class HomePage extends StatelessWidget {
                     duration: const Duration(milliseconds: 1000),
                     sliver: HSSpotsGrid.loading(isSliver: true),
                   ),
+                const Gap(32.0).toSliver,
                 _TrendingSpotsBuilder(cubit: homeCubit),
               ],
             ),

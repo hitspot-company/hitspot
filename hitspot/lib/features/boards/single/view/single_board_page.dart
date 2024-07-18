@@ -42,7 +42,6 @@ class SingleBoardPage extends StatelessWidget {
           previous.status != current.status || previous.spots != current.spots,
       builder: (context, state) {
         final bool isLoading = state.status == HSSingleBoardStatus.loading;
-        final HSUser? author = state.author;
         final HSBoard? board = state.board;
         final List<HSSpot> spots = state.spots;
         HSDebugLogger.logInfo("Updated, spots_count: ${spots.length}");
@@ -88,15 +87,6 @@ class SingleBoardPage extends StatelessWidget {
                   end: const Offset(1, 1),
                 ),
           ),
-          floatingActionButton: HSButton.icon(
-            label: Text("Create Trip",
-                style: textTheme.headlineMedium!.colorify(appTheme.mainColor)),
-            icon: const Icon(FontAwesomeIcons.mapPin),
-            onPressed: () => HSDebugLogger.logInfo("Creating trip!"),
-          ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut).scale(
-                begin: const Offset(0.8, 0.8),
-                end: const Offset(1, 1),
-              ),
           body: CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -255,6 +245,7 @@ class SingleBoardPage extends StatelessWidget {
                   },
                 ),
               ),
+              const Gap(32.0).toSliver,
             ],
           ),
         );
@@ -304,21 +295,10 @@ class _AvatarStack extends StatelessWidget {
               },
             ),
           ),
-          // AutoSizeText(usernames, textAlign: TextAlign.left, maxLines: 1),
         ],
       ),
     );
   }
-
-  // String get usernames {
-  //   if (collaborators == null || collaborators!.isEmpty) {
-  //     return "";
-  //   }
-  //   final count = collaborators!.length > 5 ? 4 : collaborators!.length - 1;
-  //   final names = collaborators!.sublist(0, count).map((e) => e.username);
-  //   final res = names.join(", ");
-  //   if (count > 0) res += " and ${collaborators!.length - count} others";
-  // }
 }
 
 class HSSimpleSliverAppBar extends StatelessWidget {
