@@ -198,6 +198,7 @@ class _CreateMenu extends StatelessWidget {
                     iconData: FontAwesomeIcons.mapPin,
                     onTap: navi.toCreateSpot,
                   ),
+                  const Gap(16.0),
                   _CreateOption(
                     title: "Board",
                     iconData: FontAwesomeIcons.grip,

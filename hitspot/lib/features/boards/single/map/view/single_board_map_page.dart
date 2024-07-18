@@ -8,6 +8,7 @@ import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
+import 'package:hitspot/widgets/spot/hs_spot_card.dart';
 
 class SingleBoardMapPage extends StatelessWidget {
   const SingleBoardMapPage({super.key});
