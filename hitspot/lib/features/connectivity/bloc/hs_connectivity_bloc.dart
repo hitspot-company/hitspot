@@ -26,6 +26,7 @@ class HSConnectivityLocationBloc
     on<HSConnectivityCheckLocationServiceEvent>(_onCheckLocationService);
     on<HSConnectivityLocationChangedEvent>((event, emit) {
       emit(state.copyWith(location: event.location));
+      // TODO: Implement location gathering system
     });
     on<HSConnectivityStopLocationSubscriptionEvent>(
         _onStopLocationSubscription);
