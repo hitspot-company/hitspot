@@ -3,8 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
-import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
+import 'package:hitspot/widgets/hs_modal_bottom_sheet_item.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 

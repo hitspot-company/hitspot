@@ -14,9 +14,8 @@ import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-
 import 'package:flutter_animate/flutter_animate.dart';
 
 class SingleSpotPage extends StatelessWidget {
@@ -68,7 +67,8 @@ class SingleSpotPage extends StatelessWidget {
                   ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
                   const Gap(16),
                   HSButton(
-                    onPressed: () {},
+                    onPressed:
+                        singleSpotCubit.fetchSpot, // TODO: To be verified
                     child: const Text("Retry"),
                   )
                       .animate()
@@ -187,28 +187,30 @@ class _AnimatedMapView extends StatelessWidget {
             height: 200.0,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
-              child: GoogleMap(
-                onMapCreated: (controller) =>
-                    controller.setMapStyle(appTheme.mapStyle),
-                onTap: (argument) => app.locationRepository.launchMaps(
+              child: GestureDetector(
+                onTap: () => app.locationRepository.launchMaps(
                   coords: spotLocation,
                   description: singleSpotCubit.state.spot.address!,
                   title: singleSpotCubit.state.spot.title!,
                 ),
-                cameraTargetBounds: CameraTargetBounds(LatLngBounds(
-                    southwest: spotLocation, northeast: spotLocation)),
-                initialCameraPosition: CameraPosition(
-                  target: spotLocation,
-                  zoom: 16.0,
+                child: AbsorbPointer(
+                  absorbing: true,
+                  child: HSGoogleMap(
+                    cameraTargetBounds: CameraTargetBounds(LatLngBounds(
+                        southwest: spotLocation, northeast: spotLocation)),
+                    initialCameraPosition: CameraPosition(
+                      target: spotLocation,
+                      zoom: 16.0,
+                    ),
+                    myLocationEnabled: false,
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('1'),
+                        position: spotLocation,
+                      )
+                    },
+                  ),
                 ),
-                markers: {
-                  Marker(
-                    markerId: const MarkerId('1'),
-                    position: spotLocation,
-                  )
-                },
-                myLocationEnabled: false,
-                myLocationButtonEnabled: false,
               ),
             ),
           )

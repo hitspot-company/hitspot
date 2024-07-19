@@ -101,51 +101,6 @@ class HSConnectivityLocationBloc
     }
   }
 
-  // Future<void> _onStartLocationSubscription(
-  //     HSConnectivityStartLocationSubscriptionEvent event,
-  //     Emitter<HSConnectivityLocationState> emit) async {
-  //   if (state.isLocationSubscriptionActive) {
-  //     return;
-  //   }
-
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!emit.isDone) {
-  //     emit(state.copyWith(isLocationServiceEnabled: serviceEnabled));
-  //   }
-
-  //   if (!serviceEnabled) {
-  //     return;
-  //   }
-
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //     if (permission == LocationPermission.denied) {
-  //       return;
-  //     }
-  //   }
-
-  //   if (permission == LocationPermission.deniedForever) {
-  //     return;
-  //   }
-
-  //   _positionSubscription = Geolocator.getPositionStream().listen(
-  //     (Position position) {
-  //       HSDebugLogger.logInfo("Location changed: $position");
-  //       if (!emit.isDone) {
-  //         emit(state.copyWith(
-  //             location: position, isLocationSubscriptionActive: true));
-  //       }
-  //     },
-  //     onError: (error) {
-  //       print('Error in location subscription: $error');
-  //       if (!emit.isDone) {
-  //         emit(state.copyWith(isLocationSubscriptionActive: false));
-  //       }
-  //     },
-  //   );
-  // }
-
   Future<void> _onStopLocationSubscription(
       HSConnectivityStopLocationSubscriptionEvent event,
       Emitter<HSConnectivityLocationState> emit) async {
