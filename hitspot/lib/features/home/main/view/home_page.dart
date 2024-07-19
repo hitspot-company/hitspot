@@ -2,20 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
-import 'package:hitspot/features/app/hs_app.dart';
+import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
-import 'package:hitspot/widgets/board/hs_board_card.dart';
-import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:hitspot/widgets/hs_search_bar.dart';
-import 'package:hitspot/widgets/hs_spots_grid.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -39,18 +34,17 @@ class HomePage extends StatelessWidget {
         selector: (state) => state.status,
         builder: (context, status) {
           final isLoading = status == HSHomeStatus.loading;
-          final trendingBoards = homeCubit.state.tredingBoards;
           return RefreshIndicator(
             onRefresh: homeCubit.handleRefresh,
             color: HSTheme.instance.mainColor,
-            backgroundColor: Colors.white,
+            backgroundColor: app.currentTheme.cardColor,
             strokeWidth: 3.0,
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
                   automaticallyImplyLeading: false,
-                  surfaceTintColor: Colors.transparent,
                   titleSpacing: 0.0,
+                  surfaceTintColor: Colors.transparent,
                   title: Align(
                     alignment: Alignment.centerLeft,
                     child: Image.asset(
@@ -77,149 +71,61 @@ class HomePage extends StatelessWidget {
                   floating: true,
                   pinned: true,
                 ),
-                SliverAppBar(
-                  automaticallyImplyLeading: false,
-                  surfaceTintColor: Colors.transparent,
-                  centerTitle: false,
-                  titleSpacing: 0.0,
-                  title: Text.rich(
-                    TextSpan(
-                      text: "Hello ",
-                      children: [
-                        TextSpan(
-                            text: currentUser.username,
-                            style: textTheme.headlineMedium),
-                        TextSpan(
-                            text: " ,\nWhere would you like to go?",
-                            style: textTheme.headlineLarge!.hintify),
-                      ],
-                    ),
-                    style: textTheme.headlineMedium!.hintify,
-                  )
-                      .animate()
-                      .fadeIn(duration: 400.ms)
-                      .slideY(begin: 0.2, end: 0),
-                  floating: true,
-                  pinned: true,
-                ),
-                const SliverToBoxAdapter(
-                  child: Gap(16.0),
-                ),
-                SliverToBoxAdapter(
-                  child: const HSSearchBar(height: 52.0)
-                      .animate()
-                      .fadeIn(duration: 500.ms)
-                      .scale(
-                          begin: const Offset(0.95, 0.95),
-                          end: const Offset(1, 1)),
-                ),
-                const Gap(32.0).toSliver,
+                const Gap(16.0).toSliver,
                 SliverToBoxAdapter(
                   child: SizedBox(
-                    height: 160,
+                    height: 200,
                     child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: BlocBuilder<HSHomeCubit, HSHomeState>(
-                          buildWhen: (previous, current) =>
-                              previous.currentPosition !=
-                                  current.currentPosition ||
-                              previous.markers != current.markers,
-                          builder: (context, state) {
-                            final Position? currentPosition =
-                                state.currentPosition;
-                            final Set<Marker> markers = state.markers.toSet();
-                            if (currentPosition != null) {
-                              homeCubit.animateCameraToNewLatLng(
-                                  currentPosition.toLatLng);
-                            }
-                            return GestureDetector(
-                              onTap: () => navi.pushTransition(
-                                PageTransitionType.fade,
-                                MapProvider(
-                                    initialCameraPosition: currentPosition),
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: BlocSelector<HSConnectivityLocationBloc,
+                          HSConnectivityLocationState, Position?>(
+                        selector: (state) => state.location,
+                        builder: (context, currentPosition) {
+                          if (currentPosition != null) {
+                            homeCubit.animateCameraToNewLatLng(
+                                currentPosition.toLatLng);
+                          }
+                          if (isLoading) {
+                            return HSShimmerBox(
+                                width: screenWidth, height: 240.0);
+                          }
+                          return GestureDetector(
+                            onTap: () => navi.pushTransition(
+                              PageTransitionType.fade,
+                              const MapProvider(),
+                            ),
+                            child: AbsorbPointer(
+                              absorbing: true,
+                              child: HSGoogleMap(
+                                initialCameraPosition: CameraPosition(
+                                  target: currentPosition?.toLatLng ??
+                                      const LatLng(0, 0),
+                                  zoom: 14.0,
+                                ),
+                                onMapCreated: (GoogleMapController controller) {
+                                  if (!mapController.isCompleted) {
+                                    mapController.complete(controller);
+                                  }
+                                },
                               ),
-                              child: AbsorbPointer(
-                                  absorbing: true,
-                                  child: HSGoogleMap(
-                                    onMapCreated:
-                                        (GoogleMapController controller) {
-                                      if (mapController.isCompleted) {
-                                        mapController =
-                                            Completer<GoogleMapController>();
-                                      }
-                                      mapController.complete(controller);
-                                    },
-                                  )),
-                            );
-                          },
-                        )),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   )
                       .animate()
                       .fadeIn(duration: 600.ms)
                       .slideY(begin: 0.2, end: 0),
                 ),
-                if (trendingBoards.isNotEmpty)
-                  SliverMainAxisGroup(
-                    slivers: [
-                      const Gap(32.0).toSliver,
-                      Text("Trending Boards", style: textTheme.headlineMedium)
-                          .animate()
-                          .fadeIn(duration: 700.ms)
-                          .scale(
-                              begin: const Offset(0.95, 0.95),
-                              end: const Offset(1, 1))
-                          .toSliver,
-                      const Gap(16.0).toSliver,
-                      SliverToBoxAdapter(
-                        child: _TrendingBoardsBuilder(
-                          isLoading: isLoading,
-                          trendingBoards: trendingBoards,
-                        )
-                            .animate()
-                            .fadeIn(duration: 800.ms)
-                            .slideX(begin: 0.2, end: 0),
-                      ),
-                    ],
-                  ),
                 const Gap(32.0).toSliver,
-                if (!isLoading)
-                  BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
-                    selector: (state) => state.nearbySpots,
-                    builder: (context, nearbySpots) {
-                      if (nearbySpots.isEmpty) {
-                        return const SizedBox().toSliver;
-                      }
-                      return SliverMainAxisGroup(
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Text("Nearby Spots",
-                                    style: textTheme.headlineMedium)
-                                .animate()
-                                .fadeIn(duration: 500.ms)
-                                .scale(
-                                    begin: const Offset(0.95, 0.95),
-                                    end: const Offset(1, 1)),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: Gap(16.0),
-                          ),
-                          HSSpotsGrid(
-                            spots: nearbySpots,
-                            isSliver: true,
-                            mainAxisSpacing: 16.0,
-                            crossAxisSpacing: 16.0,
-                          ),
-                        ],
-                      );
-                    },
-                  )
-                else
-                  SliverAnimatedOpacity(
-                    opacity: 1.0,
-                    duration: const Duration(milliseconds: 1000),
-                    sliver: HSSpotsGrid.loading(isSliver: true),
-                  ),
-                _TrendingSpotsBuilder(cubit: homeCubit),
+                const _HomeGridBuilder(type: _HomeGridBuilderType.nearbySpots),
+                const Gap(32.0).toSliver,
+                const _HomeGridBuilder(
+                    type: _HomeGridBuilderType.trendingBoards),
+                const Gap(32.0).toSliver,
+                const _HomeGridBuilder(
+                    type: _HomeGridBuilderType.trendingSpots),
               ],
             ),
           );
@@ -229,119 +135,193 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _TrendingSpotsBuilder extends StatelessWidget {
-  const _TrendingSpotsBuilder({required this.cubit});
+class HSBoardGridItem extends StatelessWidget {
+  final HSBoard board;
 
-  final HSHomeCubit cubit;
+  const HSBoardGridItem({super.key, required this.board});
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<HSHomeCubit, HSHomeState, List<HSSpot>>(
-      selector: (state) => state.trendingSpots,
-      builder: (context, state) {
-        final List<HSSpot> spots = cubit.state.trendingSpots;
-        if (spots.isEmpty) {
-          return const SizedBox().toSliver;
-        }
-
-        return SliverMainAxisGroup(
-          slivers: [
-            Text("Trending Spots", style: textTheme.headlineMedium)
-                .animate()
-                .fadeIn(duration: 500.ms)
-                .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1))
-                .toSliver,
-            const Text("This week's best picks")
-                .animate()
-                .fadeIn(duration: 500.ms)
-                .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1))
-                .toSliver,
-            SliverGrid.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+    return GestureDetector(
+      onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: board.color ?? Theme.of(context).cardColor,
+          ),
+          child: Stack(
+            children: [
+              if (board.image != null)
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      board.image!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.7),
+                        Colors.black,
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              itemCount: spots.length,
-              itemBuilder: (BuildContext context, int index) {
-                return AnimatedSpotTile(spot: spots[index], index: index);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _TrendingBoardsBuilder extends StatelessWidget {
-  const _TrendingBoardsBuilder({
-    super.key,
-    this.height = 300.0,
-    required this.isLoading,
-    required this.trendingBoards,
-  });
-
-  final double height;
-  final bool isLoading;
-  final List<HSBoard> trendingBoards;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: trendingBoards.length == 1 ? height / 2 : height,
-      child: MasonryGridView.count(
-        scrollDirection: Axis.horizontal,
-        crossAxisCount: trendingBoards.length == 1 ? 1 : 2,
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
-        itemCount: isLoading ? 16 : trendingBoards.length,
-        itemBuilder: (context, index) {
-          if (isLoading) {
-            return HSShimmerBox(width: (index % 3 + 2) * 60, height: null)
-                .animate()
-                .fadeIn(duration: 300.ms, delay: (index * 100).ms)
-                .shimmer(duration: 1500.ms, color: Colors.white24);
-          }
-          final board = trendingBoards[index];
-          return GestureDetector(
-            onTap: () => navi.toBoard(boardID: board.id!, title: board.title),
-            child: HSBoardCard(board: board, width: (index % 3 + 2) * 80)
-                .animate()
-                .fadeIn(duration: 300.ms, delay: (index * 100).ms)
-                .scale(
-                    begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
-          );
-        },
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      board.title!,
+                      style: textTheme.titleLarge,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class HSBoardTile extends StatelessWidget {
-  const HSBoardTile({
-    super.key,
-    required this.board,
-    this.width,
-    this.height,
+enum _HomeGridBuilderType { nearbySpots, trendingBoards, trendingSpots }
+
+class _HomeGridBuilder extends StatelessWidget {
+  const _HomeGridBuilder({
+    this.defaultBuilderHeight = 140.0,
+    required this.type,
   });
 
-  final HSBoard board;
-  final double? width, height;
+  final double defaultBuilderHeight;
+  final _HomeGridBuilderType type;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        HSImage(
-          width: width,
-          height: height,
-          color: board.color ?? appTheme.mainColor,
-          borderRadius: BorderRadius.circular(14.0),
-          imageUrl: board.image,
-          opacity: .8,
-        ),
-      ],
+    return BlocBuilder<HSHomeCubit, HSHomeState>(
+      buildWhen: (previous, current) {
+        switch (type) {
+          case _HomeGridBuilderType.nearbySpots:
+            return previous.nearbySpots != current.nearbySpots ||
+                previous.status != current.status;
+          case _HomeGridBuilderType.trendingBoards:
+            return previous.trendingBoards != current.trendingBoards ||
+                previous.status != current.status;
+          case _HomeGridBuilderType.trendingSpots:
+            return previous.trendingSpots != current.trendingSpots ||
+                previous.status != current.status;
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state.status == HSHomeStatus.loading;
+        late final List elements;
+        late final String title, subtitle;
+        switch (type) {
+          case _HomeGridBuilderType.nearbySpots:
+            elements = state.nearbySpots;
+            title = "Nearby Spots";
+            subtitle = "Look around you";
+            break;
+          case _HomeGridBuilderType.trendingBoards:
+            elements = state.trendingBoards;
+            title = "Trending Boards";
+            subtitle = "The best collections of spots";
+            break;
+          case _HomeGridBuilderType.trendingSpots:
+            elements = state.trendingSpots;
+            title = "Trending Spots";
+            subtitle = "Our picks for you!";
+            break;
+        }
+        if (elements.isEmpty) {
+          return const SizedBox().toSliver;
+        }
+        if (isLoading) {
+          return SliverMainAxisGroup(
+            slivers: [
+              HSShimmerBox(width: screenWidth / 3, height: 40.0).toSliver,
+              const Gap(8.0).toSliver,
+              HSShimmerBox(width: screenWidth / 3 - 10.0, height: 20.0)
+                  .toSliver,
+              const Gap(16.0).toSliver,
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 280.0,
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            mainAxisSpacing: 8.0,
+                            crossAxisSpacing: 8.0,
+                            crossAxisCount: 2),
+                    itemCount: 10,
+                    itemBuilder: (context, index) =>
+                        const HSShimmerBox(width: 40.0, height: 40.0),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        final builderHeight = elements.length < 2
+            ? defaultBuilderHeight
+            : defaultBuilderHeight * 2;
+        final crossAxisCount = elements.length < 2 ? 1 : 2;
+        return SliverMainAxisGroup(
+          slivers: [
+            Text(title, style: textTheme.headlineMedium)
+                .animate()
+                .fadeIn(duration: 500.ms)
+                .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1))
+                .toSliver,
+            Text(subtitle)
+                .animate()
+                .fadeIn(duration: 500.ms)
+                .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1))
+                .toSliver,
+            const Gap(8.0).toSliver,
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: builderHeight,
+                child: GridView.builder(
+                  scrollDirection: Axis.horizontal,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisSpacing: 8.0,
+                      crossAxisSpacing: 8.0,
+                      crossAxisCount: crossAxisCount),
+                  itemCount: elements.length,
+                  itemBuilder: (context, index) {
+                    if (type == _HomeGridBuilderType.trendingBoards) {
+                      return HSBoardGridItem(board: elements[index]);
+                    } else {
+                      return AnimatedSpotTile(
+                          spot: elements[index], index: index);
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

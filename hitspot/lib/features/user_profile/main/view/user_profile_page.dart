@@ -1,17 +1,18 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/extensions/hs_sliver_extensions.dart';
+import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
+import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-
-import 'package:hs_database_repository/hs_database_repository.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -32,30 +33,27 @@ class UserProfilePage extends StatelessWidget {
               SliverPadding(
                 padding: const EdgeInsets.all(16.0),
                 sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    _buildUserInfo(context, loading, user, userProfileCubit),
-                    const SizedBox(height: 16),
-                    _UserDataBar(loading: loading, user: user)
-                        .animate()
-                        .fadeIn(duration: 300.ms)
-                        .slideY(begin: 0.2, end: 0),
-                    const SizedBox(height: 16),
-                    if (!loading)
-                      Text(
-                        user?.biogram ?? '',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ).animate().fadeIn(duration: 300.ms),
-                    const SizedBox(height: 24),
-                    _buildContentSection(
-                        context, "Spots", loading, userProfileCubit),
-                    _buildContentSection(
-                        context, "Boards", loading, userProfileCubit),
-                    if (userProfileCubit.state.spots.isEmpty &&
-                        userProfileCubit.state.boards.isEmpty &&
-                        !loading)
-                      _buildEmptyContent(context),
-                  ]),
+                  delegate: SliverChildListDelegate(
+                    [
+                      _buildUserInfo(context, loading, user, userProfileCubit),
+                      const SizedBox(height: 16),
+                      _UserDataBar(loading: loading, user: user)
+                          .animate()
+                          .fadeIn(duration: 300.ms)
+                          .slideY(begin: 0.2, end: 0),
+                    ],
+                  ),
                 ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.all(16.0),
+                sliver: SliverMainAxisGroup(slivers: [
+                  const _UserProfileGridBuilder(
+                      type: _UserProfileGridBuilderType.spots),
+                  const Gap(32.0).toSliver,
+                  const _UserProfileGridBuilder(
+                      type: _UserProfileGridBuilderType.boards),
+                ]),
               ),
             ],
           ),
@@ -142,300 +140,6 @@ class UserProfilePage extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildContentSection(BuildContext context, String title, bool loading,
-      HSUserProfileCubit userProfileCubit) {
-    if (title == "Spots" && userProfileCubit.state.spots.isEmpty) {
-      return const SizedBox();
-    }
-    if (title == "Boards" && userProfileCubit.state.boards.isEmpty) {
-      return const SizedBox();
-    }
-    return title == "Spots"
-        ? _SpotsList(userProfileCubit: userProfileCubit, loading: loading)
-        : _BoardsList(userProfileCubit: userProfileCubit, loading: loading);
-  }
-
-  Widget _buildEmptyContent(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              FontAwesomeIcons.xmark,
-              size: 64,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No spots or boards yet',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms);
-  }
-}
-
-class _SpotsList extends StatelessWidget {
-  final HSUserProfileCubit userProfileCubit;
-  final bool loading;
-
-  const _SpotsList({required this.userProfileCubit, required this.loading});
-
-  @override
-  Widget build(BuildContext context) {
-    if (loading) {
-      return _buildLoadingList();
-    }
-
-    final spots = userProfileCubit.state.spots;
-    if (spots.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.location_on,
-                size: 64,
-                color: Colors.grey,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'The user has no spots',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12, // Reduced from 16 to 12
-        mainAxisSpacing: 12, // Reduced from 16 to 12
-        childAspectRatio: 0.8,
-      ),
-      itemCount: spots.length,
-      itemBuilder: (context, index) {
-        final spot = spots[index];
-        return _SpotCard(spot: spot, index: index);
-      },
-    ).animate().fadeIn(duration: 300.ms);
-  }
-
-  Widget _buildLoadingList() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.8,
-      ),
-      itemCount: 4,
-      itemBuilder: (context, index) {
-        return const HSShimmerBox(
-          height: 40,
-          width: 40.0,
-        );
-      },
-    );
-  }
-}
-
-class _SpotCard extends StatelessWidget {
-  final HSSpot spot;
-  final int index;
-
-  const _SpotCard({required this.spot, required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => navi.toSpot(sid: spot.sid!),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
-                child: HSImage(
-                  imageUrl: spot.images!.first,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    spot.title!,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  AutoSizeText(
-                    "${spot.likesCount} likes • ${spot.commentsCount} comments",
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ).animate().fadeIn(duration: 300.ms, delay: (50 * index).ms),
-    );
-  }
-}
-
-class _BoardsList extends StatelessWidget {
-  final HSUserProfileCubit userProfileCubit;
-  final bool loading;
-
-  const _BoardsList({required this.userProfileCubit, required this.loading});
-
-  @override
-  Widget build(BuildContext context) {
-    if (loading) {
-      return _buildLoadingList();
-    }
-
-    final boards = userProfileCubit.state.boards;
-    if (boards.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.library_books,
-                size: 64,
-                color: Colors.grey,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'The user has no boards',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: boards.length,
-      itemBuilder: (context, index) {
-        final board = boards[index];
-        return SizedBox(height: 90.0, child: _BoardCard(board: board));
-      },
-    ).animate().fadeIn(duration: 300.ms);
-  }
-
-  Widget _buildLoadingList() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return const Padding(
-          padding: EdgeInsets.only(bottom: 16),
-          child: HSShimmerBox(
-            height: 100,
-            width: 100,
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _BoardCard extends StatelessWidget {
-  final HSBoard board;
-
-  const _BoardCard({required this.board});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              board.image != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: HSImage(
-                        imageUrl: board.image,
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : const SizedBox(
-                      width: 80,
-                      height: 80,
-                      child: Icon(
-                        FontAwesomeIcons.layerGroup,
-                        size: 32.0,
-                      ),
-                    ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      board.title!,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      board.description!,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _UserDataBar extends StatelessWidget {
@@ -459,19 +163,13 @@ class _UserDataBar extends StatelessWidget {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: app.currentTheme.primaryColor,
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildDataItem('${user?.spots}', 'spots'),
-          _buildDataItem('${user?.followers}', 'followers'),
-          _buildDataItem('${user?.following}', 'following'),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildDataItem('${user?.spots}', 'spots'),
+        _buildDataItem('${user?.followers}', 'followers'),
+        _buildDataItem('${user?.following}', 'following'),
+      ],
     );
   }
 
@@ -522,6 +220,124 @@ class _UserProfileActionButton extends StatelessWidget {
             begin: const Offset(0.95, 0.95),
             end: const Offset(1.0, 1.0),
           ),
+    );
+  }
+}
+
+enum _UserProfileGridBuilderType { spots, boards }
+
+class _UserProfileGridBuilder extends StatelessWidget {
+  const _UserProfileGridBuilder({
+    this.defaultBuilderHeight = 140.0,
+    required this.type,
+  });
+
+  final double defaultBuilderHeight;
+  final _UserProfileGridBuilderType type;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSUserProfileCubit, HSUserProfileState>(
+      buildWhen: (previous, current) {
+        switch (type) {
+          case _UserProfileGridBuilderType.spots:
+            return previous.spots != current.spots ||
+                previous.status != current.status;
+          case _UserProfileGridBuilderType.boards:
+            return previous.boards != current.boards ||
+                previous.status != current.status;
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state.status == HSUserProfileStatus.loading;
+        late final List elements;
+        late final String title;
+        switch (type) {
+          case _UserProfileGridBuilderType.spots:
+            elements = state.spots;
+            title = "Spots";
+            break;
+          case _UserProfileGridBuilderType.boards:
+            elements = state.boards;
+            title = "Boards";
+            break;
+        }
+        if (elements.isEmpty) {
+          return const SizedBox().toSliver;
+        }
+        if (isLoading) {
+          return SliverMainAxisGroup(
+            slivers: [
+              HSShimmerBox(width: screenWidth / 3, height: 40.0).toSliver,
+              const Gap(8.0).toSliver,
+              HSShimmerBox(width: screenWidth / 3 - 10.0, height: 20.0)
+                  .toSliver,
+              const Gap(16.0).toSliver,
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 280.0,
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            mainAxisSpacing: 8.0,
+                            crossAxisSpacing: 8.0,
+                            crossAxisCount: 2),
+                    itemCount: 10,
+                    itemBuilder: (context, index) =>
+                        const HSShimmerBox(width: 40.0, height: 40.0),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        final builderHeight = elements.length < 2
+            ? defaultBuilderHeight
+            : defaultBuilderHeight * 2;
+        final crossAxisCount = elements.length < 2 ? 1 : 2;
+        return SliverMainAxisGroup(
+          slivers: [
+            Row(
+              children: [
+                Text(title, style: textTheme.headlineMedium)
+                    .animate()
+                    .fadeIn(duration: 500.ms)
+                    .scale(
+                        begin: const Offset(0.95, 0.95),
+                        end: const Offset(1, 1)),
+                IconButton(
+                  onPressed: () {},
+                  icon: nextIcon,
+                  iconSize: 16.0,
+                ),
+              ],
+            ).toSliver,
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: builderHeight,
+                child: GridView.builder(
+                  scrollDirection: Axis.horizontal,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisSpacing: 8.0,
+                      crossAxisSpacing: 8.0,
+                      crossAxisCount: crossAxisCount),
+                  itemCount: elements.length,
+                  itemBuilder: (context, index) {
+                    if (type == _UserProfileGridBuilderType.boards) {
+                      return HSBoardGridItem(board: elements[index]);
+                    } else {
+                      return AnimatedSpotTile(
+                          spot: elements[index], index: index);
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

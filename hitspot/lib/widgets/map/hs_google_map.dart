@@ -16,6 +16,8 @@ class HSGoogleMap extends StatelessWidget {
     this.onCameraMove,
     this.onTap,
     this.fortyFiveDegreeImageryEnabled = false,
+    this.myLocationEnabled = true,
+    this.cameraTargetBounds,
   });
 
   final CameraPosition initialCameraPosition;
@@ -24,7 +26,8 @@ class HSGoogleMap extends StatelessWidget {
   final Function()? onCameraIdle, onCameraMoveStarted;
   final Function(CameraPosition)? onCameraMove;
   final Function(LatLng)? onTap;
-  final bool fortyFiveDegreeImageryEnabled;
+  final bool fortyFiveDegreeImageryEnabled, myLocationEnabled;
+  final CameraTargetBounds? cameraTargetBounds;
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +37,13 @@ class HSGoogleMap extends StatelessWidget {
       initialCameraPosition: initialCameraPosition,
       onMapCreated: onMapCreated,
       myLocationButtonEnabled: false,
-      myLocationEnabled: true,
+      myLocationEnabled: false,
       markers: markers ?? {},
       onCameraIdle: onCameraIdle,
       onCameraMove: onCameraMove,
       onTap: onTap,
       onCameraMoveStarted: onCameraMoveStarted,
+      cameraTargetBounds: cameraTargetBounds ?? CameraTargetBounds.unbounded,
     );
   }
 }

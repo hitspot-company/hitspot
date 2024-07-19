@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -68,10 +69,13 @@ class HSBetterSpotTile extends StatelessWidget {
                   if (child == null)
                     Positioned(
                       bottom: 8.0,
-                      left: 16.0,
-                      child: Text(spot!.title!,
-                          style:
-                              textTheme.headlineSmall!.colorify(Colors.white)),
+                      right: 8.0,
+                      left: 8.0,
+                      child: AutoSizeText(
+                        spot!.title!,
+                        style: textTheme.titleLarge!.colorify(Colors.white),
+                        maxLines: 2,
+                      ),
                     )
                   else
                     child!

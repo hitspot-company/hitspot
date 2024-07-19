@@ -133,107 +133,41 @@ class _SecondPage extends StatelessWidget {
             headlineType: HSFormHeadlineType.display),
         const HSFormCaption(text: "Define the character of your board."),
         const Gap(32.0),
-        const HSFormHeadline(
-          text: "Color",
-        ),
-        const HSFormCaption(text: "give your board a unique aura."),
-        BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
-          selector: (state) => state.color != null,
-          builder: (context, isColorSelected) {
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Radio<bool>(
-                      value: true,
-                      groupValue: isColorSelected,
-                      onChanged: (value) => _addBoardCubit.pickColor(true),
-                      visualDensity: const VisualDensity(
-                        horizontal: VisualDensity.minimumDensity,
-                        vertical: VisualDensity.maximumDensity,
-                      ),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    const Text("Select"),
-                    const Gap(16.0),
-                    Radio<bool>(
-                      value: false,
-                      groupValue: isColorSelected,
-                      onChanged: (value) => _addBoardCubit.pickColor(false),
-                      visualDensity: const VisualDensity(
-                          horizontal: VisualDensity.minimumDensity,
-                          vertical: VisualDensity.minimumDensity),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    const Text("No"),
-                  ],
-                ),
-                if (isColorSelected)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Container(
-                        height: 60,
-                        width: 60,
-                        color: _addBoardCubit.state.color ??
-                            app.theme.mainColor.withOpacity(.6),
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
-        const Gap(32.0),
         const HSFormHeadline(text: "Cover"),
         const HSFormCaption(text: "choose the cover of your board."),
-        BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
-          selector: (state) => state.image.isNotEmpty,
-          builder: (context, isImageSelected) {
+        const Gap(16.0),
+        BlocSelector<HSCreateBoardCubit, HSCreateBoardState, String?>(
+          selector: (state) => state.image,
+          builder: (context, imagePath) {
+            final bool isImageSelected = imagePath != null;
             return Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Radio<bool>(
-                      value: true,
-                      groupValue: isImageSelected,
-                      onChanged: (value) => _addBoardCubit.chooseImage(true),
-                      visualDensity: const VisualDensity(
-                        horizontal: VisualDensity.minimumDensity,
-                        vertical: VisualDensity.maximumDensity,
-                      ),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    const Text("Select"),
-                    const Gap(16.0),
-                    Radio<bool>(
-                      value: false,
-                      groupValue: isImageSelected,
-                      onChanged: (value) => _addBoardCubit.chooseImage(false),
-                      visualDensity: const VisualDensity(
-                          horizontal: VisualDensity.minimumDensity,
-                          vertical: VisualDensity.minimumDensity),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    const Text("No"),
-                  ],
-                ),
-                if (isImageSelected)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ClipRRect(
+                GestureDetector(
+                  onTap: () => _addBoardCubit.chooseImage(true),
+                  child: Container(
+                    height: 120.0,
+                    width: screenWidth,
+                    decoration: BoxDecoration(
+                      color: appTheme.textfieldFillColor,
                       borderRadius: BorderRadius.circular(14),
-                      child: HSImage(
-                          height: 120.0,
-                          width: screenWidth,
-                          imageProvider: _imageProvider,
-                          fit: BoxFit.cover,
-                          opacity: .6),
+                      image: isImageSelected
+                          ? DecorationImage(
+                              image: _imageProvider!,
+                              fit: BoxFit.cover,
+                              colorFilter: ColorFilter.mode(
+                                  Colors.black.withOpacity(.6),
+                                  BlendMode.darken),
+                            )
+                          : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        isImageSelected ? "Change Image" : "Select an Image",
+                        style: textTheme.titleLarge,
+                      ),
                     ),
                   ),
+                ),
               ],
             );
           },

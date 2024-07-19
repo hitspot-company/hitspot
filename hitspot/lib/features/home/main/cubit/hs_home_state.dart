@@ -5,7 +5,7 @@ enum HSHomeStatus { loading, idle, error, refreshing }
 final class HSHomeState extends Equatable {
   const HSHomeState({
     this.status = HSHomeStatus.loading,
-    this.tredingBoards = const [],
+    this.trendingBoards = const [],
     this.markers = const [],
     this.nearbySpots = const [],
     this.trendingSpots = const [],
@@ -13,7 +13,7 @@ final class HSHomeState extends Equatable {
   });
 
   final HSHomeStatus status;
-  final List<HSBoard> tredingBoards;
+  final List<HSBoard> trendingBoards;
   final List<HSSpot> nearbySpots, trendingSpots;
   final List<Marker> markers;
   final Position? currentPosition;
@@ -21,7 +21,7 @@ final class HSHomeState extends Equatable {
   @override
   List<Object?> get props => [
         status,
-        tredingBoards,
+        trendingBoards,
         nearbySpots,
         currentPosition,
         markers,
@@ -38,7 +38,7 @@ final class HSHomeState extends Equatable {
   }) {
     return HSHomeState(
       status: status ?? this.status,
-      tredingBoards: tredingBoards ?? this.tredingBoards,
+      trendingBoards: tredingBoards ?? this.trendingBoards,
       nearbySpots: nearbySpots ?? this.nearbySpots,
       currentPosition: currentPosition ?? this.currentPosition,
       markers: markers ?? this.markers,

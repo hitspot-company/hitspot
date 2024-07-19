@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
+import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
@@ -90,4 +91,13 @@ class HSApp {
   // Location
   HSLocationRepository get locationRepository =>
       RepositoryProvider.of<HSLocationRepository>(context);
+
+  // Location and connectivity
+  HSConnectivityLocationBloc get connectivityBloc =>
+      BlocProvider.of<HSConnectivityLocationBloc>(context);
+  Position? get currentPosition => connectivityBloc.state.location;
+  bool get isLocationServiceEnabled =>
+      connectivityBloc.state.isLocationServiceEnabled;
+  bool get isConnected => connectivityBloc.state.isConnected;
+  bool get isCurrentPositionAvailable => currentPosition != null;
 }

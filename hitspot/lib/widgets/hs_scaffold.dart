@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
+import 'package:hitspot/features/search/view/main_search_delegate.dart';
+import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class HSScaffold extends StatelessWidget {
   const HSScaffold({
@@ -119,17 +125,114 @@ class _BottombarItem extends StatelessWidget {
       iconColor: appTheme.mainColor,
     ),
     _BottombarItem(
-        iconData: FontAwesomeIcons.plane, onPressed: () => print("trips")),
+        iconData: FontAwesomeIcons.magnifyingGlass,
+        onPressed: () => showSearch(
+            context: app.context,
+            delegate: MainSearchDelegate(
+                BlocProvider.of<HSMainSearchCubit>(app.context)))),
+    const _BottombarItem(
+        iconData: FontAwesomeIcons.plus,
+        iconSize: 36.0,
+        onPressed: _showCreateMenu),
     _BottombarItem(
-      iconData: FontAwesomeIcons.plus,
-      iconSize: 36.0,
-      onPressed: navi.toCreateSpot,
-    ),
-    _BottombarItem(
-        iconData: FontAwesomeIcons.mapPin, onPressed: () => print("map")),
+        iconData: FontAwesomeIcons.bell,
+        onPressed: () => print("notifications")),
     _BottombarItem(
       iconData: FontAwesomeIcons.bookmark,
       onPressed: () => navi.push("/saved"),
     ),
   ];
+
+  static void _showCreateMenu() {
+    showMaterialModalBottomSheet(
+      context: app.context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (_) => const _CreateMenu(),
+    );
+  }
+}
+
+class _CreateMenu extends StatelessWidget {
+  const _CreateMenu();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(.0, 16.0, .0, 0.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: IconButton(
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: navi.pop,
+                        icon: const Icon(FontAwesomeIcons.xmark)),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Center(
+                      child:
+                          Text("Start creating", style: textTheme.labelLarge),
+                    ),
+                  ),
+                  const Expanded(
+                    child: SizedBox(),
+                  ),
+                ],
+              ),
+              const Gap(16.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _CreateOption(
+                    title: "Spot",
+                    iconData: FontAwesomeIcons.mapPin,
+                    onTap: navi.toCreateSpot,
+                  ),
+                  const Gap(16.0),
+                  _CreateOption(
+                    title: "Board",
+                    iconData: FontAwesomeIcons.grip,
+                    onTap: navi.toCreateBoard,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CreateOption extends StatelessWidget {
+  const _CreateOption(
+      {required this.title, required this.iconData, required this.onTap});
+
+  final String title;
+  final IconData iconData;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Card(
+          margin: const EdgeInsets.all(8.0),
+          child: IconButton(icon: Icon(iconData), onPressed: onTap),
+        ),
+        const Gap(4.0),
+        Text(title, style: textTheme.labelMedium),
+      ],
+    );
+  }
 }

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSSpotsGrid extends StatelessWidget {
   const HSSpotsGrid(
@@ -57,6 +55,7 @@ class HSSpotsGrid extends StatelessWidget {
         );
       }
       return MasonryGridView.count(
+        scrollDirection: Axis.horizontal,
         crossAxisCount: crossAxisCount,
         mainAxisSpacing: mainAxisSpacing,
         crossAxisSpacing: crossAxisSpacing,

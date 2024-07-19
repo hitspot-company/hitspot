@@ -1,14 +1,10 @@
 import 'dart:async';
-
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 part 'hs_home_state.dart';
@@ -28,8 +24,9 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       emit(state.copyWith(status: HSHomeStatus.loading));
       final List<HSBoard> tredingBoards =
           await app.databaseRepository.boardFetchTrendingBoards();
-      final permission =
-          await app.locationRepository.requestLocationPermission();
+      final permission = app.isLocationServiceEnabled;
+      HSDebugLogger.logInfo("Permission: $permission");
+      HSDebugLogger.logInfo("Current Position: ${app.currentPosition}");
       if (permission) {
         await _fetchNearbySpots();
       }
@@ -38,8 +35,9 @@ class HSHomeCubit extends Cubit<HSHomeState> {
           status: HSHomeStatus.idle,
           tredingBoards: tredingBoards,
           trendingSpots: trendingSpots));
-    } catch (_) {
-      HSDebugLogger.logError("Error fetching initial data: $_");
+      HSDebugLogger.logInfo("Initial data fetched");
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching initial data: $e");
     }
   }
 
@@ -48,11 +46,16 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     await Future.delayed(const Duration(seconds: 2));
     state.copyWith(nearbySpots: [], tredingBoards: []);
     await _fetchInitial();
+    if (state.currentPosition != null) {
+      app.locationRepository.animateCameraToNewLatLng(
+          mapController, state.currentPosition!.toLatLng);
+    }
   }
 
   Future<void> _fetchNearbySpots() async {
     try {
-      final currentPosition = await app.locationRepository.getCurrentLocation();
+      final currentPosition = state.currentPosition ??
+          await app.locationRepository.getCurrentLocation();
       final lat = currentPosition.latitude;
       final long = currentPosition.longitude;
       final List<HSSpot> nearbySpots = await app.databaseRepository
@@ -88,7 +91,7 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     final List<HSSpot> spots = state.nearbySpots;
     List<Marker> markers = app.assets.generateMarkers(
       spots,
-      state.currentPosition?.toLatLng,
+      currentPosition: state.currentPosition?.toLatLng,
     );
     emit(state.copyWith(markers: markers));
   }
