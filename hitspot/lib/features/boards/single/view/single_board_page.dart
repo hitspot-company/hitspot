@@ -141,7 +141,6 @@ class SingleBoardPage extends StatelessWidget {
                 )),
               const SliverToBoxAdapter(child: Gap(16.0)),
               HSSimpleSliverAppBar(
-                height: 100.0,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +160,6 @@ class SingleBoardPage extends StatelessWidget {
                             style: textTheme.headlineLarge,
                           ),
                         const Spacer(),
-                        Spacer(),
                         if (isLoading)
                           const Expanded(
                             child: HSShimmerBox(width: 60, height: 60.0),
@@ -205,20 +203,7 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 ),
               ),
-              const Gap(24.0).toSliver,
-              if (isLoading)
-                const HSShimmerBox(width: 60, height: 70.0).toSliverBox
-              else
-                SliverMainAxisGroup(
-                  slivers: [
-                    Text("Description", style: textTheme.headlineSmall)
-                        .toSliver,
-                    Text("${board?.description}",
-                            style: textTheme.bodyMedium!.hintify)
-                        .toSliver,
-                  ],
-                ),
-              const Gap(24.0).toSliver,
+              const Gap(16.0).toSliver,
               SliverToBoxAdapter(
                 child: ReorderableListView.builder(
                   scrollController: _scrollController,
@@ -248,51 +233,85 @@ class SingleBoardPage extends StatelessWidget {
       },
     );
   }
-}
 
-class _AvatarStack extends StatelessWidget {
-  const _AvatarStack(
-      {required this.collaborators, this.height = 80.0, this.width});
-  final List<HSUser>? collaborators;
-  final double height;
-  final double? width;
-
-  @override
-  Widget build(BuildContext context) {
-    final settings = RestrictedPositions(
-      maxCoverage: .7,
-      minCoverage: .3,
-      align: StackAlign.left,
-    );
-    if (collaborators == null) {
-      return const SizedBox();
+  Widget _buildCollaboratorIcons(List<HSUser>? collaborators) {
+    if (collaborators == null || collaborators.isEmpty) {
+      return const SizedBox.shrink();
     }
-    return SizedBox(
-      height: height,
-      width: width ?? screenWidth / 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: WidgetStack(
-              positions: settings,
-              stackedWidgets: [
-                for (var n = 0; n < collaborators!.length; n++)
-                  HSUserAvatar(
-                      radius: 30.0, imageUrl: collaborators![n].avatarUrl),
-              ],
-              buildInfoWidget: (surplus) {
-                return Center(
-                  child: Text(
-                    '+$surplus',
-                    style: textTheme.headlineMedium,
-                  ),
-                );
-              },
+
+    // Limit the number of collaborators to show to 3
+    late List<HSUser> collaboratorsToShow = collaborators;
+    if (collaborators.length > 3) {
+      collaboratorsToShow = collaborators.sublist(0, 3);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(
+            collaboratorsToShow.length,
+            (index) => Padding(
+              padding: const EdgeInsets.only(right: 18.0),
+              child: Align(
+                widthFactor: 0.7,
+                child: HSUserAvatar(
+                    radius: 20.0,
+                    imageUrl: collaboratorsToShow[index].avatarUrl),
+              ),
+            ),
+          )),
+    );
+  }
+
+  void _showCollaboratorsMenu(HSSingleBoardCubit singleBoardCubit) {
+    final state = singleBoardCubit.state;
+    if (state.board?.collaborators == null ||
+        state.board?.collaborators?.isEmpty == true) {
+      return;
+    }
+
+    showDialog(
+      context: app.context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Collaborators'),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: state.board?.collaborators
+                      ?.map((collaborator) => ListTile(
+                            onTap: () => navi.toUser(userID: collaborator.uid!),
+                            leading: HSUserAvatar(
+                                radius: 20.0, imageUrl: collaborator.avatarUrl),
+                            title: Text(collaborator.name ?? ""),
+                            trailing: state.isOwner
+                                ? IconButton(
+                                    icon:
+                                        const Icon(Icons.remove_circle_outline),
+                                    onPressed: () {
+                                      singleBoardCubit.removeCollaborator(
+                                          state.board?.id, collaborator.uid);
+                                      navi.pop();
+                                    },
+                                  )
+                                : const SizedBox.shrink(),
+                          ))
+                      .toList() ??
+                  [],
             ),
           ),
-        ],
-      ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                navi.pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -356,81 +375,4 @@ class _SaveActionButton extends StatelessWidget {
       icon: icon,
     );
   }
-}
-
-Widget _buildCollaboratorIcons(List<HSUser>? collaborators) {
-  if (collaborators == null || collaborators.isEmpty) {
-    return const SizedBox.shrink();
-  }
-
-  // Limit the number of collaborators to show to 3
-  late List<HSUser> collaboratorsToShow = collaborators;
-  if (collaborators.length > 3) {
-    collaboratorsToShow = collaborators.sublist(0, 3);
-  }
-
-  return Padding(
-    padding: const EdgeInsets.all(4.0),
-    child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(
-          collaboratorsToShow.length,
-          (index) => Padding(
-            padding: const EdgeInsets.only(right: 18.0),
-            child: Align(
-              widthFactor: 0.7,
-              child: HSUserAvatar(
-                  radius: 20.0, imageUrl: collaboratorsToShow[index].avatarUrl),
-            ),
-          ),
-        )),
-  );
-}
-
-void _showCollaboratorsMenu(HSSingleBoardCubit singleBoardCubit) {
-  final state = singleBoardCubit.state;
-  if (state.board?.collaborators == null ||
-      state.board?.collaborators?.isEmpty == true) {
-    return;
-  }
-
-  showDialog(
-    context: app.context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Collaborators'),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: state.board?.collaborators
-                    ?.map((collaborator) => ListTile(
-                          leading: HSUserAvatar(
-                              radius: 20.0, imageUrl: collaborator.avatarUrl),
-                          title: Text(collaborator.name ?? ""),
-                          trailing: state.isOwner
-                              ? IconButton(
-                                  icon: const Icon(Icons.remove_circle_outline),
-                                  onPressed: () {
-                                    singleBoardCubit.removeCollaborator(
-                                        state.board?.id, collaborator.uid);
-                                    navi.pop();
-                                  },
-                                )
-                              : const SizedBox.shrink(),
-                        ))
-                    .toList() ??
-                [],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Close'),
-            onPressed: () {
-              navi.pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
 }

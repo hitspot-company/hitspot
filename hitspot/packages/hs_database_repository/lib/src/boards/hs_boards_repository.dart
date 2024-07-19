@@ -173,7 +173,7 @@ class HSBoardsRepository {
       final uid = user?.uid ?? userID!;
       final List<Map<String, dynamic>> fetchedBoards =
           await _supabase.rpc("fetch_user_boards", params: {
-        "user_id": uid,
+        "input_user_id": uid,
         "batch_offset": batchOffset,
         "batch_size": batchSize,
       });
