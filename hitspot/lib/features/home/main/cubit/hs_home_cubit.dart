@@ -35,8 +35,9 @@ class HSHomeCubit extends Cubit<HSHomeState> {
           status: HSHomeStatus.idle,
           tredingBoards: tredingBoards,
           trendingSpots: trendingSpots));
-    } catch (_) {
-      HSDebugLogger.logError("Error fetching initial data: $_");
+      HSDebugLogger.logInfo("Initial data fetched");
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching initial data: $e");
     }
   }
 

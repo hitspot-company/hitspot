@@ -140,31 +140,30 @@ class SingleBoardPage extends StatelessWidget {
                   ],
                 )),
               const SliverToBoxAdapter(child: Gap(16.0)),
-              HSSimpleSliverAppBar(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        HSUserAvatar(
-                          radius: 24,
-                          imageUrl: state.author?.avatarUrl,
-                        ),
-                        const Gap(16.0),
-                        if (isLoading)
-                          const HSShimmerBox(width: 120, height: 30.0)
-                        else
-                          Text(
-                            author?.username ?? "",
-                            style: textTheme.headlineLarge,
+              if (isLoading)
+                const HSShimmerBox(width: 60, height: 60.0)
+                    .animate()
+                    .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                    .toSliver
+              else
+                HSSimpleSliverAppBar(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          HSUserAvatar(
+                            radius: 24,
+                            imageUrl: state.author?.avatarUrl,
                           ),
-                        const Spacer(),
-                        if (isLoading)
-                          const Expanded(
-                            child: HSShimmerBox(width: 60, height: 60.0),
-                          )
-                        else
+                          const Gap(16.0),
+                          AutoSizeText(
+                            author?.username ?? "",
+                            style: textTheme.headlineMedium,
+                            maxLines: 1,
+                          ),
+                          const Spacer(),
                           _SaveActionButton(
                             status: state.status,
                             singleBoardCubit: singleBoardCubit,
@@ -172,37 +171,37 @@ class SingleBoardPage extends StatelessWidget {
                               .animate()
                               .fadeIn(duration: 300.ms, delay: 400.ms)
                               .slideY(begin: 0.2, end: 0),
-                        if (state.isOwner)
+                          if (state.isOwner)
+                            IconButton(
+                                onPressed: () =>
+                                    singleBoardCubit.shareInvitation(board?.id),
+                                icon: const Icon(FontAwesomeIcons.userPlus)),
                           IconButton(
-                              onPressed: () =>
-                                  singleBoardCubit.shareInvitation(board?.id),
-                              icon: const Icon(FontAwesomeIcons.userPlus)),
-                        IconButton(
-                          onPressed: () => navi.pushPage(
-                            page: SingleBoardMapProvider(
-                                boardID: board!.id!, board: board),
-                          ),
-                          icon: const Icon(
-                            FontAwesomeIcons.map,
-                          ),
-                        )
-                            .animate()
-                            .fadeIn(duration: 300.ms, delay: 500.ms)
-                            .slideY(begin: 0.2, end: 0),
-                        IconButton(
-                          onPressed: () => HSDebugLogger.logInfo("Share"),
-                          icon: const Icon(
-                            FontAwesomeIcons.arrowUpRightFromSquare,
-                          ),
-                        )
-                            .animate()
-                            .fadeIn(duration: 300.ms, delay: 500.ms)
-                            .slideY(begin: 0.2, end: 0),
-                      ],
-                    ),
-                  ],
+                            onPressed: () => navi.pushPage(
+                              page: SingleBoardMapProvider(
+                                  boardID: board!.id!, board: board),
+                            ),
+                            icon: const Icon(
+                              FontAwesomeIcons.map,
+                            ),
+                          )
+                              .animate()
+                              .fadeIn(duration: 300.ms, delay: 500.ms)
+                              .slideY(begin: 0.2, end: 0),
+                          IconButton(
+                            onPressed: () => HSDebugLogger.logInfo("Share"),
+                            icon: const Icon(
+                              FontAwesomeIcons.arrowUpRightFromSquare,
+                            ),
+                          )
+                              .animate()
+                              .fadeIn(duration: 300.ms, delay: 500.ms)
+                              .slideY(begin: 0.2, end: 0),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               const Gap(16.0).toSliver,
               SliverToBoxAdapter(
                 child: ReorderableListView.builder(
