@@ -163,19 +163,13 @@ class _UserDataBar extends StatelessWidget {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: app.currentTheme.primaryColor,
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildDataItem('${user?.spots}', 'spots'),
-          _buildDataItem('${user?.followers}', 'followers'),
-          _buildDataItem('${user?.following}', 'following'),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildDataItem('${user?.spots}', 'spots'),
+        _buildDataItem('${user?.followers}', 'followers'),
+        _buildDataItem('${user?.following}', 'following'),
+      ],
     );
   }
 

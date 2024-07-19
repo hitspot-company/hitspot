@@ -134,6 +134,9 @@ class _TrendingSpotsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<HSSpot> spots = mapSearchCubit.state.trendingSpots;
+    if (query.isEmpty) {
+      return const SizedBox();
+    }
     if (spots.isEmpty) {
       return Text("No spots found for $query", textAlign: TextAlign.center)
           .animate()

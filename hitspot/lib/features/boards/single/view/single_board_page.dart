@@ -1,11 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -26,7 +22,6 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:reorderable_grid/reorderable_grid.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -44,6 +39,7 @@ class SingleBoardPage extends StatelessWidget {
         final bool isLoading = state.status == HSSingleBoardStatus.loading;
         final HSBoard? board = state.board;
         final List<HSSpot> spots = state.spots;
+        final HSUser? author = state.author;
         HSDebugLogger.logInfo("Updated, spots_count: ${spots.length}");
         if (state.status == HSSingleBoardStatus.error) {
           return HSScaffold(
