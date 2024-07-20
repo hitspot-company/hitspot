@@ -139,7 +139,8 @@ class _SecondPage extends StatelessWidget {
         BlocSelector<HSCreateBoardCubit, HSCreateBoardState, String?>(
           selector: (state) => state.image,
           builder: (context, imagePath) {
-            final bool isImageSelected = imagePath != null;
+            final bool isImageSelected =
+                imagePath != null && imagePath.isNotEmpty;
             return Column(
               children: [
                 GestureDetector(
