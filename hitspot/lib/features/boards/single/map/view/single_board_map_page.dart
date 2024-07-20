@@ -50,6 +50,7 @@ class SingleBoardMapPage extends StatelessWidget {
                   HSGoogleMap(
                     onMapCreated: cubit.onMapCreated,
                     markers: markers,
+                    myLocationEnabled: true,
                   ),
                   Positioned(
                     bottom: 24.0,

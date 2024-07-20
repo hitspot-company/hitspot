@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/invitation/view/board_invitation_page.dart';
@@ -14,6 +13,7 @@ import 'package:hitspot/features/home/main/view/home_provider.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
+import 'package:hitspot/features/notifications/view/notifications_provider.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
@@ -25,7 +25,6 @@ import 'package:hitspot/features/user_profile/settings/view/settings_provider.da
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:hs_toasts/hs_toasts.dart';
 import 'package:uni_links/uni_links.dart';
 
 class HSNavigation {
@@ -76,6 +75,11 @@ class HSNavigation {
       GoRoute(path: "/", redirect: (context, state) => "/protected/home"),
       GoRoute(
         path: '/user/:userID',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/notifications',
         redirect: (context, state) =>
             '/protected/home?from=${state.matchedLocation}',
       ),
@@ -150,6 +154,10 @@ class HSNavigation {
               GoRoute(
                 path: 'settings',
                 builder: (context, state) => const SettingsProvider(),
+              ),
+              GoRoute(
+                path: 'notifications',
+                builder: (context, state) => const NotificationsProvider(),
               ),
               GoRoute(
                 path: 'board/:boardID',
@@ -253,6 +261,7 @@ class HSNavigation {
   dynamic toSettings() => router.push('/settings');
   dynamic toEditProfile() => router.push('/edit_profile');
   dynamic toCreateSpot() => router.push('/create_spot');
+  dynamic toNotifications() => router.push('/notifications');
   dynamic toSpotsMap(Position? initialPosition) =>
       pushPage(page: MapProvider(initialCameraPosition: initialPosition));
   dynamic toTagsExplore(String tag) => router.push('/tags_explore/$tag');

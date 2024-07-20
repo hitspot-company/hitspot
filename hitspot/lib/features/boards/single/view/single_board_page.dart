@@ -40,7 +40,6 @@ class SingleBoardPage extends StatelessWidget {
         final HSBoard? board = state.board;
         final List<HSSpot> spots = state.spots;
         final HSUser? author = state.author;
-        HSDebugLogger.logInfo("Updated, spots_count: ${spots.length}");
         if (state.status == HSSingleBoardStatus.error) {
           return HSScaffold(
             appBar: HSAppBar(enableDefaultBackButton: true),

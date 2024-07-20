@@ -12,9 +12,9 @@ class HSFilesRepository {
   Future<String> upload(File file, String bucketName, String uploadPath,
       FileOptions? fileOptions) async {
     try {
-      final String response = await _supabase.storage
-          .from(bucketName)
-          .upload(uploadPath, file, fileOptions: fileOptions ?? FileOptions());
+      final String response = await _supabase.storage.from(bucketName).upload(
+          uploadPath, file,
+          fileOptions: fileOptions ?? FileOptions(upsert: true));
       return response;
     } catch (_) {
       throw HSFileException.upload(details: _.toString());
