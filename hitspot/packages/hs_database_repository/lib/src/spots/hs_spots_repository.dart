@@ -1,9 +1,5 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/spots/hs_spot.dart';
-import 'package:hs_database_repository/src/utils/utils.dart';
-import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
