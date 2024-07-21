@@ -8,7 +8,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
-import 'package:hitspot/features/spots/single/view/single_spot_comments.dart';
+import 'package:hitspot/features/spots/single/view/single_spot_comments_page.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_image_full_screen_page.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';

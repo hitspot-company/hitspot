@@ -4,14 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
+import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
 class SingleSpotCommentsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    HSSingleSpotCommentsCubit singleSpotCommentsCubit =
+        BlocProvider.of<HSSingleSpotCommentsCubit>(context);
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
+      height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
         color: app.theme.currentTheme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -19,22 +23,31 @@ class SingleSpotCommentsSection extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: comments.length,
-                itemBuilder: (context, index) {
-                  return _Comment(
-                    comment: comments[index],
-                    index: index,
-                    onLike: () {
-                      // Implement like functionality
+            BlocBuilder<HSSingleSpotCommentsCubit,
+                HSSingleSpotCommentsCubitState>(
+              buildWhen: (previous, current) =>
+                  previous.fetchedComments != current.fetchedComments,
+              builder: (context, state) {
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount:
+                        singleSpotCommentsCubit.state.fetchedComments.length,
+                    itemBuilder: (context, index) {
+                      return _Comment(
+                        comment: singleSpotCommentsCubit
+                            .state.fetchedComments[index],
+                        index: index,
+                        onLike: () {
+                          // Implement like functionality
+                        },
+                        onReply: () {
+                          // Implement reply functionality
+                        },
+                      );
                     },
-                    onReply: () {
-                      // Implement reply functionality
-                    },
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
             _CommentInput(),
           ],
@@ -45,7 +58,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
 }
 
 class _Comment extends StatelessWidget {
-  final Comment comment;
+  final HSComment comment;
   final int index;
   final VoidCallback onLike;
   final VoidCallback onReply;
@@ -61,8 +74,8 @@ class _Comment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(comment.text),
-      subtitle: Text(comment.author),
+      title: Text(comment.content),
+      subtitle: Text(comment.author?.name ?? ""),
       contentPadding: EdgeInsets.only(left: 16, top: 8),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -139,17 +152,3 @@ class _CommentInput extends StatelessWidget {
             )));
   }
 }
-
-class Comment {
-  final String text;
-  final String author;
-
-  Comment({required this.text, required this.author});
-}
-
-// Example usage:
-final List<Comment> comments = [
-  Comment(text: 'Great post!', author: 'User1'),
-  Comment(text: 'I agree with you.', author: 'User2'),
-  // Add more comments as needed
-];

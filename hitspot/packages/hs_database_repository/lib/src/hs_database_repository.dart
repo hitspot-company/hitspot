@@ -3,6 +3,7 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/recommendation_system/hs_interaction_type.dart';
 import 'package:hs_database_repository/src/recommendation_system/hs_recommendation_system_repository.dart';
+import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -190,7 +191,7 @@ class HSDatabaseRepsitory {
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
 
-  Future<void> spotAddComment(
+  Future<HSComment> spotAddComment(
           {required String spotID,
           required String userID,
           required String comment}) async =>
@@ -273,6 +274,10 @@ class HSDatabaseRepsitory {
           double? long}) async =>
       await _spotsRepository.fetchTrendingSpots(
           batchSize, batchOffset, lat, long);
+
+  Future<List<HSComment>> spotFetchComments(
+          {required String spotID, required int currentPageOffset}) async =>
+      await _spotsRepository.fetchComments(spotID, currentPageOffset);
 
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);

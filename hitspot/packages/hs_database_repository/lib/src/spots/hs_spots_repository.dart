@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/src/spots/hs_spot.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
@@ -394,19 +395,41 @@ class HSSpotsRepository {
     }
   }
 
-  Future<void> addComment(
+  Future<HSComment> addComment(
       String? spotID, String? userID, String comment) async {
     try {
       assert(userID != null || spotID != null,
           "SpotID and userID must be provided");
 
-      await _supabase.from('spots_comments').insert({
-        'spot_id': spotID,
-        'created_by': userID,
-        'content': comment,
-      });
+      final newComment = await _supabase
+          .from('spots_comments')
+          .insert({
+            'spot_id': spotID,
+            'created_by': userID,
+            'content': comment,
+          })
+          .select()
+          .single();
+
+      return HSComment.deserialize(newComment);
     } catch (_) {
       throw Exception("Error adding comment: $_");
+    }
+  }
+
+  Future<List<HSComment>> fetchComments(
+      String spotID, int currentPageOffset) async {
+    try {
+      final data = await _supabase.rpc('fetch_spots_comments', params: {
+        'p_spot_id': spotID,
+        'p_limit': 10,
+        'p_offset': currentPageOffset,
+      });
+      return (data as List<dynamic>)
+          .map((e) => HSComment.deserialize(e))
+          .toList();
+    } catch (_) {
+      throw Exception("Error fetching spot comments: $_");
     }
   }
 }
