@@ -61,8 +61,24 @@ class _ReadyTiles extends StatelessWidget {
                     imageUrl: notification.fromUser?.avatarUrl),
                 title: Text(notification.title,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(notification.body),
+                subtitle: Text.rich(TextSpan(
+                  children: [
+                    TextSpan(
+                      text: notification.body,
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: "\n• ${notification.timeAgo}",
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                )),
                 trailing: Icon(notification.icon),
+                isThreeLine: true,
               );
             },
           );

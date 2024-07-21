@@ -1,5 +1,6 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:intl/intl.dart';
 
 enum HSNotificationType {
   spotlike,
@@ -167,6 +168,26 @@ class HSNotification {
         return FontAwesomeIcons.envelope;
       case HSNotificationType.other || null:
         return FontAwesomeIcons.bell;
+    }
+  }
+
+  String get timeAgo {
+    final now = DateTime.now();
+    final difference = now.difference(createdAt!);
+
+    if (difference.inDays > 365) {
+      return DateFormat.yMMMd().format(createdAt!);
+    } else if (difference.inDays > 30) {
+      final months = (difference.inDays / 30).floor();
+      return '$months month${months == 1 ? '' : 's'} ago';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays} day${difference.inDays == 1 ? '' : 's'} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour${difference.inHours == 1 ? '' : 's'} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
+    } else {
+      return 'Just now';
     }
   }
 }
