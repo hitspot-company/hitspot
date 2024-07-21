@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -389,6 +391,22 @@ class HSSpotsRepository {
       return fetchedSpots.map(HSSpot.deserializeWithAuthor).toList();
     } catch (_) {
       throw Exception("Error fetching trending spots: $_");
+    }
+  }
+
+  Future<void> addComment(
+      String? spotID, String? userID, String comment) async {
+    try {
+      assert(userID != null || spotID != null,
+          "SpotID and userID must be provided");
+
+      await _supabase.from('spots_comments').insert({
+        'spot_id': spotID,
+        'created_by': userID,
+        'content': comment,
+      });
+    } catch (_) {
+      throw Exception("Error adding comment: $_");
     }
   }
 }

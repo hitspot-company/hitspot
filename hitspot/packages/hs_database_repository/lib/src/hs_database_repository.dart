@@ -190,6 +190,12 @@ class HSDatabaseRepsitory {
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
 
+  Future<void> spotAddComment(
+          {required String spotID,
+          required String userID,
+          required String comment}) async =>
+      await _spotsRepository.addComment(spotID, userID, comment);
+
   Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
       await _spotsRepository.fetchNearbySpots(lat, long);
 
