@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -61,24 +62,26 @@ class _ReadyTiles extends StatelessWidget {
                     imageUrl: notification.fromUser?.avatarUrl),
                 title: Text(notification.title,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text.rich(TextSpan(
-                  children: [
-                    TextSpan(
-                      text: notification.body,
-                      style: const TextStyle(
-                        color: Colors.white,
+                subtitle: AutoSizeText.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: notification.body,
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    TextSpan(
-                      text: "\n• ${notification.timeAgo}",
-                      style: const TextStyle(
-                        color: Colors.grey,
+                      TextSpan(
+                        text: "\n• ${notification.timeAgo}",
+                        style: const TextStyle(
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                  ],
-                )),
+                    ],
+                  ),
+                  maxLines: 2,
+                ),
                 trailing: Icon(notification.icon),
-                isThreeLine: true,
               );
             },
           );

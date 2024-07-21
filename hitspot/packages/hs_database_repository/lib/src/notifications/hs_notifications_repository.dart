@@ -74,6 +74,7 @@ class HSNotificationsRepository {
     try {
       await _supabase.rpc("notifications_remove_notification", params: {
         "p_user_from_id": notification.from,
+        "p_user_to_id": notification.to,
         "p_spot_id": notification.spotID,
         "p_board_id": notification.boardID,
         "p_type": notification.type!.str,
