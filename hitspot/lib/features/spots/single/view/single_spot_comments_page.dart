@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
+import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
@@ -74,20 +75,40 @@ class _Comment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(comment.content),
-      subtitle: Text(comment.author?.name ?? ""),
-      contentPadding: EdgeInsets.only(left: 16, top: 8),
+      leading: HSUserAvatar(
+        radius: 20,
+        imageUrl: comment.author?.avatarUrl,
+      ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(comment.content),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Text(
+                comment.author?.name ?? "",
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _formatDate(comment.createdAt),
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
+      contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
-            icon: const Icon(FontAwesomeIcons.heart),
-            onPressed: onLike,
-          ),
-          IconButton(
-            icon: const Icon(FontAwesomeIcons.reply),
-            onPressed: onReply,
-          ),
+          _buildIconWithCount(
+              FontAwesomeIcons.heart, comment.likesCount, onLike),
+          const SizedBox(width: 2),
+          _buildIconWithCount(
+              FontAwesomeIcons.reply, comment.repliesCount, onReply),
         ],
       ),
     )
@@ -105,6 +126,35 @@ class _Comment extends StatelessWidget {
             duration: 300.ms,
             delay: (50 * index).ms);
   }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return '';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+Widget _buildIconWithCount(IconData icon, int count, VoidCallback onPressed) {
+  return SizedBox(
+    width: 40,
+    child: Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        IconButton(
+          icon: Icon(icon, size: 20),
+          onPressed: onPressed,
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+        ),
+        Positioned(
+          bottom: -3,
+          child: Text(
+            '$count',
+            style: TextStyle(fontSize: 10),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _CommentInput extends StatelessWidget {
