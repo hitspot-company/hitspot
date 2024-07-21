@@ -17,7 +17,7 @@ class HSSingleSpotCommentsCubitState extends Equatable {
   });
 
   final HSSingleSpotCommentsStatus status;
-  final List<HSComment> fetchedComments;
+  final List<Map<HSComment, bool>> fetchedComments;
   final String comment;
 
   @override
@@ -25,7 +25,7 @@ class HSSingleSpotCommentsCubitState extends Equatable {
 
   HSSingleSpotCommentsCubitState copyWith({
     HSSingleSpotCommentsStatus? status,
-    List<HSComment>? fetchedComments,
+    List<Map<HSComment, bool>>? fetchedComments,
     String? comment,
   }) {
     return HSSingleSpotCommentsCubitState(

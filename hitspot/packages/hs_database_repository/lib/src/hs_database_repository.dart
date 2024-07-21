@@ -275,9 +275,15 @@ class HSDatabaseRepsitory {
       await _spotsRepository.fetchTrendingSpots(
           batchSize, batchOffset, lat, long);
 
-  Future<List<HSComment>> spotFetchComments(
-          {required String spotID, required int currentPageOffset}) async =>
-      await _spotsRepository.fetchComments(spotID, currentPageOffset);
+  Future<List<Map<HSComment, bool>>> spotFetchComments(
+          {required String spotID,
+          required String userID,
+          required int currentPageOffset}) async =>
+      await _spotsRepository.fetchComments(spotID, userID, currentPageOffset);
+
+  Future<void> spotLikeOrDislikeComment(
+          {required String commentID, required String userID}) async =>
+      await _spotsRepository.likeOrDislikeComment(commentID, userID);
 
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);

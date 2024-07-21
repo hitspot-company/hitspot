@@ -402,7 +402,7 @@ class HSSpotsRepository {
           "SpotID and userID must be provided");
 
       final newComment = await _supabase
-          .from('spots_comments')
+          .from('spot_comments')
           .insert({
             'spot_id': spotID,
             'created_by': userID,
@@ -417,19 +417,47 @@ class HSSpotsRepository {
     }
   }
 
-  Future<List<HSComment>> fetchComments(
-      String spotID, int currentPageOffset) async {
+  Future<List<Map<HSComment, bool>>> fetchComments(
+      String spotID, String userID, int currentPageOffset) async {
     try {
-      final data = await _supabase.rpc('fetch_spots_comments', params: {
+      assert(spotID.isNotEmpty && userID.isNotEmpty,
+          "SpotID and userID must be provided");
+
+      final data = await _supabase.rpc('spot_fetch_spot_comments', params: {
         'p_spot_id': spotID,
         'p_limit': 10,
         'p_offset': currentPageOffset,
       });
-      return (data as List<dynamic>)
-          .map((e) => HSComment.deserialize(e))
-          .toList();
+      List<HSComment> fetchedComments =
+          (data as List<dynamic>).map((e) => HSComment.deserialize(e)).toList();
+
+      List<Map<HSComment, bool>> fetchedCommentsWithLikingStatus = [];
+
+      // Check if user liked these comments
+      for (int i = 0; i < fetchedComments.length; i++) {
+        bool hasLiked =
+            await _supabase.rpc('spot_has_user_liked_comment', params: {
+          'p_comment_id': fetchedComments[i].id,
+          'p_user_id': userID,
+        });
+
+        fetchedCommentsWithLikingStatus.add({fetchedComments[i]: hasLiked});
+      }
+
+      return fetchedCommentsWithLikingStatus;
     } catch (_) {
       throw Exception("Error fetching spot comments: $_");
+    }
+  }
+
+  Future<void> likeOrDislikeComment(String commentID, String userID) async {
+    try {
+      await _supabase.rpc('spot_like_or_dislike_spot_comment', params: {
+        'p_comment_id': commentID,
+        'p_user_id': userID,
+      });
+    } catch (_) {
+      throw Exception("Error liking comment: $_");
     }
   }
 }

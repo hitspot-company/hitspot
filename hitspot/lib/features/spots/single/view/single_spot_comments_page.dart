@@ -36,11 +36,15 @@ class SingleSpotCommentsSection extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return _Comment(
                         comment: singleSpotCommentsCubit
-                            .state.fetchedComments[index],
+                            .state.fetchedComments[index].keys.first,
+                        isLiked: singleSpotCommentsCubit
+                            .state.fetchedComments[index].values.first,
                         index: index,
-                        onLike: () {
-                          // Implement like functionality
-                        },
+                        onLike: () =>
+                            singleSpotCommentsCubit.likeOrDislikeComment(
+                                singleSpotCommentsCubit
+                                    .state.fetchedComments[index].keys.first,
+                                index),
                         onReply: () {
                           // Implement reply functionality
                         },
@@ -60,6 +64,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
 
 class _Comment extends StatelessWidget {
   final HSComment comment;
+  final bool isLiked;
   final int index;
   final VoidCallback onLike;
   final VoidCallback onReply;
@@ -67,6 +72,7 @@ class _Comment extends StatelessWidget {
   const _Comment({
     Key? key,
     required this.comment,
+    required this.isLiked,
     required this.index,
     required this.onLike,
     required this.onReply,
@@ -105,10 +111,13 @@ class _Comment extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildIconWithCount(
-              FontAwesomeIcons.heart, comment.likesCount, onLike),
+              isLiked ? FontAwesomeIcons.solidHeart : FontAwesomeIcons.heart,
+              comment.likesCount,
+              onLike,
+              isLiked),
           const SizedBox(width: 2),
-          _buildIconWithCount(
-              FontAwesomeIcons.reply, comment.repliesCount, onReply),
+          _buildIconWithCount(FontAwesomeIcons.reply, comment.repliesCount,
+              onReply, /* isLiked */ false),
         ],
       ),
     )
@@ -133,14 +142,15 @@ class _Comment extends StatelessWidget {
   }
 }
 
-Widget _buildIconWithCount(IconData icon, int count, VoidCallback onPressed) {
+Widget _buildIconWithCount(
+    IconData icon, int count, VoidCallback onPressed, bool isLiked) {
   return SizedBox(
     width: 40,
     child: Stack(
       alignment: Alignment.topCenter,
       children: [
         IconButton(
-          icon: Icon(icon, size: 20),
+          icon: Icon(icon, size: 20, color: isLiked ? Colors.red : null),
           onPressed: onPressed,
           padding: EdgeInsets.zero,
           constraints: BoxConstraints(minWidth: 40, minHeight: 40),
