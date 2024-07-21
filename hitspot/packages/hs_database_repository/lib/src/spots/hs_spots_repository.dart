@@ -1,14 +1,17 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSSpotsRepository {
-  const HSSpotsRepository(this._supabase, this._spots);
+  const HSSpotsRepository(
+      this._supabase, this._spots, this._notificationsRepository);
 
   final SupabaseClient _supabase;
   final String _spots;
   final String _spotsImages = "spots_images";
+  final HSNotificationsRepository _notificationsRepository;
 
   // CREATE
   Future<String> create(HSSpot spot) async {
@@ -164,7 +167,7 @@ class HSSpotsRepository {
       final sid = spot?.sid ?? spotID!;
       final fetchedSpot =
           await _supabase.rpc('spots_fetch_spot_with_author', params: {
-        'spotsid': spot != null ? spot.sid : spotID,
+        'spotsid': sid,
       });
       HSDebugLogger.logInfo("Fetched spot with author: ${fetchedSpot}");
       return HSSpot.deserializeWithAuthor(fetchedSpot.first);
@@ -199,6 +202,15 @@ class HSSpotsRepository {
         'requested_spot_id': sid,
         'requested_by_id': uid,
       });
+      final authorID = spot?.createdBy;
+      HSDebugLogger.logInfo("Spot author ID: ${spot?.createdBy}");
+      assert(authorID != null, "Spot author ID must be provided");
+      await _notificationsRepository.create(HSNotification(
+        from: uid,
+        to: authorID,
+        type: HSNotificationType.spotlike,
+        spotID: sid,
+      ));
     } catch (_) {
       throw Exception("Error liking spot: $_");
     }
@@ -214,6 +226,12 @@ class HSSpotsRepository {
         'requested_spot_id': sid,
         'requested_by_id': uid,
       });
+      await _notificationsRepository.delete(HSNotification(
+        from: uid,
+        to: spot?.createdBy,
+        type: HSNotificationType.spotlike,
+        spotID: sid,
+      ));
     } catch (_) {
       throw Exception("Error disliking spot: $_");
     }

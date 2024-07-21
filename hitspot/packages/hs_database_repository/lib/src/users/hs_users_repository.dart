@@ -1,16 +1,17 @@
 import 'package:hs_authentication_repository/src/models/hs_user.dart';
-import 'package:hs_database_repository/src/users/exceptions/hs_create_user_failure.dart';
-import 'package:hs_database_repository/src/users/exceptions/hs_read_user_failure.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_database_repository/src/users/exceptions/hs_update_user_failure.dart';
-import 'package:hs_database_repository/src/users/exceptions/hs_user_exception.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSUsersRepository {
-  const HSUsersRepository(this._supabase, this._users);
+  const HSUsersRepository(
+      this._supabase, this._users, this._notificationsRepository);
 
   final SupabaseClient _supabase;
   final String _users;
+  final HSNotificationsRepository _notificationsRepository;
 
   // CREATE
   Future<void> create(HSUser user) async {
@@ -88,6 +89,12 @@ class HSUsersRepository {
         "follower_uid": followerUID,
         "followed_uid": followedUID,
       });
+      await _notificationsRepository.delete(HSNotification(
+        from: followerUID,
+        to: followedUID,
+        type: HSNotificationType.userfollow,
+        message: "Unfollowed",
+      ));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       rethrow;
@@ -96,15 +103,21 @@ class HSUsersRepository {
 
   Future<void> follow(String? followerID, String? followedID, HSUser? follower,
       HSUser? followed) async {
-    assert(followerID != null || follower != null,
-        "Follower or followerID must be provided");
-    assert(followedID != null || followed != null,
-        "Followed or followedID must be provided");
     try {
+      assert(followerID != null || follower != null,
+          "Follower or followerID must be provided");
+      assert(followedID != null || followed != null,
+          "Followed or followedID must be provided");
       final followerUID = follower?.uid ?? followerID!;
       final followedUID = followed?.uid ?? followedID!;
       await _supabase.rpc('follow_user',
           params: {"followed_uid": followedUID, "follower_uid": followerUID});
+      await _notificationsRepository.create(HSNotification(
+        from: followerUID,
+        to: followedUID,
+        type: HSNotificationType.userfollow,
+        message: "Unfollowed",
+      ));
       HSDebugLogger.logSuccess("Followed");
     } catch (_) {
       HSDebugLogger.logError(_.toString());

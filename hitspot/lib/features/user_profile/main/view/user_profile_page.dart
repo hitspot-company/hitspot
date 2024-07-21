@@ -37,7 +37,11 @@ class UserProfilePage extends StatelessWidget {
                     [
                       _buildUserInfo(context, loading, user, userProfileCubit),
                       const SizedBox(height: 16),
-                      _UserDataBar(loading: loading, user: user)
+                      _UserDataBar(
+                              loading: loading,
+                              followersCount: state.followersCount,
+                              followingCount: state.followingCount,
+                              spotsCount: state.spotsCount)
                           .animate()
                           .fadeIn(duration: 300.ms)
                           .slideY(begin: 0.2, end: 0),
@@ -145,11 +149,13 @@ class UserProfilePage extends StatelessWidget {
 class _UserDataBar extends StatelessWidget {
   const _UserDataBar({
     required this.loading,
-    required this.user,
+    required this.followersCount,
+    required this.followingCount,
+    required this.spotsCount,
   });
 
   final bool loading;
-  final HSUser? user;
+  final int followersCount, followingCount, spotsCount;
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +172,9 @@ class _UserDataBar extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildDataItem('${user?.spots}', 'spots'),
-        _buildDataItem('${user?.followers}', 'followers'),
-        _buildDataItem('${user?.following}', 'following'),
+        _buildDataItem('$spotsCount', 'spots'),
+        _buildDataItem('$followersCount', 'followers'),
+        _buildDataItem('$followingCount', 'following'),
       ],
     );
   }

@@ -1,15 +1,18 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class HSBoardsRepository {
-  const HSBoardsRepository(this._supabase, this._boards);
+  const HSBoardsRepository(
+      this._supabase, this._boards, this._notificationsRepository);
 
   final SupabaseClient _supabase;
   final String _boards;
   final String _boardsSaves = "boards_saves";
+  final HSNotificationsRepository _notificationsRepository;
 
   // CREATE
   Future<String> create(HSBoard board) async {

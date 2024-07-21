@@ -59,21 +59,14 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
   Future<void> likeDislikeSpot() async {
     try {
       final bool isSpotLiked = await _databaseRepository.spotLikeDislike(
-          spotID: spotID, userID: currentUser.uid);
+          spot: state.spot, userID: currentUser.uid);
       emit(state.copyWith(
           isSpotLiked: isSpotLiked, status: HSSingleSpotStatus.loaded));
-
-      if (isSpotLiked) {
-        _databaseRepository.recommendationSystemCaptureEvent(
-            userId: app.currentUser.uid ?? "",
-            spotId: spotID,
-            event: HSInteractionType.like);
-      } else {
-        _databaseRepository.recommendationSystemCaptureEvent(
-            userId: app.currentUser.uid ?? "",
-            spotId: spotID,
-            event: HSInteractionType.dislike);
-      }
+      _databaseRepository.recommendationSystemCaptureEvent(
+          userId: app.currentUser.uid ?? "",
+          spotId: spotID,
+          event:
+              isSpotLiked ? HSInteractionType.like : HSInteractionType.dislike);
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }

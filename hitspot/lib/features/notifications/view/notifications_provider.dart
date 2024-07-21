@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/features/notifications/bloc/hs_notifications_bloc.dart';
+import 'package:hitspot/features/notifications/cubit/hs_notifications_cubit.dart';
 import 'package:hitspot/features/notifications/view/notifications_page.dart';
 
 class NotificationsProvider extends StatelessWidget {
@@ -9,7 +9,7 @@ class NotificationsProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HsNotificationsBloc(),
+      create: (context) => HSNotificationsCubit(),
       child: const NotificationsPage(),
     );
   }
