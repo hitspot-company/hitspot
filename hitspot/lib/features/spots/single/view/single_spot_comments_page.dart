@@ -21,8 +21,6 @@ class SingleSpotCommentsSection extends StatelessWidget {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         singleSpotCommentsCubit.fetchComments();
-
-        // TODO: Add loading animation perhaps?
       }
     });
 
@@ -93,9 +91,12 @@ class _Comment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: HSUserAvatar(
-        radius: 20,
-        imageUrl: comment.author?.avatarUrl,
+      leading: GestureDetector(
+        onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
+        child: HSUserAvatar(
+          radius: 20,
+          imageUrl: comment.author?.avatarUrl,
+        ),
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,10 +105,13 @@ class _Comment extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              Text(
-                comment.author?.name ?? "",
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              GestureDetector(
+                onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
+                child: Text(
+                  comment.author?.name ?? "",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 12),
+                ),
               ),
               const SizedBox(width: 8),
               Text(
