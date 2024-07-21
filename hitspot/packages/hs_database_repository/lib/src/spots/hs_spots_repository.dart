@@ -425,7 +425,7 @@ class HSSpotsRepository {
 
       final data = await _supabase.rpc('spot_fetch_spot_comments', params: {
         'p_spot_id': spotID,
-        'p_limit': 10,
+        'p_limit': 8,
         'p_offset': currentPageOffset,
       });
       List<HSComment> fetchedComments =

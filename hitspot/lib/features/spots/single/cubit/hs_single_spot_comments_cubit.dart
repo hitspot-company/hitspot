@@ -42,6 +42,11 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
       comment.author = author;
     }
 
+    if (comments.isNotEmpty) {
+      pagesOfCommentsLoaded += comments.length;
+      HSDebugLogger.logSuccess("Fetched new comments for spot $spotID");
+    }
+
     emit(state
         .copyWith(fetchedComments: [...state.fetchedComments, ...comments]));
 

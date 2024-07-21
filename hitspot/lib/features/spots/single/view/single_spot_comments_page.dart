@@ -14,6 +14,17 @@ class SingleSpotCommentsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
+    final ScrollController _scrollController = ScrollController();
+
+    _scrollController.addListener(() {
+      // Check if user has scrolled to the bottom
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        singleSpotCommentsCubit.fetchComments();
+
+        // TODO: Add loading animation perhaps?
+      }
+    });
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
@@ -31,6 +42,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
               builder: (context, state) {
                 return Expanded(
                   child: ListView.builder(
+                    controller: _scrollController,
                     itemCount:
                         singleSpotCommentsCubit.state.fetchedComments.length,
                     itemBuilder: (context, index) {
