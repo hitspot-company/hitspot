@@ -28,6 +28,8 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
     emit(
         state.copyWith(status: HSSingleSpotCommentsStatus.loadingMoreComments));
 
+    await Future<void>.delayed(const Duration(seconds: 1));
+
     List<Map<HSComment, bool>> comments =
         await _databaseRepository.spotFetchComments(
             spotID: spotID,

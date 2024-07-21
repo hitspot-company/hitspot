@@ -33,36 +33,43 @@ class SingleSpotCommentsSection extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            BlocBuilder<HSSingleSpotCommentsCubit,
-                HSSingleSpotCommentsCubitState>(
-              buildWhen: (previous, current) =>
-                  previous.fetchedComments != current.fetchedComments,
-              builder: (context, state) {
-                return Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount:
-                        singleSpotCommentsCubit.state.fetchedComments.length,
-                    itemBuilder: (context, index) {
-                      return _Comment(
-                        comment: singleSpotCommentsCubit
-                            .state.fetchedComments[index].keys.first,
-                        isLiked: singleSpotCommentsCubit
-                            .state.fetchedComments[index].values.first,
-                        index: index,
-                        onLike: () =>
-                            singleSpotCommentsCubit.likeOrDislikeComment(
-                                singleSpotCommentsCubit
-                                    .state.fetchedComments[index].keys.first,
-                                index),
-                        onReply: () {
-                          // Implement reply functionality
-                        },
-                      );
-                    },
-                  ),
-                );
-              },
+            Expanded(
+              child: BlocBuilder<HSSingleSpotCommentsCubit,
+                  HSSingleSpotCommentsCubitState>(
+                builder: (context, state) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: singleSpotCommentsCubit
+                              .state.fetchedComments.length,
+                          itemBuilder: (context, index) {
+                            return _Comment(
+                              comment: singleSpotCommentsCubit
+                                  .state.fetchedComments[index].keys.first,
+                              isLiked: singleSpotCommentsCubit
+                                  .state.fetchedComments[index].values.first,
+                              index: index,
+                              onLike: () =>
+                                  singleSpotCommentsCubit.likeOrDislikeComment(
+                                      singleSpotCommentsCubit.state
+                                          .fetchedComments[index].keys.first,
+                                      index),
+                              onReply: () {
+                                // Implement reply functionality
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      if (state.status ==
+                          HSSingleSpotCommentsStatus.loadingMoreComments)
+                        const CircularProgressIndicator.adaptive(),
+                    ],
+                  );
+                },
+              ),
             ),
             _CommentInput(),
           ],
