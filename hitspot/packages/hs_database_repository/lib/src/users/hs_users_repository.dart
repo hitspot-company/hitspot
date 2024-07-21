@@ -93,7 +93,6 @@ class HSUsersRepository {
         from: followerUID,
         to: followedUID,
         type: HSNotificationType.userfollow,
-        message: "Unfollowed",
       ));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
