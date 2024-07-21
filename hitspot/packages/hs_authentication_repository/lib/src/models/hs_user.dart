@@ -1,5 +1,3 @@
-import 'package:hs_debug_logger/hs_debug_logger.dart';
-
 typedef UserID = String;
 
 class HSUser {
@@ -31,26 +29,29 @@ class HSUser {
     };
   }
 
-  factory HSUser.deserialize(Map<String, dynamic> data, {String? uid}) {
+  factory HSUser.deserialize(Map<String, dynamic> data,
+      {String? uid, String prefix = ""}) {
     return HSUser(
-      uid: data["id"],
-      biogram: data["biogram"],
-      email: data["email"],
-      name: data["name"],
-      avatarUrl: data["avatar_url"],
-      username: data["username"],
-      birthday:
-          data["birthday"] != null ? DateTime.tryParse(data["birthday"]) : null,
-      createdAt: data["created_at"] != null
-          ? DateTime.tryParse(data["created_at"])
+      uid: data[prefix + "id"],
+      biogram: data[prefix + "biogram"],
+      email: data[prefix + "email"],
+      name: data[prefix + "name"],
+      avatarUrl: data[prefix + "avatar_url"],
+      username: data[prefix + "username"],
+      birthday: data[prefix + "birthday"] != null
+          ? DateTime.tryParse(data[prefix + "birthday"])
           : null,
-      emailHidden: data["is_email_hidden"] ?? true,
-      isProfileCompleted: data["is_profile_completed"] ?? false,
-      isEmailVerified: data["is_email_verified"] ?? true, // We use magic links
-      followers: data["followers_count"] ?? 0,
-      following: data["following_count"] ?? 0,
-      boards: data["boards_count"] ?? 0,
-      spots: data["spots_count"] ?? 0,
+      createdAt: data[prefix + "created_at"] != null
+          ? DateTime.tryParse(data[prefix + "created_at"])
+          : null,
+      emailHidden: data[prefix + "is_email_hidden"] ?? true,
+      isProfileCompleted: data[prefix + "is_profile_completed"] ?? false,
+      isEmailVerified:
+          data[prefix + "is_email_verified"] ?? true, // We use magic links
+      followers: data[prefix + "followers_count"] ?? 0,
+      following: data[prefix + "following_count"] ?? 0,
+      boards: data[prefix + "boards_count"] ?? 0,
+      spots: data[prefix + "spots_count"] ?? 0,
     );
   }
 

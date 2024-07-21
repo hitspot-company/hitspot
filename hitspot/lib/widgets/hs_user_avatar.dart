@@ -12,6 +12,42 @@ class HSUserAvatar extends StatelessWidget {
     this.loading = false,
     this.isAsset = false,
     this.child,
+    this.onTap,
+  });
+
+  final String? imageUrl;
+  final double radius;
+  final double? iconSize;
+  final bool loading;
+  final bool isAsset;
+  final Widget? child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: _HSUserAvatar(
+        radius: radius,
+        iconSize: iconSize,
+        loading: loading,
+        isAsset: isAsset,
+        imageUrl: imageUrl,
+        child: child,
+      ),
+    );
+  }
+}
+
+class _HSUserAvatar extends StatelessWidget {
+  const _HSUserAvatar({
+    super.key,
+    this.imageUrl,
+    required this.radius,
+    this.iconSize,
+    this.loading = false,
+    this.isAsset = false,
+    this.child,
   });
 
   final String? imageUrl;

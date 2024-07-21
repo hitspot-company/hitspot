@@ -1,3 +1,4 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 
 enum HSNotificationType {
@@ -27,28 +28,28 @@ enum HSNotificationType {
 }
 
 class HSNotification {
-  final String id, message;
-  final UserID from, to;
+  final String? id, message;
+  final UserID? from, to;
   final HSUser? fromUser, toUser;
-  final HSNotificationType type;
+  final HSNotificationType? type;
   final String? boardID, spotID;
-  final bool isRead, isHidden;
-  final DateTime createdAt, updatedAt;
-  final Map<String, dynamic> metadata;
+  final bool? isRead, isHidden;
+  final DateTime? createdAt, updatedAt;
+  final Map<String, dynamic>? metadata;
 
   HSNotification({
-    required this.id,
+    this.id,
     this.fromUser,
     this.toUser,
-    required this.message,
-    required this.from,
-    required this.to,
-    required this.type,
-    required this.isRead,
-    required this.isHidden,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.metadata,
+    this.message,
+    this.from,
+    this.to,
+    this.type,
+    this.isRead,
+    this.isHidden,
+    this.createdAt,
+    this.updatedAt,
+    this.metadata,
     this.boardID,
     this.spotID,
   });
@@ -90,7 +91,7 @@ class HSNotification {
       'user_to_id': to,
       'board_id': boardID,
       'spot_id': spotID,
-      'type': type.str,
+      'type': type!.str,
       'is_read': isRead,
       'is_hidden': isHidden,
       'metadata': metadata,
@@ -114,6 +115,58 @@ class HSNotification {
       metadata: data['metadata'],
       boardID: data['board_id'],
       spotID: data['spot_id'],
+      toUser: HSUser.deserialize(data, prefix: 'user_to_'),
+      fromUser: HSUser.deserialize(data, prefix: 'user_from_'),
     );
+  }
+
+  String get title {
+    switch (type) {
+      case HSNotificationType.spotlike:
+        return 'Spot Liked';
+      case HSNotificationType.spotcomment:
+        return 'Spot Commented';
+      case HSNotificationType.userfollow:
+        return 'New Follow';
+      case HSNotificationType.boardlike:
+        return 'Board Liked';
+      case HSNotificationType.boardinvitation:
+        return 'Board Invitation';
+      case HSNotificationType.other || null:
+        return "Notification";
+    }
+  }
+
+  String get body {
+    final fromUsername = fromUser?.username ?? 'Someone';
+    switch (type) {
+      case HSNotificationType.spotlike:
+        return '$fromUsername liked your spot';
+      case HSNotificationType.spotcomment:
+        return '$fromUsername commented on your spot';
+      case HSNotificationType.userfollow:
+        return '$fromUsername started following you';
+      case HSNotificationType.boardlike:
+        return '$fromUsername liked your board';
+      case HSNotificationType.boardinvitation:
+        return '$fromUsername invited you to a board';
+      case HSNotificationType.other || null:
+        return message ?? '';
+    }
+  }
+
+  get icon {
+    switch (type) {
+      case HSNotificationType.spotlike || HSNotificationType.boardlike:
+        return FontAwesomeIcons.solidHeart;
+      case HSNotificationType.spotcomment:
+        return FontAwesomeIcons.solidComment;
+      case HSNotificationType.userfollow:
+        return FontAwesomeIcons.userPlus;
+      case HSNotificationType.boardinvitation:
+        return FontAwesomeIcons.envelope;
+      case HSNotificationType.other || null:
+        return FontAwesomeIcons.bell;
+    }
   }
 }
