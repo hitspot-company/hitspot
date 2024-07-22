@@ -1,3 +1,4 @@
+import 'package:badword_guard/badword_guard.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:profanity_filter/profanity_filter.dart';
 
 part 'hs_single_spot_comments_state.dart';
 
@@ -79,7 +81,14 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
 
       bool isReply = state.pageStatus == HSSingleSpotCommentsPageType.replies;
 
-      // TODO: Check if goes through filter
+      // Here we check for bad language, but for now I think we can leave it commented
+      // final filter = ProfanityFilter();
+      // if (filter.hasProfanity(state.comment)) {
+      //   HSDebugLogger.logInfo("Bad language detected");
+      //   return;
+      //   // TODO: Display some error message
+      // }
+
       if (state.comment == "") {
         return;
       }
@@ -130,6 +139,12 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
           status: HSSingleSpotCommentsStatus.finishedCommenting));
 
       emit(state.copyWith(status: HSSingleSpotCommentsStatus.loaded));
+
+      HSSpot spot = await _databaseRepository.spotRead(spotID: spotID);
+      _databaseRepository.recommendationSystemCaptureEvent(
+          userId: app.currentUser.uid ?? "",
+          spot: spot,
+          event: HSInteractionType.comment);
     } catch (_) {
       HSDebugLogger.logError("Error adding comment ${_.toString()}");
     }

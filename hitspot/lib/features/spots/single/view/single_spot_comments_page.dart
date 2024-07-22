@@ -225,7 +225,6 @@ class _CommentInputState extends State<_CommentInput> {
             HSSingleSpotCommentsCubitState>(
         listener: (context, state) {
           if (state.status == HSSingleSpotCommentsStatus.finishedCommenting) {
-            // TODO: Fix - it clears after clicking button
             _controller.clear();
           }
         },

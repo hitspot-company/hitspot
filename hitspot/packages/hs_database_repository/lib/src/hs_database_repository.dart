@@ -329,7 +329,7 @@ class HSDatabaseRepsitory {
 
   Future<void> recommendationSystemCaptureEvent(
           {required String userId,
-          required String spotId,
+          required HSSpot spot,
           required HSInteractionType event}) async =>
-      await _recommendationSystemRepository.captureEvent(userId, spotId, event);
+      await _recommendationSystemRepository.captureEvent(userId, spot, event);
 }
