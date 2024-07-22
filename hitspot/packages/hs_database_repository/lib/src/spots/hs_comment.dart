@@ -7,6 +7,7 @@ class HSComment {
   final DateTime createdAt;
   int likesCount;
   int repliesCount;
+  bool isLiked;
   HSUser? author;
 
   HSComment({
@@ -16,6 +17,7 @@ class HSComment {
     required this.createdAt,
     required this.likesCount,
     required this.repliesCount,
+    this.isLiked = false,
     this.author,
   });
 
@@ -26,7 +28,29 @@ class HSComment {
       content: map['content'],
       createdAt: DateTime.parse(map['created_at']),
       likesCount: map['likes_count'],
-      repliesCount: map['replies_count'],
+      repliesCount: map['replies_count'] ?? 0,
+    );
+  }
+
+  HSComment copyWith({
+    String? id,
+    String? createdBy,
+    String? content,
+    DateTime? createdAt,
+    int? likesCount,
+    int? repliesCount,
+    bool? isLiked,
+    HSUser? author,
+  }) {
+    return HSComment(
+      id: id ?? this.id,
+      createdBy: createdBy ?? this.createdBy,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      likesCount: likesCount ?? this.likesCount,
+      repliesCount: repliesCount ?? this.repliesCount,
+      isLiked: isLiked ?? this.isLiked,
+      author: author ?? this.author,
     );
   }
 }

@@ -395,21 +395,40 @@ class HSSpotsRepository {
     }
   }
 
-  Future<HSComment> addComment(
-      String? spotID, String? userID, String comment) async {
+  Future<HSComment> addComment(String? spotID, String? userID, String comment,
+      bool isReply, String? parentCommentID) async {
     try {
       assert(userID != null || spotID != null,
           "SpotID and userID must be provided");
 
-      final newComment = await _supabase
-          .from('spot_comments')
-          .insert({
-            'spot_id': spotID,
-            'created_by': userID,
-            'content': comment,
-          })
-          .select()
-          .single();
+      late final newComment;
+
+      if (isReply) {
+        newComment = await _supabase
+            .from('spot_comments')
+            .insert({
+              'spot_id': spotID,
+              'created_by': userID,
+              'content': comment,
+              'parent_id': parentCommentID,
+            })
+            .select()
+            .single();
+
+        await _supabase.rpc('spot_increment_comment_replies_count', params: {
+          'p_comment_id': parentCommentID,
+        });
+      } else {
+        newComment = await _supabase
+            .from('spot_comments')
+            .insert({
+              'spot_id': spotID,
+              'created_by': userID,
+              'content': comment,
+            })
+            .select()
+            .single();
+      }
 
       return HSComment.deserialize(newComment);
     } catch (_) {
@@ -417,42 +436,53 @@ class HSSpotsRepository {
     }
   }
 
-  Future<List<Map<HSComment, bool>>> fetchComments(
-      String spotID, String userID, int currentPageOffset) async {
+  Future<List<HSComment>> fetchComments(
+      String id, String userID, int currentPageOffset, bool isReply) async {
     try {
-      assert(spotID.isNotEmpty && userID.isNotEmpty,
+      // ID is either spotID or commentID
+
+      assert(id.isNotEmpty && userID.isNotEmpty,
           "SpotID and userID must be provided");
 
-      final data = await _supabase.rpc('spot_fetch_spot_comments', params: {
-        'p_spot_id': spotID,
-        'p_limit': 8,
-        'p_offset': currentPageOffset,
-      });
+      late final data;
+      if (isReply) {
+        data = await _supabase.rpc('spot_fetch_spot_comment_replies', params: {
+          'p_comment_id': id,
+          'p_limit': 8,
+          'p_offset': currentPageOffset,
+        });
+      } else {
+        data = await _supabase.rpc('spot_fetch_spot_comments', params: {
+          'p_spot_id': id,
+          'p_limit': 8,
+          'p_offset': currentPageOffset,
+        });
+      }
+
       List<HSComment> fetchedComments =
           (data as List<dynamic>).map((e) => HSComment.deserialize(e)).toList();
 
-      List<Map<HSComment, bool>> fetchedCommentsWithLikingStatus = [];
-
-      // Check if user liked these comments
+      // Check if user liked these comments/replies
       for (int i = 0; i < fetchedComments.length; i++) {
-        bool hasLiked =
+        fetchedComments[i].isLiked =
             await _supabase.rpc('spot_has_user_liked_comment', params: {
           'p_comment_id': fetchedComments[i].id,
           'p_user_id': userID,
         });
-
-        fetchedCommentsWithLikingStatus.add({fetchedComments[i]: hasLiked});
       }
 
-      return fetchedCommentsWithLikingStatus;
+      return fetchedComments;
     } catch (_) {
       throw Exception("Error fetching spot comments: $_");
     }
   }
 
-  Future<void> likeOrDislikeComment(String commentID, String userID) async {
+  Future<void> likeOrDislikeComment(
+    String commentID,
+    String userID,
+  ) async {
     try {
-      await _supabase.rpc('spot_like_or_dislike_spot_comment', params: {
+      await _supabase.rpc('spot_like_or_dislike_comment', params: {
         'p_comment_id': commentID,
         'p_user_id': userID,
       });

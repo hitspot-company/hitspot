@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
@@ -194,8 +196,11 @@ class HSDatabaseRepsitory {
   Future<HSComment> spotAddComment(
           {required String spotID,
           required String userID,
-          required String comment}) async =>
-      await _spotsRepository.addComment(spotID, userID, comment);
+          required String comment,
+          required bool isReply,
+          String? parentCommentID}) async =>
+      await _spotsRepository.addComment(
+          spotID, userID, comment, isReply, parentCommentID);
 
   Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
       await _spotsRepository.fetchNearbySpots(lat, long);
@@ -275,11 +280,13 @@ class HSDatabaseRepsitory {
       await _spotsRepository.fetchTrendingSpots(
           batchSize, batchOffset, lat, long);
 
-  Future<List<Map<HSComment, bool>>> spotFetchComments(
+  Future<List<HSComment>> spotFetchComments(
           {required String spotID,
           required String userID,
-          required int currentPageOffset}) async =>
-      await _spotsRepository.fetchComments(spotID, userID, currentPageOffset);
+          required int currentPageOffset,
+          required bool isReply}) async =>
+      await _spotsRepository.fetchComments(
+          spotID, userID, currentPageOffset, isReply);
 
   Future<void> spotLikeOrDislikeComment(
           {required String commentID, required String userID}) async =>

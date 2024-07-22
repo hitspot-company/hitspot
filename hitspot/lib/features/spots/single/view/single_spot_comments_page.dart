@@ -16,8 +16,8 @@ class SingleSpotCommentsSection extends StatelessWidget {
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
     final ScrollController _scrollController = ScrollController();
 
+    // Check if user has scrolled to the bottom
     _scrollController.addListener(() {
-      // Check if user has scrolled to the bottom
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         singleSpotCommentsCubit.fetchComments();
@@ -30,50 +30,26 @@ class SingleSpotCommentsSection extends StatelessWidget {
         color: app.theme.currentTheme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: BlocBuilder<HSSingleSpotCommentsCubit,
-                  HSSingleSpotCommentsCubitState>(
-                builder: (context, state) {
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: singleSpotCommentsCubit
-                              .state.fetchedComments.length,
-                          itemBuilder: (context, index) {
-                            return _Comment(
-                              comment: singleSpotCommentsCubit
-                                  .state.fetchedComments[index].keys.first,
-                              isLiked: singleSpotCommentsCubit
-                                  .state.fetchedComments[index].values.first,
-                              index: index,
-                              onLike: () =>
-                                  singleSpotCommentsCubit.likeOrDislikeComment(
-                                      singleSpotCommentsCubit.state
-                                          .fetchedComments[index].keys.first,
-                                      index),
-                              onReply: () {
-                                // Implement reply functionality
-                              },
-                            );
-                          },
-                        ),
+      child: BlocBuilder<HSSingleSpotCommentsCubit,
+          HSSingleSpotCommentsCubitState>(
+        buildWhen: (previous, current) =>
+            previous.pageStatus != current.pageStatus ||
+            previous.status != current.status ||
+            previous.fetchedComments != current.fetchedComments ||
+            previous.fetchedReplies != current.fetchedReplies,
+        builder: (context, state) {
+          return SafeArea(
+            child: state.status == HSSingleSpotCommentsStatus.loading
+                ? const Center(child: CircularProgressIndicator())
+                : state.pageStatus == HSSingleSpotCommentsPageType.comments
+                    ? _CommentsPage(
+                        scrollController: _scrollController,
+                      )
+                    : _ReplyPage(
+                        scrollController: _scrollController,
                       ),
-                      if (state.status ==
-                          HSSingleSpotCommentsStatus.loadingMoreComments)
-                        const CircularProgressIndicator.adaptive(),
-                    ],
-                  );
-                },
-              ),
-            ),
-            _CommentInput(),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -81,18 +57,16 @@ class SingleSpotCommentsSection extends StatelessWidget {
 
 class _Comment extends StatelessWidget {
   final HSComment comment;
-  final bool isLiked;
-  final int index;
   final VoidCallback onLike;
-  final VoidCallback onReply;
+  final VoidCallback? onReply;
+  final int index;
 
   const _Comment({
     Key? key,
     required this.comment,
-    required this.isLiked,
-    required this.index,
     required this.onLike,
-    required this.onReply,
+    this.onReply,
+    required this.index,
   }) : super(key: key);
 
   @override
@@ -134,13 +108,17 @@ class _Comment extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildIconWithCount(
-              isLiked ? FontAwesomeIcons.solidHeart : FontAwesomeIcons.heart,
+              comment.isLiked
+                  ? FontAwesomeIcons.solidHeart
+                  : FontAwesomeIcons.heart,
               comment.likesCount,
               onLike,
-              isLiked),
+              comment.isLiked),
           const SizedBox(width: 2),
-          _buildIconWithCount(FontAwesomeIcons.reply, comment.repliesCount,
-              onReply, /* isLiked */ false),
+          onReply != null
+              ? _buildIconWithCount(FontAwesomeIcons.reply,
+                  comment.repliesCount, onReply!, /* isLiked */ false)
+              : const SizedBox.shrink(),
         ],
       ),
     )
@@ -191,7 +169,9 @@ Widget _buildIconWithCount(
 }
 
 class _CommentInput extends StatelessWidget {
+  _CommentInput({required this.hintText, super.key});
   final TextEditingController _controller = TextEditingController();
+  final String hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +195,7 @@ class _CommentInput extends StatelessWidget {
                     onChanged: singleSpotCommentsCubit.commentChanged,
                     textInputAction: TextInputAction.done,
                     maxLines: 2,
-                    hintText: "Write a comment...",
+                    hintText: hintText,
                     maxLength: 250,
                     readOnly:
                         state.status == HSSingleSpotCommentsStatus.commenting,
@@ -233,5 +213,163 @@ class _CommentInput extends StatelessWidget {
                             : () => singleSpotCommentsCubit.addComment()),
               ],
             )));
+  }
+}
+
+class _CommentsPage extends StatelessWidget {
+  _CommentsPage({required this.scrollController, super.key});
+  final ScrollController scrollController;
+  @override
+  Widget build(BuildContext context) {
+    HSSingleSpotCommentsCubit singleSpotCommentsCubit =
+        BlocProvider.of<HSSingleSpotCommentsCubit>(context);
+    HSSingleSpotCommentsCubitState state = singleSpotCommentsCubit.state;
+
+    return Column(
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              if (state.fetchedComments.isEmpty)
+                const Expanded(
+                  child: Center(
+                    child: Text('No comments yet'),
+                  ),
+                ),
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: state.fetchedComments.length,
+                  itemBuilder: (context, index) {
+                    return _Comment(
+                      comment: state.fetchedComments[index],
+                      index: index,
+                      onLike: () =>
+                          singleSpotCommentsCubit.likeOrDislikeComment(
+                              comment: state.fetchedComments[index],
+                              index: index,
+                              isReply: false),
+                      onReply: () => singleSpotCommentsCubit.goToReplyToComment(
+                          state.fetchedComments[index], index),
+                    );
+                  },
+                ),
+              ),
+              if (state.status ==
+                  HSSingleSpotCommentsStatus.loadingMoreComments)
+                const CircularProgressIndicator.adaptive(),
+            ],
+          ),
+        ),
+        _CommentInput(
+          hintText: "Write a comment...",
+        ),
+      ],
+    );
+  }
+}
+
+class _ReplyPage extends StatelessWidget {
+  _ReplyPage({required this.scrollController, Key? key}) : super(key: key);
+  final ScrollController scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    HSSingleSpotCommentsCubit singleSpotCommentsCubit =
+        BlocProvider.of<HSSingleSpotCommentsCubit>(context);
+    HSSingleSpotCommentsCubitState state = singleSpotCommentsCubit.state;
+
+    final HSComment originalComment =
+        singleSpotCommentsCubit.state.fetchedComments[
+            singleSpotCommentsCubit.state.indexOfCommentUnderReply];
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => singleSpotCommentsCubit.leaveReplyingToComment(),
+            ),
+            const Expanded(
+              child: Text(
+                'Replies',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(width: 48), // To balance the layout
+          ],
+        ),
+        _Comment(
+          comment: originalComment,
+          index: state.indexOfCommentUnderReply,
+          onLike: () => singleSpotCommentsCubit.likeOrDislikeComment(
+              comment: originalComment,
+              index: state.indexOfCommentUnderReply,
+              isReply: false),
+          onReply: null,
+        ),
+        if (state.status == HSSingleSpotCommentsStatus.loadingReplies)
+          const Expanded(child: Center(child: CircularProgressIndicator())),
+        if ((state.status == HSSingleSpotCommentsStatus.loaded ||
+                state.status == HSSingleSpotCommentsStatus.commenting) &&
+            state.fetchedReplies.isEmpty)
+          const Expanded(
+            child: Center(
+              child: Text('No replies yet'),
+            ),
+          ),
+        if (state.fetchedReplies.isNotEmpty)
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: state.fetchedReplies.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                            left: 24.0), // Add left padding for indent
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Add a vertical line to indicate reply
+                            Container(
+                              width: 2,
+                              height: 80,
+                              color: Colors.grey[300],
+                              margin: EdgeInsets.only(right: 12),
+                            ),
+                            Expanded(
+                              child: _Comment(
+                                comment: state.fetchedReplies[index],
+                                index: index,
+                                onLike: () => singleSpotCommentsCubit
+                                    .likeOrDislikeComment(
+                                        comment: state.fetchedReplies[index],
+                                        index: index,
+                                        isReply: true),
+                                onReply: null,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                if (state.status ==
+                    HSSingleSpotCommentsStatus.loadingMoreComments)
+                  const CircularProgressIndicator.adaptive(),
+              ],
+            ),
+          ),
+        _CommentInput(
+          hintText: "Write a reply...",
+        ),
+      ],
+    );
   }
 }
