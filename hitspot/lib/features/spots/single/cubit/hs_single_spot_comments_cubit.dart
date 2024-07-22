@@ -29,14 +29,12 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
   }
 
   Future<void> fetchComments() async {
-    bool isReply = state.pageStatus == HSSingleSpotCommentsPageType.replies;
+    bool isReply = state.pageStatus == HSSingleSpotCommentsPageStatus.replies;
 
     if (state.status == HSSingleSpotCommentsStatus.loaded) {
       emit(state.copyWith(
           status: HSSingleSpotCommentsStatus.loadingMoreComments));
     }
-
-    await Future<void>.delayed(const Duration(seconds: 1));
 
     List<HSComment> comments = await _databaseRepository.spotFetchComments(
       spotID: isReply
@@ -64,6 +62,8 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
       }
     }
 
+    await Future<void>.delayed(const Duration(seconds: 1));
+
     if (isReply) {
       emit(state.copyWith(
           fetchedReplies: [...state.fetchedReplies, ...comments],
@@ -77,9 +77,10 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
 
   Future<void> addComment() async {
     try {
-      emit(state.copyWith(status: HSSingleSpotCommentsStatus.commenting));
+      emit(state.copyWith(
+          commentingStatus: HsSingleSpotCommentsCommentingStatus.commenting));
 
-      bool isReply = state.pageStatus == HSSingleSpotCommentsPageType.replies;
+      bool isReply = state.pageStatus == HSSingleSpotCommentsPageStatus.replies;
 
       // Here we check for bad language, but for now I think we can leave it commented
       // final filter = ProfanityFilter();
@@ -115,30 +116,35 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
                   .repliesCount +
               1,
         );
+
         emit(state.copyWith(
-            fetchedReplies: [newComment, ...state.fetchedReplies],
-            fetchedComments: updatedNormalComments,
-            status: HSSingleSpotCommentsStatus.loaded));
+          fetchedReplies: [newComment, ...state.fetchedReplies],
+          fetchedComments: updatedNormalComments,
+          commentingStatus:
+              HsSingleSpotCommentsCommentingStatus.finishedCommenting,
+        ));
       } else {
         newComment = await _databaseRepository.spotAddComment(
             spotID: spotID,
             userID: app.currentUser.uid ?? "",
             comment: state.comment,
             isReply: isReply);
+
         emit(state.copyWith(
             fetchedComments: [newComment, ...state.fetchedComments],
-            status: HSSingleSpotCommentsStatus.loaded));
+            commentingStatus:
+                HsSingleSpotCommentsCommentingStatus.finishedCommenting));
       }
 
       newComment.author = currentUser;
 
-      emit(state.copyWith(comment: ""));
-
-      // Emit state to clear the comment field
       emit(state.copyWith(
-          status: HSSingleSpotCommentsStatus.finishedCommenting));
+          comment: "",
+          commentingStatus:
+              HsSingleSpotCommentsCommentingStatus.finishedCommenting));
 
-      emit(state.copyWith(status: HSSingleSpotCommentsStatus.loaded));
+      emit(state.copyWith(
+          commentingStatus: HsSingleSpotCommentsCommentingStatus.idle));
 
       HSSpot spot = await _databaseRepository.spotRead(spotID: spotID);
       _databaseRepository.recommendationSystemCaptureEvent(
@@ -177,7 +183,7 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
   Future<void> goToReplyToComment(HSComment comment, int index) async {
     emit(state.copyWith(
         indexOfCommentUnderReply: index,
-        pageStatus: HSSingleSpotCommentsPageType.replies,
+        pageStatus: HSSingleSpotCommentsPageStatus.replies,
         status: HSSingleSpotCommentsStatus.loadingReplies));
 
     // Fetch replies
@@ -186,7 +192,7 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
 
   Future<void> leaveReplyingToComment() async {
     emit(state.copyWith(
-        pageStatus: HSSingleSpotCommentsPageType.comments,
+        pageStatus: HSSingleSpotCommentsPageStatus.comments,
         indexOfCommentUnderReply: -1,
         fetchedReplies: [],
         status: HSSingleSpotCommentsStatus.loaded));
@@ -220,8 +226,12 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
     }
 
     if (isReply) {
+      pagesOfRepliesLoaded -= 1;
+
       emit(state.copyWith(fetchedReplies: updatedComments));
     } else {
+      pagesOfCommentsLoaded -= 1;
+
       emit(state.copyWith(fetchedComments: updatedComments));
     }
   }

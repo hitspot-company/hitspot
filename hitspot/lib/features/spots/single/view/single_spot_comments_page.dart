@@ -13,6 +13,8 @@ import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class SingleSpotCommentsSection extends StatelessWidget {
+  const SingleSpotCommentsSection({super.key});
+
   @override
   Widget build(BuildContext context) {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
@@ -37,14 +39,12 @@ class SingleSpotCommentsSection extends StatelessWidget {
           HSSingleSpotCommentsCubitState>(
         buildWhen: (previous, current) =>
             previous.pageStatus != current.pageStatus ||
-            previous.status != current.status ||
-            previous.fetchedComments != current.fetchedComments ||
-            previous.fetchedReplies != current.fetchedReplies,
+            previous.status != current.status,
         builder: (context, state) {
           return SafeArea(
             child: state.status == HSSingleSpotCommentsStatus.loading
                 ? const Center(child: CircularProgressIndicator())
-                : state.pageStatus == HSSingleSpotCommentsPageType.comments
+                : state.pageStatus == HSSingleSpotCommentsPageStatus.comments
                     ? _CommentsPage(
                         scrollController: _scrollController,
                       )
@@ -61,7 +61,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
 class _Comment extends StatelessWidget {
   final HSComment comment;
   final VoidCallback onLike;
-  final VoidCallback onDelete;
+  final VoidCallback? onDelete;
   final VoidCallback? onReply;
   final int index;
 
@@ -69,21 +69,24 @@ class _Comment extends StatelessWidget {
     Key? key,
     required this.comment,
     required this.onLike,
-    required this.onDelete,
+    this.onDelete,
     this.onReply,
     required this.index,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    bool isReply = onReply == null && onDelete != null;
+
     return Slidable(
       key: ValueKey(comment.id),
+      enabled: onDelete != null,
       endActionPane: ActionPane(
         extentRatio: 0.25,
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: (context) => onDelete(),
+            onPressed: (context) => onDelete!(),
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
             icon: FontAwesomeIcons.trash,
@@ -93,56 +96,83 @@ class _Comment extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        leading: GestureDetector(
-          onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
-          child: HSUserAvatar(
-            radius: 20,
-            imageUrl: comment.author?.avatarUrl,
-          ),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(comment.content),
-            const SizedBox(height: 4),
-            Row(
+      child: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: isReply ? 38 : 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
-                  child: Text(
-                    comment.author?.name ?? "",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 12),
+                Flexible(
+                  child: ListTile(
+                    leading: GestureDetector(
+                      onTap: () =>
+                          navi.toUser(userID: comment.author?.uid ?? ""),
+                      child: HSUserAvatar(
+                        radius: 20,
+                        imageUrl: comment.author?.avatarUrl,
+                      ),
+                    ),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(comment.content),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => navi.toUser(
+                                  userID: comment.author?.uid ?? ""),
+                              child: Text(
+                                comment.author?.name ?? "",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 12),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _formatDate(comment.createdAt),
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    contentPadding:
+                        const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildIconWithCount(
+                            comment.isLiked
+                                ? FontAwesomeIcons.solidHeart
+                                : FontAwesomeIcons.heart,
+                            comment.likesCount,
+                            onLike,
+                            comment.isLiked),
+                        const SizedBox(width: 2),
+                        if (onReply != null)
+                          _buildIconWithCount(FontAwesomeIcons.reply,
+                              comment.repliesCount, onReply!, false),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  _formatDate(comment.createdAt),
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ],
             ),
-          ],
-        ),
-        contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildIconWithCount(
-                comment.isLiked
-                    ? FontAwesomeIcons.solidHeart
-                    : FontAwesomeIcons.heart,
-                comment.likesCount,
-                onLike,
-                comment.isLiked),
-            const SizedBox(width: 2),
-            onReply != null
-                ? _buildIconWithCount(FontAwesomeIcons.reply,
-                    comment.repliesCount, onReply!, /* isLiked */ false)
-                : const SizedBox.shrink(),
-          ],
-        ),
+          ),
+          if (isReply)
+            Positioned(
+              left: 34,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 2,
+                color: Colors.grey[300],
+              ),
+            ),
+        ],
       )
           .animate()
           .fadeIn(duration: 300.ms, delay: (50 * index).ms)
@@ -153,8 +183,8 @@ class _Comment extends StatelessWidget {
               delay: (50 * index).ms,
               curve: Curves.easeOut)
           .scale(
-              begin: Offset(0.8, 0.8),
-              end: Offset(1, 1),
+              begin: const Offset(0.8, 0.8),
+              end: const Offset(1, 1),
               duration: 300.ms,
               delay: (50 * index).ms),
     );
@@ -194,7 +224,8 @@ Widget _buildIconWithCount(
 }
 
 class _CommentInput extends StatefulWidget {
-  _CommentInput({required this.hintText, super.key});
+  const _CommentInput({required this.hintText, super.key});
+
   final String hintText;
 
   @override
@@ -224,10 +255,13 @@ class _CommentInputState extends State<_CommentInput> {
     return BlocConsumer<HSSingleSpotCommentsCubit,
             HSSingleSpotCommentsCubitState>(
         listener: (context, state) {
-          if (state.status == HSSingleSpotCommentsStatus.finishedCommenting) {
+          if (state.commentingStatus ==
+              HsSingleSpotCommentsCommentingStatus.finishedCommenting) {
             _controller.clear();
           }
         },
+        buildWhen: (previous, current) =>
+            previous.commentingStatus != current.commentingStatus,
         builder: (context, state) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: Row(
@@ -240,194 +274,192 @@ class _CommentInputState extends State<_CommentInput> {
                     maxLines: 2,
                     hintText: widget.hintText,
                     maxLength: 250,
-                    readOnly:
-                        state.status == HSSingleSpotCommentsStatus.commenting,
+                    readOnly: state.commentingStatus ==
+                        HsSingleSpotCommentsCommentingStatus.commenting,
                   ),
                 ),
                 IconButton(
-                    icon: state.status == HSSingleSpotCommentsStatus.commenting
+                    icon: state.commentingStatus ==
+                            HsSingleSpotCommentsCommentingStatus.commenting
                         ? const HSLoadingIndicator(
                             size: 16.0,
                           )
                         : const Icon(Icons.send),
-                    onPressed:
-                        state.status == HSSingleSpotCommentsStatus.commenting
-                            ? null
-                            : () => singleSpotCommentsCubit.addComment()),
+                    onPressed: state.commentingStatus ==
+                            HsSingleSpotCommentsCommentingStatus.commenting
+                        ? null
+                        : () => singleSpotCommentsCubit.addComment()),
               ],
             )));
   }
 }
 
 class _CommentsPage extends StatelessWidget {
-  _CommentsPage({required this.scrollController, super.key});
+  const _CommentsPage({required this.scrollController});
+
   final ScrollController scrollController;
+
   @override
   Widget build(BuildContext context) {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
-    HSSingleSpotCommentsCubitState state = singleSpotCommentsCubit.state;
 
-    return Column(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              if (state.fetchedComments.isEmpty)
-                const Expanded(
-                  child: Center(
-                    child: Text('No comments yet'),
-                  ),
-                ),
-              if (state.fetchedComments.isNotEmpty)
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: state.fetchedComments.length,
-                    itemBuilder: (context, index) {
-                      return _Comment(
-                        comment: state.fetchedComments[index],
-                        index: index,
-                        onLike: () =>
-                            singleSpotCommentsCubit.likeOrDislikeComment(
-                                comment: state.fetchedComments[index],
-                                index: index,
-                                isReply: false),
-                        onReply: () =>
-                            singleSpotCommentsCubit.goToReplyToComment(
-                                state.fetchedComments[index], index),
-                        onDelete: () => singleSpotCommentsCubit.removeComment(
+    return BlocBuilder<HSSingleSpotCommentsCubit,
+        HSSingleSpotCommentsCubitState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.fetchedComments != current.fetchedComments,
+      builder: (context, state) {
+        return Column(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  if (state.fetchedComments.isEmpty)
+                    const Expanded(
+                      child: Center(
+                        child: Text('There are no comments yet'),
+                      ),
+                    ),
+                  if (state.fetchedComments.isNotEmpty)
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: state.fetchedComments.length,
+                        itemBuilder: (context, index) {
+                          return _Comment(
                             comment: state.fetchedComments[index],
                             index: index,
-                            isReply: false),
-                      );
-                    },
-                  ),
-                ),
-              if (state.status ==
-                  HSSingleSpotCommentsStatus.loadingMoreComments)
-                const CircularProgressIndicator.adaptive(),
-            ],
-          ),
-        ),
-        _CommentInput(
-          hintText: "Write a comment...",
-        ),
-      ],
+                            onLike: () =>
+                                singleSpotCommentsCubit.likeOrDislikeComment(
+                                    comment: state.fetchedComments[index],
+                                    index: index,
+                                    isReply: false),
+                            onReply: () =>
+                                singleSpotCommentsCubit.goToReplyToComment(
+                                    state.fetchedComments[index], index),
+                            onDelete: () =>
+                                singleSpotCommentsCubit.removeComment(
+                                    comment: state.fetchedComments[index],
+                                    index: index,
+                                    isReply: false),
+                          );
+                        },
+                      ),
+                    ),
+                  if (state.status ==
+                      HSSingleSpotCommentsStatus.loadingMoreComments)
+                    const CircularProgressIndicator.adaptive(),
+                ],
+              ),
+            ),
+            _CommentInput(
+              hintText: "Write a comment...",
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
 class _ReplyPage extends StatelessWidget {
-  _ReplyPage({required this.scrollController, Key? key}) : super(key: key);
+  const _ReplyPage({required this.scrollController});
   final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
-    HSSingleSpotCommentsCubitState state = singleSpotCommentsCubit.state;
 
-    final HSComment originalComment =
-        singleSpotCommentsCubit.state.fetchedComments[
-            singleSpotCommentsCubit.state.indexOfCommentUnderReply];
+    return BlocBuilder<HSSingleSpotCommentsCubit,
+        HSSingleSpotCommentsCubitState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.fetchedReplies != current.fetchedReplies ||
+          previous.fetchedComments != current.fetchedComments,
+      builder: (context, state) {
+        final HSComment originalComment =
+            singleSpotCommentsCubit.state.fetchedComments[
+                singleSpotCommentsCubit.state.indexOfCommentUnderReply];
 
-    return Column(
-      children: [
-        Row(
+        return Column(
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => singleSpotCommentsCubit.leaveReplyingToComment(),
-            ),
-            const Expanded(
-              child: Text(
-                'Replies',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(width: 48), // To balance the layout
-          ],
-        ),
-        _Comment(
-          comment: originalComment,
-          index: state.indexOfCommentUnderReply,
-          onLike: () => singleSpotCommentsCubit.likeOrDislikeComment(
-              comment: originalComment,
-              index: state.indexOfCommentUnderReply,
-              isReply: false),
-          onDelete: () => singleSpotCommentsCubit.removeComment(
-              comment: state.fetchedComments[state.indexOfCommentUnderReply],
-              index: state.indexOfCommentUnderReply,
-              isReply: false),
-          onReply: null,
-        ),
-        if (state.status == HSSingleSpotCommentsStatus.loadingReplies)
-          const Expanded(child: Center(child: CircularProgressIndicator())),
-        if ((state.status == HSSingleSpotCommentsStatus.loaded ||
-                state.status == HSSingleSpotCommentsStatus.commenting) &&
-            state.fetchedReplies.isEmpty)
-          const Expanded(
-            child: Center(
-              child: Text('No replies yet'),
-            ),
-          ),
-        if (state.fetchedReplies.isNotEmpty)
-          Expanded(
-            child: Column(
+            Row(
               children: [
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: state.fetchedReplies.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                            left: 24.0), // Add left padding for indent
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Add a vertical line to indicate reply
-                            Container(
-                              width: 2,
-                              height: 80,
-                              color: Colors.grey[300],
-                              margin: EdgeInsets.only(right: 12),
-                            ),
-                            Expanded(
-                              child: _Comment(
-                                comment: state.fetchedReplies[index],
-                                index: index,
-                                onLike: () => singleSpotCommentsCubit
-                                    .likeOrDislikeComment(
-                                        comment: state.fetchedReplies[index],
-                                        index: index,
-                                        isReply: true),
-                                onReply: null,
-                                onDelete: () =>
-                                    singleSpotCommentsCubit.removeComment(
-                                        comment: state.fetchedReplies[index],
-                                        index: index,
-                                        isReply: true),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () =>
+                      singleSpotCommentsCubit.leaveReplyingToComment(),
+                ),
+                const Expanded(
+                  child: Text(
+                    'Replies',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                if (state.status ==
-                    HSSingleSpotCommentsStatus.loadingMoreComments)
-                  const CircularProgressIndicator.adaptive(),
+                const SizedBox(width: 48), // To balance the layout
               ],
             ),
-          ),
-        _CommentInput(
-          hintText: "Write a reply...",
-        ),
-      ],
+            _Comment(
+              comment: originalComment,
+              index: state.indexOfCommentUnderReply,
+              onLike: () => singleSpotCommentsCubit.likeOrDislikeComment(
+                  comment: originalComment,
+                  index: state.indexOfCommentUnderReply,
+                  isReply: false),
+              onDelete: null,
+              onReply: null,
+            ),
+            if (state.status == HSSingleSpotCommentsStatus.loadingReplies)
+              const Expanded(child: Center(child: CircularProgressIndicator())),
+            if ((state.status == HSSingleSpotCommentsStatus.loaded) &&
+                state.fetchedReplies.isEmpty)
+              const Expanded(
+                child: Center(
+                  child: Text('There are no replies yet'),
+                ),
+              ),
+            if (state.fetchedReplies.isNotEmpty)
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: state.fetchedReplies.length,
+                        itemBuilder: (context, index) {
+                          return _Comment(
+                            comment: state.fetchedReplies[index],
+                            index: index,
+                            onLike: () =>
+                                singleSpotCommentsCubit.likeOrDislikeComment(
+                                    comment: state.fetchedReplies[index],
+                                    index: index,
+                                    isReply: true),
+                            onReply: null,
+                            onDelete: () =>
+                                singleSpotCommentsCubit.removeComment(
+                                    comment: state.fetchedReplies[index],
+                                    index: index,
+                                    isReply: true),
+                          );
+                        },
+                      ),
+                    ),
+                    if (state.status ==
+                        HSSingleSpotCommentsStatus.loadingMoreComments)
+                      const CircularProgressIndicator.adaptive(),
+                  ],
+                ),
+              ),
+            const _CommentInput(
+              hintText: "Write a reply...",
+            ),
+          ],
+        );
+      },
     );
   }
 }

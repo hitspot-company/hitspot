@@ -414,10 +414,6 @@ class HSSpotsRepository {
             })
             .select()
             .single();
-
-        await _supabase.rpc('spot_increment_comment_replies_count', params: {
-          'p_comment_id': parentCommentID,
-        });
       } else {
         newComment = await _supabase
             .from('spot_comments')
@@ -439,7 +435,7 @@ class HSSpotsRepository {
   Future<List<HSComment>> fetchComments(
       String id, String userID, int currentPageOffset, bool isReply) async {
     try {
-      // ID is either spotID or commentID
+      // ID is either spotID (for normal comments) or commentID (for replies)
 
       assert(id.isNotEmpty && userID.isNotEmpty,
           "SpotID and userID must be provided");
@@ -498,10 +494,6 @@ class HSSpotsRepository {
           .delete()
           .eq("id", commentID)
           .eq("created_by", userID);
-      await _supabase
-          .rpc('spot_decrement_parents_comment_replies_count', params: {
-        'p_reply_id': commentID,
-      });
     } catch (_) {
       throw Exception("Error deleting comment: $_");
     }
