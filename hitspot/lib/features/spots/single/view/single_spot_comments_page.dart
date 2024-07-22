@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class SingleSpotCommentsSection extends StatelessWidget {
   @override
@@ -73,73 +76,88 @@ class _Comment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: GestureDetector(
-        onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
-        child: HSUserAvatar(
-          radius: 20,
-          imageUrl: comment.author?.avatarUrl,
-        ),
-      ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Slidable(
+      key: ValueKey(comment.id),
+      endActionPane: ActionPane(
+        extentRatio: 0.25,
+        motion: const ScrollMotion(),
         children: [
-          Text(comment.content),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
-                child: Text(
-                  comment.author?.name ?? "",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                _formatDate(comment.createdAt),
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
+          SlidableAction(
+            onPressed: (context) => onDelete(),
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: FontAwesomeIcons.trash,
+            label: 'Delete',
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            borderRadius: BorderRadius.circular(4),
           ),
         ],
       ),
-      contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildIconWithCount(
-              FontAwesomeIcons.trash, null, onDelete, /* isLiked */ false),
-          const SizedBox(width: 2),
-          _buildIconWithCount(
-              comment.isLiked
-                  ? FontAwesomeIcons.solidHeart
-                  : FontAwesomeIcons.heart,
-              comment.likesCount,
-              onLike,
-              comment.isLiked),
-          const SizedBox(width: 2),
-          onReply != null
-              ? _buildIconWithCount(FontAwesomeIcons.reply,
-                  comment.repliesCount, onReply!, /* isLiked */ false)
-              : const SizedBox.shrink(),
-        ],
-      ),
-    )
-        .animate()
-        .fadeIn(duration: 300.ms, delay: (50 * index).ms)
-        .slideY(
-            begin: 0.2,
-            end: 0,
-            duration: 300.ms,
-            delay: (50 * index).ms,
-            curve: Curves.easeOut)
-        .scale(
-            begin: Offset(0.8, 0.8),
-            end: Offset(1, 1),
-            duration: 300.ms,
-            delay: (50 * index).ms);
+      child: ListTile(
+        leading: GestureDetector(
+          onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
+          child: HSUserAvatar(
+            radius: 20,
+            imageUrl: comment.author?.avatarUrl,
+          ),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(comment.content),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () => navi.toUser(userID: comment.author?.uid ?? ""),
+                  child: Text(
+                    comment.author?.name ?? "",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _formatDate(comment.createdAt),
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+        ),
+        contentPadding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildIconWithCount(
+                comment.isLiked
+                    ? FontAwesomeIcons.solidHeart
+                    : FontAwesomeIcons.heart,
+                comment.likesCount,
+                onLike,
+                comment.isLiked),
+            const SizedBox(width: 2),
+            onReply != null
+                ? _buildIconWithCount(FontAwesomeIcons.reply,
+                    comment.repliesCount, onReply!, /* isLiked */ false)
+                : const SizedBox.shrink(),
+          ],
+        ),
+      )
+          .animate()
+          .fadeIn(duration: 300.ms, delay: (50 * index).ms)
+          .slideY(
+              begin: 0.2,
+              end: 0,
+              duration: 300.ms,
+              delay: (50 * index).ms,
+              curve: Curves.easeOut)
+          .scale(
+              begin: Offset(0.8, 0.8),
+              end: Offset(1, 1),
+              duration: 300.ms,
+              delay: (50 * index).ms),
+    );
   }
 
   String _formatDate(DateTime? date) {
@@ -175,10 +193,28 @@ Widget _buildIconWithCount(
   );
 }
 
-class _CommentInput extends StatelessWidget {
+class _CommentInput extends StatefulWidget {
   _CommentInput({required this.hintText, super.key});
-  final TextEditingController _controller = TextEditingController();
   final String hintText;
+
+  @override
+  State<_CommentInput> createState() => _CommentInputState();
+}
+
+class _CommentInputState extends State<_CommentInput> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +225,7 @@ class _CommentInput extends StatelessWidget {
             HSSingleSpotCommentsCubitState>(
         listener: (context, state) {
           if (state.status == HSSingleSpotCommentsStatus.finishedCommenting) {
+            // TODO: Fix - it clears after clicking button
             _controller.clear();
           }
         },
@@ -202,7 +239,7 @@ class _CommentInput extends StatelessWidget {
                     onChanged: singleSpotCommentsCubit.commentChanged,
                     textInputAction: TextInputAction.done,
                     maxLines: 2,
-                    hintText: hintText,
+                    hintText: widget.hintText,
                     maxLength: 250,
                     readOnly:
                         state.status == HSSingleSpotCommentsStatus.commenting,
