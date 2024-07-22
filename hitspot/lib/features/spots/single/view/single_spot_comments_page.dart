@@ -58,6 +58,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
 class _Comment extends StatelessWidget {
   final HSComment comment;
   final VoidCallback onLike;
+  final VoidCallback onDelete;
   final VoidCallback? onReply;
   final int index;
 
@@ -65,6 +66,7 @@ class _Comment extends StatelessWidget {
     Key? key,
     required this.comment,
     required this.onLike,
+    required this.onDelete,
     this.onReply,
     required this.index,
   }) : super(key: key);
@@ -108,6 +110,9 @@ class _Comment extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildIconWithCount(
+              FontAwesomeIcons.trash, null, onDelete, /* isLiked */ false),
+          const SizedBox(width: 2),
+          _buildIconWithCount(
               comment.isLiked
                   ? FontAwesomeIcons.solidHeart
                   : FontAwesomeIcons.heart,
@@ -144,7 +149,7 @@ class _Comment extends StatelessWidget {
 }
 
 Widget _buildIconWithCount(
-    IconData icon, int count, VoidCallback onPressed, bool isLiked) {
+    IconData icon, int? count, VoidCallback onPressed, bool isLiked) {
   return SizedBox(
     width: 40,
     child: Stack(
@@ -156,13 +161,15 @@ Widget _buildIconWithCount(
           padding: EdgeInsets.zero,
           constraints: BoxConstraints(minWidth: 40, minHeight: 40),
         ),
-        Positioned(
-          bottom: -3,
-          child: Text(
-            '$count',
-            style: TextStyle(fontSize: 10),
-          ),
-        ),
+        count != null
+            ? Positioned(
+                bottom: -3,
+                child: Text(
+                  '$count',
+                  style: TextStyle(fontSize: 10),
+                ),
+              )
+            : const SizedBox.shrink(),
       ],
     ),
   );
@@ -236,25 +243,31 @@ class _CommentsPage extends StatelessWidget {
                     child: Text('No comments yet'),
                   ),
                 ),
-              Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: state.fetchedComments.length,
-                  itemBuilder: (context, index) {
-                    return _Comment(
-                      comment: state.fetchedComments[index],
-                      index: index,
-                      onLike: () =>
-                          singleSpotCommentsCubit.likeOrDislikeComment(
-                              comment: state.fetchedComments[index],
-                              index: index,
-                              isReply: false),
-                      onReply: () => singleSpotCommentsCubit.goToReplyToComment(
-                          state.fetchedComments[index], index),
-                    );
-                  },
+              if (state.fetchedComments.isNotEmpty)
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: state.fetchedComments.length,
+                    itemBuilder: (context, index) {
+                      return _Comment(
+                        comment: state.fetchedComments[index],
+                        index: index,
+                        onLike: () =>
+                            singleSpotCommentsCubit.likeOrDislikeComment(
+                                comment: state.fetchedComments[index],
+                                index: index,
+                                isReply: false),
+                        onReply: () =>
+                            singleSpotCommentsCubit.goToReplyToComment(
+                                state.fetchedComments[index], index),
+                        onDelete: () => singleSpotCommentsCubit.removeComment(
+                            comment: state.fetchedComments[index],
+                            index: index,
+                            isReply: false),
+                      );
+                    },
+                  ),
                 ),
-              ),
               if (state.status ==
                   HSSingleSpotCommentsStatus.loadingMoreComments)
                 const CircularProgressIndicator.adaptive(),
@@ -308,6 +321,10 @@ class _ReplyPage extends StatelessWidget {
               comment: originalComment,
               index: state.indexOfCommentUnderReply,
               isReply: false),
+          onDelete: () => singleSpotCommentsCubit.removeComment(
+              comment: state.fetchedComments[state.indexOfCommentUnderReply],
+              index: state.indexOfCommentUnderReply,
+              isReply: false),
           onReply: null,
         ),
         if (state.status == HSSingleSpotCommentsStatus.loadingReplies)
@@ -352,6 +369,11 @@ class _ReplyPage extends StatelessWidget {
                                         index: index,
                                         isReply: true),
                                 onReply: null,
+                                onDelete: () =>
+                                    singleSpotCommentsCubit.removeComment(
+                                        comment: state.fetchedReplies[index],
+                                        index: index,
+                                        isReply: true),
                               ),
                             ),
                           ],

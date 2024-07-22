@@ -292,6 +292,10 @@ class HSDatabaseRepsitory {
           {required String commentID, required String userID}) async =>
       await _spotsRepository.likeOrDislikeComment(commentID, userID);
 
+  Future<void> spotRemoveComment(
+          {required String commentID, required String userID}) async =>
+      await _spotsRepository.removeComment(commentID, userID);
+
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);
   Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>

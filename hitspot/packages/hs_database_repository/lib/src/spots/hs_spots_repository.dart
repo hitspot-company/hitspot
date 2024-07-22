@@ -490,4 +490,20 @@ class HSSpotsRepository {
       throw Exception("Error liking comment: $_");
     }
   }
+
+  Future<void> removeComment(String commentID, String userID) async {
+    try {
+      await _supabase
+          .from("spot_comments")
+          .delete()
+          .eq("id", commentID)
+          .eq("created_by", userID);
+      await _supabase
+          .rpc('spot_decrement_parents_comment_replies_count', params: {
+        'p_reply_id': commentID,
+      });
+    } catch (_) {
+      throw Exception("Error deleting comment: $_");
+    }
+  }
 }

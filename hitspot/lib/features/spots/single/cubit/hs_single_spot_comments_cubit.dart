@@ -96,8 +96,19 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
             isReply: isReply,
             parentCommentID:
                 state.fetchedComments[state.indexOfCommentUnderReply].id);
+
+        // Increate share counter of parent comment
+        var updatedNormalComments = List<HSComment>.from(state.fetchedComments);
+
+        updatedNormalComments[state.indexOfCommentUnderReply] =
+            updatedNormalComments[state.indexOfCommentUnderReply].copyWith(
+          repliesCount: updatedNormalComments[state.indexOfCommentUnderReply]
+                  .repliesCount +
+              1,
+        );
         emit(state.copyWith(
             fetchedReplies: [newComment, ...state.fetchedReplies],
+            fetchedComments: updatedNormalComments,
             status: HSSingleSpotCommentsStatus.loaded));
       } else {
         newComment = await _databaseRepository.spotAddComment(
@@ -166,5 +177,37 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
         status: HSSingleSpotCommentsStatus.loaded));
 
     pagesOfRepliesLoaded = 0;
+  }
+
+  Future<void> removeComment(
+      {required HSComment comment,
+      required int index,
+      required bool isReply}) async {
+    await _databaseRepository.spotRemoveComment(
+        commentID: comment.id, userID: app.currentUser.uid ?? "");
+
+    var updatedComments = List<HSComment>.from(
+        isReply ? state.fetchedReplies : state.fetchedComments);
+    updatedComments.removeAt(index);
+
+    // Decrease replies count of parent comment
+    if (isReply) {
+      List<HSComment> updatedNormalComments =
+          List<HSComment>.from(state.fetchedComments);
+
+      updatedNormalComments[state.indexOfCommentUnderReply] =
+          updatedNormalComments[state.indexOfCommentUnderReply].copyWith(
+        repliesCount:
+            updatedNormalComments[state.indexOfCommentUnderReply].repliesCount -
+                1,
+      );
+      emit(state.copyWith(fetchedComments: updatedNormalComments));
+    }
+
+    if (isReply) {
+      emit(state.copyWith(fetchedReplies: updatedComments));
+    } else {
+      emit(state.copyWith(fetchedComments: updatedComments));
+    }
   }
 }
