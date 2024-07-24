@@ -91,6 +91,8 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
       // }
 
       if (state.comment == "") {
+        emit(state.copyWith(
+            commentingStatus: HsSingleSpotCommentsCommentingStatus.idle));
         return;
       }
 
