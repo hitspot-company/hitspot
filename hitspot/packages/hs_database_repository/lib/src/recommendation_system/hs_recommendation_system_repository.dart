@@ -1,3 +1,4 @@
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,15 +12,20 @@ class HSRecommendationSystemRepository {
   final SupabaseClient _supabase;
 
   Future<void> captureEvent(
-      String userId, String spotId, HSInteractionType event) async {
+      String userId, HSSpot spot, HSInteractionType event) async {
     try {
       if (!isGatheringInformationOn) {
         return;
       }
 
-      if (userId == "" || spotId == "") {
+      if (userId == "" || spot.sid == "") {
         HSDebugLogger.logError(
             "Capturing event failed - invalid userId or spotId");
+        return;
+      }
+
+      // Don't capture events for the author of the spot
+      if (spot.createdBy == userId) {
         return;
       }
 
@@ -27,7 +33,7 @@ class HSRecommendationSystemRepository {
 
       await _supabase.from('interactions').insert({
         'user_id': userId,
-        'spot_id': spotId,
+        'spot_id': spot.sid,
         'interaction_type': eventAsString,
       });
       HSDebugLogger.logInfo("Event captured - ${eventAsString}!");

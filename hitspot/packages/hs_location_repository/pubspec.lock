@@ -356,7 +356,7 @@ packages:
     source: hosted
     version: "2.1.0"
   hs_authentication_repository:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../hs_authentication_repository"
       relative: true
@@ -370,7 +370,7 @@ packages:
     source: path
     version: "1.0.0+1"
   hs_debug_logger:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../hs_debug_logger"
       relative: true

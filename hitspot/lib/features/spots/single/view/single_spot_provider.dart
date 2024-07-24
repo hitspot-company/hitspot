@@ -11,7 +11,7 @@ class SingleSpotProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HSSingleSpotCubit(spotID),
+      create: (context) => HSSingleSpotCubit(spotID: spotID),
       child: const SingleSpotPage(),
     );
   }

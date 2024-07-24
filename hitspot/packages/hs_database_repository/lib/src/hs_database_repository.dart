@@ -1,8 +1,11 @@
+import 'dart:ffi';
+
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_database_repository/src/recommendation_system/hs_recommendation_system_repository.dart';
+import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -194,6 +197,18 @@ class HSDatabaseRepsitory {
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
 
+  Future<HSComment> spotAddComment(
+          {required String spotID,
+          required String userID,
+          required String comment,
+          required bool isReply,
+          String? parentCommentID}) async =>
+      await _spotsRepository.addComment(
+          spotID, userID, comment, isReply, parentCommentID);
+
+  Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
+      await _spotsRepository.fetchNearbySpots(lat, long);
+
   Future<List<HSSpot>> spotFetchSpotsWithinRadius(
           {required double lat, required double long, double? radius}) async =>
       await _spotsRepository.fetchSpotsWithinRadius(lat, long, radius);
@@ -262,6 +277,22 @@ class HSDatabaseRepsitory {
       await _spotsRepository.fetchTrendingSpots(
           batchSize, batchOffset, lat, long);
 
+  Future<List<HSComment>> spotFetchComments(
+          {required String spotID,
+          required String userID,
+          required int currentPageOffset,
+          required bool isReply}) async =>
+      await _spotsRepository.fetchComments(
+          spotID, userID, currentPageOffset, isReply);
+
+  Future<void> spotLikeOrDislikeComment(
+          {required String commentID, required String userID}) async =>
+      await _spotsRepository.likeOrDislikeComment(commentID, userID);
+
+  Future<void> spotRemoveComment(
+          {required String commentID, required String userID}) async =>
+      await _spotsRepository.removeComment(commentID, userID);
+
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);
   Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>
@@ -295,7 +326,7 @@ class HSDatabaseRepsitory {
 
   Future<void> recommendationSystemCaptureEvent(
           {required String userId,
-          required String spotId,
+          required HSSpot spot,
           required HSInteractionType event}) async =>
       await _recommendationSystemRepository.captureEvent(userId, spotId, event);
 
