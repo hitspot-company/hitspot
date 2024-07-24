@@ -14,12 +14,13 @@ import 'package:share_plus/share_plus.dart';
 part 'hs_single_spot_state.dart';
 
 class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
-  HSSingleSpotCubit(this.spotID) : super(const HSSingleSpotState()) {
+  HSSingleSpotCubit({required this.spotID}) : super(const HSSingleSpotState()) {
     fetchSpot();
   }
 
-  final String spotID;
   final _databaseRepository = app.databaseRepository;
+  final String spotID;
+
   LatLng? get spotLocation =>
       state.spot.latitude == null || state.spot.longitude == null
           ? null
@@ -27,7 +28,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
 
   Future<void> fetchSpot() async {
     try {
-      final HSSpot spot =
+      HSSpot spot =
           await _databaseRepository.spotfetchSpotWithAuthor(spotID: spotID);
       final bool isSpotLiked = await _databaseRepository.spotIsSpotLiked(
           spotID: spotID, userID: currentUser.uid);
@@ -48,7 +49,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
 
       _databaseRepository.recommendationSystemCaptureEvent(
           userId: app.currentUser.uid ?? "",
-          spotId: spot.sid ?? "",
+          spot: spot,
           event: HSInteractionType.viewed);
     } catch (_) {
       HSDebugLogger.logError("Error fetching spot: $_");
@@ -66,12 +67,12 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       if (isSpotLiked) {
         _databaseRepository.recommendationSystemCaptureEvent(
             userId: app.currentUser.uid ?? "",
-            spotId: spotID,
+            spot: state.spot,
             event: HSInteractionType.like);
       } else {
         _databaseRepository.recommendationSystemCaptureEvent(
             userId: app.currentUser.uid ?? "",
-            spotId: spotID,
+            spot: state.spot,
             event: HSInteractionType.dislike);
       }
     } catch (_) {
@@ -90,12 +91,12 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       if (isSpotSaved) {
         _databaseRepository.recommendationSystemCaptureEvent(
             userId: app.currentUser.uid ?? "",
-            spotId: spotID,
+            spot: state.spot,
             event: HSInteractionType.save);
       } else {
         _databaseRepository.recommendationSystemCaptureEvent(
             userId: app.currentUser.uid ?? "",
-            spotId: spotID,
+            spot: state.spot,
             event: HSInteractionType.unsave);
       }
     } catch (_) {
@@ -126,7 +127,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       navi.pop();
       _databaseRepository.recommendationSystemCaptureEvent(
           userId: app.currentUser.uid ?? "",
-          spotId: spotID,
+          spot: state.spot,
           event: HSInteractionType.addedToBoard);
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -170,7 +171,7 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       if (shareStatus.status == ShareResultStatus.success) {
         _databaseRepository.recommendationSystemCaptureEvent(
             userId: app.currentUser.uid ?? "",
-            spotId: spotID,
+            spot: state.spot,
             event: HSInteractionType.share);
       }
     } catch (_) {

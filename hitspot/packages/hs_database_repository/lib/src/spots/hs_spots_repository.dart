@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/src/spots/hs_spot.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
@@ -389,6 +392,110 @@ class HSSpotsRepository {
       return fetchedSpots.map(HSSpot.deserializeWithAuthor).toList();
     } catch (_) {
       throw Exception("Error fetching trending spots: $_");
+    }
+  }
+
+  Future<HSComment> addComment(String? spotID, String? userID, String comment,
+      bool isReply, String? parentCommentID) async {
+    try {
+      assert(userID != null || spotID != null,
+          "SpotID and userID must be provided");
+
+      late final newComment;
+
+      if (isReply) {
+        newComment = await _supabase
+            .from('spot_comments')
+            .insert({
+              'spot_id': spotID,
+              'created_by': userID,
+              'content': comment,
+              'parent_id': parentCommentID,
+            })
+            .select()
+            .single();
+      } else {
+        newComment = await _supabase
+            .from('spot_comments')
+            .insert({
+              'spot_id': spotID,
+              'created_by': userID,
+              'content': comment,
+            })
+            .select()
+            .single();
+      }
+
+      return HSComment.deserialize(newComment);
+    } catch (_) {
+      throw Exception("Error adding comment: $_");
+    }
+  }
+
+  Future<List<HSComment>> fetchComments(
+      String id, String userID, int currentPageOffset, bool isReply) async {
+    try {
+      // ID is either spotID (for normal comments) or commentID (for replies)
+
+      assert(id.isNotEmpty && userID.isNotEmpty,
+          "SpotID and userID must be provided");
+
+      late final data;
+      if (isReply) {
+        data = await _supabase.rpc('spot_fetch_spot_comment_replies', params: {
+          'p_comment_id': id,
+          'p_limit': 8,
+          'p_offset': currentPageOffset,
+        });
+      } else {
+        data = await _supabase.rpc('spot_fetch_spot_comments', params: {
+          'p_spot_id': id,
+          'p_limit': 8,
+          'p_offset': currentPageOffset,
+        });
+      }
+
+      List<HSComment> fetchedComments =
+          (data as List<dynamic>).map((e) => HSComment.deserialize(e)).toList();
+
+      // Check if user liked these comments/replies
+      for (int i = 0; i < fetchedComments.length; i++) {
+        fetchedComments[i].isLiked =
+            await _supabase.rpc('spot_has_user_liked_comment', params: {
+          'p_comment_id': fetchedComments[i].id,
+          'p_user_id': userID,
+        });
+      }
+
+      return fetchedComments;
+    } catch (_) {
+      throw Exception("Error fetching spot comments: $_");
+    }
+  }
+
+  Future<void> likeOrDislikeComment(
+    String commentID,
+    String userID,
+  ) async {
+    try {
+      await _supabase.rpc('spot_like_or_dislike_comment', params: {
+        'p_comment_id': commentID,
+        'p_user_id': userID,
+      });
+    } catch (_) {
+      throw Exception("Error liking comment: $_");
+    }
+  }
+
+  Future<void> removeComment(String commentID, String userID) async {
+    try {
+      await _supabase
+          .from("spot_comments")
+          .delete()
+          .eq("id", commentID)
+          .eq("created_by", userID);
+    } catch (_) {
+      throw Exception("Error deleting comment: $_");
     }
   }
 }
