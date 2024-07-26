@@ -1,4 +1,4 @@
-name: Build Android
+name: Build
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  android:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,4 +37,32 @@ jobs:
 
       - name: Build Android
         run: flutter build apk --release
+        working-directory: ./hitspot
+  ios_build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.3'
+
+      - name: Install CocoaPods
+        run: |
+          sudo gem install cocoapods
+          pod setup
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: ./hitspot
+
+      - name: Verify Flutter installation
+        run: flutter doctor -v
+        working-directory: ./hitspot
+
+      - name: Build iOS
+        run: flutter build ios --no-codesign
         working-directory: ./hitspot
