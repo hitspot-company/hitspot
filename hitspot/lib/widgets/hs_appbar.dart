@@ -71,9 +71,9 @@ class HSAppBar extends StatelessWidget {
                   titleText!,
                   textAlign: TextAlign.center,
                   style: textTheme.headlineMedium!.copyWith(
-                      fontWeight:
-                          titleBold ? FontWeight.bold : FontWeight.normal,
-                      fontSize: fontSize),
+                    fontWeight: titleBold ? FontWeight.bold : FontWeight.normal,
+                    fontSize: fontSize,
+                  ),
                   maxLines: maxLines,
                 ),
               ),
