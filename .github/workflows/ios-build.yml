@@ -19,7 +19,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.0.0' # You can specify the exact version of Flutter here
+          flutter-version: '3.0.0' # Specify the Flutter version
 
       - name: Install CocoaPods
         run: |
@@ -28,9 +28,12 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+        working-directory: ./hitspot
 
       - name: Verify Flutter installation
         run: flutter doctor -v
+        working-directory: ./hitspot
 
       - name: Build iOS
         run: flutter build ios --no-codesign
+        working-directory: ./hitspot
