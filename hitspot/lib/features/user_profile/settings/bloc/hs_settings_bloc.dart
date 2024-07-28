@@ -13,10 +13,7 @@ part 'hs_settings_state.dart';
 class HsSettingsBloc extends Bloc<HsSettingsEvent, HsSettingsState> {
   HsSettingsBloc() : super(const HsSettingsStateReady()) {
     on<HSSettingsSwitchThemeModeEvent>((event, emit) async {
-      //emit(const HsSettingsStateInitial());
       app.themeBloc.add(HSThemeSwitchEvent());
-      //await Future.delayed(const Duration(milliseconds: 300));
-      //emit(const HsSettingsStateReady());
     });
   }
 
