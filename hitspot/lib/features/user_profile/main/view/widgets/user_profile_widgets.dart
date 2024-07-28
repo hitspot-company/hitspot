@@ -1,21 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/app/hs_app.dart';
-import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
-import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
-import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
-import 'package:hitspot/widgets/hs_button.dart';
-import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+part of '../user_profile_page.dart';
 
-import '../../../../home/main/view/home_page.dart';
-
-class UserProfileInfo extends StatelessWidget {
-  const UserProfileInfo({
+class _UserProfileInfo extends StatelessWidget {
+  const _UserProfileInfo({
     required this.context,
     required this.loading,
     required this.user,
@@ -44,7 +30,7 @@ class UserProfileInfo extends StatelessWidget {
           const HSShimmerBox(width: 200, height: 30)
         else
           Text(
-            user?.name ?? '',
+            '@${user?.username ?? ''}',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -64,8 +50,8 @@ class UserProfileInfo extends StatelessWidget {
   }
 }
 
-class UserDataBar extends StatelessWidget {
-  const UserDataBar({
+class _UserDataBar extends StatelessWidget {
+  const _UserDataBar({
     required this.loading,
     required this.user,
   });
@@ -75,6 +61,15 @@ class UserDataBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget _buildDataItem(String value, String label) {
+      return Column(
+        children: [
+          Text(value, style: Theme.of(context).textTheme.headlineSmall),
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      );
+    }
+
     if (loading) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(25),
@@ -122,19 +117,10 @@ class UserDataBar extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildDataItem(String value, String label) {
-    return Column(
-      children: [
-        Text(value, style: textTheme.headlineSmall),
-        Text(label, style: textTheme.bodySmall),
-      ],
-    );
-  }
 }
 
-class UserProfileActionButton extends StatelessWidget {
-  const UserProfileActionButton({
+class _UserProfileActionButton extends StatelessWidget {
+  const _UserProfileActionButton({
     required this.isLoading,
   });
 
@@ -156,25 +142,30 @@ class UserProfileActionButton extends StatelessWidget {
     final bool isFollowed =
         context.read<HSUserProfileCubit>().state.isFollowed == true;
 
-    return SizedBox(
-      height: 50.0,
-      child: HSButton(
-        onPressed: ownProfile
-            ? navi.toEditProfile
-            : context.read<HSUserProfileCubit>().followUser,
-        child: Text(
-          ownProfile ? 'Edit Profile' : (isFollowed ? 'Unfollow' : 'Follow'),
-        ),
-      ).animate().fadeIn(duration: 300.ms).scale(
-            begin: const Offset(0.95, 0.95),
-            end: const Offset(1.0, 1.0),
-          ),
-    );
+    return !ownProfile
+        ? Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: SizedBox(
+              height: 50.0,
+              child: HSButton(
+                onPressed: ownProfile
+                    ? navi.toEditProfile
+                    : context.read<HSUserProfileCubit>().followUser,
+                child: Text(
+                  (isFollowed ? 'Unfollow' : 'Follow'),
+                ),
+              ).animate().fadeIn(duration: 300.ms).scale(
+                    begin: const Offset(0.95, 0.95),
+                    end: const Offset(1.0, 1.0),
+                  ),
+            ),
+          )
+        : const SizedBox.shrink();
   }
 }
 
-class TabContent extends StatelessWidget {
-  const TabContent({
+class _TabContent extends StatelessWidget {
+  const _TabContent({
     required this.context,
     required this.isLoading,
     required this.elements,
@@ -215,7 +206,7 @@ class TabContent extends StatelessWidget {
   }
 }
 
-class TabBarWidget extends StatelessWidget {
+class _TabBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const TabBar(

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/settings/bloc/hs_settings_bloc.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -14,7 +15,8 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return HSScaffold(
       appBar: HSAppBar(
-        title: Text('Settings', style: currentTheme.textTheme.headlineSmall),
+        title:
+            Text('Settings', style: Theme.of(context).textTheme.headlineSmall),
         enableDefaultBackButton: true,
       ),
       body: BlocBuilder<HsSettingsBloc, HsSettingsState>(

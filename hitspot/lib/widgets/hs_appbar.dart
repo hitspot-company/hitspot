@@ -70,10 +70,11 @@ class HSAppBar extends StatelessWidget {
                 child: AutoSizeText(
                   titleText!,
                   textAlign: TextAlign.center,
-                  style: textTheme.headlineMedium!.copyWith(
-                    fontWeight: titleBold ? FontWeight.bold : FontWeight.normal,
-                    fontSize: fontSize,
-                  ),
+                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                        fontWeight:
+                            titleBold ? FontWeight.bold : FontWeight.normal,
+                        fontSize: fontSize,
+                      ),
                   maxLines: maxLines,
                 ),
               ),
