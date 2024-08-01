@@ -29,9 +29,10 @@ class HSUsersRepository {
     try {
       assert(user != null || userID != null, "User or userID must be provided");
       late final String uid = user?.uid ?? userID!;
-      final fetchedUser = await _supabase.from(_users).select().eq("id", uid);
-      if (fetchedUser.isEmpty) throw HSReadUserFailure(code: 404);
-      return HSUser.deserialize(fetchedUser.first);
+      final List<Map<String, dynamic>> fetched =
+          await _supabase.rpc("user_fetch", params: {"p_user_id": uid});
+      if (fetched.isEmpty) throw HSReadUserFailure(code: 404);
+      return HSUser.deserialize(fetched.first);
     } catch (_) {
       HSDebugLogger.logError("Error fetching user: $_");
       throw HSReadUserFailure(customDetails: _.toString());
