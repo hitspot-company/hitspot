@@ -194,9 +194,6 @@ class HSDatabaseRepsitory {
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
 
-  Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
-      await _spotsRepository.fetchNearbySpots(lat, long);
-
   Future<List<HSSpot>> spotFetchSpotsWithinRadius(
           {required double lat, required double long, double? radius}) async =>
       await _spotsRepository.fetchSpotsWithinRadius(lat, long, radius);
@@ -253,13 +250,6 @@ class HSDatabaseRepsitory {
           int batchOffset = 0,
           int batchSize = 20}) async =>
       await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
-
-  Future<List<HSBoard>> spotfetchUserBoards(
-          {HSUser? user,
-          String? userID,
-          int batchOffset = 0,
-          int batchSize = 20}) async =>
-      await _spotsRepository.userBoards(user, userID, batchOffset, batchSize);
 
   Future<HSSpot> spotFetchTopSpotWithTag(String tag) async =>
       await _spotsRepository.fetchTopSpotWithTag(tag);
