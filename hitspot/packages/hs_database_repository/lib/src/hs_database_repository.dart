@@ -206,9 +206,6 @@ class HSDatabaseRepsitory {
       await _spotsRepository.addComment(
           spotID, userID, comment, isReply, parentCommentID);
 
-  Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
-      await _spotsRepository.fetchNearbySpots(lat, long);
-
   Future<List<HSSpot>> spotFetchSpotsWithinRadius(
           {required double lat, required double long, double? radius}) async =>
       await _spotsRepository.fetchSpotsWithinRadius(lat, long, radius);
@@ -328,7 +325,7 @@ class HSDatabaseRepsitory {
           {required String userId,
           required HSSpot spot,
           required HSInteractionType event}) async =>
-      await _recommendationSystemRepository.captureEvent(userId, spotId, event);
+      await _recommendationSystemRepository.captureEvent(userId, spot, event);
 
   Future<void> notificationCreate(
           {required HSNotification notificaton}) async =>

@@ -21,9 +21,6 @@ final class HSUserProfileState extends Equatable {
     this.spotsCount = 0,
     this.followingCount = 0,
     this.trips = const [],
-    this.followersCount = 0,
-    this.spotsCount = 0,
-    this.followingCount = 0,
   });
 
   final HSUserProfileStatus status;
@@ -33,7 +30,6 @@ final class HSUserProfileState extends Equatable {
   final List<HSBoard> boards;
   final int followersCount, followingCount, spotsCount;
   final List<dynamic> trips;
-  final int followersCount, followingCount, spotsCount;
 
   @override
   List<Object?> get props => [
@@ -58,9 +54,6 @@ final class HSUserProfileState extends Equatable {
     int? followingCount,
     int? spotsCount,
     List<dynamic>? trips,
-    int? followersCount,
-    int? followingCount,
-    int? spotsCount,
   }) {
     return HSUserProfileState(
       status: status ?? this.status,
@@ -72,9 +65,6 @@ final class HSUserProfileState extends Equatable {
       followingCount: followingCount ?? this.followingCount,
       spotsCount: spotsCount ?? this.spotsCount,
       trips: trips ?? this.trips,
-      followersCount: followersCount ?? this.followersCount,
-      followingCount: followingCount ?? this.followingCount,
-      spotsCount: spotsCount ?? this.spotsCount,
     );
   }
 }
