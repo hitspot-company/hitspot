@@ -86,10 +86,8 @@ class HSUsersRepository {
     try {
       final followerUID = follower?.uid ?? followerID!;
       final followedUID = followed?.uid ?? followedID!;
-      await _supabase.rpc('unfollow_user', params: {
-        "follower_uid": followerUID,
-        "followed_uid": followedUID,
-      });
+      await _supabase.rpc('user_unfollow',
+          params: {"p_follower_id": followerUID, "p_followed_id": followedUID});
       await _notificationsRepository.delete(HSNotification(
         from: followerUID,
         to: followedUID,
@@ -110,8 +108,8 @@ class HSUsersRepository {
           "Followed or followedID must be provided");
       final followerUID = follower?.uid ?? followerID!;
       final followedUID = followed?.uid ?? followedID!;
-      await _supabase.rpc('follow_user',
-          params: {"followed_uid": followedUID, "follower_uid": followerUID});
+      await _supabase.rpc('user_follow',
+          params: {"p_followed_id": followedUID, "p_follower_id": followerUID});
       await _notificationsRepository.create(HSNotification(
         from: followerUID,
         to: followedUID,
@@ -134,9 +132,9 @@ class HSUsersRepository {
     try {
       final String followedUID = followed?.uid ?? followedID!;
       final String followerUID = follower?.uid ?? followerID!;
-      final bool response = await _supabase.rpc('is_user_followed', params: {
-        'follower_uid': followerUID,
-        'followed_uid': followedUID,
+      final bool response = await _supabase.rpc('user_is_followed', params: {
+        'p_follower_id': followerUID,
+        'p_followed_id': followedUID,
       });
       return (response);
     } catch (_) {

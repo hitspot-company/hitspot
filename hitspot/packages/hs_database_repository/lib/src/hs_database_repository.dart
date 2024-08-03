@@ -266,13 +266,6 @@ class HSDatabaseRepsitory {
           int batchSize = 20}) async =>
       await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
 
-  Future<List<HSBoard>> spotfetchUserBoards(
-          {HSUser? user,
-          String? userID,
-          int batchOffset = 0,
-          int batchSize = 20}) async =>
-      await _spotsRepository.userBoards(user, userID, batchOffset, batchSize);
-
   Future<HSSpot> spotFetchTopSpotWithTag(String tag) async =>
       await _spotsRepository.fetchTopSpotWithTag(tag);
 

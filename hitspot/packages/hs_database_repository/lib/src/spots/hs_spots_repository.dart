@@ -38,9 +38,8 @@ class HSSpotsRepository {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
       final sid = spot?.sid ?? spotID!;
-      final fetchedSpot = await _supabase.rpc('spots_fetch_spot', params: {
-        'requested_spot_id': sid,
-      });
+      final fetchedSpot =
+          await _supabase.rpc('spot_fetch', params: {'p_spot_id': sid});
       if (fetchedSpot.isEmpty) throw "Spot not found";
       HSDebugLogger.logInfo("Fetched: ${fetchedSpot.toString()}");
       return HSSpot.deserialize(fetchedSpot.first);
@@ -88,30 +87,12 @@ class HSSpotsRepository {
     }
   }
 
-  // Fetch nearby spots
-  Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async {
-    const double DEFAULT_RADIUS = 4000000000.0;
-    try {
-      final data = await _supabase.rpc('spots_fetch_nearby_spots', params: {
-        'lat': lat,
-        'long': long,
-      });
-      HSDebugLogger.logInfo(data.toString());
-      final List<HSSpot> spots =
-          (data as List<dynamic>).map((e) => HSSpot.deserialize(e)).toList();
-      return (spots);
-    } catch (_) {
-      HSDebugLogger.logError(_.toString());
-      throw Exception("Error fetching nearby spots: $_");
-    }
-  }
-
   Future<List<HSSpot>> fetchSpotsWithinRadius(double lat, double long,
       [double? radius]) async {
     const double DEFAULT_RADIUS = 1000 * 50; // 50km
     try {
       final List<Map<String, dynamic>> data =
-          await _supabase.rpc('spots_fetch_spots_within_radius', params: {
+          await _supabase.rpc('spot_fetch_within_radius', params: {
         'p_lat': lat,
         'p_long': long,
         'p_radius': radius ?? DEFAULT_RADIUS,
@@ -119,10 +100,6 @@ class HSSpotsRepository {
 
       final List<HSSpot> spots =
           data.map(HSSpot.deserializeWithAuthor).toList();
-      // for (var i = 0; i < spots.length; i++) {
-      //   final spot = await _composeSpotWithImages(spots[i]);
-      //   spots[i] = spot;
-      // }
       return (spots);
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -135,10 +112,10 @@ class HSSpotsRepository {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
       final sid = spot?.sid ?? spotID!;
-      final data = await _supabase
-          .rpc("spots_fetch_spot_images", params: {'requested_spot_id': sid});
+      final List<Map<String, dynamic>> data =
+          await _supabase.rpc("spot_fetch_images", params: {'p_spot_id': sid});
       final List<String> imageUrls =
-          (data as List<dynamic>).map((e) => e['image_url'] as String).toList();
+          data.map((e) => e['image_url'] as String).toList();
       return imageUrls;
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -172,10 +149,8 @@ class HSSpotsRepository {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
       final sid = spot?.sid ?? spotID!;
-      final fetchedSpot =
-          await _supabase.rpc('spots_fetch_spot_with_author', params: {
-        'spotsid': sid,
-      });
+      final fetchedSpot = await _supabase
+          .rpc('spot_fetch_with_author', params: {'p_spot_id': sid});
       HSDebugLogger.logInfo("Fetched spot with author: ${fetchedSpot}");
       return HSSpot.deserializeWithAuthor(fetchedSpot.first);
     } catch (_) {
@@ -189,10 +164,8 @@ class HSSpotsRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final sid = spot?.sid ?? spotID!;
       final uid = user?.uid ?? userID!;
-      final bool data = await _supabase.rpc('spots_is_spot_liked', params: {
-        'requested_spot_id': sid,
-        'requested_by_id': uid,
-      });
+      final bool data = await _supabase
+          .rpc('spot_is_liked', params: {'p_spot_id': sid, 'p_user_id': uid});
       return data;
     } catch (_) {
       throw Exception("Error checking if spot is liked: $_");
@@ -205,10 +178,8 @@ class HSSpotsRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final sid = spot?.sid ?? spotID!;
       final uid = user?.uid ?? userID!;
-      await _supabase.rpc('spots_like_spot', params: {
-        'requested_spot_id': sid,
-        'requested_by_id': uid,
-      });
+      await _supabase
+          .rpc('spot_like', params: {'p_spot_id': sid, 'p_user_id': uid});
       final authorID = spot?.createdBy;
       HSDebugLogger.logInfo("Spot author ID: ${spot?.createdBy}");
       assert(authorID != null, "Spot author ID must be provided");
@@ -229,10 +200,8 @@ class HSSpotsRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final sid = spot?.sid ?? spotID!;
       final uid = user?.uid ?? userID!;
-      await _supabase.rpc('spots_dislike_spot', params: {
-        'requested_spot_id': sid,
-        'requested_by_id': uid,
-      });
+      await _supabase
+          .rpc('spot_dislike', params: {'p_spot_id': sid, 'p_user_id': uid});
       await _notificationsRepository.delete(HSNotification(
         from: uid,
         to: spot?.createdBy,
@@ -266,10 +235,8 @@ class HSSpotsRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final sid = spot?.sid ?? spotID!;
       final uid = user?.uid ?? userID!;
-      final bool data = await _supabase.rpc('spots_is_spot_saved', params: {
-        'requested_spot_id': sid,
-        'requested_by_id': uid,
-      });
+      final bool data = await _supabase
+          .rpc('spot_is_saved', params: {'p_spot_id': sid, 'p_user_id': uid});
       return data;
     } catch (_) {
       throw Exception("Error checking if spot is saved: $_");
@@ -282,10 +249,8 @@ class HSSpotsRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final sid = spot?.sid ?? spotID!;
       final uid = user?.uid ?? userID!;
-      await _supabase.rpc('spots_save_spot', params: {
-        'requested_spot_id': sid,
-        'requested_by_id': uid,
-      });
+      await _supabase
+          .rpc('spot_save', params: {'p_spot_id': sid, 'p_user_id': uid});
     } catch (_) {
       throw Exception("Error saving spot: $_");
     }
@@ -297,10 +262,8 @@ class HSSpotsRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final sid = spot?.sid ?? spotID!;
       final uid = user?.uid ?? userID!;
-      await _supabase.rpc('spots_unsave_spot', params: {
-        'requested_spot_id': sid,
-        'requested_by_id': uid,
-      });
+      await _supabase
+          .rpc('spot_unsave', params: {'p_spot_id': sid, 'p_user_id': uid});
     } catch (_) {
       throw Exception("Error unsaving spot: $_");
     }
@@ -327,36 +290,18 @@ class HSSpotsRepository {
     try {
       assert(user != null || userID != null, "User or userID must be provided");
       final uid = user?.uid ?? userID!;
-      final data = await _supabase.rpc('spots_fetch_user_spots', params: {
-        'user_id': uid,
-        'batch_offset': batchOffset,
-        'batch_size': batchSize,
+      final List<Map<String, dynamic>> data = await _supabase
+          .rpc('spot_fetch_user_spots', params: {
+        'p_user_id': uid,
+        'p_batch_offset': batchOffset,
+        'p_batch_size': batchSize
       });
-      final List<HSSpot> spots =
-          (data as List<dynamic>).map((e) => HSSpot.deserialize(e)).toList();
+      final spots = data.map(HSSpot.deserialize).toList();
       for (var i = 0; i < spots.length; i++) {
         final spot = await _composeSpotWithImages(spots[i]);
         spots[i] = spot;
       }
       return (spots);
-    } catch (_) {
-      throw Exception("Error fetching user spots: $_");
-    }
-  }
-
-  Future<List<HSBoard>> userBoards(
-      HSUser? user, String? userID, int batchOffset, int batchSize) async {
-    try {
-      assert(user != null || userID != null, "User or userID must be provided");
-      final uid = user?.uid ?? userID!;
-      final data = await _supabase.rpc('fetch_user_boards', params: {
-        'user_id': uid,
-        'batch_offset': batchOffset,
-        'batch_size': batchSize,
-      });
-      final List<HSBoard> boards =
-          (data as List<dynamic>).map((e) => HSBoard.deserialize(e)).toList();
-      return boards;
     } catch (_) {
       throw Exception("Error fetching user spots: $_");
     }
@@ -370,11 +315,11 @@ class HSSpotsRepository {
   ) async {
     try {
       final List<Map<String, dynamic>> data =
-          await _supabase.rpc('spots_fetch_spots_in_view', params: {
-        'min_lat': minLat,
-        'min_long': minLong,
-        'max_lat': maxLat,
-        'max_long': maxLong,
+          await _supabase.rpc('spot_fetch_within_bounding_box', params: {
+        'p_min_lat': minLat,
+        'p_min_long': minLong,
+        'p_max_lat': maxLat,
+        'p_max_long': maxLong,
       });
       final List<HSSpot> spots =
           data.map(HSSpot.deserializeWithAuthor).toList();
@@ -387,10 +332,8 @@ class HSSpotsRepository {
 
   Future<HSSpot> fetchTopSpotWithTag(String tag) async {
     try {
-      final List<Map<String, dynamic>> fetchedSpot =
-          await _supabase.rpc('spots_fetch_top_spot_with_tag', params: {
-        'tag': tag,
-      });
+      final List<Map<String, dynamic>> fetchedSpot = await _supabase
+          .rpc('spot_fetch_top_spot_with_tag', params: {'p_tag': tag});
       return HSSpot.deserializeWithAuthor(fetchedSpot.first);
     } catch (_) {
       throw Exception("Error fetching top spot with tag: $_");
@@ -401,11 +344,11 @@ class HSSpotsRepository {
       int? batchSize, int? batchOffset, double? lat, double? long) async {
     try {
       final List<Map<String, dynamic>> fetchedSpots =
-          await _supabase.rpc('spots_fetch_trending_spots', params: {
-        'batch_size': batchSize,
-        'batch_offset': batchOffset,
-        'user_lat': lat,
-        'user_long': long,
+          await _supabase.rpc('spot_fetch_trending', params: {
+        'p_batch_size': batchSize,
+        'p_batch_offset': batchOffset,
+        'p_user_lat': lat,
+        'p_user_long': long,
       });
       return fetchedSpots.map(HSSpot.deserializeWithAuthor).toList();
     } catch (_) {
