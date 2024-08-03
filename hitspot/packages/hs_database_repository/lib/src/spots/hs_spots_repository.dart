@@ -183,12 +183,6 @@ class HSSpotsRepository {
       final authorID = spot?.createdBy;
       HSDebugLogger.logInfo("Spot author ID: ${spot?.createdBy}");
       assert(authorID != null, "Spot author ID must be provided");
-      await _notificationsRepository.create(HSNotification(
-        from: uid,
-        to: authorID,
-        type: HSNotificationType.spotlike,
-        spotID: sid,
-      ));
     } catch (_) {
       throw Exception("Error liking spot: $_");
     }
@@ -202,12 +196,6 @@ class HSSpotsRepository {
       final uid = user?.uid ?? userID!;
       await _supabase
           .rpc('spot_dislike', params: {'p_spot_id': sid, 'p_user_id': uid});
-      await _notificationsRepository.delete(HSNotification(
-        from: uid,
-        to: spot?.createdBy,
-        type: HSNotificationType.spotlike,
-        spotID: sid,
-      ));
     } catch (_) {
       throw Exception("Error disliking spot: $_");
     }

@@ -95,13 +95,10 @@ extension HSBoardStringExtensions on String {
 
 enum HSBoardVisibility {
   private,
-  invite,
   public;
 
   factory HSBoardVisibility.deserialize(String name) {
     switch (name) {
-      case "on-invite":
-        return HSBoardVisibility.invite;
       case "public":
         return HSBoardVisibility.public;
       default:
@@ -113,8 +110,6 @@ enum HSBoardVisibility {
     switch (this) {
       case HSBoardVisibility.private:
         return 0;
-      case HSBoardVisibility.invite:
-        return 1;
       case HSBoardVisibility.public:
         return 2;
     }
@@ -124,8 +119,6 @@ enum HSBoardVisibility {
     switch (this) {
       case HSBoardVisibility.private:
         return "private";
-      case HSBoardVisibility.invite:
-        return "on-invite";
       case HSBoardVisibility.public:
         return "public";
     }
@@ -135,8 +128,6 @@ enum HSBoardVisibility {
     switch (this) {
       case HSBoardVisibility.private:
         return "Only you can see the board.";
-      case HSBoardVisibility.invite:
-        return "You and the people you give access can see the board.";
       case HSBoardVisibility.public:
         return "Everyone can see the board.";
     }

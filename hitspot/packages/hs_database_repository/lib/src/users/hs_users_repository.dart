@@ -88,11 +88,6 @@ class HSUsersRepository {
       final followedUID = followed?.uid ?? followedID!;
       await _supabase.rpc('user_unfollow',
           params: {"p_follower_id": followerUID, "p_followed_id": followedUID});
-      await _notificationsRepository.delete(HSNotification(
-        from: followerUID,
-        to: followedUID,
-        type: HSNotificationType.userfollow,
-      ));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       rethrow;
@@ -110,12 +105,6 @@ class HSUsersRepository {
       final followedUID = followed?.uid ?? followedID!;
       await _supabase.rpc('user_follow',
           params: {"p_followed_id": followedUID, "p_follower_id": followerUID});
-      await _notificationsRepository.create(HSNotification(
-        from: followerUID,
-        to: followedUID,
-        type: HSNotificationType.userfollow,
-        message: "Unfollowed",
-      ));
       HSDebugLogger.logSuccess("Followed");
     } catch (_) {
       HSDebugLogger.logError(_.toString());

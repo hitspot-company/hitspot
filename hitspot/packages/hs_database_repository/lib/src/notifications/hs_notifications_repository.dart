@@ -55,7 +55,7 @@ class HSNotificationsRepository {
           "Either notification or notificationID has to be provided");
       final uid = currentUser?.uid ?? currentUserID;
       final List<Map<String, dynamic>> result =
-          await _supabase.rpc("notifications_read_user_notifications", params: {
+          await _supabase.rpc("notification_fetch_user_notifications", params: {
         'p_user_id': uid,
         'p_limit': limit,
         'p_offset': offset,
