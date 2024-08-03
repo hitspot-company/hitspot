@@ -9,7 +9,7 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 part 'hs_user_profile_state.dart';
 
 class HSUserProfileCubit extends Cubit<HSUserProfileState> {
-  HSUserProfileCubit(this.userID) : super(HSUserProfileState()) {
+  HSUserProfileCubit(this.userID) : super(const HSUserProfileState()) {
     _init();
   }
 
