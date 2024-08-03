@@ -59,8 +59,6 @@ final class HSUserProfileState extends Equatable {
       spots: spots ?? this.spots,
       boards: boards ?? this.boards,
       followersCount: followersCount ?? this.followersCount,
-      followingCount: followingCount ?? this.followingCount,
-      spotsCount: spotsCount ?? this.spotsCount,
     );
   }
 }

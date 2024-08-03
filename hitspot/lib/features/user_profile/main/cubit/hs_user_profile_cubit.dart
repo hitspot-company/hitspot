@@ -155,7 +155,7 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
       if (!state.isFollowed!) {
         updatedFollowers = state.followersCount + 1;
       } else {
-        updatedFollowers = state.followingCount - 1;
+        updatedFollowers = state.followersCount - 1;
       }
       HSDebugLogger.logInfo(state.user.toString());
       emit(state.copyWith(

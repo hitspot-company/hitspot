@@ -84,7 +84,7 @@ class _UserDataBar extends StatelessWidget {
       padding: const EdgeInsets.only(top: 12.0),
       child: Column(
         children: [
-          Divider(),
+          const Divider(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
@@ -97,10 +97,17 @@ class _UserDataBar extends StatelessWidget {
                           child: _buildDataItem('${user?.spots}', 'spots'),
                         ))),
                 Expanded(
-                    child: Align(
-                        alignment: Alignment.center,
-                        child:
-                            _buildDataItem('${user?.followers}', 'followers'))),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: BlocSelector<HSUserProfileCubit, HSUserProfileState,
+                        int>(
+                      selector: (state) => state.followersCount,
+                      builder: (context, followersCount) {
+                        return _buildDataItem('$followersCount', 'followers');
+                      },
+                    ),
+                  ),
+                ),
                 Expanded(
                     child: Align(
                         alignment: Alignment.centerRight,
