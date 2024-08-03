@@ -48,17 +48,12 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
   }
 
   Future<void> _loadMoreSpots() async {
-    // if (state.hasReachedMaxSpots) return;
-
     HSDebugLogger.logInfo("Fetching more spots...");
     emit(state.copyWith(status: HSUserProfileStatus.loadingMoreSpots));
 
     try {
-      final newSpots = await _databaseRepository.spotfetchUserSpots(
-        user: state.user!,
-        // startAfter: state.spots.last,
-        // limit: 10,
-      );
+      final newSpots =
+          await _databaseRepository.spotfetchUserSpots(user: state.user!);
 
       if (newSpots.isEmpty) {
         emit(state.copyWith(

@@ -11,17 +11,7 @@ class HSSpotDeleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog.adaptive(
       title: const Text('Delete Spot'),
-      content: const Text.rich(
-        TextSpan(
-          text: 'Destructive Action. ',
-          style: TextStyle(fontWeight: FontWeight.bold),
-          children: [
-            TextSpan(
-                text: "This spot will be deleted permanently.",
-                style: TextStyle(fontWeight: FontWeight.normal))
-          ],
-        ),
-      ),
+      content: const Text("This spot will be deleted permanently."),
       actions: <Widget>[
         CupertinoDialogAction(
           onPressed: () => navi.pop(false),
