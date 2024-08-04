@@ -3,7 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
-import 'package:flutter_config/flutter_config.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -48,31 +48,31 @@ class DefaultFirebaseOptions {
   }
 
   static FirebaseOptions web = FirebaseOptions(
-    apiKey: FlutterConfig.get('FIREBASE_API_KEY'),
-    appId: FlutterConfig.get('FIREBASE_WEB_APP_ID'),
-    messagingSenderId: FlutterConfig.get('FIREBASE_MESSAGING_SENDER_ID'),
+    apiKey: dotenv.env['FIREBASE_API_KEY']!,
+    appId: dotenv.env['FIREBASE_WEB_APP_ID']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
     projectId: 'hitspot-2092c',
     authDomain: 'hitspot-2092c.firebaseapp.com',
     storageBucket: 'hitspot-2092c.appspot.com',
-    measurementId: FlutterConfig.get('FIREBASE_MEASUREMENT_ID'),
+    measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
   );
 
   static FirebaseOptions android = FirebaseOptions(
-    apiKey: FlutterConfig.get('FIREBASE_API_KEY'),
-    appId: FlutterConfig.get('FIREBASE_ANDROID_APP_ID'),
-    messagingSenderId: FlutterConfig.get('FIREBASE_MESSAGING_SENDER_ID'),
+    apiKey: dotenv.env['FIREBASE_API_KEY']!,
+    appId: dotenv.env['FIREBASE_ANDROID_APP_ID']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
     projectId: 'hitspot-2092c',
     storageBucket: 'hitspot-2092c.appspot.com',
   );
 
   static FirebaseOptions ios = FirebaseOptions(
-    apiKey: FlutterConfig.get('FIREBASE_API_KEY'),
-    appId: FlutterConfig.get('FIREBASE_IOS_APP_ID'),
-    messagingSenderId: FlutterConfig.get('FIREBASE_MESSAGING_SENDER_ID'),
+    apiKey: dotenv.env['FIREBASE_API_KEY']!,
+    appId: dotenv.env['FIREBASE_IOS_APP_ID']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
     projectId: 'hitspot-2092c',
     storageBucket: 'hitspot-2092c.appspot.com',
-    androidClientId: FlutterConfig.get('FIREBASE_ANDROID_CLIENT_ID'),
-    iosClientId: FlutterConfig.get('FIREBASE_IOS_CLIENT_ID'),
+    androidClientId: dotenv.env['FIREBASE_ANDROID_CLIENT_ID']!,
+    iosClientId: dotenv.env['FIREBASE_IOS_CLIENT_ID']!,
     iosBundleId: 'app.hitspot',
   );
 }

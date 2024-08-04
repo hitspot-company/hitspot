@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_config/flutter_config.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
@@ -19,11 +19,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterConfig.loadEnvVariables();
-  final url = FlutterConfig.get("SUPABASE_URL");
-  final anon = FlutterConfig.get("SUPABASE_ANON_KEY");
+  await dotenv.load(fileName: ".env");
+  final url = dotenv.env['SUPABASE_URL'];
+  final anon = dotenv.env["SUPABASE_ANON_KEY"];
   HSDebugLogger.logInfo("$url: $anon");
-  await Supabase.initialize(url: url, anonKey: anon);
+  await Supabase.initialize(url: url!, anonKey: anon!);
 
   final HSAuthenticationRepository authenticationRepository =
       HSAuthenticationRepository(supabase);
@@ -72,8 +72,8 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (_) => HSLocationRepository(
-            FlutterConfig.get("GOOGLE_MAPS_KEY"),
-            FlutterConfig.get("GOOGLE_MAPS_KEY"),
+            dotenv.env["GOOGLE_MAPS_KEY"]!,
+            dotenv.env["GOOGLE_MAPS_KEY"]!,
           ),
         ),
       ],
