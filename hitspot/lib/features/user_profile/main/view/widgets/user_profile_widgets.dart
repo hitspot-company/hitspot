@@ -84,7 +84,7 @@ class _UserDataBar extends StatelessWidget {
       padding: const EdgeInsets.only(top: 12.0),
       child: Column(
         children: [
-          const Divider(),
+          const Divider(thickness: .2),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Row(
@@ -119,7 +119,7 @@ class _UserDataBar extends StatelessWidget {
               ],
             ),
           ),
-          Divider(),
+          const Divider(thickness: .2),
         ],
       ),
     );

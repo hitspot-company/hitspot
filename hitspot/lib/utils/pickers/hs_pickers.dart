@@ -150,6 +150,11 @@ class HSPickers {
         ),
         AndroidUiSettings(
           cropStyle: cropStyle ?? CropStyle.rectangle,
+          lockAspectRatio: true,
+          initAspectRatio: cropStyle == CropStyle.circle
+              ? CropAspectRatioPreset.square
+              : null,
+          showCropGrid: false,
         )
       ],
     );

@@ -43,7 +43,6 @@ class UserProfilePage extends StatelessWidget {
         return HSScaffold(
           appBar: HSAppBar(
             enableDefaultBackButton: true,
-            titleText: 'User Profile',
             right: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
