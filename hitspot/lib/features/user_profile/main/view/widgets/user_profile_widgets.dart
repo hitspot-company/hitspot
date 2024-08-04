@@ -40,7 +40,7 @@ class _UserProfileInfo extends StatelessWidget {
           const HSShimmerBox(width: 150, height: 20)
         else
           Text(
-            '@${user?.username ?? ''}',
+            user?.name ?? '',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.grey,
                 ),

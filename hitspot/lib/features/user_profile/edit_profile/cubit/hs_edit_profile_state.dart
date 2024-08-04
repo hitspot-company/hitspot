@@ -1,9 +1,9 @@
-part of 'edit_profile_cubit.dart';
+part of 'hs_edit_profile_cubit.dart';
 
 enum HSImageChangeState { idle, choosing, uploading, setting, done }
 
-class EditProfileState extends Equatable {
-  const EditProfileState(
+class HSEditProfileState extends Equatable {
+  const HSEditProfileState(
       {this.imageChangeState = HSImageChangeState.idle,
       this.changeProgress = 0.0});
 
@@ -13,11 +13,11 @@ class EditProfileState extends Equatable {
   @override
   List<Object> get props => [imageChangeState, changeProgress];
 
-  EditProfileState copy({
+  HSEditProfileState copy({
     HSImageChangeState? imageChangeState,
     double? changeProgress,
   }) {
-    return EditProfileState(
+    return HSEditProfileState(
       imageChangeState: imageChangeState ?? this.imageChangeState,
       changeProgress: changeProgress ?? this.changeProgress,
     );
