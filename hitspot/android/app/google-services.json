@@ -1,26 +1,87 @@
-`{
+{
   "project_info": {
-    "project_number": "863272170210",
-    "project_id": "hitspot-production",
-    "storage_bucket": "hitspot-production.appspot.com"
+    "project_number": "145078839676",
+    "project_id": "hitspot-2092c",
+    "storage_bucket": "hitspot-2092c.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:863272170210:android:1bbfaf2e4c7eb8732364bb",
+        "mobilesdk_app_id": "1:145078839676:android:66659f5c349007e9135cf9",
         "android_client_info": {
           "package_name": "com.company.hitspot"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "145078839676-910bgn5cutvou0jkev4i7jgp8u50jnp0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.company.hitspot",
+            "certificate_hash": "f4edc2ec2535f12dce9a0262b5d7f1fa441c9f0c"
+          }
+        },
+        {
+          "client_id": "145078839676-l5r4lqmkn18llatpeqo2b0or1u7ei0d8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAmIv7lriRX04A3Yk2VFO5_7F0wcayqxyA"
+          "current_key": "AIzaSyAmfr06x8ufZJg8rJZdJtTpEgZXJszJI1M"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145078839676-cu1rrvvm3dcfgqjcona6ilt0m4jng5av.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "145078839676-36cce3q17bap6mp1giqn0o1828h5vebd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "jnenczak.hitspot"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145078839676:android:2a4fd9a5ece05260135cf9",
+        "android_client_info": {
+          "package_name": "com.example.hitspot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145078839676-l5r4lqmkn18llatpeqo2b0or1u7ei0d8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmfr06x8ufZJg8rJZdJtTpEgZXJszJI1M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145078839676-cu1rrvvm3dcfgqjcona6ilt0m4jng5av.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "145078839676-36cce3q17bap6mp1giqn0o1828h5vebd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "jnenczak.hitspot"
+              }
+            }
+          ]
         }
       }
     }
