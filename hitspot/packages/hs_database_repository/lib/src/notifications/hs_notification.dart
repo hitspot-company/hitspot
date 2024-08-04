@@ -170,13 +170,15 @@ class HSNotification {
         return FontAwesomeIcons.bell;
     }
   }
+}
 
+extension TimeAgo on DateTime {
   String get timeAgo {
     final now = DateTime.now();
-    final difference = now.difference(createdAt!);
+    final difference = now.difference(this);
 
     if (difference.inDays > 365) {
-      return DateFormat.yMMMd().format(createdAt!);
+      return DateFormat.yMMMd().format(this);
     } else if (difference.inDays > 30) {
       final months = (difference.inDays / 30).floor();
       return '$months month${months == 1 ? '' : 's'} ago';

@@ -13,9 +13,11 @@ class HSNotificationsCubit extends Cubit<HSNotificationsState> {
 
   final _databaseRepository = app.databaseRepository;
 
-  void _init() {
+  void _init() async {
     try {
-      _fetchNotifications();
+      await _fetchNotifications();
+      await _fetchAnnouncements();
+      emit(state.copyWith(status: HSNotificationsStatus.loaded));
     } catch (_) {
       emit(state.copyWith(status: HSNotificationsStatus.error));
       HSDebugLogger.logError("HSNotificationsCubit: Error in _init");
@@ -28,12 +30,23 @@ class HSNotificationsCubit extends Cubit<HSNotificationsState> {
       List<HSNotification> notifications = await _databaseRepository
           .notificationReadUserNotifications(currentUser: currentUser);
       HSDebugLogger.logSuccess("HSNotificationsCubit: Notifications fetched");
-      emit(state.copyWith(
-          notifications: notifications, status: HSNotificationsStatus.loaded));
+      emit(state.copyWith(notifications: notifications));
     } catch (_) {
       emit(state.copyWith(status: HSNotificationsStatus.error));
       HSDebugLogger.logError(
           "HSNotificationsCubit: Error in _fetchNotifications");
+    }
+  }
+
+  Future<void> _fetchAnnouncements() async {
+    try {
+      List<HSAnnouncement> announcements =
+          await _databaseRepository.announcementGetRecent();
+      emit(state.copyWith(announcements: announcements));
+    } catch (_) {
+      emit(state.copyWith(status: HSNotificationsStatus.error));
+      HSDebugLogger.logError(
+          "HSNotificationsCubit: Error in _fetchAnnouncements");
     }
   }
 

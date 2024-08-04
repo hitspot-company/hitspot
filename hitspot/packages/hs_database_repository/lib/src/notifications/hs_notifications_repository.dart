@@ -1,4 +1,5 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
+import 'package:hs_database_repository/src/notifications/hs_announcement.dart';
 import 'package:hs_database_repository/src/notifications/hs_notification.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -83,5 +84,33 @@ class HSNotificationsRepository {
       HSDebugLogger.logError("Error deleting notification: $e");
       rethrow;
     }
+  }
+
+  // ANNOUNCEMENTS
+  // Fetch recent announcements
+  Future<List<HSAnnouncement>> announcementGetRecent(
+      int batchLimit, int batchOffset) async {
+    try {
+      final List<Map<String, dynamic>> response =
+          await Supabase.instance.client.rpc(
+        'announcement_get_recent',
+        params: {'p_batch_limit': batchLimit, 'p_batch_offset': batchOffset},
+      );
+      HSDebugLogger.logInfo("Fetched $response");
+      return response.map(HSAnnouncement.deserialize).toList();
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching recent announcements: $e");
+      rethrow;
+    }
+  }
+
+  // Fetch announcement by ID
+  Future<HSAnnouncement?> announcementGetByID(String id) async {
+    final response = await _supabase.rpc(
+      'announcement_get_by_id',
+      params: {'p_id': id},
+    );
+
+    return response != null ? HSAnnouncement.deserialize(response) : null;
   }
 }

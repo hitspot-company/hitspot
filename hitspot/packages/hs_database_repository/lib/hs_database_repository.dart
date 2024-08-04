@@ -8,3 +8,4 @@ export 'src/tags/hs_tag.dart';
 export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 export 'src/recommendation_system/hs_interaction_type.dart';
 export 'src/notifications/hs_notification.dart';
+export 'src/notifications/hs_announcement.dart';
