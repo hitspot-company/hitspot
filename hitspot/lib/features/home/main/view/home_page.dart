@@ -250,9 +250,6 @@ class _HomeGridBuilder extends StatelessWidget {
             subtitle = "Our picks for you!";
             break;
         }
-        if (elements.isEmpty) {
-          return const SizedBox().toSliver;
-        }
         if (isLoading) {
           return SliverMainAxisGroup(
             slivers: [
@@ -280,6 +277,9 @@ class _HomeGridBuilder extends StatelessWidget {
               ),
             ],
           );
+        }
+        if (elements.isEmpty) {
+          return const SizedBox().toSliver;
         }
         final builderHeight = elements.length < 2
             ? defaultBuilderHeight
