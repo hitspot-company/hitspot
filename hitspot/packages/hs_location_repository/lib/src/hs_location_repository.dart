@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:dio/dio.dart';
@@ -214,11 +215,17 @@ class HSLocationRepository {
   Future<void> animateCameraToNewLatLng(
       Completer<GoogleMapController> mapController, LatLng location,
       [double? zoom]) async {
+    late final double zoomLevel;
     final GoogleMapController controller = await mapController.future;
+    if (Platform.isAndroid) {
+      zoomLevel = zoom ?? 16.0;
+    } else {
+      zoomLevel = zoom ?? await controller.getZoomLevel();
+    }
     controller.animateCamera(
       CameraUpdate.newLatLngZoom(
         location,
-        zoom ?? await controller.getZoomLevel(),
+        zoomLevel,
       ),
     );
   }

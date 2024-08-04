@@ -50,7 +50,7 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     await _fetchInitial();
     if (state.currentPosition != null) {
       app.locationRepository.animateCameraToNewLatLng(
-          mapController, state.currentPosition!.toLatLng);
+          mapController, state.currentPosition!.toLatLng, 16.0);
     }
   }
 
