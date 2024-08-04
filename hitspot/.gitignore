@@ -48,5 +48,7 @@ app.*.map.json
 pubspec.lock
 pubspec_overrides.yaml
 
+firebase.json
+
 android/upload-keystore.jks
 android/key.properties

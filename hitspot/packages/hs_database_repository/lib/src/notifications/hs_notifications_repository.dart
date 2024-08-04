@@ -91,6 +91,13 @@ class HSNotificationsRepository {
     }
   }
 
+  Future<void> changeFcmToken(String userID, String fcmToken) async {
+    await _supabase.rpc("notifications_register_fcm_token", params: {
+      "p_user_id": userID,
+      "p_fcm_token": fcmToken,
+    });
+  }
+
   Future<bool> notificationIsRead(String id) async {
     try {
       SharedPreferences instance = await SharedPreferences.getInstance();
