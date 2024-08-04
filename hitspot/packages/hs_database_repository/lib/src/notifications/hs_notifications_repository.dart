@@ -2,6 +2,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_announcement.dart';
 import 'package:hs_database_repository/src/notifications/hs_notification.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSNotificationsRepository {
@@ -62,7 +63,11 @@ class HSNotificationsRepository {
         'p_offset': offset,
         'p_include_hidden': includeHidden,
       });
-      return result.map(HSNotification.deserialize).toList();
+      final List<HSNotification> ret = await Future.wait(result.map((e) async {
+        return HSNotification.deserialize(e)
+            .copyWith(isRead: await notificationIsRead(e['id']));
+      }));
+      return ret;
     } catch (e) {
       HSDebugLogger.logError("Error reading notification: $e");
       rethrow;
@@ -86,6 +91,28 @@ class HSNotificationsRepository {
     }
   }
 
+  Future<bool> notificationIsRead(String id) async {
+    try {
+      SharedPreferences instance = await SharedPreferences.getInstance();
+      HSDebugLogger.logInfo("Checking if the notification is read");
+      return instance.getBool("notification_$id") ?? false;
+    } catch (_) {
+      HSDebugLogger.logError("Failed to check if the notification is read");
+      rethrow;
+    }
+  }
+
+  Future<void> notificationMarkAsRead(String id) async {
+    try {
+      SharedPreferences instance = await SharedPreferences.getInstance();
+      await instance.setBool("notification_$id", true);
+      HSDebugLogger.logSuccess("Marked the notification as read");
+    } catch (_) {
+      HSDebugLogger.logError("Failed to set as the notification as read");
+      rethrow;
+    }
+  }
+
   // ANNOUNCEMENTS
   // Fetch recent announcements
   Future<List<HSAnnouncement>> announcementGetRecent(
@@ -97,7 +124,12 @@ class HSNotificationsRepository {
         params: {'p_batch_limit': batchLimit, 'p_batch_offset': batchOffset},
       );
       HSDebugLogger.logInfo("Fetched $response");
-      return response.map(HSAnnouncement.deserialize).toList();
+      final List<HSAnnouncement> ret =
+          await Future.wait(response.map((e) async {
+        return HSAnnouncement.deserialize(e)
+            .copyWith(isRead: await announcementIsRead(e['id']));
+      }));
+      return ret;
     } catch (e) {
       HSDebugLogger.logError("Error fetching recent announcements: $e");
       rethrow;
@@ -112,5 +144,27 @@ class HSNotificationsRepository {
     );
 
     return response != null ? HSAnnouncement.deserialize(response) : null;
+  }
+
+  Future<bool> announcementIsRead(String id) async {
+    try {
+      SharedPreferences instance = await SharedPreferences.getInstance();
+      HSDebugLogger.logInfo("Checking if the announcement is read");
+      return instance.getBool("announcement_$id") ?? false;
+    } catch (_) {
+      HSDebugLogger.logError("Failed to check if the notification is read");
+      rethrow;
+    }
+  }
+
+  Future<void> announcementMarkAsRead(String id) async {
+    try {
+      SharedPreferences instance = await SharedPreferences.getInstance();
+      await instance.setBool("announcement_$id", true);
+      HSDebugLogger.logSuccess("Marked the announcement as read");
+    } catch (_) {
+      HSDebugLogger.logError("Failed to set as the announcement as read");
+      rethrow;
+    }
   }
 }

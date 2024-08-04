@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/widgets/notifications/hs_announcement_detail_dialog.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
@@ -52,6 +54,7 @@ class HSNotificationsCubit extends Cubit<HSNotificationsState> {
 
   void openNotification(HSNotification notification) {
     try {
+      _databaseRepository.notificationMarkAsRead(id: notification.id!);
       final type = notification.type;
       if (type == HSNotificationType.spotlike ||
           type == HSNotificationType.spotcomment) {
@@ -62,6 +65,20 @@ class HSNotificationsCubit extends Cubit<HSNotificationsState> {
       } else if (type == HSNotificationType.userfollow) {
         navi.toUser(userID: notification.from!);
       }
+    } catch (_) {
+      emit(state.copyWith(status: HSNotificationsStatus.error));
+      HSDebugLogger.logError("HSNotificationsCubit: Error in openNotification");
+    }
+  }
+
+  void openAnnouncement(HSAnnouncement announcement) {
+    try {
+      _databaseRepository.announcementMarkAsRead(id: announcement.id!);
+      showDialog(
+        context: app.context,
+        builder: (context) =>
+            HSAnnouncementDetailDialog(announcement: announcement),
+      );
     } catch (_) {
       emit(state.copyWith(status: HSNotificationsStatus.error));
       HSDebugLogger.logError("HSNotificationsCubit: Error in openNotification");

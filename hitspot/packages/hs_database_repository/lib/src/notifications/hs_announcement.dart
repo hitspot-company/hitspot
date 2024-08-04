@@ -96,6 +96,7 @@ class HSAnnouncement {
   final DateTime? publishedAt;
   final DateTime? expiresAt;
   final bool? isActive;
+  final bool isRead;
   final String? ctaText;
   final String? ctaLink;
 
@@ -109,6 +110,7 @@ class HSAnnouncement {
     this.publishedAt,
     this.expiresAt,
     this.isActive,
+    this.isRead = false,
     this.ctaText,
     this.ctaLink,
   });
@@ -143,5 +145,35 @@ class HSAnnouncement {
       'cta_text': ctaText,
       'cta_link': ctaLink,
     };
+  }
+
+  HSAnnouncement copyWith({
+    String? id,
+    String? title,
+    String? content,
+    HSAnnouncementType? announcementType,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? publishedAt,
+    DateTime? expiresAt,
+    bool? isActive,
+    bool? isRead,
+    String? ctaText,
+    String? ctaLink,
+  }) {
+    return HSAnnouncement(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      announcementType: announcementType ?? this.announcementType,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      publishedAt: publishedAt ?? this.publishedAt,
+      expiresAt: expiresAt ?? this.expiresAt,
+      isActive: isActive ?? this.isActive,
+      isRead: isRead ?? this.isRead,
+      ctaText: ctaText ?? this.ctaText,
+      ctaLink: ctaLink ?? this.ctaLink,
+    );
   }
 }
