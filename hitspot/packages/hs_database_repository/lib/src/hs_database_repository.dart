@@ -343,4 +343,22 @@ class HSDatabaseRepsitory {
           bool includeHidden = false}) async =>
       await _notificationsRepository.readUserNotifications(
           currentUser, currentUserID, limit, offset, includeHidden);
+
+  Future<void> notificationMarkAsRead({required String id}) async =>
+      _notificationsRepository.notificationMarkAsRead(id);
+  Future<bool> notificationIsRead({required String id}) async =>
+      _notificationsRepository.notificationIsRead(id);
+
+  Future<HSAnnouncement?> announcementGetByID(String id) async =>
+      _notificationsRepository.announcementGetByID(id);
+  Future<List<HSAnnouncement>> announcementGetRecent({
+    int batchLimit = 10,
+    int batchOffset = 0,
+  }) async =>
+      _notificationsRepository.announcementGetRecent(batchLimit, batchOffset);
+
+  Future<void> announcementMarkAsRead({required String id}) async =>
+      _notificationsRepository.announcementMarkAsRead(id);
+  Future<bool> announcementIsRead({required String id}) async =>
+      _notificationsRepository.announcementIsRead(id);
 }

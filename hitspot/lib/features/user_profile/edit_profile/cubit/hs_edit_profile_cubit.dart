@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
-import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -11,21 +10,20 @@ import 'package:equatable/equatable.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-part 'edit_profile_state.dart';
+part 'hs_edit_profile_state.dart';
 
-class EditProfileCubit extends Cubit<EditProfileState> {
-  EditProfileCubit(HSDatabaseRepsitory databaseRepository)
+class HSEditProfileCubit extends Cubit<HSEditProfileState> {
+  HSEditProfileCubit(HSDatabaseRepsitory databaseRepository)
       : _databaseRepository = databaseRepository,
-        super(const EditProfileState());
+        super(const HSEditProfileState());
 
   final HSDatabaseRepsitory _databaseRepository;
   bool shouldUpdate = false;
 
   Future<void> chooseImage() async {
     try {
-      final CroppedFile? image = await app.pickers.image(
-          cropStyle: CropStyle.rectangle,
-          cropAspectRatio: const CropAspectRatio(ratioX: 16, ratioY: 9));
+      final CroppedFile? image =
+          await app.pickers.image(cropStyle: CropStyle.circle);
       if (image == null) return;
       final File file = File(image.path);
       emit(state.copy(imageChangeState: HSImageChangeState.uploading));

@@ -34,7 +34,8 @@ class HSNotification {
   final HSUser? fromUser, toUser;
   final HSNotificationType? type;
   final String? boardID, spotID;
-  final bool? isRead, isHidden;
+  final bool? isHidden;
+  final bool isRead;
   final DateTime? createdAt, updatedAt;
   final Map<String, dynamic>? metadata;
 
@@ -46,7 +47,7 @@ class HSNotification {
     this.from,
     this.to,
     this.type,
-    this.isRead,
+    this.isRead = false,
     this.isHidden,
     this.createdAt,
     this.updatedAt,
@@ -124,15 +125,15 @@ class HSNotification {
   String get title {
     switch (type) {
       case HSNotificationType.spotlike:
-        return 'Spot Liked';
+        return 'Spot liked';
       case HSNotificationType.spotcomment:
-        return 'Spot Commented';
+        return 'Spot commented';
       case HSNotificationType.userfollow:
-        return 'New Follow';
+        return 'New follow';
       case HSNotificationType.boardlike:
-        return 'Board Liked';
+        return 'Board liked';
       case HSNotificationType.boardinvitation:
-        return 'Board Invitation';
+        return 'Board invitation';
       case HSNotificationType.other || null:
         return "Notification";
     }
@@ -170,13 +171,15 @@ class HSNotification {
         return FontAwesomeIcons.bell;
     }
   }
+}
 
+extension TimeAgo on DateTime {
   String get timeAgo {
     final now = DateTime.now();
-    final difference = now.difference(createdAt!);
+    final difference = now.difference(this);
 
     if (difference.inDays > 365) {
-      return DateFormat.yMMMd().format(createdAt!);
+      return DateFormat.yMMMd().format(this);
     } else if (difference.inDays > 30) {
       final months = (difference.inDays / 30).floor();
       return '$months month${months == 1 ? '' : 's'} ago';

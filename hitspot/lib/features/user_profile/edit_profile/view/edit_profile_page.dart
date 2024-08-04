@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
-import 'package:hitspot/features/user_profile/edit_profile/cubit/edit_profile_cubit.dart';
+import 'package:hitspot/features/user_profile/edit_profile/cubit/hs_edit_profile_cubit.dart';
 import 'package:hitspot/features/user_profile/edit_value/view/edit_value_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -18,7 +18,7 @@ class EditProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editProfileCubit = context.read<EditProfileCubit>();
+    final editProfileCubit = context.read<HSEditProfileCubit>();
     return HSScaffold(
       appBar: HSAppBar(
         titleText: "EDIT PROFILE",
@@ -41,7 +41,7 @@ class EditProfilePage extends StatelessWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   background: Column(
                     children: [
-                      BlocBuilder<EditProfileCubit, EditProfileState>(
+                      BlocBuilder<HSEditProfileCubit, HSEditProfileState>(
                         builder: (context, state) {
                           final HSImageChangeState imageChangeState =
                               state.imageChangeState;
@@ -145,7 +145,7 @@ class _TextEditPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HSTextField.filled(
-      onTap: () => _toEdit(context.read<EditProfileCubit>()),
+      onTap: () => _toEdit(context.read<HSEditProfileCubit>()),
       suffixIcon: const Opacity(
         opacity: 0.0,
         child: Icon(FontAwesomeIcons.user),
@@ -155,7 +155,7 @@ class _TextEditPrompt extends StatelessWidget {
     );
   }
 
-  Future<void> _toEdit(EditProfileCubit editProfileCubit) async {
+  Future<void> _toEdit(HSEditProfileCubit editProfileCubit) async {
     final bool shouldUpdate = await navi.pushPage(
         page: EditValueProvider(
       field: field,
