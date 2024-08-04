@@ -48,17 +48,12 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
   }
 
   Future<void> _loadMoreSpots() async {
-    // if (state.hasReachedMaxSpots) return;
-
     HSDebugLogger.logInfo("Fetching more spots...");
     emit(state.copyWith(status: HSUserProfileStatus.loadingMoreSpots));
 
     try {
-      final newSpots = await _databaseRepository.spotfetchUserSpots(
-        user: state.user!,
-        // startAfter: state.spots.last,
-        // limit: 10,
-      );
+      final newSpots =
+          await _databaseRepository.spotfetchUserSpots(user: state.user!);
 
       if (newSpots.isEmpty) {
         emit(state.copyWith(
@@ -115,8 +110,6 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
     _spotsScrollController.addListener(_onSpotsScroll);
     _boardsScrollController.addListener(_onBoardsScroll);
     emit(state.copyWith(status: HSUserProfileStatus.loading));
-
-    emit(state.copyWith(status: HSUserProfileStatus.loading));
     if (userID == currentUser.uid) {
       isOwnProfile = true;
     } else {
@@ -133,13 +126,14 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
           await _databaseRepository.spotfetchUserSpots(user: user);
       final List<HSBoard> userBoards =
           await _databaseRepository.boardFetchUserBoards(user: user);
-      HSDebugLogger.logSuccess("Fetched user boards: ${userBoards.length}");
       final bool? isFollowed = await app.databaseRepository
           .userIsUserFollowed(followerID: currentUser.uid, followedID: userID);
-      HSDebugLogger.logSuccess("Fetched following: $isFollowed");
       emit(state.copyWith(
         status: HSUserProfileStatus.loaded,
         user: user,
+        followersCount: user.followers,
+        followingCount: user.following,
+        spotsCount: user.spots,
         spots: userSpots,
         boards: userBoards,
         isFollowed: isFollowed ?? false,
@@ -159,15 +153,16 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
           followedID: userID);
       late final int updatedFollowers;
       if (!state.isFollowed!) {
-        updatedFollowers = state.user!.followers! + 1;
+        updatedFollowers = state.followersCount + 1;
       } else {
-        updatedFollowers = state.user!.followers! - 1;
+        updatedFollowers = state.followersCount - 1;
       }
       HSDebugLogger.logInfo(state.user.toString());
       emit(state.copyWith(
-          status: HSUserProfileStatus.loaded,
-          isFollowed: !state.isFollowed!,
-          user: state.user?.copyWith(followers: updatedFollowers)));
+        status: HSUserProfileStatus.loaded,
+        isFollowed: !state.isFollowed!,
+        followersCount: updatedFollowers,
+      ));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }

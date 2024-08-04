@@ -19,6 +19,8 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   Completer<GoogleMapController> get mapController => _mapController;
   final _databaseRepository = app.databaseRepository;
 
+  void lateFetchNearby() => _fetchNearbySpots();
+
   Future<void> _fetchInitial() async {
     try {
       emit(state.copyWith(status: HSHomeStatus.loading));

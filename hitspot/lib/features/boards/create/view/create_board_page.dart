@@ -175,16 +175,20 @@ class _SecondPage extends StatelessWidget {
         ),
         const Gap(32.0),
         HSFormButtonsRow(
-          left: HSFormButton(
-            onPressed: _addBoardCubit.prevPage,
-            child: const Text("Back"),
-          ),
-          right: HSFormButton(
-            onPressed: _addBoardCubit.nextPage,
-            icon: nextIcon,
-            child: const Text("Visibility"),
-          ),
-        ),
+            left: HSFormButton(
+              onPressed: _addBoardCubit.prevPage,
+              child: const Text("Back"),
+            ),
+            right: BlocSelector<HSCreateBoardCubit, HSCreateBoardState, bool>(
+              selector: (state) => state.image.isNotEmpty,
+              builder: (context, isImageSelected) {
+                return HSFormButton(
+                  onPressed: isImageSelected ? _addBoardCubit.nextPage : null,
+                  icon: nextIcon,
+                  child: const Text("Visibility"),
+                );
+              },
+            )),
       ],
     );
   }

@@ -1,16 +1,17 @@
 import 'package:hs_authentication_repository/src/models/hs_user.dart';
-import 'package:hs_database_repository/src/users/exceptions/hs_create_user_failure.dart';
-import 'package:hs_database_repository/src/users/exceptions/hs_read_user_failure.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_database_repository/src/users/exceptions/hs_update_user_failure.dart';
-import 'package:hs_database_repository/src/users/exceptions/hs_user_exception.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSUsersRepository {
-  const HSUsersRepository(this._supabase, this._users);
+  const HSUsersRepository(
+      this._supabase, this._users, this._notificationsRepository);
 
   final SupabaseClient _supabase;
   final String _users;
+  final HSNotificationsRepository _notificationsRepository;
 
   // CREATE
   Future<void> create(HSUser user) async {
@@ -28,9 +29,10 @@ class HSUsersRepository {
     try {
       assert(user != null || userID != null, "User or userID must be provided");
       late final String uid = user?.uid ?? userID!;
-      final fetchedUser = await _supabase.from(_users).select().eq("id", uid);
-      if (fetchedUser.isEmpty) throw HSReadUserFailure(code: 404);
-      return HSUser.deserialize(fetchedUser.first);
+      final List<Map<String, dynamic>> fetched =
+          await _supabase.rpc("user_fetch", params: {"p_user_id": uid});
+      if (fetched.isEmpty) throw HSReadUserFailure(code: 404);
+      return HSUser.deserialize(fetched.first);
     } catch (_) {
       HSDebugLogger.logError("Error fetching user: $_");
       throw HSReadUserFailure(customDetails: _.toString());
@@ -84,10 +86,8 @@ class HSUsersRepository {
     try {
       final followerUID = follower?.uid ?? followerID!;
       final followedUID = followed?.uid ?? followedID!;
-      await _supabase.rpc('unfollow_user', params: {
-        "follower_uid": followerUID,
-        "followed_uid": followedUID,
-      });
+      await _supabase.rpc('user_unfollow',
+          params: {"p_follower_id": followerUID, "p_followed_id": followedUID});
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       rethrow;
@@ -96,15 +96,15 @@ class HSUsersRepository {
 
   Future<void> follow(String? followerID, String? followedID, HSUser? follower,
       HSUser? followed) async {
-    assert(followerID != null || follower != null,
-        "Follower or followerID must be provided");
-    assert(followedID != null || followed != null,
-        "Followed or followedID must be provided");
     try {
+      assert(followerID != null || follower != null,
+          "Follower or followerID must be provided");
+      assert(followedID != null || followed != null,
+          "Followed or followedID must be provided");
       final followerUID = follower?.uid ?? followerID!;
       final followedUID = followed?.uid ?? followedID!;
-      await _supabase.rpc('follow_user',
-          params: {"followed_uid": followedUID, "follower_uid": followerUID});
+      await _supabase.rpc('user_follow',
+          params: {"p_followed_id": followedUID, "p_follower_id": followerUID});
       HSDebugLogger.logSuccess("Followed");
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -121,9 +121,9 @@ class HSUsersRepository {
     try {
       final String followedUID = followed?.uid ?? followedID!;
       final String followerUID = follower?.uid ?? followerID!;
-      final bool response = await _supabase.rpc('is_user_followed', params: {
-        'follower_uid': followerUID,
-        'followed_uid': followedUID,
+      final bool response = await _supabase.rpc('user_is_followed', params: {
+        'p_follower_id': followerUID,
+        'p_followed_id': followedUID,
       });
       return (response);
     } catch (_) {

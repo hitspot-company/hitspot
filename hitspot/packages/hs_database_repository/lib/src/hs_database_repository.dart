@@ -3,7 +3,7 @@ import 'dart:ffi';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
-import 'package:hs_database_repository/src/recommendation_system/hs_interaction_type.dart';
+import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_database_repository/src/recommendation_system/hs_recommendation_system_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
@@ -12,9 +12,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
   HSDatabaseRepsitory(this._supabaseClient) {
-    this._usersRepository = HSUsersRepository(_supabaseClient, users);
-    this._boardsRepository = HSBoardsRepository(_supabaseClient, boards);
-    this._spotsRepository = HSSpotsRepository(_supabaseClient, spots);
+    this._notificationsRepository = HSNotificationsRepository(_supabaseClient);
+    this._usersRepository =
+        HSUsersRepository(_supabaseClient, users, _notificationsRepository);
+    this._boardsRepository =
+        HSBoardsRepository(_supabaseClient, boards, _notificationsRepository);
+    this._spotsRepository =
+        HSSpotsRepository(_supabaseClient, spots, _notificationsRepository);
     this._tagsRepository = HSTagsRepository(_supabaseClient, spots);
     this._recommendationSystemRepository =
         HSRecommendationSystemRepository(_supabaseClient);
@@ -24,12 +28,14 @@ class HSDatabaseRepsitory {
   static const String boards = "boards";
   static const String spots = "spots";
   static const String tags = "tags";
+  static const String notifications = "notifications";
   final SupabaseClient _supabaseClient;
   late final HSUsersRepository _usersRepository;
   late final HSBoardsRepository _boardsRepository;
   late final HSSpotsRepository _spotsRepository;
   late final HSTagsRepository _tagsRepository;
   late final HSRecommendationSystemRepository _recommendationSystemRepository;
+  late final HSNotificationsRepository _notificationsRepository;
 
   Future<void> userCreate({required HSUser user}) async =>
       await _usersRepository.create(user);
@@ -60,11 +66,9 @@ class HSDatabaseRepsitory {
     final bool? foll = await userIsUserFollowed(
         followedID: followedID, followerID: followerID);
     if (foll!) {
-      // HSDebugLogger.logInfo("User followed: Yes");
       await _usersRepository.unfollow(
           followerID, followedID, follower, followed);
     } else {
-      // HSDebugLogger.logInfo("User followed: No");
       await _usersRepository.follow(followerID, followedID, follower, followed);
     }
   }
@@ -202,9 +206,6 @@ class HSDatabaseRepsitory {
       await _spotsRepository.addComment(
           spotID, userID, comment, isReply, parentCommentID);
 
-  Future<List<HSSpot>> fetchNearbySpots(double lat, double long) async =>
-      await _spotsRepository.fetchNearbySpots(lat, long);
-
   Future<List<HSSpot>> spotFetchSpotsWithinRadius(
           {required double lat, required double long, double? radius}) async =>
       await _spotsRepository.fetchSpotsWithinRadius(lat, long, radius);
@@ -261,13 +262,6 @@ class HSDatabaseRepsitory {
           int batchOffset = 0,
           int batchSize = 20}) async =>
       await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
-
-  Future<List<HSBoard>> spotfetchUserBoards(
-          {HSUser? user,
-          String? userID,
-          int batchOffset = 0,
-          int batchSize = 20}) async =>
-      await _spotsRepository.userBoards(user, userID, batchOffset, batchSize);
 
   Future<HSSpot> spotFetchTopSpotWithTag(String tag) async =>
       await _spotsRepository.fetchTopSpotWithTag(tag);
@@ -332,4 +326,21 @@ class HSDatabaseRepsitory {
           required HSSpot spot,
           required HSInteractionType event}) async =>
       await _recommendationSystemRepository.captureEvent(userId, spot, event);
+
+  Future<void> notificationCreate(
+          {required HSNotification notificaton}) async =>
+      await _notificationsRepository.create(notificaton);
+
+  Future<HSNotification> notificationRead(
+          {HSNotification? notification, String? notificationID}) async =>
+      _notificationsRepository.read(notification, notificationID);
+
+  Future<List<HSNotification>> notificationReadUserNotifications(
+          {HSUser? currentUser,
+          String? currentUserID,
+          int limit = 20,
+          int offset = 0,
+          bool includeHidden = false}) async =>
+      await _notificationsRepository.readUserNotifications(
+          currentUser, currentUserID, limit, offset, includeHidden);
 }

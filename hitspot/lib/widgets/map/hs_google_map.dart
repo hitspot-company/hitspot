@@ -37,7 +37,7 @@ class HSGoogleMap extends StatelessWidget {
       initialCameraPosition: initialCameraPosition,
       onMapCreated: onMapCreated,
       myLocationButtonEnabled: false,
-      myLocationEnabled: false,
+      myLocationEnabled: myLocationEnabled,
       markers: markers ?? {},
       onCameraIdle: onCameraIdle,
       onCameraMove: onCameraMove,

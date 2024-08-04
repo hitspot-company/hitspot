@@ -1,15 +1,18 @@
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class HSBoardsRepository {
-  const HSBoardsRepository(this._supabase, this._boards);
+  const HSBoardsRepository(
+      this._supabase, this._boards, this._notificationsRepository);
 
   final SupabaseClient _supabase;
   final String _boards;
   final String _boardsSaves = "boards_saves";
+  final HSNotificationsRepository _notificationsRepository;
 
   // CREATE
   Future<String> create(HSBoard board) async {
@@ -93,11 +96,10 @@ class HSBoardsRepository {
           "Either board or boardID has to be provided.");
       assert((user != null || userID != null),
           "Either user or userID has to be provided.");
-
       final uid = user?.uid ?? userID;
       final bid = board?.id ?? boardID;
-      final bool is_saved = await _supabase.rpc("boards_is_board_saved",
-          params: {'saved_by_id': uid, 'saved_board_id': bid});
+      final bool is_saved = await _supabase
+          .rpc("board_is_saved", params: {'p_user_id': uid, 'p_board_id': bid});
       return is_saved;
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -124,9 +126,9 @@ class HSBoardsRepository {
       final bool isFollowed = await isBoardSaved(board, boardID, user, userID);
       final uid = user?.uid ?? userID;
       final bid = board?.id ?? boardID;
-      await _supabase.rpc('boards_save_unsave_board', params: {
-        "saved_board_id": bid,
-        "saved_by_id": uid,
+      await _supabase.rpc('board_save_unsave', params: {
+        "p_user_id": uid,
+        "p_board_id": bid,
       });
       return !isFollowed;
     } catch (_) {
@@ -152,8 +154,8 @@ class HSBoardsRepository {
           "The user or the userID has to be provided.");
       final uid = user?.uid ?? userID;
       final bid = board?.id ?? boardID;
-      final bool result = await _supabase.rpc('boards_is_editor',
-          params: {"selected_board_id": bid, "selected_user_id": uid});
+      final bool result = await _supabase.rpc('board_is_editor',
+          params: {"p_board_id": bid, "p_user_id": uid});
       return (result);
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -172,12 +174,12 @@ class HSBoardsRepository {
     try {
       final uid = user?.uid ?? userID!;
       final List<Map<String, dynamic>> fetchedBoards =
-          await _supabase.rpc("fetch_user_boards", params: {
-        "input_user_id": uid,
-        "batch_offset": batchOffset,
-        "batch_size": batchSize,
+          await _supabase.rpc("board_fetch_user_boards", params: {
+        "p_user_id": uid,
+        "p_batch_offset": batchOffset,
+        "p_batch_size": batchSize,
       });
-      return fetchedBoards.map((e) => HSBoard.deserialize(e)).toList();
+      return fetchedBoards.map(HSBoard.deserialize).toList();
     } catch (_) {
       throw HSBoardException(
           type: HSBoardExceptionType.read, details: _.toString());
@@ -185,14 +187,13 @@ class HSBoardsRepository {
   }
 
   // READ TRENDING BOARDS
-  Future<List<HSBoard>> fetchTrendingBoards() async {
+  Future<List<HSBoard>> fetchTrendingBoards(
+      [int batchOffset = 0, int batchSize = 10]) async {
     try {
-      final fetchedBoards =
-          await _supabase.rpc('fetch_trending_boards', params: {
-        'limit_size': 16,
-      });
-      final List<dynamic> boards = fetchedBoards as List<dynamic>;
-      return boards.map((boardData) => HSBoard.deserialize(boardData)).toList();
+      final List<Map<String, dynamic>> fetchedBoards = await _supabase.rpc(
+          'board_fetch_trending',
+          params: {'p_batch_offset': batchOffset, 'p_batch_size': batchSize});
+      return fetchedBoards.map(HSBoard.deserialize).toList();
     } catch (_) {
       throw HSBoardException(
           type: HSBoardExceptionType.read,
@@ -207,10 +208,10 @@ class HSBoardsRepository {
     try {
       final bid = board?.id ?? boardID!;
       final List<Map<String, dynamic>> fetchedSpots = await _supabase
-          .rpc('boards_fetch_board_spots', params: {
-        'board_id_input': bid,
-        "batch_size": batchSize,
-        "batch_offset": batchOffset
+          .rpc('board_fetch_spots', params: {
+        'p_board_id': bid,
+        "p_batch_size": batchSize,
+        "p_batch_offset": batchOffset
       });
       HSDebugLogger.logSuccess("Fetched spots of board: $fetchedSpots");
 
@@ -246,10 +247,10 @@ class HSBoardsRepository {
 
       final bid = board?.id ?? boardID!;
       final List fetchedCollaborators = await _supabase
-          .rpc('boards_fetch_board_collaborators', params: {
-        'requested_board_id': bid,
-        "batch_size": batchSize,
-        "batch_offset": batchOffset
+          .rpc('board_fetch_collaborators', params: {
+        'p_board_id': bid,
+        "p_batch_size": batchSize,
+        "p_batch_offset": batchOffset
       });
 
       HSDebugLogger.logSuccess(
@@ -277,10 +278,10 @@ class HSBoardsRepository {
       final bid = board?.id ?? boardID!;
       final sid = spot?.sid ?? spotID!;
       final uid = addedBy?.uid ?? addedByID!;
-      await _supabase.rpc('boards_add_spot_to_board', params: {
-        "board_id_input": bid,
-        "spot_id_input": sid,
-        "added_by_input": uid,
+      await _supabase.rpc('board_add_spot', params: {
+        "p_board_id": bid,
+        "p_spot_id": sid,
+        "p_added_by": uid,
       });
     } catch (_) {
       throw Exception("Error adding spot: $_");
@@ -295,9 +296,9 @@ class HSBoardsRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final bid = board?.id ?? boardID!;
       final sid = spot?.sid ?? spotID!;
-      await _supabase.rpc('boards_delete_spot_from_board', params: {
-        "board_id_input": bid,
-        "spot_id_input": sid,
+      await _supabase.rpc('board_delete_spot', params: {
+        "p_board_id": bid,
+        "p_spot_id": sid,
       });
     } catch (_) {
       throw Exception("Error adding spot: $_");
@@ -312,10 +313,10 @@ class HSBoardsRepository {
 
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
 
-      await _supabase.rpc('boards_update_spot_index', params: {
-        "board_id_input": board?.id ?? boardID!,
-        "spot_id_input": spot?.sid ?? spotID!,
-        "new_index_input": newIndex,
+      await _supabase.rpc('board_update_spot_index', params: {
+        "p_board_id": board?.id ?? boardID!,
+        "p_spot_id": spot?.sid ?? spotID!,
+        "p_new_spot_index": newIndex,
       });
     } catch (_) {
       throw Exception("Error updating spots: $_");
@@ -447,8 +448,8 @@ class HSBoardsRepository {
 
   Future<HSBoard?> fetchBoardForInvitation(String boardId) async {
     try {
-      final board = await _supabase.rpc('fetch_board_details_for_invitation',
-          params: {'input_board_id': boardId});
+      final board = await _supabase.rpc('board_fetch_invitation_details',
+          params: {'p_board_id': boardId});
 
       HSDebugLogger.logSuccess('Fetched board for invitation: $board');
 

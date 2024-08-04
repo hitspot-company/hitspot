@@ -1,5 +1,4 @@
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/tags/hs_tag.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,9 +10,7 @@ class HSTagsRepository {
   // CREATE
   Future<void> create(String value) async {
     try {
-      await _supabase.rpc('tags_create_tag', params: {
-        'tag_value_input': value,
-      });
+      await _supabase.rpc('tag_create', params: {'p_tag': value});
     } catch (error) {
       throw Exception("Error creating tag: $error");
     }
@@ -53,6 +50,7 @@ class HSTagsRepository {
       await _supabase.rpc('tags_delete_tag', params: {
         'tag_value_input': tag.value,
       });
+      // TODO: Add this function
     } catch (error) {
       throw Exception("Error deleting tag: $error");
     }
@@ -72,10 +70,10 @@ class HSTagsRepository {
 
   Future<void> createSpot(String value, String userID, String spotID) async {
     try {
-      await _supabase.rpc('spots_tags_add_tag', params: {
-        'tag_value_input': value,
-        'user_id_input': userID,
-        'spot_id_input': spotID,
+      await _supabase.rpc('spot_tags_create', params: {
+        'p_tag': value,
+        'p_user_id': userID,
+        'p_spot_id': spotID,
       });
     } catch (_) {
       throw Exception("Error creating spot tag: $_");
@@ -87,6 +85,7 @@ class HSTagsRepository {
       await _supabase.rpc('spots_tags_delete_tag', params: {
         'tag_value_input': value,
       });
+      // TODO: Add this function
     } catch (_) {
       throw Exception("Error creating spot tag: $_");
     }
@@ -96,13 +95,10 @@ class HSTagsRepository {
     try {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final sid = spot?.sid ?? spotID;
-      final List response =
-          await _supabase.rpc('spots_tags_fetch_tags_of_spot', params: {
-        'spot_id_input': sid,
-      });
+      final List<Map<String, dynamic>> response =
+          await _supabase.rpc('spot_fetch_tags', params: {'p_spot_id': sid});
       HSDebugLogger.logSuccess("Fetched : $response");
-      final List<HSTag> tags =
-          response.map((e) => HSTag.deserialize(e)).toList();
+      final List<HSTag> tags = response.map(HSTag.deserialize).toList();
       return tags;
     } catch (_) {
       throw Exception("Error reading spot tags: $_");
@@ -113,10 +109,10 @@ class HSTagsRepository {
       String tag, int batchSize, int batchOffset) async {
     try {
       final List<Map<String, dynamic>> response =
-          await _supabase.rpc('spots_fetch_spots_with_tag', params: {
-        "tag": tag,
-        "batch_size": batchSize,
-        "batch_offset": batchOffset,
+          await _supabase.rpc('spot_fetch_with_tag', params: {
+        "p_tag": tag,
+        "p_batch_size": batchSize,
+        "p_batch_offset": batchOffset,
       });
       HSDebugLogger.logSuccess("Fetched : $response");
       final List<HSSpot> spots = response.map(HSSpot.deserialize).toList();
@@ -130,10 +126,10 @@ class HSTagsRepository {
       String query, int batchOffset, int batchSize) async {
     try {
       final List<Map<String, dynamic>> response =
-          await _supabase.rpc('tags_query_tag', params: {
-        'query': query,
-        "batch_offset": batchOffset,
-        "batch_size": batchSize,
+          await _supabase.rpc('tag_query', params: {
+        'p_query': query,
+        "p_batch_offset": batchOffset,
+        "p_batch_size": batchSize,
       });
       final List<HSTag> tags =
           response.map((e) => HSTag.deserialize(e)).toList();
