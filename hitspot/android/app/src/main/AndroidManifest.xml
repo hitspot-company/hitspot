@@ -24,6 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+		<!-- IMAGE CROPPER -->
+		<activity
+			android:name="com.yalantis.ucrop.UCropActivity"
+			android:screenOrientation="portrait"
+			android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+		 <!-- /IMAGE CROPPER -->
 		<!-- GOOGLE MAPS -->
 		<meta-data android:name="com.google.android.geo.API_KEY"
 			android:value="AIzaSyA3tLxZRVjepuBmufoYsDp2NfCiUXk6_DY"/>
