@@ -32,6 +32,8 @@ class HSGoogleMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
+      mapToolbarEnabled: false,
+      zoomControlsEnabled: false,
       fortyFiveDegreeImageryEnabled: fortyFiveDegreeImageryEnabled,
       style: app.theme.mapStyleDark,
       initialCameraPosition: initialCameraPosition,

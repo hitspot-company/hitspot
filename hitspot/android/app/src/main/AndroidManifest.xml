@@ -24,6 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+		<!-- IMAGE CROPPER -->
+		<activity
+			android:name="com.yalantis.ucrop.UCropActivity"
+			android:screenOrientation="portrait"
+			android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+		 <!-- /IMAGE CROPPER -->
+		<!-- GOOGLE MAPS -->
+		<meta-data android:name="com.google.android.geo.API_KEY"
+			android:value="AIzaSyA3tLxZRVjepuBmufoYsDp2NfCiUXk6_DY"/>
+		<!-- /GOOGLE MAPS -->
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -41,4 +51,8 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+	<!-- GEOLOCATOR -->
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<!-- /GEOLOCATOR -->
 </manifest>

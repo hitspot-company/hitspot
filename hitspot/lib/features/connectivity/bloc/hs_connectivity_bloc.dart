@@ -31,21 +31,35 @@ class HSConnectivityLocationBloc
     on<HSConnectivityStopLocationSubscriptionEvent>(
         _onStopLocationSubscription);
 
-    // Initialize connectivity listener
-    _connectivitySubscription = _connectivity.onConnectivityChanged
-        .listen((List<ConnectivityResult> result) {
-      add(HSConnectivityCheckConnectivityEvent());
-    });
-
-    _positionSubscription =
-        Geolocator.getPositionStream().listen((Position position) {
-      HSDebugLogger.logInfo("Location changed: $position");
-      add(HSConnectivityLocationChangedEvent(position));
-    });
-
     add(HSConnectivityCheckConnectivityEvent());
     add(HSConnectivityCheckLocationServiceEvent());
     add(HSConnectivityRequestLocationEvent());
+
+    if (state.isLocationServiceEnabled) {
+      _connectivitySubscription = _connectivity.onConnectivityChanged
+          .listen((List<ConnectivityResult> result) {
+        add(HSConnectivityCheckConnectivityEvent());
+      });
+
+      _positionSubscription =
+          Geolocator.getPositionStream().listen((Position position) {
+        HSDebugLogger.logInfo("Location changed: $position");
+        add(HSConnectivityLocationChangedEvent(position));
+      });
+    } else {
+      add(HSConnectivityLocationChangedEvent(Position(
+        longitude: 12.496366,
+        latitude: 41.902782,
+        timestamp: DateTime.now(),
+        accuracy: 0.0,
+        altitude: 0.0,
+        altitudeAccuracy: 0.0,
+        heading: 0.0,
+        headingAccuracy: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0,
+      )));
+    }
   }
 
   Future<void> _onCheckConnectivity(HSConnectivityCheckConnectivityEvent event,

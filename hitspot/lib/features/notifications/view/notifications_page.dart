@@ -71,76 +71,85 @@ class _LoadedView extends StatelessWidget {
     final cubit = context.read<HSNotificationsCubit>();
     return CustomScrollView(
       slivers: [
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Text("Announcements", style: textTheme.headlineMedium),
-            const Gap(16.0),
-          ]),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final announcement = state.announcements[index];
-              return ListTile(
-                onTap: () => cubit.openAnnouncement(announcement),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+        if (cubit.state.announcements.isNotEmpty)
+          SliverMainAxisGroup(
+            slivers: [
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  Text("Announcements", style: textTheme.headlineMedium),
+                  const Gap(16.0),
+                ]),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final announcement = state.announcements[index];
+                    return ListTile(
+                      onTap: () => cubit.openAnnouncement(announcement),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      tileColor: Colors.grey.shade900,
+                      title: Text(announcement.announcementType!.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(announcement.title!),
+                      trailing: !announcement.isRead
+                          ? const badges.Badge(
+                              child: Icon(FontAwesomeIcons.bullhorn))
+                          : const Icon(FontAwesomeIcons.bullhorn),
+                    );
+                  },
+                  childCount: state.announcements.length,
                 ),
-                tileColor: Colors.grey.shade900,
-                title: Text(announcement.announcementType!.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(announcement.title!),
-                trailing: !announcement.isRead
-                    ? const badges.Badge(child: Icon(FontAwesomeIcons.bullhorn))
-                    : const Icon(FontAwesomeIcons.bullhorn),
-              );
-            },
-            childCount: state.announcements.length,
+              ),
+              const Gap(32.0).toSliver,
+            ],
           ),
-        ),
-        const Gap(32.0).toSliver,
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Text("Notifications", style: textTheme.headlineMedium),
-            const Gap(16.0),
-          ]),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final notification = state.notifications[index];
-              return ListTile(
-                onTap: () => cubit.openNotification(notification),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                tileColor: Colors.grey.shade900,
-                leading: HSUserAvatar(
-                  onTap: () => navi.toUser(userID: notification.from!),
-                  radius: 24,
-                  imageUrl: notification.fromUser?.avatarUrl,
-                ),
-                title: Text(notification.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: AutoSizeText.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: notification.body),
+        if (cubit.state.notifications.isNotEmpty)
+          SliverMainAxisGroup(slivers: [
+            SliverList(
+              delegate: SliverChildListDelegate([
+                Text("Notifications", style: textTheme.headlineMedium),
+                const Gap(16.0),
+              ]),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final notification = state.notifications[index];
+                  return ListTile(
+                    onTap: () => cubit.openNotification(notification),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    tileColor: Colors.grey.shade900,
+                    leading: HSUserAvatar(
+                      onTap: () => navi.toUser(userID: notification.from!),
+                      radius: 24,
+                      imageUrl: notification.fromUser?.avatarUrl,
+                    ),
+                    title: Text(notification.title,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: AutoSizeText.rich(
                       TextSpan(
-                          text: "\n• ${notification.createdAt!.timeAgo}",
-                          style: const TextStyle(fontSize: 14.0)),
-                    ],
-                  ),
-                  maxLines: 2,
-                ),
-                trailing: !notification.isRead
-                    ? badges.Badge(child: Icon(notification.icon))
-                    : Icon(notification.icon),
-              );
-            },
-            childCount: state.notifications.length,
-          ),
-        ),
+                        children: [
+                          TextSpan(text: notification.body),
+                          TextSpan(
+                              text: "\n• ${notification.createdAt!.timeAgo}",
+                              style: const TextStyle(fontSize: 14.0)),
+                        ],
+                      ),
+                      maxLines: 2,
+                    ),
+                    trailing: !notification.isRead
+                        ? badges.Badge(child: Icon(notification.icon))
+                        : Icon(notification.icon),
+                  );
+                },
+                childCount: state.notifications.length,
+              ),
+            ),
+          ]),
       ],
     );
   }
