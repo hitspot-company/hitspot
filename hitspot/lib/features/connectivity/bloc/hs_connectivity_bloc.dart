@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -36,6 +35,17 @@ class HSConnectivityLocationBloc
     });
     on<HSConnectivityStopLocationSubscriptionEvent>(
         _onStopLocationSubscription);
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final notification = message.notification;
+      if (notification != null) {
+        app.showToast(
+            toastType: HSToastType.pushNotification,
+            title: notification.title ?? "",
+            primaryColor: app.currentTheme.cardColor,
+            description: notification.body ?? "");
+      }
+    });
 
     add(HSConnectivityCheckConnectivityEvent());
     add(HSConnectivityCheckLocationServiceEvent());

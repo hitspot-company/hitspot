@@ -76,11 +76,13 @@ class HSApp {
           {required HSToastType toastType,
           required String title,
           String? description,
+          Color? primaryColor,
           Alignment? alignment}) =>
       toasts.toast(
         context,
         toastType: toastType,
         title: title,
+        primaryColor: primaryColor,
         descriptionText: description,
         alignment: alignment,
       );
