@@ -1,11 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
+import 'package:hitspot/firebase_options.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -18,14 +21,19 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  final url = dotenv.env["SUPABASE_URL"]!;
-  final anon = dotenv.env["SUPABASE_ANON_KEY"]!;
+  final url = dotenv.env['SUPABASE_URL'];
+  final anon = dotenv.env["SUPABASE_ANON_KEY"];
   HSDebugLogger.logInfo("$url: $anon");
-  await Supabase.initialize(url: url, anonKey: anon);
+  await Supabase.initialize(url: url!, anonKey: anon!);
 
   final HSAuthenticationRepository authenticationRepository =
       HSAuthenticationRepository(supabase);
   final HSThemeRepository themeRepository = HSThemeRepository.instance;
+
+  await Firebase.initializeApp(
+    name: "hitspot",
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(MyApp(
     authenticationRepository: authenticationRepository,

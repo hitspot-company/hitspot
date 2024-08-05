@@ -327,6 +327,10 @@ class HSDatabaseRepsitory {
           required HSInteractionType event}) async =>
       await _recommendationSystemRepository.captureEvent(userId, spot, event);
 
+  Future<void> notifactionChangeFcmToken(
+          {required String userID, required String fcmToken}) async =>
+      await _notificationsRepository.changeFcmToken(userID, fcmToken);
+
   Future<void> notificationCreate(
           {required HSNotification notificaton}) async =>
       await _notificationsRepository.create(notificaton);

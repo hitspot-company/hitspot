@@ -35,7 +35,7 @@ class HSGoogleMap extends StatelessWidget {
       mapToolbarEnabled: false,
       zoomControlsEnabled: false,
       fortyFiveDegreeImageryEnabled: fortyFiveDegreeImageryEnabled,
-      style: app.theme.mapStyleDark,
+      style: app.theme.mapStyle,
       initialCameraPosition: initialCameraPosition,
       onMapCreated: onMapCreated,
       myLocationButtonEnabled: false,

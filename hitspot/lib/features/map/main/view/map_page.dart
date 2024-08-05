@@ -325,7 +325,12 @@ class _TopBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(icon, color: Colors.white),
+                      icon: Icon(icon,
+                          color: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.color ??
+                              Colors.white),
                       onPressed: mapCubit.defaultButtonCallback,
                     ).animate().fade(),
                     if (titleText.isNotEmpty)

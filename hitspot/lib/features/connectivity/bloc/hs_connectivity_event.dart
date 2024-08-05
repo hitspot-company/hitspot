@@ -16,6 +16,15 @@ class HSConnectivityStartLocationSubscriptionEvent
 class HSConnectivityStopLocationSubscriptionEvent
     extends HSConnectivityLocationEvent {}
 
+class HSConnectivityRequestNotificationPermissionEvent
+    extends HSConnectivityLocationEvent {}
+
+class HSConnectivityFcmTokenChangedEvent extends HSConnectivityLocationEvent {
+  final String fcmToken;
+
+  HSConnectivityFcmTokenChangedEvent(this.fcmToken);
+}
+
 class HSConnectivityLocationChangedEvent extends HSConnectivityLocationEvent {
   final Position location;
 
