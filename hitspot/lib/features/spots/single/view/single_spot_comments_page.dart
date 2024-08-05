@@ -1,16 +1,18 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 
 class SingleSpotCommentsSection extends StatelessWidget {
   const SingleSpotCommentsSection({super.key});
@@ -19,39 +21,62 @@ class SingleSpotCommentsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
-    final ScrollController _scrollController = ScrollController();
-
-    // Check if user has scrolled to the bottom
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+    final ScrollController scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         singleSpotCommentsCubit.fetchComments();
       }
     });
-
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: BoxDecoration(
-        color: app.theme.currentTheme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    return GestureDetector(
+      onTap: HSScaffold.hideInput,
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        decoration: BoxDecoration(
+          color: app.theme.currentTheme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child:
+            BlocBuilder<HSSingleSpotCommentsCubit, HSSingleSpotCommentsState>(
+          buildWhen: (previous, current) =>
+              previous.pageStatus != current.pageStatus ||
+              previous.status != current.status,
+          builder: (context, state) {
+            return SafeArea(
+              child: state.status == HSSingleSpotCommentsStatus.loading
+                  ? const _LoadingComments()
+                  : state.pageStatus == HSSingleSpotCommentsPageStatus.comments
+                      ? _CommentsPage(
+                          scrollController: scrollController,
+                        )
+                      : _ReplyPage(
+                          scrollController: scrollController,
+                        ),
+            );
+          },
+        ),
       ),
-      child: BlocBuilder<HSSingleSpotCommentsCubit,
-          HSSingleSpotCommentsCubitState>(
-        buildWhen: (previous, current) =>
-            previous.pageStatus != current.pageStatus ||
-            previous.status != current.status,
-        builder: (context, state) {
-          return SafeArea(
-            child: state.status == HSSingleSpotCommentsStatus.loading
-                ? const Center(child: CircularProgressIndicator())
-                : state.pageStatus == HSSingleSpotCommentsPageStatus.comments
-                    ? _CommentsPage(
-                        scrollController: _scrollController,
-                      )
-                    : _ReplyPage(
-                        scrollController: _scrollController,
-                      ),
-          );
+    );
+  }
+}
+
+class _LoadingComments extends StatelessWidget {
+  const _LoadingComments({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView.separated(
+        shrinkWrap: true,
+        itemCount: 6,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Gap(16.0);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          return HSShimmerBox(width: screenWidth, height: 60.0);
         },
       ),
     );
@@ -66,13 +91,12 @@ class _Comment extends StatelessWidget {
   final int index;
 
   const _Comment({
-    Key? key,
     required this.comment,
     required this.onLike,
     this.onDelete,
     this.onReply,
     required this.index,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -130,8 +154,9 @@ class _Comment extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              _formatDate(comment.createdAt),
+                            AutoSizeText(
+                              "• ${comment.createdAt.timeAgo}",
+                              maxLines: 1,
                               style: const TextStyle(
                                   color: Colors.grey, fontSize: 12),
                             ),
@@ -189,11 +214,6 @@ class _Comment extends StatelessWidget {
               delay: (50 * index).ms),
     );
   }
-
-  String _formatDate(DateTime? date) {
-    if (date == null) return '';
-    return '${date.day}/${date.month}/${date.year}';
-  }
 }
 
 Widget _buildIconWithCount(
@@ -207,91 +227,20 @@ Widget _buildIconWithCount(
           icon: Icon(icon, size: 20, color: isLiked ? Colors.red : null),
           onPressed: onPressed,
           padding: EdgeInsets.zero,
-          constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
         ),
         count != null
             ? Positioned(
                 bottom: -3,
                 child: Text(
                   '$count',
-                  style: TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 10),
                 ),
               )
             : const SizedBox.shrink(),
       ],
     ),
   );
-}
-
-class _CommentInput extends StatefulWidget {
-  const _CommentInput({required this.hintText, super.key});
-
-  final String hintText;
-
-  @override
-  State<_CommentInput> createState() => _CommentInputState();
-}
-
-class _CommentInputState extends State<_CommentInput> {
-  late TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    HSSingleSpotCommentsCubit singleSpotCommentsCubit =
-        BlocProvider.of<HSSingleSpotCommentsCubit>(context);
-
-    return BlocConsumer<HSSingleSpotCommentsCubit,
-            HSSingleSpotCommentsCubitState>(
-        listener: (context, state) {
-          if (state.commentingStatus ==
-              HsSingleSpotCommentsCommentingStatus.finishedCommenting) {
-            _controller.clear();
-          }
-        },
-        buildWhen: (previous, current) =>
-            previous.commentingStatus != current.commentingStatus,
-        builder: (context, state) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: HSTextField(
-                    controller: _controller,
-                    onChanged: singleSpotCommentsCubit.commentChanged,
-                    textInputAction: TextInputAction.done,
-                    maxLines: 2,
-                    hintText: widget.hintText,
-                    maxLength: 250,
-                    readOnly: state.commentingStatus ==
-                        HsSingleSpotCommentsCommentingStatus.commenting,
-                  ),
-                ),
-                IconButton(
-                    icon: state.commentingStatus ==
-                            HsSingleSpotCommentsCommentingStatus.commenting
-                        ? const HSLoadingIndicator(
-                            size: 16.0,
-                          )
-                        : const Icon(Icons.send),
-                    onPressed: state.commentingStatus ==
-                            HsSingleSpotCommentsCommentingStatus.commenting
-                        ? null
-                        : () => singleSpotCommentsCubit.addComment()),
-              ],
-            )));
-  }
 }
 
 class _CommentsPage extends StatelessWidget {
@@ -304,8 +253,7 @@ class _CommentsPage extends StatelessWidget {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
 
-    return BlocBuilder<HSSingleSpotCommentsCubit,
-        HSSingleSpotCommentsCubitState>(
+    return BlocBuilder<HSSingleSpotCommentsCubit, HSSingleSpotCommentsState>(
       buildWhen: (previous, current) =>
           previous.status != current.status ||
           previous.fetchedComments != current.fetchedComments,
@@ -317,10 +265,7 @@ class _CommentsPage extends StatelessWidget {
                 children: [
                   if (state.fetchedComments.isEmpty)
                     const Expanded(
-                      child: Center(
-                        child: Text('There are no comments yet'),
-                      ),
-                    ),
+                        child: _EmptyComments("Be the first to comment")),
                   if (state.fetchedComments.isNotEmpty)
                     Expanded(
                       child: ListView.builder(
@@ -349,16 +294,86 @@ class _CommentsPage extends StatelessWidget {
                     ),
                   if (state.status ==
                       HSSingleSpotCommentsStatus.loadingMoreComments)
-                    const CircularProgressIndicator.adaptive(),
+                    const HSLoadingIndicator()
                 ],
               ),
             ),
-            _CommentInput(
-              hintText: "Write a comment...",
-            ),
+            const _CommentInput(),
           ],
         );
       },
+    );
+  }
+}
+
+class _EmptyComments extends StatelessWidget {
+  const _EmptyComments(this.message);
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            FontAwesomeIcons.comment,
+            size: 64,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommentInput extends StatelessWidget {
+  const _CommentInput();
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<HSSingleSpotCommentsCubit>(context);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+          16, 8, 16, MediaQuery.of(context).viewInsets.bottom + 8.0),
+      child: HSTextField.filled(
+        maxLength: 256,
+        autofocus: true,
+        controller: cubit.commentController,
+        hintText: 'Write a comment...',
+        onChanged: cubit.commentChanged,
+        suffixIcon:
+            BlocBuilder<HSSingleSpotCommentsCubit, HSSingleSpotCommentsState>(
+          buildWhen: (previous, current) =>
+              previous.commentingStatus != current.commentingStatus ||
+              previous.comment != current.comment,
+          builder: (context, state) {
+            final isSending = state.commentingStatus ==
+                HsSingleSpotCommentsCommentingStatus.commenting;
+            final isNotEmpty = state.comment.isNotEmpty;
+            if (isSending) {
+              return const HSLoadingIndicator(size: 16.0);
+            }
+            return IconButton(
+              icon: Icon(Icons.send,
+                  color: isNotEmpty ? app.theme.mainColor : Colors.grey),
+              onPressed: isNotEmpty && !isSending
+                  ? () => BlocProvider.of<HSSingleSpotCommentsCubit>(context)
+                      .addComment()
+                  : null,
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -372,8 +387,7 @@ class _ReplyPage extends StatelessWidget {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
 
-    return BlocBuilder<HSSingleSpotCommentsCubit,
-        HSSingleSpotCommentsCubitState>(
+    return BlocBuilder<HSSingleSpotCommentsCubit, HSSingleSpotCommentsState>(
       buildWhen: (previous, current) =>
           previous.status != current.status ||
           previous.fetchedReplies != current.fetchedReplies ||
@@ -413,14 +427,10 @@ class _ReplyPage extends StatelessWidget {
               onReply: null,
             ),
             if (state.status == HSSingleSpotCommentsStatus.loadingReplies)
-              const Expanded(child: Center(child: CircularProgressIndicator())),
+              const Expanded(child: _LoadingComments()),
             if ((state.status == HSSingleSpotCommentsStatus.loaded) &&
                 state.fetchedReplies.isEmpty)
-              const Expanded(
-                child: Center(
-                  child: Text('There are no replies yet'),
-                ),
-              ),
+              const Expanded(child: _EmptyComments("No replies yet")),
             if (state.fetchedReplies.isNotEmpty)
               Expanded(
                 child: Column(
@@ -455,8 +465,8 @@ class _ReplyPage extends StatelessWidget {
                 ),
               ),
             const _CommentInput(
-              hintText: "Write a reply...",
-            ),
+                // hintText: "Write a reply...",
+                ),
           ],
         );
       },

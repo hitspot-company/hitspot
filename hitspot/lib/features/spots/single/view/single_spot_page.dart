@@ -15,13 +15,10 @@ import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hs_toasts/hs_toasts.dart';
 
 class SingleSpotPage extends StatelessWidget {
   const SingleSpotPage({super.key});
@@ -289,7 +286,7 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Spacer(),
+              const Spacer(),
               _AnimatedActionButton(
                 onTap: singleSpotCubit.likeDislikeSpot,
                 selector: (state) => state.isSpotLiked,
@@ -306,7 +303,7 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
                   builder: (context) => BlocProvider(
                       create: (context) => HSSingleSpotCommentsCubit(
                           spotID: singleSpotCubit.spotID),
-                      child: SingleSpotCommentsSection()),
+                      child: const SingleSpotCommentsSection()),
                 ),
                 selector: (state) => state.isCommentSectionVisible,
                 activeIcon: FontAwesomeIcons.solidComment,

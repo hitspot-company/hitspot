@@ -216,22 +216,22 @@ class _TabContent extends StatelessWidget {
 class _TabBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const TabBar(
-      labelStyle: TextStyle(
+    return TabBar(
+      labelStyle: const TextStyle(
         fontSize: 16.0,
         fontWeight: FontWeight.bold,
       ),
-      unselectedLabelStyle: TextStyle(
+      unselectedLabelStyle: const TextStyle(
         fontSize: 15.0,
         fontWeight: FontWeight.normal,
       ),
-      labelColor: Colors.blue,
+      labelColor: app.theme.mainColor,
       indicatorPadding: EdgeInsets.zero,
-      indicator: UnderlineTabIndicator(
+      indicator: const UnderlineTabIndicator(
         borderSide: BorderSide(width: 2.0, color: Colors.blue),
       ),
       unselectedLabelColor: Colors.grey,
-      tabs: [
+      tabs: const [
         Tab(text: 'Spots'),
         Tab(text: 'Boards'),
       ],

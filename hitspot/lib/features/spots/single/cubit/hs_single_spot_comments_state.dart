@@ -19,8 +19,8 @@ enum HSSingleSpotCommentsStatus {
   error,
 }
 
-class HSSingleSpotCommentsCubitState extends Equatable {
-  const HSSingleSpotCommentsCubitState({
+class HSSingleSpotCommentsState extends Equatable {
+  const HSSingleSpotCommentsState({
     this.pageStatus = HSSingleSpotCommentsPageStatus.comments,
     this.status = HSSingleSpotCommentsStatus.loading,
     this.commentingStatus = HsSingleSpotCommentsCommentingStatus.idle,
@@ -49,7 +49,7 @@ class HSSingleSpotCommentsCubitState extends Equatable {
         fetchedReplies,
       ];
 
-  HSSingleSpotCommentsCubitState copyWith({
+  HSSingleSpotCommentsState copyWith({
     HSSingleSpotCommentsPageStatus? pageStatus,
     HSSingleSpotCommentsStatus? status,
     HsSingleSpotCommentsCommentingStatus? commentingStatus,
@@ -58,7 +58,7 @@ class HSSingleSpotCommentsCubitState extends Equatable {
     int? indexOfCommentUnderReply,
     List<HSComment>? fetchedReplies,
   }) {
-    return HSSingleSpotCommentsCubitState(
+    return HSSingleSpotCommentsState(
       pageStatus: pageStatus ?? this.pageStatus,
       status: status ?? this.status,
       commentingStatus: commentingStatus ?? this.commentingStatus,

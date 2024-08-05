@@ -41,7 +41,6 @@ class HSUserAvatar extends StatelessWidget {
 
 class _HSUserAvatar extends StatelessWidget {
   const _HSUserAvatar({
-    super.key,
     this.imageUrl,
     required this.radius,
     this.iconSize,

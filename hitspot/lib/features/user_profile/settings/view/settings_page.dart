@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hitspot/constants/constants.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/features/user_profile/settings/bloc/hs_settings_bloc.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +31,7 @@ class SettingsPage extends StatelessWidget {
               ThemedSettingsSection(
                 title: 'Application',
                 tiles: [
-                  SettingsTile(
+                  const SettingsTile(
                     icon: FontAwesomeIcons.globe,
                     title: 'Language',
                     enabled: false,
@@ -84,24 +83,19 @@ class SettingsPage extends StatelessWidget {
               ThemedSettingsSection(
                 title: 'Account',
                 tiles: [
-                  const SettingsTile(
-                    icon: FontAwesomeIcons.lock,
-                    title: 'Change Password',
-                    // onTap: () => settingsCubit.changePassword(),
-                    enabled: false,
-                  ),
                   SettingsTile(
                     icon: FontAwesomeIcons.trash,
                     title: 'Delete Account',
                     onTap: () => settingsCubit.deleteAccount(),
                   ),
                   SettingsTile(
-                    icon: FontAwesomeIcons.signOutAlt,
+                    icon: FontAwesomeIcons.rightFromBracket,
                     title: 'Sign Out',
                     onTap: () => settingsCubit.signOut(),
                   ),
                 ],
               ),
+              const Gap(32.0),
             ],
           );
         },
@@ -115,30 +109,33 @@ class ThemedSettingsSection extends StatelessWidget {
   final List<SettingsTile> tiles;
 
   const ThemedSettingsSection({
-    Key? key,
+    super.key,
     required this.title,
     required this.tiles,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      color: theme.brightness == Brightness.light
-          ? theme.scaffoldBackgroundColor
-          : theme.highlightColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              title,
-              style: theme.textTheme.headlineSmall,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Container(
+        color: theme.brightness == Brightness.light
+            ? theme.scaffoldBackgroundColor
+            : theme.highlightColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                title,
+                style: theme.textTheme.headlineSmall,
+              ),
             ),
-          ),
-          ...tiles,
-        ],
+            ...tiles,
+          ],
+        ),
       ),
     );
   }
@@ -170,7 +167,7 @@ class SettingsTile extends StatelessWidget {
       subtitle: subtitle != null ? Text(subtitle!) : null,
       enabled: enabled,
       onTap: enabled ? onTap : null,
-      trailing: onTap != null ? Icon(Icons.chevron_right) : null,
+      trailing: onTap != null ? const Icon(Icons.chevron_right) : null,
     );
   }
 }

@@ -118,12 +118,9 @@ class HomePage extends StatelessWidget {
                       .fadeIn(duration: 600.ms)
                       .slideY(begin: 0.2, end: 0),
                 ),
-                const Gap(32.0).toSliver,
                 const _HomeGridBuilder(type: _HomeGridBuilderType.nearbySpots),
-                const Gap(32.0).toSliver,
                 const _HomeGridBuilder(
                     type: _HomeGridBuilderType.trendingBoards),
-                const Gap(32.0).toSliver,
                 const _HomeGridBuilder(
                     type: _HomeGridBuilderType.trendingSpots),
               ],
@@ -287,6 +284,7 @@ class _HomeGridBuilder extends StatelessWidget {
         final crossAxisCount = elements.length < 2 ? 1 : 2;
         return SliverMainAxisGroup(
           slivers: [
+            const Gap(32.0).toSliver,
             Text(title, style: textTheme.headlineMedium)
                 .animate()
                 .fadeIn(duration: 500.ms)

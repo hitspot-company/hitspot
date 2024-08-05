@@ -22,32 +22,27 @@ class HSModalBottomSheetItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(borderRadius),
-          onTap: onTap ?? () {},
-          child: SizedBox(
-            height: height,
-            width: screenWidth,
-            child: Padding(
-              padding: EdgeInsets.only(left: leftPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (iconData != null)
-                    Row(
-                      children: [
-                        Icon(iconData),
-                        const Gap(16.0),
-                      ],
-                    ),
-                  Text(title, style: const TextStyle(fontSize: 16.0)),
-                ],
-              ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(borderRadius),
+        onTap: onTap ?? () {},
+        child: SizedBox(
+          height: height,
+          width: screenWidth,
+          child: Padding(
+            padding: EdgeInsets.only(left: leftPadding),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (iconData != null)
+                  Row(
+                    children: [
+                      Icon(iconData),
+                      const Gap(16.0),
+                    ],
+                  ),
+                Text(title, style: const TextStyle(fontSize: 16.0)),
+              ],
             ),
           ),
         ),
