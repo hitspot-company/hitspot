@@ -33,7 +33,7 @@ class HSGoogleMap extends StatelessWidget {
   Widget build(BuildContext context) {
     return GoogleMap(
       fortyFiveDegreeImageryEnabled: fortyFiveDegreeImageryEnabled,
-      style: app.theme.mapStyleDark,
+      style: app.theme.mapStyle,
       initialCameraPosition: initialCameraPosition,
       onMapCreated: onMapCreated,
       myLocationButtonEnabled: false,

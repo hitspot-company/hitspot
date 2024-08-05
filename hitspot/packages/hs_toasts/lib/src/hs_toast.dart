@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 
-enum HSToastType { success, error, warning }
+enum HSToastType { success, error, warning, pushNotification }
 
 class HSToasts {
   // SINGLETON
@@ -44,6 +44,12 @@ class HSToasts {
         chosenType = ToastificationType.warning;
         toastIcon = icon ?? const Icon(FontAwesomeIcons.triangleExclamation);
         toastColor = primaryColor ?? Colors.yellow;
+        break;
+
+      case HSToastType.pushNotification:
+        chosenType = ToastificationType.info;
+        toastIcon = icon ?? const Icon(FontAwesomeIcons.bell);
+        toastColor = primaryColor!;
         break;
     }
 
