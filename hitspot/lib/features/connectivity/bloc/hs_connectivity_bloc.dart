@@ -35,6 +35,11 @@ class HSConnectivityLocationBloc
     });
     on<HSConnectivityStopLocationSubscriptionEvent>(
         _onStopLocationSubscription);
+    on<HSConnectivityRequestNotificationPermissionEvent>(
+        _onRequestPushNotificationPermission);
+    on<HSConnectivityFcmTokenChangedEvent>((event, emit) {
+      emit(state.copyWith(fcmToken: event.fcmToken));
+    });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       final notification = message.notification;
