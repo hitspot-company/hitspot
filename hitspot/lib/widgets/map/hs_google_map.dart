@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
+import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 class HSGoogleMap extends StatelessWidget {
@@ -31,21 +35,27 @@ class HSGoogleMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      mapToolbarEnabled: false,
-      zoomControlsEnabled: false,
-      fortyFiveDegreeImageryEnabled: fortyFiveDegreeImageryEnabled,
-      style: app.theme.mapStyle,
-      initialCameraPosition: initialCameraPosition,
-      onMapCreated: onMapCreated,
-      myLocationButtonEnabled: false,
-      myLocationEnabled: myLocationEnabled,
-      markers: markers ?? {},
-      onCameraIdle: onCameraIdle,
-      onCameraMove: onCameraMove,
-      onTap: onTap,
-      onCameraMoveStarted: onCameraMoveStarted,
-      cameraTargetBounds: cameraTargetBounds ?? CameraTargetBounds.unbounded,
+    return BlocSelector<HSThemeBloc, HSThemeState, String>(
+      selector: (state) => state.mapStyle ?? HSTheme.instance.mapStyleLight,
+      builder: (context, mapStyle) {
+        return GoogleMap(
+          mapToolbarEnabled: false,
+          zoomControlsEnabled: false,
+          fortyFiveDegreeImageryEnabled: fortyFiveDegreeImageryEnabled,
+          style: mapStyle,
+          initialCameraPosition: initialCameraPosition,
+          onMapCreated: onMapCreated,
+          myLocationButtonEnabled: false,
+          myLocationEnabled: myLocationEnabled,
+          markers: markers ?? {},
+          onCameraIdle: onCameraIdle,
+          onCameraMove: onCameraMove,
+          onTap: onTap,
+          onCameraMoveStarted: onCameraMoveStarted,
+          cameraTargetBounds:
+              cameraTargetBounds ?? CameraTargetBounds.unbounded,
+        );
+      },
     );
   }
 }

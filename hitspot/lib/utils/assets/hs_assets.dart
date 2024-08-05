@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'dart:ui' as ui;
 
@@ -18,7 +17,8 @@ class HSAssets {
   static const String _iconsPath = "assets/icons";
   final String textLogo = "$_iconsPath/logotype/blue.png";
   final String logo = "$_iconsPath/logo/blue.png";
-  static const String mapStyle = "assets/map/map_dark.json";
+  final String mapStyleLight = "assets/map/map_blue.json";
+  final String mapStyleDark = "assets/map/map_dark.json";
 
   // MAP MARKERS
   static const String mapIconsPath = "assets/map";

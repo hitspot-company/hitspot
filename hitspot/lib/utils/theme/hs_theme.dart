@@ -1,27 +1,47 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
-import 'package:hs_location_repository/hs_location_repository.dart';
 
 final class HSTheme {
-  // SINGLETON
-  HSTheme._internal() {
-    rootBundle.loadString(HSAssets.mapStyle).then((string) {
-      _mapStyleString = string;
-    });
-  }
+  HSTheme._internal();
+
   static final HSTheme _instance = HSTheme._internal();
   static HSTheme get instance => _instance;
 
   static const Color _mainColor = Color(0xFF00c0ca);
   static const Color _textfieldFillColor = Color.fromARGB(57, 160, 160, 160);
 
-  late String _mapStyleString;
-  String get mapStyle => _mapStyleString;
+  late String _mapStyleLightString;
+  late String _mapStyleDarkString;
+
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
+
+  Future<void> initialize() async {
+    _mapStyleLightString =
+        await rootBundle.loadString(HSAssets.instance.mapStyleLight);
+    _mapStyleDarkString =
+        await rootBundle.loadString(HSAssets.instance.mapStyleDark);
+    _isInitialized = true;
+  }
+
+  String get mapStyleDark {
+    _ensureInitialized();
+    return _mapStyleDarkString;
+  }
+
+  String get mapStyleLight {
+    _ensureInitialized();
+    return _mapStyleLightString;
+  }
+
+  void _ensureInitialized() {
+    if (!_isInitialized) {
+      throw 'HSTheme has not been initialized.';
+    }
+  }
 
   final ThemeData lightTheme = ThemeData(
     colorSchemeSeed: _mainColor,
@@ -42,18 +62,6 @@ final class HSTheme {
   BuildContext get context => app.context;
   TextTheme get textTheme => Theme.of(context).textTheme;
   ThemeData get currentTheme => Theme.of(context);
-
-  Future<void> applyMapDarkStyle(
-      Completer<GoogleMapController> controller) async {
-    if (await app.themeRepository.isDark()) {
-      controller.future.then((value) {
-        // GoogleMap.style(mapStyle)
-        value.setMapStyle(mapStyle);
-      });
-    }
-  }
-
-  String get mapStyleDark => _mapStyleString;
 }
 
 extension TextStyleAltering on TextStyle {
