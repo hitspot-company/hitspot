@@ -8,6 +8,7 @@ import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/invitation/view/board_invitation_page.dart';
 import 'package:hitspot/features/boards/single/view/single_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
+import 'package:hitspot/features/deep_link_error/view/deep_link_error_page.dart';
 import 'package:hitspot/features/home/main/view/home_provider.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -52,6 +53,11 @@ class HSNavigation {
             duration: const Duration(milliseconds: 350),
             reverseDuration: const Duration(milliseconds: 350),
             alignment: Alignment.bottomCenter),
+      );
+  dynamic go(String location) => router.go(location);
+  dynamic replacePage({required Widget page}) =>
+      router.configuration.navigatorKey.currentState!.pushReplacement(
+        MaterialPageRoute(builder: (_) => page),
       );
 
   final GoRouter router = GoRouter(
@@ -128,6 +134,10 @@ class HSNavigation {
         redirect: (context, state) => '/protected/home?from=${state.uri}',
       ),
       GoRoute(
+        path: '/error',
+        redirect: (context, state) => '/protected/home?from=${state.uri}',
+      ),
+      GoRoute(
         path: "/protected",
         redirect: _protectedRedirect,
         routes: [
@@ -154,6 +164,13 @@ class HSNavigation {
               GoRoute(
                 path: 'settings',
                 builder: (context, state) => const SettingsProvider(),
+              ),
+              GoRoute(
+                path: 'error',
+                builder: (context, state) => DeepLinkErrorPage(
+                  title: state.uri.queryParameters['title'],
+                  message: state.uri.queryParameters['message'],
+                ),
               ),
               GoRoute(
                 path: 'notifications',
@@ -271,4 +288,6 @@ class HSNavigation {
           bool isSubmit = false,
           String? spotID}) =>
       isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
+  dynamic toError({String? title, String? message}) =>
+      router.replace("/error?title=$title&message=$message");
 }

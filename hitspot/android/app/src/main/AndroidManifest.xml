@@ -36,6 +36,7 @@
 				<data android:pathPattern="/user/.*" />
 				<data android:pathPattern="/spot/.*" />
 				<data android:pathPattern="/board/.*" />
+				<data android:pathPattern="/invite/.*" />
 			  </intent-filter>			  
 			<!-- /DEEP LINKS -->
         </activity>

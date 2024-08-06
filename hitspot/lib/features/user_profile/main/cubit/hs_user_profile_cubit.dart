@@ -107,15 +107,23 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
   }
 
   Future<void> _init() async {
-    _spotsScrollController.addListener(_onSpotsScroll);
-    _boardsScrollController.addListener(_onBoardsScroll);
-    emit(state.copyWith(status: HSUserProfileStatus.loading));
-    if (userID == currentUser.uid) {
-      isOwnProfile = true;
-    } else {
-      isOwnProfile = false;
+    try {
+      _spotsScrollController.addListener(_onSpotsScroll);
+      _boardsScrollController.addListener(_onBoardsScroll);
+      emit(state.copyWith(status: HSUserProfileStatus.loading));
+      if (userID == currentUser.uid) {
+        isOwnProfile = true;
+      } else {
+        isOwnProfile = false;
+      }
+      await _fetchUserData();
+    } catch (e) {
+      HSDebugLogger.logError("Error initializing user profile: $e");
+      navi.toError(
+        title: "Error",
+        message: "An error occurred while loading the user profile.",
+      );
     }
-    await _fetchUserData();
   }
 
   Future<void> _fetchUserData() async {
@@ -140,6 +148,7 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
       ));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
+      rethrow;
     }
   }
 
