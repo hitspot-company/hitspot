@@ -140,6 +140,10 @@ class HSNavigation {
         redirect: (context, state) => '/protected/home',
       ),
       GoRoute(
+        path: '/error',
+        redirect: (context, state) => '/protected/home?from=${state.uri}',
+      ),
+      GoRoute(
         path: "/protected",
         redirect: _protectedRedirect,
         routes: [
