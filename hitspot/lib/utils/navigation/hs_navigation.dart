@@ -30,11 +30,7 @@ class HSNavigation {
   HSNavigation._privateConstructor();
   static final HSNavigation _instance = HSNavigation._privateConstructor();
 
-  factory HSNavigation() {
-    // initMagicLinks();
-
-    return _instance;
-  }
+  factory HSNavigation() => _instance;
 
   BuildContext get context => router.configuration.navigatorKey.currentContext!;
 
@@ -131,11 +127,17 @@ class HSNavigation {
       ),
       GoRoute(
         path: '/invite/:boardId',
-        redirect: (context, state) => '/protected/home?from=${state.uri}',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
         path: '/error',
-        redirect: (context, state) => '/protected/home?from=${state.uri}',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/login-callback',
+        redirect: (context, state) => '/protected/home',
       ),
       GoRoute(
         path: "/protected",
