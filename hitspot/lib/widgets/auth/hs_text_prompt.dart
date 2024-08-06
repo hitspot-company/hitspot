@@ -18,7 +18,7 @@ class HSTextPrompt extends StatelessWidget {
   final String pressableText;
   final Color promptColor;
   final TextAlign textAlign;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final TextStyle? textStyle;
 
   @override
@@ -32,10 +32,12 @@ class HSTextPrompt extends StatelessWidget {
           children: [
             TextSpan(
               text: pressableText,
-              style: app.textTheme.bodySmall!
-                  .colorify(HSTheme.instance.mainColor)
-                  .boldify,
-              recognizer: TapGestureRecognizer()..onTap = () => onTap(),
+              style: textStyle?.colorify(HSTheme.instance.mainColor).boldify ??
+                  app.textTheme.bodySmall!
+                      .colorify(HSTheme.instance.mainColor)
+                      .boldify,
+              recognizer: onTap == null ? null : TapGestureRecognizer()
+                ?..onTap = () => onTap!(),
             ),
           ],
         ),

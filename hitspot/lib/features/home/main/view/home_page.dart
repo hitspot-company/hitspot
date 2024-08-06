@@ -250,6 +250,7 @@ class _HomeGridBuilder extends StatelessWidget {
         if (isLoading) {
           return SliverMainAxisGroup(
             slivers: [
+              const Gap(32.0).toSliver,
               HSShimmerBox(width: screenWidth / 3, height: 40.0).toSliver,
               const Gap(8.0).toSliver,
               HSShimmerBox(width: screenWidth / 3 - 10.0, height: 20.0)
