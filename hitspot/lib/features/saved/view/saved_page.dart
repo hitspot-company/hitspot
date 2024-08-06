@@ -141,10 +141,4 @@ class _BoardsBuilder extends StatelessWidget {
       },
     );
   }
-
-  Widget _buildSavedSpotsTab() {
-    return Center(
-      child: Text('Saved Spots Tab Content'),
-    );
-  }
 }
