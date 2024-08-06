@@ -17,6 +17,7 @@ import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
+import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -287,42 +288,88 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               const Spacer(),
-              _AnimatedActionButton(
-                onTap: singleSpotCubit.likeDislikeSpot,
-                selector: (state) => state.isSpotLiked,
-                activeIcon: FontAwesomeIcons.solidHeart,
-                inactiveIcon: FontAwesomeIcons.heart,
-                loadingStatus: HSSingleSpotStatus.liking,
-                delay: 450.ms,
+              Column(
+                children: [
+                  _AnimatedActionButton(
+                    onTap: singleSpotCubit.likeDislikeSpot,
+                    selector: (state) => state.isSpotLiked,
+                    activeIcon: FontAwesomeIcons.solidHeart,
+                    inactiveIcon: FontAwesomeIcons.heart,
+                    loadingStatus: HSSingleSpotStatus.liking,
+                    delay: 450.ms,
+                  ),
+                  Text(singleSpotCubit.state.spot.formattedLikesCount,
+                      style: const TextStyle(fontSize: 12.0)),
+                ],
               ),
-              _AnimatedActionButton(
-                onTap: () => showModalBottomSheet(
-                  context: app.context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => BlocProvider(
-                      create: (context) => HSSingleSpotCommentsCubit(
-                          spotID: singleSpotCubit.spotID),
-                      child: const SingleSpotCommentsSection()),
-                ),
-                selector: (state) => state.isCommentSectionVisible,
-                activeIcon: FontAwesomeIcons.solidComment,
-                inactiveIcon: FontAwesomeIcons.comment,
-                loadingStatus: HSSingleSpotStatus.commenting,
-                delay: 500.ms,
+              Column(
+                children: [
+                  _AnimatedActionButton(
+                    onTap: () => showModalBottomSheet(
+                      context: app.context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => BlocProvider(
+                          create: (context) => HSSingleSpotCommentsCubit(
+                              spotID: singleSpotCubit.spotID),
+                          child: const SingleSpotCommentsSection()),
+                    ),
+                    selector: (state) => state.isCommentSectionVisible,
+                    activeIcon: FontAwesomeIcons.solidComment,
+                    inactiveIcon: FontAwesomeIcons.comment,
+                    loadingStatus: HSSingleSpotStatus.commenting,
+                    delay: 500.ms,
+                  ),
+                  Text(singleSpotCubit.state.spot.formattedCommentsCount,
+                      style: const TextStyle(fontSize: 12.0)),
+                ],
               ),
-              _AnimatedActionButton(
-                onTap: singleSpotCubit.saveUnsaveSpot,
-                selector: (state) => state.isSpotSaved,
-                activeIcon: FontAwesomeIcons.solidBookmark,
-                inactiveIcon: FontAwesomeIcons.bookmark,
-                loadingStatus: HSSingleSpotStatus.saving,
-                delay: 550.ms,
+              Column(
+                children: [
+                  _AnimatedActionButton(
+                    onTap: singleSpotCubit.saveUnsaveSpot,
+                    selector: (state) => state.isSpotSaved,
+                    activeIcon: FontAwesomeIcons.solidBookmark,
+                    inactiveIcon: FontAwesomeIcons.bookmark,
+                    loadingStatus: HSSingleSpotStatus.saving,
+                    delay: 550.ms,
+                  ),
+                  const _Counter(_CounterType.saves),
+                ],
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+enum _CounterType { likes, comments, saves }
+
+class _Counter extends StatelessWidget {
+  const _Counter(this.type);
+
+  final _CounterType type;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
+      builder: (context, state) {
+        final String value;
+        switch (type) {
+          case _CounterType.likes:
+            value = state.spot.formattedLikesCount;
+            break;
+          case _CounterType.comments:
+            value = state.spot.formattedCommentsCount;
+            break;
+          case _CounterType.saves:
+            value = state.spot.formattedSavesCount;
+            break;
+        }
+        return Text(value, style: const TextStyle(fontSize: 12.0));
+      },
     );
   }
 }

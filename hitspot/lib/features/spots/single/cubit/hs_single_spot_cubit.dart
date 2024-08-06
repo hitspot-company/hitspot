@@ -58,8 +58,13 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     try {
       final bool isSpotLiked = await _databaseRepository.spotLikeDislike(
           spot: state.spot, userID: currentUser.uid);
+      final newLikesCount =
+          isSpotLiked ? state.spot.likesCount! + 1 : state.spot.likesCount! - 1;
+      final HSSpot spot = state.spot.copyWith(likesCount: newLikesCount);
       emit(state.copyWith(
-          isSpotLiked: isSpotLiked, status: HSSingleSpotStatus.loaded));
+          isSpotLiked: isSpotLiked,
+          status: HSSingleSpotStatus.loaded,
+          spot: spot));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
@@ -70,8 +75,13 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       emit(state.copyWith(status: HSSingleSpotStatus.saving));
       final bool isSpotSaved = await _databaseRepository.spotSaveUnsave(
           spotID: spotID, userID: currentUser.uid);
+      final newSavesCount =
+          isSpotSaved ? state.spot.savesCount! + 1 : state.spot.savesCount! - 1;
+      final HSSpot spot = state.spot.copyWith(savesCount: newSavesCount);
       emit(state.copyWith(
-          isSpotSaved: isSpotSaved, status: HSSingleSpotStatus.loaded));
+          isSpotSaved: isSpotSaved,
+          status: HSSingleSpotStatus.loaded,
+          spot: spot));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
