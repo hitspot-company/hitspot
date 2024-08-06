@@ -39,18 +39,21 @@ class SavedPage extends StatelessWidget {
 }
 
 class _LoadingBuilder extends StatelessWidget {
-  const _LoadingBuilder({super.key});
+  const _LoadingBuilder();
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: 6,
-      separatorBuilder: (BuildContext context, int index) {
-        return const Gap(16.0);
-      },
-      itemBuilder: (BuildContext context, int index) {
-        return HSShimmerBox(height: 80.0, width: screenWidth);
-      },
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView.separated(
+        itemCount: 6,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Gap(16.0);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          return HSShimmerBox(height: 80.0, width: screenWidth);
+        },
+      ),
     );
   }
 }
@@ -68,7 +71,7 @@ class _SavedBoardsBuilder extends StatelessWidget {
         final isLoading = state.status == HSSavedStatus.loading;
         final isEmpty = state.savedBoards.isEmpty;
         if (isLoading) {
-          const _LoadingBuilder();
+          return const _LoadingBuilder();
         }
         if (isEmpty) {
           return const HSIconPrompt(
@@ -94,7 +97,7 @@ class _OwnBoardsBuilder extends StatelessWidget {
         final isLoading = state.status == HSSavedStatus.loading;
         final isEmpty = state.ownBoards.isEmpty;
         if (isLoading) {
-          const _LoadingBuilder();
+          return const _LoadingBuilder();
         }
         if (isEmpty) {
           return const HSIconPrompt(

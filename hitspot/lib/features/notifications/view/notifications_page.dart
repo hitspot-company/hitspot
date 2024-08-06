@@ -140,8 +140,9 @@ class _LoadedView extends StatelessWidget {
                       maxLines: 2,
                     ),
                     trailing: !notification.isRead
-                        ? badges.Badge(child: Icon(notification.icon))
-                        : Icon(notification.icon),
+                        ? badges.Badge(
+                            child: Icon(notification.icon, color: Colors.grey))
+                        : Icon(notification.icon, color: Colors.grey),
                   );
                 },
                 childCount: state.notifications.length,
