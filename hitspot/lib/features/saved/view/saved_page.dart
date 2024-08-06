@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
+import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
+import 'package:hitspot/widgets/hs_icon_prompt.dart';
+import 'package:hitspot/widgets/hs_image.dart';
+import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
+import 'package:hs_database_repository/src/boards/hs_board.dart';
 
 class SavedPage extends StatelessWidget {
   const SavedPage({super.key});
@@ -6,7 +15,7 @@ class SavedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Saved'),
@@ -14,60 +23,119 @@ class SavedPage extends StatelessWidget {
             tabs: [
               Tab(text: 'Your Boards'),
               Tab(text: 'Saved Boards'),
-              Tab(text: 'Saved Spots'),
+              // Tab(text: 'Saved Spots'),
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
-            _buildYourBoardsTab(),
-            _buildSavedBoardsTab(),
-            _buildSavedSpotsTab(),
+            _OwnBoardsBuilder(),
+            _SavedBoardsBuilder(),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildYourBoardsTab() {
-    return ListView.builder(
-      itemCount: 10, // Replace with actual data length
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text('Your Board ${index + 1}'),
-          subtitle: Text('Description of board ${index + 1}'),
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage('https://via.placeholder.com/150'),
-          ),
-          onTap: () {
-            // Handle board tap
-          },
-        );
+class _LoadingBuilder extends StatelessWidget {
+  const _LoadingBuilder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: 6,
+      separatorBuilder: (BuildContext context, int index) {
+        return const Gap(16.0);
+      },
+      itemBuilder: (BuildContext context, int index) {
+        return HSShimmerBox(height: 80.0, width: screenWidth);
       },
     );
   }
+}
 
-  Widget _buildSavedBoardsTab() {
-    return ListView.builder(
-      itemCount: 10, // Replace with actual data length
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text('Saved Board ${index + 1}'),
-          subtitle: Text('Description of saved board ${index + 1}'),
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage('https://via.placeholder.com/150'),
-          ),
-          onTap: () {
-            // Handle saved board tap
-          },
-        );
+class _SavedBoardsBuilder extends StatelessWidget {
+  const _SavedBoardsBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSSavedCubit, HSSavedState>(
+      buildWhen: (previous, current) =>
+          previous.savedBoards != current.savedBoards ||
+          previous.status != current.status,
+      builder: (context, state) {
+        final isLoading = state.status == HSSavedStatus.loading;
+        final isEmpty = state.savedBoards.isEmpty;
+        if (isLoading) {
+          const _LoadingBuilder();
+        }
+        if (isEmpty) {
+          return const HSIconPrompt(
+              message: "No saved boards", iconData: FontAwesomeIcons.bookmark);
+        }
+        final boards = state.savedBoards;
+        return _BoardsBuilder(boards: boards);
       },
     );
   }
+}
 
-  Widget _buildSavedSpotsTab() {
-    return Center(
-      child: Text('Saved Spots Tab Content'),
+class _OwnBoardsBuilder extends StatelessWidget {
+  const _OwnBoardsBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSSavedCubit, HSSavedState>(
+      buildWhen: (previous, current) =>
+          previous.ownBoards != current.ownBoards ||
+          previous.status != current.status,
+      builder: (context, state) {
+        final isLoading = state.status == HSSavedStatus.loading;
+        final isEmpty = state.ownBoards.isEmpty;
+        if (isLoading) {
+          const _LoadingBuilder();
+        }
+        if (isEmpty) {
+          return const HSIconPrompt(
+              message: "You don't have any boards",
+              iconData: FontAwesomeIcons.bookmark);
+        }
+        final boards = state.ownBoards;
+        return _BoardsBuilder(boards: boards);
+      },
+    );
+  }
+}
+
+class _BoardsBuilder extends StatelessWidget {
+  const _BoardsBuilder({
+    required this.boards,
+  });
+
+  final List<HSBoard> boards;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: boards.length,
+      separatorBuilder: (BuildContext context, int index) {
+        return const Gap(16.0);
+      },
+      itemBuilder: (BuildContext context, int index) {
+        final board = boards[index];
+        return ListTile(
+          onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
+          leading: AspectRatio(
+              aspectRatio: 1.0,
+              child: HSImage(
+                imageUrl: boards[index].image,
+                borderRadius: BorderRadius.circular(10.0),
+              )),
+          title: Text(board.title!),
+          subtitle: Text(board.description!),
+        );
+      },
     );
   }
 }

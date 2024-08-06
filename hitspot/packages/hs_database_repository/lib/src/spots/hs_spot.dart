@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
+import 'package:intl/intl.dart';
 
 class HSSpot {
   final String? sid, title, description, geohash, createdBy, address;
@@ -147,5 +148,15 @@ class HSSpot {
       spots: data['user_spots_count'],
       boards: data['user_boards_count'],
     );
+  }
+}
+
+String formatNumber(int number) {
+  if (number >= 1000000) {
+    return '${(number / 1000000).toStringAsFixed(1)}M';
+  } else if (number >= 1000) {
+    return '${(number / 1000).toStringAsFixed(1)}K';
+  } else {
+    return NumberFormat.decimalPattern().format(number);
   }
 }

@@ -48,7 +48,9 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       ));
     } catch (_) {
       HSDebugLogger.logError("Error fetching spot: $_");
-      emit(state.copyWith(status: HSSingleSpotStatus.error));
+      navi.toError(
+          title: "Error fetching spot",
+          message: "Could not fetch spot. Please try again later.");
     }
   }
 
