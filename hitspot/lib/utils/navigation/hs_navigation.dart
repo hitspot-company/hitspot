@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/invitation/view/board_invitation_page.dart';
@@ -25,14 +24,13 @@ import 'package:hitspot/features/user_profile/settings/view/settings_provider.da
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:uni_links/uni_links.dart';
 
 class HSNavigation {
   HSNavigation._privateConstructor();
   static final HSNavigation _instance = HSNavigation._privateConstructor();
 
   factory HSNavigation() {
-    initMagicLinks();
+    // initMagicLinks();
 
     return _instance;
   }
@@ -75,10 +73,11 @@ class HSNavigation {
       ),
       GoRoute(path: "/", redirect: (context, state) => "/protected/home"),
       GoRoute(
-        path: '/user/:userID',
-        redirect: (context, state) =>
-            '/protected/home?from=${state.matchedLocation}',
-      ),
+          path: '/user/:userID',
+          redirect: (context, state) {
+            HSDebugLogger.logInfo("RECEIVED LINK!");
+            return '/protected/home?from=${state.matchedLocation}';
+          }),
       GoRoute(
         path: '/notifications',
         redirect: (context, state) =>
@@ -272,20 +271,4 @@ class HSNavigation {
           bool isSubmit = false,
           String? spotID}) =>
       isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
-
-  // Magic links
-  static void initMagicLinks() {
-    uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        Uri parsedUri = Uri.parse(uri.toString());
-        String fullPath =
-            '/${parsedUri.authority}${parsedUri.path}${uri.hasQuery ? '?${uri.query}' : ''}';
-
-        HSDebugLogger.logInfo('Received magic link: $fullPath');
-        navi.router.push(fullPath);
-      }
-    }, onError: (err) {
-      HSDebugLogger.logError("Error listening to magic link: $err");
-    });
-  }
 }
