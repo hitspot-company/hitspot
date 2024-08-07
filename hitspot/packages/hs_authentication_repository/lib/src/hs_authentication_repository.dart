@@ -82,8 +82,12 @@ class HSAuthenticationRepository {
   /// Throws a [LogOutFailure] if an exception occurs.
   Future<void> signOut() async {
     try {
+      await _supabaseClient
+          .from("users")
+          .update({"fcm_token": null}).eq('id', currentUser!.uid!);
       await _supabaseClient.auth.signOut();
     } catch (_) {
+      HSDebugLogger.logError("Error: ${_.toString()}");
       throw LogOutFailure();
     }
   }
@@ -142,7 +146,7 @@ class HSAuthenticationRepository {
     try {
       await _supabaseClient.auth.signInWithOtp(
         email: email,
-        emailRedirectTo: kIsWeb ? null : 'app.hitspot://login-callback/',
+        emailRedirectTo: kIsWeb ? null : 'https://hitspot.app/login-callback',
       );
     } catch (_) {
       throw HSAuthenticationException.magicLink(details: _.toString());

@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:avatar_stack/avatar_stack.dart';
-import 'package:avatar_stack/positions.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,7 +9,6 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
 import 'package:hitspot/features/boards/single/map/view/single_board_map_provider.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
@@ -22,7 +20,6 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-
 import 'package:flutter_animate/flutter_animate.dart';
 
 class SingleBoardPage extends StatelessWidget {
@@ -38,7 +35,6 @@ class SingleBoardPage extends StatelessWidget {
       builder: (context, state) {
         final bool isLoading = state.status == HSSingleBoardStatus.loading;
         final HSBoard? board = state.board;
-        final List<HSSpot> spots = state.spots;
         final HSUser? author = state.author;
         if (state.status == HSSingleBoardStatus.error) {
           return HSScaffold(
@@ -60,7 +56,7 @@ class SingleBoardPage extends StatelessWidget {
                   ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
                   const Gap(16),
                   HSButton(
-                    onPressed: () {},
+                    onPressed: () {}, // TODO: Add functionality
                     child: const Text("Retry"),
                   )
                       .animate()
@@ -72,10 +68,11 @@ class SingleBoardPage extends StatelessWidget {
           );
         }
         return HSScaffold(
+          onTap: singleBoardCubit.exitEditMode,
           appBar: HSAppBar(
             enableDefaultBackButton: true,
             right: IconButton(
-              onPressed: () => HSDebugLogger.logInfo("More"),
+              onPressed: singleBoardCubit.showBottomSheet,
               icon: const Icon(FontAwesomeIcons.ellipsisVertical),
             ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut).scale(
                   begin: const Offset(0.8, 0.8),
@@ -170,11 +167,6 @@ class SingleBoardPage extends StatelessWidget {
                               .animate()
                               .fadeIn(duration: 300.ms, delay: 400.ms)
                               .slideY(begin: 0.2, end: 0),
-                          if (state.isOwner)
-                            IconButton(
-                                onPressed: () =>
-                                    singleBoardCubit.shareInvitation(board?.id),
-                                icon: const Icon(FontAwesomeIcons.userPlus)),
                           IconButton(
                             onPressed: () => navi.pushPage(
                               page: SingleBoardMapProvider(
@@ -187,42 +179,14 @@ class SingleBoardPage extends StatelessWidget {
                               .animate()
                               .fadeIn(duration: 300.ms, delay: 500.ms)
                               .slideY(begin: 0.2, end: 0),
-                          IconButton(
-                            onPressed: () => HSDebugLogger.logInfo("Share"),
-                            icon: const Icon(
-                              FontAwesomeIcons.arrowUpRightFromSquare,
-                            ),
-                          )
-                              .animate()
-                              .fadeIn(duration: 300.ms, delay: 500.ms)
-                              .slideY(begin: 0.2, end: 0),
                         ],
                       ),
                     ],
                   ),
                 ),
               const Gap(16.0).toSliver,
-              SliverToBoxAdapter(
-                child: ReorderableListView.builder(
-                  scrollController: _scrollController,
-                  shrinkWrap: true,
-                  itemCount: spots.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      key: ValueKey(index),
-                      child: HSSpotTile(
-                        onLongPress: singleBoardCubit.onLongPress,
-                        index: index,
-                        spot: spots[index],
-                        extent: (index % 3 + 2) * 70.0 + 70.0,
-                      ),
-                    );
-                  },
-                  onReorder: (int oldIndex, int newIndex) {
-                    singleBoardCubit.reorderSpots(spots, oldIndex, newIndex);
-                  },
-                ),
+              const SliverToBoxAdapter(
+                child: AnimatedEditableListView(),
               ),
               const Gap(32.0).toSliver,
             ],
@@ -314,6 +278,88 @@ class SingleBoardPage extends StatelessWidget {
   }
 }
 
+class AnimatedEditableListView extends StatelessWidget {
+  const AnimatedEditableListView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<HSSingleBoardCubit>();
+    return BlocBuilder<HSSingleBoardCubit, HSSingleBoardState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.spots != current.spots ||
+          previous.board != current.board,
+      builder: (context, state) {
+        final isEditMode = state.status == HSSingleBoardStatus.editing;
+        return GestureDetector(
+          onLongPress: cubit.toggleEditMode,
+          child: ReorderableListView.builder(
+              buildDefaultDragHandles: isEditMode,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.spots.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  key: ValueKey(state.spots[index].sid!),
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Stack(
+                    children: [
+                      HSSpotTile(
+                        onLongPress: (p0) =>
+                            isEditMode ? null : cubit.toggleEditMode,
+                        index: index,
+                        spot: state.spots[index],
+                        extent: (index % 3 + 2) * 70.0 + 70.0,
+                      ),
+                      if (isEditMode)
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                onPressed: () => cubit.removeSpot(index),
+                                icon: const Icon(
+                                  FontAwesomeIcons.trash,
+                                ),
+                              ),
+                              const SizedBox(width: 8.0),
+                              IgnorePointer(
+                                child: IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    Icons.drag_handle,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).animate().fade(duration: 300.ms),
+                    ],
+                  )
+                      .animate(
+                        target: isEditMode ? 1 : 0,
+                        autoPlay: isEditMode,
+                        onComplete: (controller) {
+                          if (isEditMode) {
+                            controller.repeat();
+                          }
+                        },
+                      )
+                      .shake(
+                          hz: 2,
+                          delay: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          rotation: .005),
+                );
+              },
+              onReorder: cubit.reorderSpots),
+        );
+      },
+    );
+  }
+}
+
 class HSSimpleSliverAppBar extends StatelessWidget {
   const HSSimpleSliverAppBar(
       {super.key, this.height, required this.child, this.leading});
@@ -350,12 +396,12 @@ class _SaveActionButton extends StatelessWidget {
     late final bool isEditor;
     isEditor = singleBoardCubit.state.isEditor;
     if (isEditor) {
-      onPressed = () => navi.pushPage(
-          page: CreateBoardProvider(prototype: singleBoardCubit.state.board));
-      icon = Icon(FontAwesomeIcons.pen, color: accentColor);
+      return const SizedBox();
     } else {
       switch (status) {
-        case HSSingleBoardStatus.updating || HSSingleBoardStatus.loading:
+        case HSSingleBoardStatus.updating ||
+              HSSingleBoardStatus.loading ||
+              HSSingleBoardStatus.editing:
           onPressed = null;
           icon = HSLoadingIndicator(size: 24, color: accentColor);
         case HSSingleBoardStatus.idle:

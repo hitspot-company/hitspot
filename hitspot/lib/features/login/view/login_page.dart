@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -41,11 +43,22 @@ class LoginForm extends StatelessWidget {
           const SliverToBoxAdapter(child: Gap(24.0)),
           SliverToBoxAdapter(
               child: HSSocialLoginButtons.google(loginCubit.logInWithGoogle)),
-          const SliverToBoxAdapter(child: Gap(24.0)),
-          SliverToBoxAdapter(
-              child: HSSocialLoginButtons.apple(loginCubit.logInWithApple)),
-          const SliverToBoxAdapter(child: Gap(24.0)),
-          const SliverToBoxAdapter(child: _Footer()),
+          if (Platform.isIOS) ...[
+            const SliverToBoxAdapter(child: Gap(24.0)),
+            SliverToBoxAdapter(
+                child: HSSocialLoginButtons.apple(loginCubit.logInWithApple)),
+          ],
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 24.0),
+                child: const _Footer(),
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
+import 'package:intl/intl.dart';
 
 class HSSpot {
   final String? sid, title, description, geohash, createdBy, address;
@@ -148,4 +149,40 @@ class HSSpot {
       boards: data['user_boards_count'],
     );
   }
+
+  static String formatNumber(int number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    } else {
+      return NumberFormat.decimalPattern().format(number);
+    }
+  }
+}
+
+extension HSSpotExtension on HSSpot {
+  String get formattedLikesCount => HSSpot.formatNumber(likesCount ?? 0);
+
+  String get formattedCommentsCount => HSSpot.formatNumber(commentsCount ?? 0);
+
+  String get formattedSavesCount => HSSpot.formatNumber(savesCount ?? 0);
+
+  String get formattedTripsCount => HSSpot.formatNumber(tripsCount ?? 0);
+
+  String get formattedBoardsCount => HSSpot.formatNumber(boardsCount ?? 0);
+
+  String get formattedSharesCount => HSSpot.formatNumber(sharesCount ?? 0);
+
+  String get formattedSpotIndex => HSSpot.formatNumber(spotIndex ?? 0);
+
+  String get formattedAuthorFollowers =>
+      HSSpot.formatNumber(author?.followers ?? 0);
+
+  String get formattedAuthorFollowing =>
+      HSSpot.formatNumber(author?.following ?? 0);
+
+  String get formattedAuthorSpots => HSSpot.formatNumber(author?.spots ?? 0);
+
+  String get formattedAuthorBoards => HSSpot.formatNumber(author?.boards ?? 0);
 }

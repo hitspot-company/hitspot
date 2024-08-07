@@ -43,26 +43,7 @@ class MapSearchDelegate extends SearchDelegate<HSPrediction> {
   Widget buildSuggestions(BuildContext context) {
     mapSearchCubit.updateQuery(query);
     if (query.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search,
-              size: 64,
-              color: Colors.grey,
-            ),
-            SizedBox(height: 16),
-            Text(
-              "Enter a location to search",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      );
+      return const _SearchPrompt();
     }
     return _buildPredictionsList(context);
   }
@@ -75,11 +56,30 @@ class MapSearchDelegate extends SearchDelegate<HSPrediction> {
           return const HSLoadingIndicator();
         }
 
+        if (query.isEmpty) {
+          return const _SearchPrompt();
+        }
         final List<HSPrediction> predictions = state.predictions;
         if (predictions.isEmpty) {
-          return Text(
-            "No locations found for $query",
-            textAlign: TextAlign.center,
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.search,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "No results found for '$query'",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           );
         }
 
@@ -99,6 +99,34 @@ class MapSearchDelegate extends SearchDelegate<HSPrediction> {
           },
         );
       },
+    );
+  }
+}
+
+class _SearchPrompt extends StatelessWidget {
+  const _SearchPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search,
+            size: 64,
+            color: Colors.grey,
+          ),
+          SizedBox(height: 16),
+          Text(
+            "Enter a location to search",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/invitation/view/board_invitation_page.dart';
 import 'package:hitspot/features/boards/single/view/single_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
+import 'package:hitspot/features/deep_link_error/view/deep_link_error_page.dart';
 import 'package:hitspot/features/home/main/view/home_provider.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
@@ -25,17 +25,12 @@ import 'package:hitspot/features/user_profile/settings/view/settings_provider.da
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:uni_links/uni_links.dart';
 
 class HSNavigation {
   HSNavigation._privateConstructor();
   static final HSNavigation _instance = HSNavigation._privateConstructor();
 
-  factory HSNavigation() {
-    initMagicLinks();
-
-    return _instance;
-  }
+  factory HSNavigation() => _instance;
 
   BuildContext get context => router.configuration.navigatorKey.currentContext!;
 
@@ -54,6 +49,11 @@ class HSNavigation {
             duration: const Duration(milliseconds: 350),
             reverseDuration: const Duration(milliseconds: 350),
             alignment: Alignment.bottomCenter),
+      );
+  dynamic go(String location) => router.go(location);
+  dynamic replacePage({required Widget page}) =>
+      router.configuration.navigatorKey.currentState!.pushReplacement(
+        MaterialPageRoute(builder: (_) => page),
       );
 
   final GoRouter router = GoRouter(
@@ -75,10 +75,11 @@ class HSNavigation {
       ),
       GoRoute(path: "/", redirect: (context, state) => "/protected/home"),
       GoRoute(
-        path: '/user/:userID',
-        redirect: (context, state) =>
-            '/protected/home?from=${state.matchedLocation}',
-      ),
+          path: '/user/:userID',
+          redirect: (context, state) {
+            HSDebugLogger.logInfo("RECEIVED LINK!");
+            return '/protected/home?from=${state.matchedLocation}';
+          }),
       GoRoute(
         path: '/notifications',
         redirect: (context, state) =>
@@ -126,7 +127,17 @@ class HSNavigation {
       ),
       GoRoute(
         path: '/invite/:boardId',
-        redirect: (context, state) => '/protected/home?from=${state.uri}',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/error',
+        redirect: (context, state) =>
+            '/protected/home?from=${state.matchedLocation}',
+      ),
+      GoRoute(
+        path: '/login-callback',
+        redirect: (context, state) => '/protected/home',
       ),
       GoRoute(
         path: "/protected",
@@ -155,6 +166,13 @@ class HSNavigation {
               GoRoute(
                 path: 'settings',
                 builder: (context, state) => const SettingsProvider(),
+              ),
+              GoRoute(
+                path: 'error',
+                builder: (context, state) => DeepLinkErrorPage(
+                  title: state.uri.queryParameters['title'],
+                  message: state.uri.queryParameters['message'],
+                ),
               ),
               GoRoute(
                 path: 'notifications',
@@ -272,20 +290,6 @@ class HSNavigation {
           bool isSubmit = false,
           String? spotID}) =>
       isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
-
-  // Magic links
-  static void initMagicLinks() {
-    uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        Uri parsedUri = Uri.parse(uri.toString());
-        String fullPath =
-            '/${parsedUri.authority}${parsedUri.path}${uri.hasQuery ? '?${uri.query}' : ''}';
-
-        HSDebugLogger.logInfo('Received magic link: $fullPath');
-        navi.router.push(fullPath);
-      }
-    }, onError: (err) {
-      HSDebugLogger.logError("Error listening to magic link: $err");
-    });
-  }
+  dynamic toError({String? title, String? message}) =>
+      router.replace("/error?title=$title&message=$message");
 }

@@ -1,15 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
-import 'package:hitspot/widgets/hs_modal_bottom_sheet_item.dart';
+import 'package:hitspot/widgets/board/hs_board_bottom_sheet.dart';
+import 'package:hitspot/widgets/hs_adaptive_dialog.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:hs_toasts/hs_toasts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -74,29 +71,6 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
     }
   }
 
-  Future<void> onLongPress(HSSpot spot) async {
-    return showCupertinoModalBottomSheet(
-      context: app.context,
-      builder: (context) => Material(
-        color: Colors.transparent,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Gap(8.0),
-            Text("Spot: ${spot.title}", style: textTheme.headlineMedium),
-            const Gap(8.0),
-            HSModalBottomSheetItem(
-              title: "Remove from board",
-              iconData: FontAwesomeIcons.xmark,
-              onTap: () => _removeSpotFromBoard(spot),
-            ),
-            const Gap(32.0),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _removeSpotFromBoard(HSSpot spot) async {
     try {
       emit(state.copyWith(status: HSSingleBoardStatus.updating));
@@ -108,49 +82,37 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
         spots: state.spots,
         board: state.board!,
       ));
-      navi.pop();
-      app.showToast(
-          toastType: HSToastType.success,
-          title: "Spot removed.",
-          alignment: Alignment.bottomCenter,
-          description: "Spot has been removed from the board.");
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
   }
 
-  Future<void> reorderSpots(
-      List<HSSpot> spots, int oldIndex, int newIndex) async {
+  Future<void> reorderSpots(int oldIndex, int newIndex) async {
     try {
-      emit(state.copyWith(status: HSSingleBoardStatus.updating));
       if (oldIndex < newIndex) {
         newIndex -= 1;
       }
 
-      final HSSpot spot = state.spots.removeAt(oldIndex);
-      state.spots.insert(newIndex, spot);
-
-      for (var spot in spots) {
+      final spots = state.spots;
+      final HSSpot spot = spots.removeAt(oldIndex);
+      spots.insert(newIndex, spot);
+      for (var element in spots) {
         await app.databaseRepository.boardUpdateSpotIndex(
-            boardID: boardID, spotID: spot.sid!, newIndex: spots.indexOf(spot));
+            boardID: boardID,
+            spotID: element.sid!,
+            newIndex: spots.indexOf(element));
       }
-
-      emit(state.copyWith(
-        status: HSSingleBoardStatus.idle,
-        spots: state.spots,
-        board: state.board!,
-      ));
+      emit(state.copyWith(spots: spots));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
   }
 
-  Future<void> shareInvitation(String? boardId) async {
+  Future<void> _shareInvitation() async {
     try {
-      assert(boardId != null, 'Board ID cannot be null');
-
+      final boardID = state.board!.id!;
       final magicLink = await app.databaseRepository
-          .boardGenerateBoardInvitation(boardId: boardId!);
+          .boardGenerateBoardInvitation(boardId: boardID);
 
       final String shareText =
           'Join our board collaboration! Click this link to accept the invitation: $magicLink';
@@ -180,5 +142,63 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
     } catch (error) {
       HSDebugLogger.logError('Error removing collaborator: $error');
     }
+  }
+
+  void toggleEditMode() =>
+      emit(state.copyWith(status: HSSingleBoardStatus.editing));
+
+  void exitEditMode() {
+    HSDebugLogger.logInfo('Exiting edit mode');
+    emit(state.copyWith(status: HSSingleBoardStatus.idle));
+  }
+
+  void removeSpot(int index) {
+    _removeSpotFromBoard(state.spots[index]);
+  }
+
+  Future<void> _shareBoard() async {
+    try {
+      await Share.share("https://hitspot.app/board/${state.board!.id}",
+          subject:
+              "Check out this board: ${state.board!.title} by ${state.author!.username}");
+    } catch (_) {
+      HSDebugLogger.logError("Could not share board: $_");
+    }
+  }
+
+  Future<void> _removeBoard() async {
+    try {
+      final bool? isDelete = await showAdaptiveDialog(
+          context: app.context,
+          builder: (context) => const HSAdaptiveDialog(
+              title: "Delete board",
+              content: "This board will be deleted permanently."));
+      if (isDelete == true) {
+        HSDebugLogger.logSuccess("Delete");
+        emit(state.copyWith(status: HSSingleBoardStatus.loading));
+        await app.databaseRepository.boardDelete(board: state.board!);
+        HSDebugLogger.logSuccess("Board deleted successfully");
+        navi.go('/');
+        return;
+      } else {
+        HSDebugLogger.logError("Cancelled");
+      }
+    } catch (e) {
+      HSDebugLogger.logError("Could not remove board: $e");
+      emit(state.copyWith(status: HSSingleBoardStatus.error));
+    }
+  }
+
+  Future<void> showBottomSheet() {
+    return showCupertinoModalBottomSheet(
+      context: app.context,
+      builder: (context) => HSBoardBottomSheet(
+        isEditor: state.isEditor,
+        board: state.board!,
+        inviteCollaborator: _shareInvitation,
+        share: _shareBoard,
+        removeBoard: _removeBoard,
+      ),
+    );
   }
 }

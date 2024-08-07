@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/spot/hs_spot_bottom_sheet.dart';
-import 'package:hitspot/widgets/spot/hs_spot_delete_dialog.dart';
+import 'package:hitspot/widgets/hs_adaptive_dialog.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -48,7 +48,9 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       ));
     } catch (_) {
       HSDebugLogger.logError("Error fetching spot: $_");
-      emit(state.copyWith(status: HSSingleSpotStatus.error));
+      navi.toError(
+          title: "Error fetching spot",
+          message: "Could not fetch spot. Please try again later.");
     }
   }
 
@@ -56,8 +58,13 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     try {
       final bool isSpotLiked = await _databaseRepository.spotLikeDislike(
           spot: state.spot, userID: currentUser.uid);
+      final newLikesCount =
+          isSpotLiked ? state.spot.likesCount! + 1 : state.spot.likesCount! - 1;
+      final HSSpot spot = state.spot.copyWith(likesCount: newLikesCount);
       emit(state.copyWith(
-          isSpotLiked: isSpotLiked, status: HSSingleSpotStatus.loaded));
+          isSpotLiked: isSpotLiked,
+          status: HSSingleSpotStatus.loaded,
+          spot: spot));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
@@ -68,8 +75,13 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       emit(state.copyWith(status: HSSingleSpotStatus.saving));
       final bool isSpotSaved = await _databaseRepository.spotSaveUnsave(
           spotID: spotID, userID: currentUser.uid);
+      final newSavesCount =
+          isSpotSaved ? state.spot.savesCount! + 1 : state.spot.savesCount! - 1;
+      final HSSpot spot = state.spot.copyWith(savesCount: newSavesCount);
       emit(state.copyWith(
-          isSpotSaved: isSpotSaved, status: HSSingleSpotStatus.loaded));
+          isSpotSaved: isSpotSaved,
+          status: HSSingleSpotStatus.loaded,
+          spot: spot));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
@@ -83,6 +95,11 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       HSDebugLogger.logError(e.toString());
       return [];
     }
+  }
+
+  Future<void> saveOnLongPress() async {
+    final List<HSBoard> boards = await fetchUserBoards();
+    await _addToBoardPrompt(boards);
   }
 
   Future<void> _addToBoard(HSBoard board) async {
@@ -142,7 +159,10 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     try {
       final bool? isDelete = await showAdaptiveDialog(
         context: app.context,
-        builder: (context) => const HSSpotDeleteDialog(),
+        builder: (context) => const HSAdaptiveDialog(
+          title: "Delete Spot",
+          content: "This spot will be deleted permanently.",
+        ),
       );
       if (isDelete == true) {
         HSDebugLogger.logSuccess("Delete");

@@ -63,6 +63,7 @@ class HSNotificationsRepository {
         'p_offset': offset,
         'p_include_hidden': includeHidden,
       });
+      print(result);
       final List<HSNotification> ret = await Future.wait(result.map((e) async {
         return HSNotification.deserialize(e)
             .copyWith(isRead: await notificationIsRead(e['id']));

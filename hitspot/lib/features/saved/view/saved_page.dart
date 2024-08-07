@@ -1,167 +1,142 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/extensions/hs_sliver_extensions.dart';
-import 'package:hitspot/features/boards/single/view/single_board_page.dart';
 import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
-import 'package:hitspot/widgets/board/hs_board_card.dart';
-import 'package:hitspot/widgets/hs_appbar.dart';
-import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
-import 'package:hitspot/widgets/hs_loading_indicator.dart';
-import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
+import 'package:hs_database_repository/src/boards/hs_board.dart';
 
 class SavedPage extends StatelessWidget {
   const SavedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final savedCubit = BlocProvider.of<HSSavedCubit>(context);
-    return HSScaffold(
-      appBar: HSAppBar(
-        enableDefaultBackButton: true,
-        titleText: 'Saved',
-        titleBold: true,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Saved'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Your Boards'),
+              Tab(text: 'Saved Boards'),
+              // Tab(text: 'Saved Spots'),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            _OwnBoardsBuilder(),
+            _SavedBoardsBuilder(),
+          ],
+        ),
       ),
-      body: BlocSelector<HSSavedCubit, HSSavedState, HSSavedStatus>(
-        selector: (state) => state.status,
-        builder: (context, state) {
-          switch (state) {
-            case HSSavedStatus.loading:
-              return const HSLoadingIndicator()
-                  .animate()
-                  .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
-            case HSSavedStatus.error:
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.red, size: 48)
-                        .animate()
-                        .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                        .scale(
-                            begin: const Offset(0.8, 0.8),
-                            end: const Offset(1, 1)),
-                    const Gap(16),
-                    Text(
-                      'Something went wrong.',
-                      style: textTheme.headlineSmall,
-                    ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
-                    const Gap(16),
-                    HSButton(
-                      onPressed: () {},
-                      child: const Text("Retry"),
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: 200.ms)
-                        .slideY(begin: 0.2, end: 0),
-                  ],
-                ),
-              );
-            case HSSavedStatus.idle:
-              return CustomScrollView(
-                slivers: [
-                  const Gap(16.0).toSliver,
-                  HSSimpleSliverAppBar(
-                    child: Text(
-                      "Saved boards",
-                      style: textTheme.headlineLarge,
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: 100.ms)
-                        .slideY(begin: 0.2, end: 0),
-                  ),
-                  if (savedCubit.state.savedBoards.isEmpty)
-                    SliverMainAxisGroup(
-                      slivers: [
-                        const Center(child: Text('No boards saved yet.'))
-                            .animate()
-                            .fadeIn(duration: 300.ms, delay: 200.ms)
-                            .slideY(begin: 0.2, end: 0)
-                            .toSliver,
-                        const Gap(16.0).toSliver,
-                        HSButton(
-                                child: const Text("Find Boards"),
-                                onPressed: () =>
-                                    HSDebugLogger.logInfo("Find Boards"))
-                            .animate()
-                            .fadeIn(duration: 300.ms, delay: 300.ms)
-                            .slideY(begin: 0.2, end: 0)
-                            .toSliver,
-                      ],
-                    )
-                  else
-                    _BoardsBuilder(
-                      savedCubit: savedCubit,
-                      boards: savedCubit.state.savedBoards,
-                    ),
-                  const Gap(16.0).toSliver,
-                  HSSimpleSliverAppBar(
-                    child: Text(
-                      "Your boards",
-                      style: textTheme.headlineLarge,
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: 400.ms)
-                        .slideY(begin: 0.2, end: 0),
-                  ),
-                  if (savedCubit.state.ownBoards.isEmpty)
-                    SliverMainAxisGroup(
-                      slivers: [
-                        const Center(child: Text('No boards.')).toSliver,
-                      ],
-                    )
-                  else
-                    _BoardsBuilder(
-                      savedCubit: savedCubit,
-                      boards: savedCubit.state.ownBoards,
-                    ),
-                  const Gap(16.0).toSliver,
-                  HSButton(
-                    onPressed: navi.toCreateBoard,
-                    child: const Text("Create Board"),
-                  )
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 600.ms)
-                      .slideY(begin: 0.2, end: 0)
-                      .toSliver,
-                  const Gap(32.0).toSliver,
-                ],
-              );
-          }
+    );
+  }
+}
+
+class _LoadingBuilder extends StatelessWidget {
+  const _LoadingBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView.separated(
+        itemCount: 6,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Gap(16.0);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          return HSShimmerBox(height: 80.0, width: screenWidth);
         },
       ),
     );
   }
 }
 
+class _SavedBoardsBuilder extends StatelessWidget {
+  const _SavedBoardsBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSSavedCubit, HSSavedState>(
+      buildWhen: (previous, current) =>
+          previous.savedBoards != current.savedBoards ||
+          previous.status != current.status,
+      builder: (context, state) {
+        final isLoading = state.status == HSSavedStatus.loading;
+        final isEmpty = state.savedBoards.isEmpty;
+        if (isLoading) {
+          return const _LoadingBuilder();
+        }
+        if (isEmpty) {
+          return const HSIconPrompt(
+              message: "No saved boards", iconData: FontAwesomeIcons.bookmark);
+        }
+        final boards = state.savedBoards;
+        return _BoardsBuilder(boards: boards);
+      },
+    );
+  }
+}
+
+class _OwnBoardsBuilder extends StatelessWidget {
+  const _OwnBoardsBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HSSavedCubit, HSSavedState>(
+      buildWhen: (previous, current) =>
+          previous.ownBoards != current.ownBoards ||
+          previous.status != current.status,
+      builder: (context, state) {
+        final isLoading = state.status == HSSavedStatus.loading;
+        final isEmpty = state.ownBoards.isEmpty;
+        if (isLoading) {
+          return const _LoadingBuilder();
+        }
+        if (isEmpty) {
+          return const HSIconPrompt(
+              message: "You don't have any boards",
+              iconData: FontAwesomeIcons.bookmark);
+        }
+        final boards = state.ownBoards;
+        return _BoardsBuilder(boards: boards);
+      },
+    );
+  }
+}
+
 class _BoardsBuilder extends StatelessWidget {
   const _BoardsBuilder({
-    required this.savedCubit,
     required this.boards,
   });
 
-  final HSSavedCubit savedCubit;
   final List<HSBoard> boards;
 
   @override
   Widget build(BuildContext context) {
-    return SliverList.separated(
+    return ListView.separated(
       itemCount: boards.length,
-      separatorBuilder: (BuildContext context, int index) => const Gap(16.0),
+      separatorBuilder: (BuildContext context, int index) {
+        return const Gap(16.0);
+      },
       itemBuilder: (BuildContext context, int index) {
-        final HSBoard board = boards[index];
-        return GestureDetector(
-          onTap: () => navi.toBoard(boardID: board.id!, title: board.title),
-          child: HSBoardCard(
-                  board: board, height: 120.0, layout: HSBoardCardLayout.list)
-              .animate()
-              .fadeIn(duration: 300.ms, delay: (100 * index).ms)
-              .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
+        final board = boards[index];
+        return ListTile(
+          onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
+          leading: AspectRatio(
+              aspectRatio: 1.0,
+              child: HSImage(
+                imageUrl: boards[index].image,
+                borderRadius: BorderRadius.circular(10.0),
+              )),
+          title: Text(board.title!),
+          subtitle: Text(board.description!),
         );
       },
     );

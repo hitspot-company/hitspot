@@ -23,6 +23,7 @@ class HSScaffold extends StatelessWidget {
     this.bottombar,
     this.defaultBottombarEnabled = false,
     this.floatingActionButton,
+    this.onTap,
   });
 
   final bool topSafe;
@@ -36,6 +37,7 @@ class HSScaffold extends StatelessWidget {
   final Widget? bottombar;
   final Widget? floatingActionButton;
   final bool defaultBottombarEnabled;
+  final VoidCallback? onTap;
 
   static void hideInput() =>
       SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -43,7 +45,7 @@ class HSScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: hideInput,
+      onTap: onTap ?? hideInput,
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(
@@ -177,11 +179,11 @@ class _CreateMenu extends StatelessWidget {
                         onPressed: navi.pop,
                         icon: const Icon(FontAwesomeIcons.xmark)),
                   ),
-                  Expanded(
+                  const Expanded(
                     flex: 3,
                     child: Center(
-                      child:
-                          Text("Start creating", style: textTheme.labelLarge),
+                      child: Text("Start creating",
+                          style: TextStyle(fontSize: 20)),
                     ),
                   ),
                   const Expanded(
@@ -225,15 +227,23 @@ class _CreateOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Card(
-          margin: const EdgeInsets.all(8.0),
-          child: IconButton(icon: Icon(iconData), onPressed: onTap),
-        ),
-        const Gap(4.0),
-        Text(title, style: textTheme.labelMedium),
-      ],
+    return SizedBox(
+      height: 100.0,
+      child: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(8.0),
+            child:
+                IconButton(icon: Icon(iconData, size: 24.0), onPressed: onTap),
+          ),
+          const Gap(4.0),
+          Text(title,
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              )),
+        ],
+      ),
     );
   }
 }

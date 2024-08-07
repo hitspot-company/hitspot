@@ -1,8 +1,6 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
 enum HSBoardCardLayout { grid, list }

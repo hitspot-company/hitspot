@@ -89,7 +89,6 @@ class _LoadedView extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      tileColor: Colors.grey.shade900,
                       title: Text(announcement.announcementType!.name,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(announcement.title!),
@@ -122,7 +121,6 @@ class _LoadedView extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    tileColor: Colors.grey.shade900,
                     leading: HSUserAvatar(
                       onTap: () => navi.toUser(userID: notification.from!),
                       radius: 24,
@@ -142,8 +140,9 @@ class _LoadedView extends StatelessWidget {
                       maxLines: 2,
                     ),
                     trailing: !notification.isRead
-                        ? badges.Badge(child: Icon(notification.icon))
-                        : Icon(notification.icon),
+                        ? badges.Badge(
+                            child: Icon(notification.icon, color: Colors.grey))
+                        : Icon(notification.icon, color: Colors.grey),
                   );
                 },
                 childCount: state.notifications.length,

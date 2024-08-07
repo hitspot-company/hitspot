@@ -3,11 +3,13 @@ import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
@@ -22,7 +24,7 @@ class MapPage extends StatelessWidget {
   const MapPage({super.key});
 
   final appBarHeight = 120.0;
-  final persistentHeaderHeight = 80.0;
+  final persistentHeaderHeight = 120.0;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,6 @@ class MapPage extends StatelessWidget {
       body: Stack(
         children: [
           BlocBuilder<HSMapCubit, HSMapState>(
-            // selector: (state) => state.currentlySelectedSpot,
             buildWhen: (previous, current) =>
                 previous.selectedSpot != current.selectedSpot ||
                 previous.spotsInView != current.spotsInView,
@@ -118,9 +119,9 @@ class _ExpandableContent extends StatelessWidget {
           HSDebugLogger.logInfo(
               "Selected spot changed: ${selectedSpot?.title}");
           if (spots.isEmpty) {
-            return const Center(
-              child: Text("No spots in the area."),
-            );
+            return const HSIconPrompt(
+                message: "No spots in the area.",
+                iconData: FontAwesomeIcons.mapPin);
           }
           return ListView.separated(
             shrinkWrap: true,
@@ -193,8 +194,16 @@ class _PersistentHeader extends StatelessWidget {
                 else if (state.spotsInView.isEmpty)
                   const _CreateSpotPrompt()
                 else
-                  Text("Found $spotsCount spots",
-                      style: textTheme.headlineSmall),
+                  HSTextPrompt(
+                          prompt: "Spots in the area: $spotsCount \n",
+                          pressableText: "Show",
+                          promptColor: app.theme.mainColor,
+                          textStyle: const TextStyle(
+                            fontSize: 18.0,
+                          ),
+                          onTap: null)
+                      .animate()
+                      .fadeIn(duration: 400.ms),
               ],
             ),
           ),
@@ -280,7 +289,9 @@ class _CreateSpotPrompt extends StatelessWidget {
             prompt: "No spots in the area.\n",
             pressableText: "CREATE",
             promptColor: app.theme.mainColor,
-            textStyle: textTheme.labelMedium,
+            textStyle: const TextStyle(
+              fontSize: 18.0,
+            ),
             onTap: navi.toCreateSpot)
         .animate()
         .fadeIn(duration: 400.ms);

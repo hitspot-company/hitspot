@@ -69,6 +69,8 @@ class HSNotification {
     Map<String, dynamic>? metadata,
     String? boardID,
     String? spotID,
+    HSUser? fromUser,
+    HSUser? toUser,
   }) {
     return HSNotification(
       id: id ?? this.id,
@@ -83,6 +85,8 @@ class HSNotification {
       metadata: metadata ?? this.metadata,
       boardID: boardID ?? this.boardID,
       spotID: spotID ?? this.spotID,
+      fromUser: fromUser ?? this.fromUser,
+      toUser: toUser ?? this.toUser,
     );
   }
 

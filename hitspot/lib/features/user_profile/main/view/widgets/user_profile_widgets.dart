@@ -16,7 +16,11 @@ class _UserProfileInfo extends StatelessWidget {
     return Column(
       children: [
         if (loading)
-          const HSShimmerBox(width: 200, height: 30)
+          const HSShimmer(
+            child: HSShimmerCircleSkeleton(
+              size: 128.0,
+            ),
+          )
         else
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
@@ -37,7 +41,7 @@ class _UserProfileInfo extends StatelessWidget {
           ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 4),
         if (loading)
-          const HSShimmerBox(width: 150, height: 20)
+          const HSShimmerBox(width: 200, height: 20)
         else
           Text(
             user?.name ?? '',
@@ -45,6 +49,42 @@ class _UserProfileInfo extends StatelessWidget {
                   color: Colors.grey,
                 ),
           ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+        const SizedBox(
+          height: 16.0,
+        ),
+        //   if (loading) ...[
+        //     HSShimmerBox(width: screenWidth, height: 20),
+        //     const Gap(8.0),
+        //     HSShimmerBox(width: screenWidth, height: 20),
+        //   ] else if (user?.biogram != null && user!.biogram!.isNotEmpty)
+        //     SizedBox(
+        //       width: screenWidth,
+        //       child: Container(
+        //         padding: const EdgeInsets.all(8.0),
+        //         decoration: BoxDecoration(
+        //           color: Theme.of(context).highlightColor,
+        //           borderRadius: BorderRadius.circular(8),
+        //         ),
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           mainAxisAlignment: MainAxisAlignment.start,
+        //           children: [
+        //             const Text(
+        //               "Biogram",
+        //               style: TextStyle(fontSize: 16),
+        //             ),
+        //             const Gap(16.0),
+        //             Text(
+        //               user!.biogram!,
+        //               style: Theme.of(context)
+        //                   .textTheme
+        //                   .titleMedium
+        //                   ?.copyWith(color: Colors.grey),
+        //             )
+        //           ],
+        //         ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+        //       ),
+        //     ),
       ],
     );
   }
@@ -61,7 +101,7 @@ class _UserDataBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget _buildDataItem(String value, String label) {
+    Widget buildDataItem(String value, String label) {
       return Column(
         children: [
           Text(value, style: Theme.of(context).textTheme.headlineSmall),
@@ -94,7 +134,7 @@ class _UserDataBar extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: Padding(
                           padding: const EdgeInsets.only(left: 32.0),
-                          child: _buildDataItem('${user?.spots}', 'spots'),
+                          child: buildDataItem('${user?.spots}', 'spots'),
                         ))),
                 Expanded(
                   child: Align(
@@ -103,7 +143,7 @@ class _UserDataBar extends StatelessWidget {
                         int>(
                       selector: (state) => state.followersCount,
                       builder: (context, followersCount) {
-                        return _buildDataItem('$followersCount', 'followers');
+                        return buildDataItem('$followersCount', 'followers');
                       },
                     ),
                   ),
@@ -114,7 +154,7 @@ class _UserDataBar extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(right: 32.0),
                           child:
-                              _buildDataItem('${user?.following}', 'following'),
+                              buildDataItem('${user?.following}', 'following'),
                         ))),
               ],
             ),
@@ -136,10 +176,10 @@ class _UserProfileActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(25)),
+      return ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(25)),
         child: HSShimmerBox(
-          width: 50.0,
+          width: screenWidth,
           height: 50,
         ),
       );
@@ -153,6 +193,7 @@ class _UserProfileActionButton extends StatelessWidget {
         ? Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: SizedBox(
+              width: screenWidth,
               height: 50.0,
               child: HSButton(
                 onPressed: ownProfile
@@ -187,11 +228,15 @@ class _TabContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const _GridLoading();
     }
 
     if (elements.isEmpty) {
-      return Center(child: Text('No ${title.toLowerCase()} available'));
+      return HSIconPrompt(
+          message: "No $title",
+          iconData: title == "Spots"
+              ? FontAwesomeIcons.locationDot
+              : FontAwesomeIcons.bookmark);
     }
 
     return GridView.builder(
@@ -213,25 +258,46 @@ class _TabContent extends StatelessWidget {
   }
 }
 
+class _GridLoading extends StatelessWidget {
+  const _GridLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.0,
+        mainAxisSpacing: 12.0,
+      ),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return const Padding(
+            padding: EdgeInsets.only(top: 16.0),
+            child: HSShimmerBox(width: 60.0, height: 60.0));
+      },
+    );
+  }
+}
+
 class _TabBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const TabBar(
-      labelStyle: TextStyle(
+    return TabBar(
+      labelStyle: const TextStyle(
         fontSize: 16.0,
         fontWeight: FontWeight.bold,
       ),
-      unselectedLabelStyle: TextStyle(
+      unselectedLabelStyle: const TextStyle(
         fontSize: 15.0,
         fontWeight: FontWeight.normal,
       ),
-      labelColor: Colors.blue,
+      labelColor: app.theme.mainColor,
       indicatorPadding: EdgeInsets.zero,
-      indicator: UnderlineTabIndicator(
+      indicator: const UnderlineTabIndicator(
         borderSide: BorderSide(width: 2.0, color: Colors.blue),
       ),
       unselectedLabelColor: Colors.grey,
-      tabs: [
+      tabs: const [
         Tab(text: 'Spots'),
         Tab(text: 'Boards'),
       ],

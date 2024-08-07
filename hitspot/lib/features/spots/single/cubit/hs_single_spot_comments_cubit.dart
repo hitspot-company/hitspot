@@ -1,25 +1,22 @@
-import 'package:badword_guard/badword_guard.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hs_authentication_repository/hs_authentication_repository.dart';
-import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:profanity_filter/profanity_filter.dart';
 
 part 'hs_single_spot_comments_state.dart';
 
-class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
+class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsState> {
   HSSingleSpotCommentsCubit({required this.spotID})
-      : super(const HSSingleSpotCommentsCubitState()) {
+      : super(const HSSingleSpotCommentsState()) {
     emit(state.copyWith(status: HSSingleSpotCommentsStatus.loading));
     fetchComments();
   }
 
   final HSDatabaseRepsitory _databaseRepository = app.databaseRepository;
   final String spotID;
+  final TextEditingController commentController = TextEditingController();
 
   int pagesOfCommentsLoaded = 0;
   int pagesOfRepliesLoaded = 0;
@@ -119,7 +116,9 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
               1,
         );
 
+        commentController.clear();
         emit(state.copyWith(
+          comment: "",
           fetchedReplies: [newComment, ...state.fetchedReplies],
           fetchedComments: updatedNormalComments,
           commentingStatus:
@@ -132,7 +131,9 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
             comment: state.comment,
             isReply: isReply);
 
+        commentController.clear();
         emit(state.copyWith(
+            comment: "",
             fetchedComments: [newComment, ...state.fetchedComments],
             commentingStatus:
                 HsSingleSpotCommentsCommentingStatus.finishedCommenting));
@@ -236,5 +237,11 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsCubitState> {
 
       emit(state.copyWith(fetchedComments: updatedComments));
     }
+  }
+
+  @override
+  Future<void> close() {
+    commentController.dispose();
+    return super.close();
   }
 }
