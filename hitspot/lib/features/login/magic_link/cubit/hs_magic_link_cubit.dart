@@ -11,7 +11,11 @@ class HSMagicLinkCubit extends Cubit<HSMagicLinkState> {
 
   final String email;
 
-  void updateOtp(String value) => emit(state.copyWith(otp: value));
+  void updateOtp(String value) =>
+      emit(state.copyWith(otp: value, errorMessage: ""));
+
+  void updateErrorMessage(String value) =>
+      emit(state.copyWith(errorMessage: value));
 
   Future<void> verifyOtp() async {
     try {
@@ -19,10 +23,15 @@ class HSMagicLinkCubit extends Cubit<HSMagicLinkState> {
       await supabase.auth
           .verifyOTP(email: email, token: state.otp, type: OtpType.magiclink);
       HSDebugLogger.logSuccess("Successfully verified OTP!");
+      emit(state.copyWith(status: HSMagicLinkStatus.idle));
       return;
+    } on AuthException catch (e) {
+      HSDebugLogger.logError(e.message);
+      emit(state.copyWith(
+          status: HSMagicLinkStatus.error, errorMessage: e.message));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
+      emit(state.copyWith(status: HSMagicLinkStatus.error));
     }
-    emit(state.copyWith(status: HSMagicLinkStatus.idle));
   }
 }

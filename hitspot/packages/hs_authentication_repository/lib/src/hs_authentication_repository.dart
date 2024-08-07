@@ -82,10 +82,12 @@ class HSAuthenticationRepository {
   /// Throws a [LogOutFailure] if an exception occurs.
   Future<void> signOut() async {
     try {
-      // Remove the FCM_Token after the user signs out
-      await _supabaseClient.from("users").update({"fcm_token": null});
+      await _supabaseClient
+          .from("users")
+          .update({"fcm_token": null}).eq('id', currentUser!.uid!);
       await _supabaseClient.auth.signOut();
     } catch (_) {
+      HSDebugLogger.logError("Error: ${_.toString()}");
       throw LogOutFailure();
     }
   }

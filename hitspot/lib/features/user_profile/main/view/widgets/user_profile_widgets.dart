@@ -52,39 +52,39 @@ class _UserProfileInfo extends StatelessWidget {
         const SizedBox(
           height: 16.0,
         ),
-        if (loading) ...[
-          HSShimmerBox(width: screenWidth, height: 20),
-          const Gap(8.0),
-          HSShimmerBox(width: screenWidth, height: 20),
-        ] else if (user?.biogram != null && user!.biogram!.isNotEmpty)
-          SizedBox(
-            width: screenWidth,
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).highlightColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Biogram",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const Gap(16.0),
-                  Text(
-                    user!.biogram!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(color: Colors.grey),
-                  )
-                ],
-              ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
-            ),
-          ),
+        //   if (loading) ...[
+        //     HSShimmerBox(width: screenWidth, height: 20),
+        //     const Gap(8.0),
+        //     HSShimmerBox(width: screenWidth, height: 20),
+        //   ] else if (user?.biogram != null && user!.biogram!.isNotEmpty)
+        //     SizedBox(
+        //       width: screenWidth,
+        //       child: Container(
+        //         padding: const EdgeInsets.all(8.0),
+        //         decoration: BoxDecoration(
+        //           color: Theme.of(context).highlightColor,
+        //           borderRadius: BorderRadius.circular(8),
+        //         ),
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           mainAxisAlignment: MainAxisAlignment.start,
+        //           children: [
+        //             const Text(
+        //               "Biogram",
+        //               style: TextStyle(fontSize: 16),
+        //             ),
+        //             const Gap(16.0),
+        //             Text(
+        //               user!.biogram!,
+        //               style: Theme.of(context)
+        //                   .textTheme
+        //                   .titleMedium
+        //                   ?.copyWith(color: Colors.grey),
+        //             )
+        //           ],
+        //         ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+        //       ),
+        //     ),
       ],
     );
   }

@@ -67,11 +67,18 @@ class MagicLinkSentPage extends StatelessWidget {
               .fadeIn(delay: 300.ms, duration: 600.ms)
               .slideY(begin: 0.2, end: 0, delay: 300.ms, duration: 600.ms),
           const Gap(24.0),
-          HSTextField.filled(
-            hintText: "0123",
-            onChanged: magiclinkCubit.updateOtp,
-            maxLength: 6,
-            keyboardType: TextInputType.number,
+          BlocSelector<HSMagicLinkCubit, HSMagicLinkState, String?>(
+            selector: (state) =>
+                state.errorMessage.isNotEmpty ? state.errorMessage : null,
+            builder: (context, errorMessage) {
+              return HSTextField.filled(
+                hintText: "0123",
+                errorText: errorMessage,
+                onChanged: magiclinkCubit.updateOtp,
+                maxLength: 6,
+                keyboardType: TextInputType.number,
+              );
+            },
           )
               .animate()
               .fadeIn(delay: 600.ms, duration: 600.ms)
