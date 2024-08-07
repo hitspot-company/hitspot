@@ -1,6 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:avatar_stack/avatar_stack.dart';
-import 'package:avatar_stack/positions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,7 +8,6 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
 import 'package:hitspot/features/boards/single/map/view/single_board_map_provider.dart';
-import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
@@ -22,7 +19,7 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter_animate/flutter_animate.dart';
 
 class SingleBoardPage extends StatelessWidget {
@@ -38,7 +35,6 @@ class SingleBoardPage extends StatelessWidget {
       builder: (context, state) {
         final bool isLoading = state.status == HSSingleBoardStatus.loading;
         final HSBoard? board = state.board;
-        final List<HSSpot> spots = state.spots;
         final HSUser? author = state.author;
         if (state.status == HSSingleBoardStatus.error) {
           return HSScaffold(
@@ -202,27 +198,8 @@ class SingleBoardPage extends StatelessWidget {
                   ),
                 ),
               const Gap(16.0).toSliver,
-              SliverToBoxAdapter(
-                child: ReorderableListView.builder(
-                  scrollController: _scrollController,
-                  shrinkWrap: true,
-                  itemCount: spots.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      key: ValueKey(index),
-                      child: HSSpotTile(
-                        onLongPress: singleBoardCubit.onLongPress,
-                        index: index,
-                        spot: spots[index],
-                        extent: (index % 3 + 2) * 70.0 + 70.0,
-                      ),
-                    );
-                  },
-                  onReorder: (int oldIndex, int newIndex) {
-                    singleBoardCubit.reorderSpots(spots, oldIndex, newIndex);
-                  },
-                ),
+              const SliverToBoxAdapter(
+                child: AnimatedEditableListView(),
               ),
               const Gap(32.0).toSliver,
             ],
@@ -314,6 +291,73 @@ class SingleBoardPage extends StatelessWidget {
   }
 }
 
+class AnimatedEditableListView extends StatelessWidget {
+  const AnimatedEditableListView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<HSSingleBoardCubit>();
+    return BlocBuilder<HSSingleBoardCubit, HSSingleBoardState>(
+      builder: (context, state) {
+        final isEditMode = state.status == HSSingleBoardStatus.editing;
+        return GestureDetector(
+          onLongPress: cubit.toggleEditMode,
+          behavior: HitTestBehavior.translucent,
+          child: IgnorePointer(
+            ignoring: !isEditMode,
+            child: ReorderableListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.spots.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                    key: ValueKey(state.spots[index].sid!),
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Stack(
+                      children: [
+                        HSSpotTile(
+                          onLongPress: (p0) =>
+                              isEditMode ? null : cubit.toggleEditMode,
+                          index: index,
+                          spot: state.spots[index],
+                          extent: (index % 3 + 2) * 70.0 + 70.0,
+                        )
+                            .animate(target: isEditMode ? 1 : 0)
+                            .shake(hz: 4, curve: Curves.easeInOut),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                onPressed: () => cubit.removeSpot(index),
+                                icon: const Icon(FontAwesomeIcons.trash),
+                              ),
+                              const Gap(8.0),
+                              IgnorePointer(
+                                child: IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.drag_handle),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ));
+              },
+              onReorder: (oldIndex, newIndex) {
+                if (oldIndex < newIndex) newIndex--;
+                cubit.reorderSpots(state.spots, oldIndex, newIndex);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class HSSimpleSliverAppBar extends StatelessWidget {
   const HSSimpleSliverAppBar(
       {super.key, this.height, required this.child, this.leading});
@@ -355,7 +399,9 @@ class _SaveActionButton extends StatelessWidget {
       icon = Icon(FontAwesomeIcons.pen, color: accentColor);
     } else {
       switch (status) {
-        case HSSingleBoardStatus.updating || HSSingleBoardStatus.loading:
+        case HSSingleBoardStatus.updating ||
+              HSSingleBoardStatus.loading ||
+              HSSingleBoardStatus.editing:
           onPressed = null;
           icon = HSLoadingIndicator(size: 24, color: accentColor);
         case HSSingleBoardStatus.idle:

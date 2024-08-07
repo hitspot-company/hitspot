@@ -1,6 +1,6 @@
 part of 'hs_single_board_cubit.dart';
 
-enum HSSingleBoardStatus { loading, idle, error, updating }
+enum HSSingleBoardStatus { loading, idle, error, updating, editing }
 
 final class HSSingleBoardState extends Equatable {
   const HSSingleBoardState({

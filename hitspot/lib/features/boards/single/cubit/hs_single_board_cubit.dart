@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/widgets/hs_modal_bottom_sheet_item.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:hs_toasts/hs_toasts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -108,12 +106,6 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
         spots: state.spots,
         board: state.board!,
       ));
-      navi.pop();
-      app.showToast(
-          toastType: HSToastType.success,
-          title: "Spot removed.",
-          alignment: Alignment.bottomCenter,
-          description: "Spot has been removed from the board.");
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
@@ -180,5 +172,12 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
     } catch (error) {
       HSDebugLogger.logError('Error removing collaborator: $error');
     }
+  }
+
+  void toggleEditMode() =>
+      emit(state.copyWith(status: HSSingleBoardStatus.editing));
+
+  void removeSpot(int index) {
+    _removeSpotFromBoard(state.spots[index]);
   }
 }

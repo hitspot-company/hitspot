@@ -301,7 +301,7 @@ class HSBoardsRepository {
         "p_spot_id": sid,
       });
     } catch (_) {
-      throw Exception("Error adding spot: $_");
+      throw Exception("Error removing spot from board: $_");
     }
   }
 
