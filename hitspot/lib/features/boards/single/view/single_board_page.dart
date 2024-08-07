@@ -34,7 +34,6 @@ class SingleBoardPage extends StatelessWidget {
           previous.status != current.status || previous.spots != current.spots,
       builder: (context, state) {
         final bool isLoading = state.status == HSSingleBoardStatus.loading;
-        final bool isEditMode = state.status == HSSingleBoardStatus.editing;
         final HSBoard? board = state.board;
         final HSUser? author = state.author;
         if (state.status == HSSingleBoardStatus.error) {
@@ -57,7 +56,7 @@ class SingleBoardPage extends StatelessWidget {
                   ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
                   const Gap(16),
                   HSButton(
-                    onPressed: () {},
+                    onPressed: () {}, // TODO: Add functionality
                     child: const Text("Retry"),
                   )
                       .animate()
@@ -73,7 +72,7 @@ class SingleBoardPage extends StatelessWidget {
           appBar: HSAppBar(
             enableDefaultBackButton: true,
             right: IconButton(
-              onPressed: () => HSDebugLogger.logInfo("More"),
+              onPressed: singleBoardCubit.showBottomSheet,
               icon: const Icon(FontAwesomeIcons.ellipsisVertical),
             ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut).scale(
                   begin: const Offset(0.8, 0.8),
@@ -168,11 +167,6 @@ class SingleBoardPage extends StatelessWidget {
                               .animate()
                               .fadeIn(duration: 300.ms, delay: 400.ms)
                               .slideY(begin: 0.2, end: 0),
-                          if (state.isOwner)
-                            IconButton(
-                                onPressed: () =>
-                                    singleBoardCubit.shareInvitation(board?.id),
-                                icon: const Icon(FontAwesomeIcons.userPlus)),
                           IconButton(
                             onPressed: () => navi.pushPage(
                               page: SingleBoardMapProvider(
@@ -180,15 +174,6 @@ class SingleBoardPage extends StatelessWidget {
                             ),
                             icon: const Icon(
                               FontAwesomeIcons.map,
-                            ),
-                          )
-                              .animate()
-                              .fadeIn(duration: 300.ms, delay: 500.ms)
-                              .slideY(begin: 0.2, end: 0),
-                          IconButton(
-                            onPressed: () => HSDebugLogger.logInfo("Share"),
-                            icon: const Icon(
-                              FontAwesomeIcons.arrowUpRightFromSquare,
                             ),
                           )
                               .animate()
@@ -411,9 +396,7 @@ class _SaveActionButton extends StatelessWidget {
     late final bool isEditor;
     isEditor = singleBoardCubit.state.isEditor;
     if (isEditor) {
-      onPressed = () => navi.pushPage(
-          page: CreateBoardProvider(prototype: singleBoardCubit.state.board));
-      icon = Icon(FontAwesomeIcons.pen, color: accentColor);
+      return const SizedBox();
     } else {
       switch (status) {
         case HSSingleBoardStatus.updating ||

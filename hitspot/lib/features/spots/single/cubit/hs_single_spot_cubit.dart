@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/spot/hs_spot_bottom_sheet.dart';
-import 'package:hitspot/widgets/spot/hs_spot_delete_dialog.dart';
+import 'package:hitspot/widgets/hs_adaptive_dialog.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -159,7 +159,10 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     try {
       final bool? isDelete = await showAdaptiveDialog(
         context: app.context,
-        builder: (context) => const HSSpotDeleteDialog(),
+        builder: (context) => const HSAdaptiveDialog(
+          title: "Delete Spot",
+          content: "This spot will be deleted permanently.",
+        ),
       );
       if (isDelete == true) {
         HSDebugLogger.logSuccess("Delete");
