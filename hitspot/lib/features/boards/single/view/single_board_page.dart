@@ -34,7 +34,6 @@ class SingleBoardPage extends StatelessWidget {
           previous.status != current.status || previous.spots != current.spots,
       builder: (context, state) {
         final bool isLoading = state.status == HSSingleBoardStatus.loading;
-        final bool isEditMode = state.status == HSSingleBoardStatus.editing;
         final HSBoard? board = state.board;
         final HSUser? author = state.author;
         if (state.status == HSSingleBoardStatus.error) {
