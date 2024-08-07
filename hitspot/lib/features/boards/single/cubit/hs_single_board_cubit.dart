@@ -72,29 +72,6 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
     }
   }
 
-  Future<void> onLongPress(HSSpot spot) async {
-    return showCupertinoModalBottomSheet(
-      context: app.context,
-      builder: (context) => Material(
-        color: Colors.transparent,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Gap(8.0),
-            Text("Spot: ${spot.title}", style: textTheme.headlineMedium),
-            const Gap(8.0),
-            HSModalBottomSheetItem(
-              title: "Remove from board",
-              iconData: FontAwesomeIcons.xmark,
-              onTap: () => _removeSpotFromBoard(spot),
-            ),
-            const Gap(32.0),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _removeSpotFromBoard(HSSpot spot) async {
     try {
       emit(state.copyWith(status: HSSingleBoardStatus.updating));
@@ -114,7 +91,6 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
   Future<void> reorderSpots(
       List<HSSpot> spots, int oldIndex, int newIndex) async {
     try {
-      emit(state.copyWith(status: HSSingleBoardStatus.updating));
       if (oldIndex < newIndex) {
         newIndex -= 1;
       }
@@ -128,7 +104,6 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
       }
 
       emit(state.copyWith(
-        status: HSSingleBoardStatus.idle,
         spots: state.spots,
         board: state.board!,
       ));
@@ -176,6 +151,11 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
 
   void toggleEditMode() =>
       emit(state.copyWith(status: HSSingleBoardStatus.editing));
+
+  void exitEditMode() {
+    HSDebugLogger.logInfo('Exiting edit mode');
+    emit(state.copyWith(status: HSSingleBoardStatus.idle));
+  }
 
   void removeSpot(int index) {
     _removeSpotFromBoard(state.spots[index]);

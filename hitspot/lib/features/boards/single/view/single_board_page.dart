@@ -19,7 +19,6 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:badges/badges.dart' as badges;
 import 'package:flutter_animate/flutter_animate.dart';
 
 class SingleBoardPage extends StatelessWidget {
@@ -68,6 +67,7 @@ class SingleBoardPage extends StatelessWidget {
           );
         }
         return HSScaffold(
+          onTap: singleBoardCubit.exitEditMode,
           appBar: HSAppBar(
             enableDefaultBackButton: true,
             right: IconButton(
@@ -298,6 +298,7 @@ class AnimatedEditableListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<HSSingleBoardCubit>();
     return BlocBuilder<HSSingleBoardCubit, HSSingleBoardState>(
+      buildWhen: (previous, current) => previous.status != current.status,
       builder: (context, state) {
         final isEditMode = state.status == HSSingleBoardStatus.editing;
         return GestureDetector(
@@ -311,19 +312,18 @@ class AnimatedEditableListView extends StatelessWidget {
               itemCount: state.spots.length,
               itemBuilder: (context, index) {
                 return Padding(
-                    key: ValueKey(state.spots[index].sid!),
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Stack(
-                      children: [
-                        HSSpotTile(
-                          onLongPress: (p0) =>
-                              isEditMode ? null : cubit.toggleEditMode,
-                          index: index,
-                          spot: state.spots[index],
-                          extent: (index % 3 + 2) * 70.0 + 70.0,
-                        )
-                            .animate(target: isEditMode ? 1 : 0)
-                            .shake(hz: 4, curve: Curves.easeInOut),
+                  key: ValueKey(state.spots[index].sid!),
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Stack(
+                    children: [
+                      HSSpotTile(
+                        onLongPress: (p0) =>
+                            isEditMode ? null : cubit.toggleEditMode,
+                        index: index,
+                        spot: state.spots[index],
+                        extent: (index % 3 + 2) * 70.0 + 70.0,
+                      ),
+                      if (isEditMode)
                         Positioned(
                           bottom: 0,
                           right: 0,
@@ -331,20 +331,39 @@ class AnimatedEditableListView extends StatelessWidget {
                             children: [
                               IconButton(
                                 onPressed: () => cubit.removeSpot(index),
-                                icon: const Icon(FontAwesomeIcons.trash),
+                                icon: const Icon(
+                                  FontAwesomeIcons.trash,
+                                ),
                               ),
-                              const Gap(8.0),
+                              const SizedBox(width: 8.0),
                               IgnorePointer(
                                 child: IconButton(
                                   onPressed: () {},
-                                  icon: const Icon(Icons.drag_handle),
+                                  icon: const Icon(
+                                    Icons.drag_handle,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        )
-                      ],
-                    ));
+                        ).animate().fade(duration: 300.ms),
+                    ],
+                  )
+                      .animate(
+                        target: isEditMode ? 1 : 0,
+                        autoPlay: isEditMode,
+                        onComplete: (controller) {
+                          if (isEditMode) {
+                            controller.repeat();
+                          }
+                        },
+                      )
+                      .shake(
+                          hz: 2,
+                          delay: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          rotation: .005),
+                );
               },
               onReorder: (oldIndex, newIndex) {
                 if (oldIndex < newIndex) newIndex--;

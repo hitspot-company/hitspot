@@ -23,6 +23,7 @@ class HSScaffold extends StatelessWidget {
     this.bottombar,
     this.defaultBottombarEnabled = false,
     this.floatingActionButton,
+    this.onTap,
   });
 
   final bool topSafe;
@@ -36,6 +37,7 @@ class HSScaffold extends StatelessWidget {
   final Widget? bottombar;
   final Widget? floatingActionButton;
   final bool defaultBottombarEnabled;
+  final VoidCallback? onTap;
 
   static void hideInput() =>
       SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -43,7 +45,7 @@ class HSScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: hideInput,
+      onTap: onTap ?? hideInput,
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(

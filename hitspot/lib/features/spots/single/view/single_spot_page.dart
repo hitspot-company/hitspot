@@ -332,6 +332,7 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
                     activeIcon: FontAwesomeIcons.solidBookmark,
                     inactiveIcon: FontAwesomeIcons.bookmark,
                     loadingStatus: HSSingleSpotStatus.saving,
+                    onLongPress: singleSpotCubit.saveOnLongPress,
                     delay: 550.ms,
                   ),
                   const _Counter(_CounterType.saves),
@@ -382,9 +383,11 @@ class _AnimatedActionButton extends StatelessWidget {
     required this.inactiveIcon,
     required this.loadingStatus,
     required this.delay,
+    this.onLongPress,
   });
 
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final bool Function(HSSingleSpotState) selector;
   final IconData activeIcon;
   final IconData inactiveIcon;
@@ -396,6 +399,10 @@ class _AnimatedActionButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, right: 10.0),
       child: GestureDetector(
+        onLongPress: () {
+          HapticFeedback.mediumImpact();
+          onLongPress?.call();
+        },
         onTap: () {
           HapticFeedback.lightImpact(); // Adds slight vibration
           onTap();

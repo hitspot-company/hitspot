@@ -97,6 +97,11 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
     }
   }
 
+  Future<void> saveOnLongPress() async {
+    final List<HSBoard> boards = await fetchUserBoards();
+    await _addToBoardPrompt(boards);
+  }
+
   Future<void> _addToBoard(HSBoard board) async {
     try {
       emit(state.copyWith(status: HSSingleSpotStatus.addingToBoard));
