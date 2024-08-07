@@ -1,14 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/widgets/hs_modal_bottom_sheet_item.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 
 part 'hs_single_board_state.dart';
@@ -88,25 +83,22 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
     }
   }
 
-  Future<void> reorderSpots(
-      List<HSSpot> spots, int oldIndex, int newIndex) async {
+  Future<void> reorderSpots(int oldIndex, int newIndex) async {
     try {
       if (oldIndex < newIndex) {
         newIndex -= 1;
       }
 
-      final HSSpot spot = state.spots.removeAt(oldIndex);
-      state.spots.insert(newIndex, spot);
-
-      for (var spot in spots) {
+      final spots = state.spots;
+      final HSSpot spot = spots.removeAt(oldIndex);
+      spots.insert(newIndex, spot);
+      for (var element in spots) {
         await app.databaseRepository.boardUpdateSpotIndex(
-            boardID: boardID, spotID: spot.sid!, newIndex: spots.indexOf(spot));
+            boardID: boardID,
+            spotID: element.sid!,
+            newIndex: spots.indexOf(element));
       }
-
-      emit(state.copyWith(
-        spots: state.spots,
-        board: state.board!,
-      ));
+      emit(state.copyWith(spots: spots));
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }

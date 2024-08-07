@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -33,6 +34,7 @@ class SingleBoardPage extends StatelessWidget {
           previous.status != current.status || previous.spots != current.spots,
       builder: (context, state) {
         final bool isLoading = state.status == HSSingleBoardStatus.loading;
+        final bool isEditMode = state.status == HSSingleBoardStatus.editing;
         final HSBoard? board = state.board;
         final HSUser? author = state.author;
         if (state.status == HSSingleBoardStatus.error) {
@@ -298,15 +300,16 @@ class AnimatedEditableListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<HSSingleBoardCubit>();
     return BlocBuilder<HSSingleBoardCubit, HSSingleBoardState>(
-      buildWhen: (previous, current) => previous.status != current.status,
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.spots != current.spots ||
+          previous.board != current.board,
       builder: (context, state) {
         final isEditMode = state.status == HSSingleBoardStatus.editing;
         return GestureDetector(
           onLongPress: cubit.toggleEditMode,
-          behavior: HitTestBehavior.translucent,
-          child: IgnorePointer(
-            ignoring: !isEditMode,
-            child: ReorderableListView.builder(
+          child: ReorderableListView.builder(
+              buildDefaultDragHandles: isEditMode,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: state.spots.length,
@@ -365,12 +368,7 @@ class AnimatedEditableListView extends StatelessWidget {
                           rotation: .005),
                 );
               },
-              onReorder: (oldIndex, newIndex) {
-                if (oldIndex < newIndex) newIndex--;
-                cubit.reorderSpots(state.spots, oldIndex, newIndex);
-              },
-            ),
-          ),
+              onReorder: cubit.reorderSpots),
         );
       },
     );
