@@ -7,7 +7,6 @@ import 'package:hitspot/widgets/hs_adaptive_dialog.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 
 part 'hs_single_board_state.dart';
