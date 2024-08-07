@@ -52,3 +52,7 @@ firebase.json
 
 android/upload-keystore.jks
 android/key.properties
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
