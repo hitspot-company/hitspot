@@ -1,12 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
-import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/single/cubit/hs_single_board_cubit.dart';
 import 'package:hitspot/features/boards/single/map/view/single_board_map_provider.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -19,7 +17,6 @@ import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class SingleBoardPage extends StatelessWidget {
@@ -56,7 +53,7 @@ class SingleBoardPage extends StatelessWidget {
                   ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
                   const Gap(16),
                   HSButton(
-                    onPressed: () {}, // TODO: Add functionality
+                    onPressed: singleBoardCubit.refresh,
                     child: const Text("Retry"),
                   )
                       .animate()
@@ -67,129 +64,140 @@ class SingleBoardPage extends StatelessWidget {
             ),
           );
         }
-        return HSScaffold(
-          onTap: singleBoardCubit.exitEditMode,
-          appBar: HSAppBar(
-            enableDefaultBackButton: true,
-            right: IconButton(
-              onPressed: singleBoardCubit.showBottomSheet,
-              icon: const Icon(FontAwesomeIcons.ellipsisVertical),
-            ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut).scale(
-                  begin: const Offset(0.8, 0.8),
-                  end: const Offset(1, 1),
-                ),
-          ),
-          body: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              if (board?.image != null)
-                HSSimpleSliverAppBar(
-                    height: 120,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        HSImage(
-                          borderRadius: BorderRadius.circular(14.0),
-                          imageUrl: singleBoardCubit.state.board?.image,
-                          color: board?.color,
-                        ),
-                        Positioned(
-                          bottom: 6,
-                          left: 12,
-                          child: GestureDetector(
-                              onTap: () =>
-                                  _showCollaboratorsMenu(singleBoardCubit),
-                              child: _buildCollaboratorIcons(
-                                  board?.collaborators)),
-                        ),
-                      ],
-                    )),
-              const SliverToBoxAdapter(child: Gap(16.0)),
-              if (isLoading)
-                const HSShimmerBox(width: 60, height: 60.0)
-                    .animate()
-                    .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                    .toSliver
-              else
-                SliverToBoxAdapter(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AutoSizeText(
-                      board!.title!,
-                      style: const TextStyle(
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: 100.ms)
-                        .slideY(begin: 0.2, end: 0),
-                    Text(
-                      board.description!,
-                      style: const TextStyle(color: Colors.grey),
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms, delay: 200.ms)
-                        .slideY(begin: 0.2, end: 0),
-                  ],
-                )),
-              const SliverToBoxAdapter(child: Gap(16.0)),
-              if (isLoading)
-                const HSShimmerBox(width: 60, height: 60.0)
-                    .animate()
-                    .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                    .toSliver
-              else
-                HSSimpleSliverAppBar(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+        return RefreshIndicator(
+          onRefresh: singleBoardCubit.refresh,
+          child: HSScaffold(
+            onTap: singleBoardCubit.exitEditMode,
+            appBar: HSAppBar(
+              enableDefaultBackButton: true,
+              right: IconButton(
+                onPressed: singleBoardCubit.showBottomSheet,
+                icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+              )
+                  .animate()
+                  .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                  .scale(
+                    begin: const Offset(0.8, 0.8),
+                    end: const Offset(1, 1),
+                  ),
+            ),
+            body: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                if (board?.image != null)
+                  HSSimpleSliverAppBar(
+                      height: 120,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          HSImage(
+                            onTap: singleBoardCubit.state.board?.image != null
+                                ? () => app.gallery.showImageGallery(images: [
+                                      singleBoardCubit.state.board!.image!
+                                    ])
+                                : null,
+                            borderRadius: BorderRadius.circular(14.0),
+                            imageUrl: singleBoardCubit.state.board?.image,
+                            color: board?.color,
+                          ),
+                          Positioned(
+                            bottom: 6,
+                            left: 12,
+                            child: GestureDetector(
+                                onTap: () =>
+                                    _showCollaboratorsMenu(singleBoardCubit),
+                                child: _buildCollaboratorIcons(
+                                    board?.collaborators)),
+                          ),
+                        ],
+                      )),
+                const SliverToBoxAdapter(child: Gap(16.0)),
+                if (isLoading)
+                  const HSShimmerBox(width: 60, height: 60.0)
+                      .animate()
+                      .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                      .toSliver
+                else
+                  SliverToBoxAdapter(
+                      child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          HSUserAvatar(
-                            radius: 24,
-                            imageUrl: state.author?.avatarUrl,
-                          ),
-                          const Gap(16.0),
-                          AutoSizeText(
-                            author?.username ?? "",
-                            style: textTheme.headlineMedium,
-                            maxLines: 1,
-                          ),
-                          const Spacer(),
-                          _SaveActionButton(
-                            status: state.status,
-                            singleBoardCubit: singleBoardCubit,
-                          )
-                              .animate()
-                              .fadeIn(duration: 300.ms, delay: 400.ms)
-                              .slideY(begin: 0.2, end: 0),
-                          IconButton(
-                            onPressed: () => navi.pushPage(
-                              page: SingleBoardMapProvider(
-                                  boardID: board!.id!, board: board),
-                            ),
-                            icon: const Icon(
-                              FontAwesomeIcons.map,
-                            ),
-                          )
-                              .animate()
-                              .fadeIn(duration: 300.ms, delay: 500.ms)
-                              .slideY(begin: 0.2, end: 0),
-                        ],
-                      ),
+                      AutoSizeText(
+                        board!.title!,
+                        style: const TextStyle(
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                      )
+                          .animate()
+                          .fadeIn(duration: 300.ms, delay: 100.ms)
+                          .slideY(begin: 0.2, end: 0),
+                      Text(
+                        board.description!,
+                        style: const TextStyle(color: Colors.grey),
+                      )
+                          .animate()
+                          .fadeIn(duration: 300.ms, delay: 200.ms)
+                          .slideY(begin: 0.2, end: 0),
                     ],
+                  )),
+                const SliverToBoxAdapter(child: Gap(16.0)),
+                if (isLoading)
+                  const HSShimmerBox(width: 60, height: 60.0)
+                      .animate()
+                      .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                      .toSliver
+                else
+                  HSSimpleSliverAppBar(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            HSUserAvatar(
+                              radius: 24,
+                              imageUrl: state.author?.avatarUrl,
+                            ),
+                            const Gap(16.0),
+                            AutoSizeText(
+                              author?.username ?? "",
+                              style: textTheme.headlineMedium,
+                              maxLines: 1,
+                            ),
+                            const Spacer(),
+                            _SaveActionButton(
+                              status: state.status,
+                              singleBoardCubit: singleBoardCubit,
+                            )
+                                .animate()
+                                .fadeIn(duration: 300.ms, delay: 400.ms)
+                                .slideY(begin: 0.2, end: 0),
+                            IconButton(
+                              onPressed: () => navi.pushPage(
+                                page: SingleBoardMapProvider(
+                                    boardID: board!.id!, board: board),
+                              ),
+                              icon: const Icon(
+                                FontAwesomeIcons.map,
+                              ),
+                            )
+                                .animate()
+                                .fadeIn(duration: 300.ms, delay: 500.ms)
+                                .slideY(begin: 0.2, end: 0),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
+                const Gap(16.0).toSliver,
+                const SliverToBoxAdapter(
+                  child: AnimatedEditableListView(),
                 ),
-              const Gap(16.0).toSliver,
-              const SliverToBoxAdapter(
-                child: AnimatedEditableListView(),
-              ),
-              const Gap(32.0).toSliver,
-            ],
+                const Gap(32.0).toSliver,
+              ],
+            ),
           ),
         );
       },

@@ -1,12 +1,5 @@
-import 'dart:ui';
-
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_database_repository/src/spots/hs_comment.dart';
-import 'package:hs_database_repository/src/spots/hs_spot.dart';
-import 'package:hs_database_repository/src/utils/utils.dart';
-import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -445,6 +438,21 @@ class HSSpotsRepository {
           .eq("created_by", userID);
     } catch (_) {
       throw Exception("Error deleting comment: $_");
+    }
+  }
+
+  Future<List<HSSpot>> fetchSavedSpots(
+      String userID, int batchSize, int batchOffset) async {
+    try {
+      final List<Map<String, dynamic>> data = await _supabase
+          .rpc('spot_fetch_saved', params: {
+        'p_user_id': userID,
+        'p_batch_size': batchSize,
+        'p_batch_offset': batchOffset
+      });
+      return data.map(HSSpot.deserialize).toList();
+    } catch (_) {
+      throw Exception("Error fetching saved spots: $_");
     }
   }
 }

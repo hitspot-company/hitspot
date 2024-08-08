@@ -9,7 +9,7 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_comments_page.dart';
-import 'package:hitspot/features/spots/single/view/single_spot_image_full_screen_page.dart';
+import 'package:hitspot/utils/gallery/hs_gallery.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
@@ -154,9 +154,13 @@ class _AnimatedImageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<HSSingleSpotCubit>(context);
     return GestureDetector(
-      onTap: () => navi.pushPage(
-          page: SingleSpotImageFullScreenPage(imageUrl: imageUrl)),
+      onTap: () => app.gallery.showImageGallery(
+        images: cubit.state.spot.images!,
+        type: HSImageGalleryType.network,
+        initialIndex: cubit.state.spot.images!.indexOf(imageUrl),
+      ),
       child: Hero(
         tag: imageUrl,
         child: HSImage(

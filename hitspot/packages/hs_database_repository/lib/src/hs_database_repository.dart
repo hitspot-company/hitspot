@@ -290,6 +290,12 @@ class HSDatabaseRepsitory {
           {required String commentID, required String userID}) async =>
       await _spotsRepository.removeComment(commentID, userID);
 
+  Future<List<HSSpot>> spotFetchSaved(
+          {required String userID,
+          int batchSize = 10,
+          int batchOffset = 0}) async =>
+      await _spotsRepository.fetchSavedSpots(userID, batchSize, batchOffset);
+
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);
   Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>

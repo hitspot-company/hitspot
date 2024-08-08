@@ -24,10 +24,16 @@ class _UserProfileInfo extends StatelessWidget {
         else
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
-            child: HSUserAvatar(
-              imageUrl: user?.avatarUrl,
-              radius: 54,
-            ).animate().fadeIn(duration: 300.ms),
+            child: ZoomOverlay(
+              minScale: 1.0,
+              maxScale: 3.0,
+              animationCurve: Curves.fastOutSlowIn,
+              animationDuration: const Duration(milliseconds: 300),
+              child: HSUserAvatar(
+                imageUrl: user?.avatarUrl,
+                radius: 54,
+              ).animate().fadeIn(duration: 300.ms),
+            ),
           ),
         const SizedBox(height: 12),
         if (loading)
@@ -240,6 +246,7 @@ class _TabContent extends StatelessWidget {
     }
 
     return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12.0,

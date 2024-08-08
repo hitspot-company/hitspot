@@ -4,6 +4,7 @@ import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/utils/gallery/hs_gallery.dart';
 import 'package:hitspot/utils/navigation/hs_navigation.dart';
 import 'package:hitspot/utils/pickers/hs_pickers.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
@@ -102,4 +103,6 @@ class HSApp {
       connectivityBloc.state.isLocationServiceEnabled;
   bool get isConnected => connectivityBloc.state.isConnected;
   bool get isCurrentPositionAvailable => currentPosition != null;
+
+  HSGallery get gallery => HSGallery();
 }

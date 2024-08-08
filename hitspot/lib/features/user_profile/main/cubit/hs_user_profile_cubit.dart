@@ -22,15 +22,6 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
   ScrollController get spotsScrollController => _spotsScrollController;
   ScrollController get boardsScrollController => _boardsScrollController;
 
-  @override
-  Future<void> close() {
-    _spotsScrollController.removeListener(_onSpotsScroll);
-    _boardsScrollController.removeListener(_onBoardsScroll);
-    _spotsScrollController.dispose();
-    _boardsScrollController.dispose();
-    return super.close();
-  }
-
   void _onSpotsScroll() {
     if (_spotsScrollController.position.pixels >=
             _spotsScrollController.position.maxScrollExtent - 200 &&
@@ -79,8 +70,8 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
     try {
       final newBoards = await _databaseRepository.boardFetchUserBoards(
         user: state.user!,
-        // startAfter: state.boards.last,
-        // limit: 10,
+        // batchOffset: state.boards.length - 1,
+        // batchSize: 10,
       );
 
       if (newBoards.isEmpty) {
@@ -175,5 +166,14 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
     } catch (_) {
       HSDebugLogger.logError(_.toString());
     }
+  }
+
+  @override
+  Future<void> close() {
+    _spotsScrollController.removeListener(_onSpotsScroll);
+    _boardsScrollController.removeListener(_onBoardsScroll);
+    _spotsScrollController.dispose();
+    _boardsScrollController.dispose();
+    return super.close();
   }
 }
