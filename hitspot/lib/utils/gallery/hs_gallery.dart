@@ -15,9 +15,9 @@ class HSGallery {
   factory HSGallery() => _instance;
   static OverlayEntry? _overlayEntry;
 
-  static void showImageGallery({
+  void showImageGallery({
     required List<String> images,
-    required HSImageGalleryType type,
+    HSImageGalleryType type = HSImageGalleryType.network,
     BoxDecoration? backgroundDecoration,
     PageController? pageController,
     Function(int)? onPageChanged,

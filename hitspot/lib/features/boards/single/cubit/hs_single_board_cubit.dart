@@ -21,6 +21,8 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
   final String boardID;
   final String title;
 
+  Future<void> refresh() async => _fetchInitial();
+
   Future<void> _fetchInitial() async {
     try {
       emit(state.copyWith(status: HSSingleBoardStatus.loading));

@@ -156,7 +156,7 @@ class _AnimatedImageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = BlocProvider.of<HSSingleSpotCubit>(context);
     return GestureDetector(
-      onTap: () => HSGallery.showImageGallery(
+      onTap: () => app.gallery.showImageGallery(
         images: cubit.state.spot.images!,
         type: HSImageGalleryType.network,
         initialIndex: cubit.state.spot.images!.indexOf(imageUrl),
