@@ -9,11 +9,10 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_comments_page.dart';
-import 'package:hitspot/features/spots/single/view/single_spot_image_full_screen_page.dart';
+import 'package:hitspot/utils/gallery/hs_gallery.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
-import 'package:hitspot/widgets/hs_image_gallery.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
@@ -157,12 +156,10 @@ class _AnimatedImageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = BlocProvider.of<HSSingleSpotCubit>(context);
     return GestureDetector(
-      onTap: () => navi.pushPage(
-        page: HSImageGallery(
-          pageController: PageController(
-              initialPage: cubit.state.spot.images!.indexOf(imageUrl)),
-          images: cubit.state.spot.images!,
-        ),
+      onTap: () => HSGallery.showImageGallery(
+        images: cubit.state.spot.images!,
+        type: HSImageGalleryType.network,
+        initialIndex: cubit.state.spot.images!.indexOf(imageUrl),
       ),
       child: Hero(
         tag: imageUrl,
