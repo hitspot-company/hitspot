@@ -24,20 +24,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 			<!-- DEEP LINKS -->
+			<meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
 			<intent-filter android:autoVerify="true">
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
-			  
+				<data android:scheme="http" android:host="hitspot.app" />
 				<data android:scheme="https" />
-				<data android:host="hitspot.app" />
-				<!-- Schemes -->
-				<data android:path="/login-callback/" />  
-				<data android:pathPattern="/user/.*" />
-				<data android:pathPattern="/spot/.*" />
-				<data android:pathPattern="/board/.*" />
-				<data android:pathPattern="/invite/.*" />
-			  </intent-filter>			  
+			</intent-filter>  
 			<!-- /DEEP LINKS -->
         </activity>
 		<!-- IMAGE CROPPER -->
@@ -71,4 +65,7 @@
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 	<!-- /GEOLOCATOR -->
+	 <!-- VIBRATIONS -->
+	 <uses-permission android:name="android.permission.VIBRATE" />
+	 <!-- /VIBRATIONS -->
 </manifest>
