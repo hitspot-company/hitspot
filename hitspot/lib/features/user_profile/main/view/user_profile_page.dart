@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -51,29 +52,20 @@ class UserProfilePage extends StatelessWidget {
           ),
           body: DefaultTabController(
             length: 2,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(0.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _UserProfileInfo(
-                        context: context,
-                        loading: loading,
-                        user: user,
-                      ),
-                      const SizedBox(height: 8),
-                      _UserProfileActionButton(isLoading: loading),
-                      const SizedBox(height: 8),
-                      _UserDataBar(loading: loading, user: user),
-                      const SizedBox(height: 16),
-                      _TabBarWidget(),
-                    ],
-                  ),
-                ),
-                Expanded(
+            child: CustomScrollView(
+              slivers: [
+                _UserProfileInfo(
+                  context: context,
+                  loading: loading,
+                  user: user,
+                ).toSliver,
+                const Gap(8.0).toSliver,
+                _UserProfileActionButton(isLoading: loading).toSliver,
+                const Gap(8.0).toSliver,
+                _UserDataBar(loading: loading, user: user).toSliver,
+                const Gap(16.0).toSliver,
+                _TabBarWidget().toSliver,
+                SliverFillRemaining(
                   child: TabBarView(
                     children: [
                       _TabContent(
@@ -90,7 +82,7 @@ class UserProfilePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
+                )
               ],
             ),
           ),
