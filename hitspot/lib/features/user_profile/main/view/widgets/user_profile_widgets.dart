@@ -24,11 +24,12 @@ class _UserProfileInfo extends StatelessWidget {
         else
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
-            child: Hero(
-              tag: user!.avatarUrl!,
+            child: ZoomOverlay(
+              minScale: 1.0,
+              maxScale: 3.0,
+              animationCurve: Curves.fastOutSlowIn,
+              animationDuration: const Duration(milliseconds: 300),
               child: HSUserAvatar(
-                onTap: () => navi.pushPage(
-                    page: HSImageGallery(images: [user!.avatarUrl!])),
                 imageUrl: user?.avatarUrl,
                 radius: 54,
               ).animate().fadeIn(duration: 300.ms),

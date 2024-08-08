@@ -13,6 +13,7 @@ import 'package:hitspot/features/spots/single/view/single_spot_image_full_screen
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
+import 'package:hitspot/widgets/hs_image_gallery.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
@@ -154,9 +155,15 @@ class _AnimatedImageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<HSSingleSpotCubit>(context);
     return GestureDetector(
       onTap: () => navi.pushPage(
-          page: SingleSpotImageFullScreenPage(imageUrl: imageUrl)),
+        page: HSImageGallery(
+          pageController: PageController(
+              initialPage: cubit.state.spot.images!.indexOf(imageUrl)),
+          images: cubit.state.spot.images!,
+        ),
+      ),
       child: Hero(
         tag: imageUrl,
         child: HSImage(

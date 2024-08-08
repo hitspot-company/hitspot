@@ -18,6 +18,7 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hitspot/widgets/hs_button.dart';
+import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 part 'widgets/user_profile_widgets.dart';
 
