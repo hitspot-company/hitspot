@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/spots/create/cubit/hs_spot_creation_data.dart';
+import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/spots/create/map/view/choose_location_provider.dart';
 import 'package:hitspot/main.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -119,6 +124,9 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
   List<File> get _xfilesToFiles =>
       state.images.map((e) => File(e.path)).toList();
 
+  final HSSpotUploadCubit spotUploadCubit =
+      BlocProvider.of<HSSpotUploadCubit>(app.context);
+
   Future<void> submitSpot() async {
     try {
       emit(state.copyWith(status: HSCreateSpotStatus.submitting));
@@ -133,30 +141,38 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
         longitude: long,
         address: state.spotLocation!.address,
       );
-      HSDebugLogger.logInfo(spot.toString());
-      late final String sid;
+
       if (prototype != null) {
+        // Handle updating existing spot (not using isolate for simplicity)
         await app.databaseRepository
             .spotUpdate(spot: spot.copyWith(sid: prototype!.sid!));
-        sid = prototype!.sid!;
+        if (state.selectedTags.isNotEmpty) {
+          await uploadTags(prototype!.sid!);
+        }
+        HSDebugLogger.logSuccess("Spot updated: ${prototype!.sid!}");
+        navi.toSpot(sid: prototype!.sid!, isSubmit: true);
       } else {
-        sid = await app.databaseRepository.spotCreate(spot: spot);
-        final List<String> urls = await app.storageRepository.spotUploadImages(
-            files: _xfilesToFiles, uid: currentUser.uid!, sid: sid);
-        HSDebugLogger.logSuccess("Uploaded images to the storage!");
-        await app.databaseRepository.spotUploadImages(
-            spotID: sid, imageUrls: urls, uid: currentUser.uid!);
-        HSDebugLogger.logSuccess("Uploaded images to the database!");
-        HSDebugLogger.logSuccess("Spot submitted: $sid");
+        final receivePort = ReceivePort();
+        final spotData = HSSpotCreationData(
+          spot: spot,
+          imagePaths: state.images.map((e) => e.path).toList(),
+          uid: currentUser.uid!,
+          tags: state.selectedTags,
+          sendPort: receivePort.sendPort,
+          supabaseData: {
+            'url': dotenv.env['SUPABASE_URL'],
+            'anonKey': dotenv.env['SUPABASE_ANON_KEY'],
+          },
+          currentSession: supabase.auth.currentSession,
+        );
+
+        spotUploadCubit.startUpload();
+        navi.pop();
+        await createSpotWithIsolate(spotData, spotUploadCubit);
       }
-      if (state.selectedTags.isNotEmpty) {
-        await uploadTags(sid);
-      }
-      HSDebugLogger.logSuccess("Spot created / updated: $sid");
-      navi.toSpot(sid: sid, isSubmit: true);
-      return;
-    } catch (_) {
-      HSDebugLogger.logError("Could not submit spot: $_");
+    } catch (e) {
+      HSDebugLogger.logError("Could not submit spot: $e");
+      emit(state.copyWith(status: HSCreateSpotStatus.error));
     }
   }
 
