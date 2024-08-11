@@ -143,6 +143,10 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
     }
   }
 
+  void clearData() {
+    emit(const HSUserProfileState());
+  }
+
   Future<void> followUser() async {
     HSDebugLogger.logInfo("Initial User Data: ${state.user.toString()}");
     try {

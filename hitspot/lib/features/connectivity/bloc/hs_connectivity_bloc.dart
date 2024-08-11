@@ -1,14 +1,13 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/utils/notifications/hs_notification_handler.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
-
 part 'hs_connectivity_event.dart';
 part 'hs_connectivity_state.dart';
 
@@ -41,13 +40,27 @@ class HSConnectivityLocationBloc
       emit(state.copyWith(fcmToken: event.fcmToken));
     });
 
+    // FCM Handlers
+    FirebaseMessaging.onBackgroundMessage(HSNotificationHandler.messageHandler);
+    FirebaseMessaging.onMessageOpenedApp
+        .listen(HSNotificationHandler.messageHandler);
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        HSNotificationHandler.messageHandler(message);
+      }
+    });
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      HSDebugLogger.logInfo("Foreground message: ${message.data}");
       final notification = message.notification;
       if (notification != null) {
         app.showToast(
             toastType: HSToastType.pushNotification,
             title: notification.title ?? "",
             primaryColor: app.currentTheme.cardColor,
+            onTap: () => HSNotificationHandler.messageHandler(message),
             description: notification.body ?? "");
       }
     });
@@ -159,7 +172,7 @@ class HSConnectivityLocationBloc
   Future<void> _onRequestPushNotificationPermission(
       HSConnectivityRequestNotificationPermissionEvent event,
       Emitter<HSConnectivityLocationState> emit) async {
-    await FirebaseMessaging.instance.requestPermission();
+    await FirebaseMessaging.instance.requestPermission(provisional: true);
 
     await FirebaseMessaging.instance.getAPNSToken();
 

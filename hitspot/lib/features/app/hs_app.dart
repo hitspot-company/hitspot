@@ -78,11 +78,13 @@ class HSApp {
           required String title,
           String? description,
           Color? primaryColor,
-          Alignment? alignment}) =>
+          Alignment? alignment,
+          Function()? onTap}) =>
       toasts.toast(
         context,
         toastType: toastType,
         title: title,
+        onTap: onTap,
         primaryColor: primaryColor,
         descriptionText: description,
         alignment: alignment,

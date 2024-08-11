@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +10,7 @@ import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/firebase_options.dart';
-import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/utils/notifications/hs_notification_handler.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -27,15 +28,12 @@ Future<void> main() async {
   HSDebugLogger.logInfo("$url: $anon");
   await Supabase.initialize(url: url!, anonKey: anon!);
 
+  await Firebase.initializeApp(
+      name: "hitspot", options: DefaultFirebaseOptions.currentPlatform);
+
   final HSAuthenticationRepository authenticationRepository =
       HSAuthenticationRepository(supabase);
   final HSThemeRepository themeRepository = HSThemeRepository.instance;
-  final HSAssets assets = HSAssets.instance;
-
-  await Firebase.initializeApp(
-    name: "hitspot",
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   runApp(MyApp(
       authenticationRepository: authenticationRepository,

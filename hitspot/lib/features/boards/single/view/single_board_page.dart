@@ -317,7 +317,7 @@ class AnimatedEditableListView extends StatelessWidget {
                             isEditMode ? null : cubit.toggleEditMode,
                         index: index,
                         spot: state.spots[index],
-                        extent: (index % 3 + 2) * 70.0 + 70.0,
+                        extent: 160.0,
                       ),
                       if (isEditMode)
                         Positioned(
@@ -327,9 +327,7 @@ class AnimatedEditableListView extends StatelessWidget {
                             children: [
                               IconButton(
                                 onPressed: () => cubit.removeSpot(index),
-                                icon: const Icon(
-                                  FontAwesomeIcons.trash,
-                                ),
+                                icon: const Icon(FontAwesomeIcons.xmark),
                               ),
                               const SizedBox(width: 8.0),
                               IgnorePointer(
