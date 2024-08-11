@@ -73,10 +73,14 @@ class HomePage extends StatelessWidget {
                   floating: true,
                   pinned: true,
                 ),
-                BlocSelector<HSSpotUploadCubit, HSSpotUploadState,
-                    HSUploadStatus>(
-                  selector: (state) => state.status,
-                  builder: (context, status) {
+                BlocConsumer<HSSpotUploadCubit, HSSpotUploadState>(
+                  listener: (context, state) {
+                    if (state.status == HSUploadStatus.success) {
+                      homeCubit.handleRefresh();
+                    }
+                  },
+                  builder: (context, state) {
+                    final status = state.status;
                     if (status != HSUploadStatus.initial) {
                       return SliverMainAxisGroup(
                         slivers: [
