@@ -10,7 +10,6 @@ import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/firebase_options.dart';
-import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/notifications/hs_notification_handler.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -41,7 +40,9 @@ Future<void> main() async {
       themeRepository: themeRepository));
 }
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  HSDebugLogger.logInfo("Handling a background message: ${message.messageId}");
   FirebaseMessaging.onBackgroundMessage(HSNotificationHandler.messageHandler);
   await Firebase.initializeApp(
       name: "hitspot", options: DefaultFirebaseOptions.currentPlatform);

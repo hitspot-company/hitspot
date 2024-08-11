@@ -43,7 +43,30 @@ class HSConnectivityLocationBloc
       emit(state.copyWith(fcmToken: event.fcmToken));
     });
 
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      HSDebugLogger.logInfo("Message opened: ${message.data}");
+      HSNotificationHandler.messageHandler(message);
+    });
+
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        HSDebugLogger.logInfo("Initial message: ${message.data}");
+        final notification = message.notification;
+        if (notification != null) {
+          app.showToast(
+              toastType: HSToastType.pushNotification,
+              title: notification.title ?? "",
+              primaryColor: app.currentTheme.cardColor,
+              onTap: () => HSNotificationHandler.messageHandler(message),
+              description: notification.body ?? "");
+        }
+      }
+    });
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      HSDebugLogger.logInfo("Foreground message: ${message.data}");
       final notification = message.notification;
       if (notification != null) {
         app.showToast(
@@ -162,7 +185,7 @@ class HSConnectivityLocationBloc
   Future<void> _onRequestPushNotificationPermission(
       HSConnectivityRequestNotificationPermissionEvent event,
       Emitter<HSConnectivityLocationState> emit) async {
-    await FirebaseMessaging.instance.requestPermission();
+    await FirebaseMessaging.instance.requestPermission(provisional: true);
 
     await FirebaseMessaging.instance.getAPNSToken();
 

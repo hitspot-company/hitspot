@@ -5,7 +5,7 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class HSNotificationHandler {
   static Future<void> messageHandler(RemoteMessage message) async {
-    HSDebugLogger.logInfo("Handling message: $message");
+    HSDebugLogger.logInfo("Handling message: ${message.data}");
     final data = message.data;
     final type = data['type'];
     final senderID = data['sender'];
