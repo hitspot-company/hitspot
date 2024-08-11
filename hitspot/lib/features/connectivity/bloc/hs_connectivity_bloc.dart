@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/utils/notifications/hs_notification_handler.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -48,6 +50,7 @@ class HSConnectivityLocationBloc
             toastType: HSToastType.pushNotification,
             title: notification.title ?? "",
             primaryColor: app.currentTheme.cardColor,
+            onTap: () => HSNotificationHandler.messageHandler(message),
             description: notification.body ?? "");
       }
     });

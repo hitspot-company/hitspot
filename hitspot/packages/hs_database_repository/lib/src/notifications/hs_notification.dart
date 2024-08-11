@@ -26,6 +26,23 @@ enum HSNotificationType {
         return 'other';
     }
   }
+
+  static HSNotificationType fromString(String str) {
+    switch (str) {
+      case 'spot_like':
+        return HSNotificationType.spotlike;
+      case 'spot_comment':
+        return HSNotificationType.spotcomment;
+      case 'user_follow':
+        return HSNotificationType.userfollow;
+      case 'board_like':
+        return HSNotificationType.boardlike;
+      case 'board_invitation':
+        return HSNotificationType.boardinvitation;
+      default:
+        return HSNotificationType.other;
+    }
+  }
 }
 
 class HSNotification {
