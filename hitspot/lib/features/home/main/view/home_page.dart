@@ -8,6 +8,7 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
+import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -15,6 +16,7 @@ import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
+import 'package:hitspot/widgets/spot/hs_upload_progress_widget.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
@@ -70,6 +72,25 @@ class HomePage extends StatelessWidget {
                   ],
                   floating: true,
                   pinned: true,
+                ),
+                BlocConsumer<HSSpotUploadCubit, HSSpotUploadState>(
+                  listener: (context, state) {
+                    if (state.status == HSUploadStatus.success) {
+                      homeCubit.handleRefresh();
+                    }
+                  },
+                  builder: (context, state) {
+                    final status = state.status;
+                    if (status != HSUploadStatus.initial) {
+                      return SliverMainAxisGroup(
+                        slivers: [
+                          const Gap(16.0).toSliver,
+                          const HSUploadProgressWidget().toSliver,
+                        ],
+                      );
+                    }
+                    return const SizedBox().toSliver;
+                  },
                 ),
                 const Gap(16.0).toSliver,
                 SliverToBoxAdapter(

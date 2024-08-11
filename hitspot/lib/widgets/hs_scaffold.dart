@@ -6,7 +6,6 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/features/search/view/main_search_delegate.dart';
-import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class HSScaffold extends StatelessWidget {
@@ -199,13 +198,19 @@ class _CreateMenu extends StatelessWidget {
                   _CreateOption(
                     title: "Spot",
                     iconData: FontAwesomeIcons.mapPin,
-                    onTap: navi.toCreateSpot,
+                    onTap: () {
+                      navi.pop();
+                      navi.toCreateSpot();
+                    },
                   ),
                   const Gap(16.0),
                   _CreateOption(
                     title: "Board",
                     iconData: FontAwesomeIcons.grip,
-                    onTap: navi.toCreateBoard,
+                    onTap: () {
+                      navi.pop();
+                      navi.toCreateBoard();
+                    },
                   ),
                 ],
               ),
