@@ -104,7 +104,7 @@ class _Comment extends StatelessWidget {
 
     return Slidable(
       key: ValueKey(comment.id),
-      enabled: onDelete != null,
+      enabled: onDelete != null && comment.author?.uid == app.currentUser.uid,
       endActionPane: ActionPane(
         extentRatio: 0.25,
         motion: const ScrollMotion(),
