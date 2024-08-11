@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/notifications/hs_notification_handler.dart';
@@ -10,7 +8,6 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_toasts/hs_toasts.dart';
-
 part 'hs_connectivity_event.dart';
 part 'hs_connectivity_state.dart';
 
@@ -43,11 +40,10 @@ class HSConnectivityLocationBloc
       emit(state.copyWith(fcmToken: event.fcmToken));
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      HSDebugLogger.logInfo("Message opened: ${message.data}");
-      HSNotificationHandler.messageHandler(message);
-    });
-
+    // FCM Handlers
+    FirebaseMessaging.onBackgroundMessage(HSNotificationHandler.messageHandler);
+    FirebaseMessaging.onMessageOpenedApp
+        .listen(HSNotificationHandler.messageHandler);
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) {

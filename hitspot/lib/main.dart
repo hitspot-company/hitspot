@@ -27,7 +27,7 @@ Future<void> main() async {
   final anon = dotenv.env["SUPABASE_ANON_KEY"];
   HSDebugLogger.logInfo("$url: $anon");
   await Supabase.initialize(url: url!, anonKey: anon!);
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   await Firebase.initializeApp(
       name: "hitspot", options: DefaultFirebaseOptions.currentPlatform);
 
@@ -38,14 +38,6 @@ Future<void> main() async {
   runApp(MyApp(
       authenticationRepository: authenticationRepository,
       themeRepository: themeRepository));
-}
-
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  HSDebugLogger.logInfo("Handling a background message: ${message.messageId}");
-  FirebaseMessaging.onBackgroundMessage(HSNotificationHandler.messageHandler);
-  await Firebase.initializeApp(
-      name: "hitspot", options: DefaultFirebaseOptions.currentPlatform);
 }
 
 final supabase = Supabase.instance.client;
