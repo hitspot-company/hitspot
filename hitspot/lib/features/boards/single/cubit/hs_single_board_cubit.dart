@@ -20,6 +20,7 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
 
   final String boardID;
   final String title;
+  bool get isEditor => state.isEditor;
 
   Future<void> refresh() async => _fetchInitial();
 
@@ -146,8 +147,9 @@ class HSSingleBoardCubit extends Cubit<HSSingleBoardState> {
     }
   }
 
-  void toggleEditMode() =>
-      emit(state.copyWith(status: HSSingleBoardStatus.editing));
+  void toggleEditMode() => isEditor
+      ? emit(state.copyWith(status: HSSingleBoardStatus.editing))
+      : null;
 
   void exitEditMode() {
     HSDebugLogger.logInfo('Exiting edit mode');

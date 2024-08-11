@@ -47,100 +47,104 @@ class SingleSpotPage extends StatelessWidget {
                   );
             },
           )),
-      body: BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
-        buildWhen: (previous, current) =>
-            previous.status != current.status || previous.spot != current.spot,
-        builder: (context, state) {
-          final status = state.status;
-          if (status == HSSingleSpotStatus.error) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 48)
-                      .animate()
-                      .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                      .scale(
-                          begin: const Offset(0.8, 0.8),
-                          end: const Offset(1, 1)),
-                  const Gap(16),
-                  Text(
-                    'Something went wrong.',
-                    style: textTheme.headlineSmall,
-                  ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
-                  const Gap(16),
-                  HSButton(
-                    onPressed:
-                        singleSpotCubit.fetchSpot, // TODO: To be verified
-                    child: const Text("Retry"),
-                  )
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 200.ms)
-                      .slideY(begin: 0.2, end: 0),
-                ],
-              ),
-            );
-          }
-          if (status == HSSingleSpotStatus.loading) {
-            return const HSLoadingIndicator()
-                .animate()
-                .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
-          }
-          final spot = singleSpotCubit.state.spot;
-          final imagesCount = spot.images?.length ?? 0;
-          return CustomScrollView(
-            slivers: [
-              Text(
-                "${spot.title}",
-                style: textTheme.displayMedium,
-              )
+      body: RefreshIndicator(
+        onRefresh: singleSpotCubit.refresh,
+        child: BlocBuilder<HSSingleSpotCubit, HSSingleSpotState>(
+          buildWhen: (previous, current) =>
+              previous.status != current.status ||
+              previous.spot != current.spot,
+          builder: (context, state) {
+            final status = state.status;
+            if (status == HSSingleSpotStatus.error) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 48)
+                        .animate()
+                        .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                        .scale(
+                            begin: const Offset(0.8, 0.8),
+                            end: const Offset(1, 1)),
+                    const Gap(16),
+                    Text(
+                      'Something went wrong.',
+                      style: textTheme.headlineSmall,
+                    ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
+                    const Gap(16),
+                    HSButton(
+                      onPressed:
+                          singleSpotCubit.fetchSpot, // TODO: To be verified
+                      child: const Text("Retry"),
+                    )
+                        .animate()
+                        .fadeIn(duration: 300.ms, delay: 200.ms)
+                        .slideY(begin: 0.2, end: 0),
+                  ],
+                ),
+              );
+            }
+            if (status == HSSingleSpotStatus.loading) {
+              return const HSLoadingIndicator()
                   .animate()
-                  .fadeIn(duration: 300.ms, delay: 100.ms)
-                  .slideY(begin: 0.2, end: 0)
-                  .toSliver,
-              const Gap(24.0).toSliver,
-              _AnimatedImageTile(
-                imageUrl: spot.images!.first,
-              ).toSliver,
-              const Gap(16.0).toSliver,
-              AutoSizeText(
-                "${spot.address}",
-                style: const TextStyle(fontSize: 14.0, color: Colors.grey),
-                maxLines: 2,
-              )
-                  .animate()
-                  .fadeIn(duration: 300.ms, delay: 200.ms)
-                  .slideY(begin: 0.2, end: 0)
-                  .toSliver,
-              const _AnimatedTagsBuilder().toSliver,
-              const Gap(32.0).toSliver,
-              Text(spot.description!, style: const TextStyle(fontSize: 16.0))
-                  .animate()
-                  .fadeIn(duration: 300.ms, delay: 300.ms)
-                  .slideY(begin: 0.2, end: 0)
-                  .toSliver,
-              const Gap(32.0).toSliver,
-              _AnimatedUserAndActionBar(singleSpotCubit: singleSpotCubit)
-                  .toSliver,
-              const Gap(32.0).toSliver,
-              _AnimatedMapView(singleSpotCubit: singleSpotCubit).toSliver,
-              const Gap(32.0).toSliver,
-              SliverList.separated(
-                itemCount: imagesCount - 1,
-                separatorBuilder: (context, index) => const Gap(16.0),
-                itemBuilder: (context, index) => _AnimatedImageTile(
-                  imageUrl: spot.images![index + 1],
+                  .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
+            }
+            final spot = singleSpotCubit.state.spot;
+            final imagesCount = spot.images?.length ?? 0;
+            return CustomScrollView(
+              slivers: [
+                Text(
+                  "${spot.title}",
+                  style: textTheme.displayMedium,
                 )
                     .animate()
-                    .fadeIn(duration: 300.ms, delay: (400 + index * 100).ms)
-                    .scale(
-                        begin: const Offset(0.95, 0.95),
-                        end: const Offset(1, 1)),
-              ),
-              const Gap(32.0).toSliver,
-            ],
-          );
-        },
+                    .fadeIn(duration: 300.ms, delay: 100.ms)
+                    .slideY(begin: 0.2, end: 0)
+                    .toSliver,
+                const Gap(24.0).toSliver,
+                _AnimatedImageTile(
+                  imageUrl: spot.images!.first,
+                ).toSliver,
+                const Gap(16.0).toSliver,
+                AutoSizeText(
+                  "${spot.address}",
+                  style: const TextStyle(fontSize: 14.0, color: Colors.grey),
+                  maxLines: 2,
+                )
+                    .animate()
+                    .fadeIn(duration: 300.ms, delay: 200.ms)
+                    .slideY(begin: 0.2, end: 0)
+                    .toSliver,
+                const _AnimatedTagsBuilder().toSliver,
+                const Gap(32.0).toSliver,
+                Text(spot.description!, style: const TextStyle(fontSize: 16.0))
+                    .animate()
+                    .fadeIn(duration: 300.ms, delay: 300.ms)
+                    .slideY(begin: 0.2, end: 0)
+                    .toSliver,
+                const Gap(32.0).toSliver,
+                _AnimatedUserAndActionBar(singleSpotCubit: singleSpotCubit)
+                    .toSliver,
+                const Gap(32.0).toSliver,
+                _AnimatedMapView(singleSpotCubit: singleSpotCubit).toSliver,
+                const Gap(32.0).toSliver,
+                SliverList.separated(
+                  itemCount: imagesCount - 1,
+                  separatorBuilder: (context, index) => const Gap(16.0),
+                  itemBuilder: (context, index) => _AnimatedImageTile(
+                    imageUrl: spot.images![index + 1],
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: (400 + index * 100).ms)
+                      .scale(
+                          begin: const Offset(0.95, 0.95),
+                          end: const Offset(1, 1)),
+                ),
+                const Gap(32.0).toSliver,
+              ],
+            );
+          },
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/login/magic_link/cubit/hs_magic_link_cubit.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -19,7 +20,10 @@ class MagicLinkSentPage extends StatelessWidget {
       appBar: HSAppBar(
         title: Text("Magic Link Sent", style: textTheme.headlineSmall),
         enableDefaultBackButton: true,
-        defaultBackButtonCallback: app.signOut,
+        defaultBackButtonCallback: () {
+          app.authenticationBloc
+              .add(const HSAuthenticationMagicLinkCancelled());
+        },
       ),
       body: ListView(
         children: [

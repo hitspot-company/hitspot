@@ -48,16 +48,7 @@ class HSConnectivityLocationBloc
         .getInitialMessage()
         .then((RemoteMessage? message) {
       if (message != null) {
-        HSDebugLogger.logInfo("Initial message: ${message.data}");
-        final notification = message.notification;
-        if (notification != null) {
-          app.showToast(
-              toastType: HSToastType.pushNotification,
-              title: notification.title ?? "",
-              primaryColor: app.currentTheme.cardColor,
-              onTap: () => HSNotificationHandler.messageHandler(message),
-              description: notification.body ?? "");
-        }
+        HSNotificationHandler.messageHandler(message);
       }
     });
 

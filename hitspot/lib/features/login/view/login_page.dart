@@ -21,6 +21,7 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final loginCubit = context.read<HSLoginCubit>();
     return HSScaffold(
+      resizeToAvoidBottomInset: false,
       bottomSafe: true,
       sidePadding: 24.0,
       body: CustomScrollView(
@@ -48,14 +49,13 @@ class LoginForm extends StatelessWidget {
             SliverToBoxAdapter(
                 child: HSSocialLoginButtons.apple(loginCubit.logInWithApple)),
           ],
-          SliverFillRemaining(
+          const SliverFillRemaining(
             hasScrollBody: false,
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 24.0),
-                child: const _Footer(),
+                padding: EdgeInsets.only(bottom: 24.0),
+                child: _Footer(),
               ),
             ),
           ),

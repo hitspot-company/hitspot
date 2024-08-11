@@ -56,12 +56,25 @@ class HSEditValueCubit extends Cubit<HSEditValueState> {
         errorText: null,
       ));
 
-  Future<void> updateUser(HSUser user) async {
+  HSUser getUpdatedUser(HSUser user) {
+    switch (field) {
+      case "username":
+        return user.copyWith(username: state.value);
+      case "name":
+        return user.copyWith(fullName: state.value);
+      case "biogram":
+        return user.copyWith(biogram: state.value);
+      default:
+        return user;
+    }
+  }
+
+  Future<void> updateUser() async {
     emit(state.copyWith(status: HSEditValueStatus.loading));
     try {
+      final user = getUpdatedUser(currentUser);
       await validateInput(state.value, field);
-      _databaseRepository.userUpdate(user: user);
-      await Future.delayed(const Duration(seconds: 1));
+      await _databaseRepository.userUpdate(user: user);
       app.showToast(
         toastType: HSToastType.success,
         title: "Success",

@@ -60,9 +60,7 @@ class _DoneButton extends StatelessWidget {
       builder: (context, currentStatus) {
         final isDisabled = currentStatus != HSEditValueStatus.idle;
         return TextButton(
-          onPressed: isDisabled
-              ? null
-              : () => _editValueCubit.updateUser(currentUser!),
+          onPressed: isDisabled ? null : _editValueCubit.updateUser,
           child: _getChild(currentStatus),
         );
       },

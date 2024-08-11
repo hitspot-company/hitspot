@@ -178,4 +178,14 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       HSDebugLogger.logError(e.toString());
     }
   }
+
+  Future<void> refresh() async {
+    try {
+      emit(state.copyWith(status: HSSingleSpotStatus.loading));
+      await fetchSpot();
+    } catch (e) {
+      HSDebugLogger.logError("Error refreshing spot: $e");
+      rethrow;
+    }
+  }
 }
