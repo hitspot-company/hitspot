@@ -256,19 +256,17 @@ class _FetchedBoardsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     mapSearchCubit.updateQuery(query);
-    return FutureBuilder<List<HSBoard>>(
-      future: mapSearchCubit.fetchBoards(),
-      builder: (BuildContext context, AsyncSnapshot<List<HSBoard>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+    if (query.isEmpty) {
+      mapSearchCubit.fetchTrendingBoards();
+    }
+    return BlocSelector<HSMainSearchCubit, HSMainSearchState, List<HSBoard>>(
+      selector: (state) => state.boards,
+      builder: (context, state) {
+        final List<HSBoard> boards = state;
+        if (boards.isEmpty) {
           return const HSLoadingIndicator()
               .animate()
               .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
-        }
-        final List<HSBoard> boards = snapshot.data ?? [];
-        if (boards.isEmpty) {
-          return Text("No boards found for $query", textAlign: TextAlign.center)
-              .animate()
-              .fadeIn(duration: 300.ms);
         }
         return GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -315,19 +313,17 @@ class _FetchedTagsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     mapSearchCubit.updateQuery(query);
-    return FutureBuilder<List<HSTag>>(
-      future: mapSearchCubit.fetchTags(),
-      builder: (BuildContext context, AsyncSnapshot<List<HSTag>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+    if (query.isEmpty) {
+      mapSearchCubit.fetchTrendingTags();
+    }
+    return BlocSelector<HSMainSearchCubit, HSMainSearchState, List<HSTag>>(
+      selector: (state) => state.tags,
+      builder: (context, state) {
+        final List<HSTag> tags = state;
+        if (tags.isEmpty) {
           return const HSLoadingIndicator()
               .animate()
               .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
-        }
-        final List<HSTag> tags = snapshot.data ?? [];
-        if (tags.isEmpty) {
-          return Text("No tags found for $query", textAlign: TextAlign.center)
-              .animate()
-              .fadeIn(duration: 300.ms);
         }
         return Padding(
           padding: const EdgeInsets.all(8.0),

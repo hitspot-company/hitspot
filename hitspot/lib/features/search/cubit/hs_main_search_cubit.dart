@@ -77,6 +77,20 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
     }
   }
 
+  Future<void> fetchTrendingTags() async {
+    try {
+      final List<Map<String, dynamic>> fetchedTags = await supabase
+          .from('tags')
+          .select()
+          .order('spots_count', ascending: false)
+          .limit(20);
+      emit(state.copyWith(tags: fetchedTags.map(HSTag.deserialize).toList()));
+    } catch (e) {
+      HSDebugLogger.logError("Error $e");
+      emit(state.copyWith(tags: []));
+    }
+  }
+
   Future<List<HSBoard>> fetchBoards() async {
     try {
       final query = state.query;
@@ -87,6 +101,18 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
           .limit(20);
       emit(state.copyWith(
           boards: fetchedBoards.map(HSBoard.deserialize).toList()));
+      return (state.boards);
+    } catch (e) {
+      HSDebugLogger.logError("Error $e");
+      return [];
+    }
+  }
+
+  Future<List<HSBoard>> fetchTrendingBoards() async {
+    try {
+      final fetchedBoards =
+          await _databaseRepository.boardFetchTrendingBoards();
+      emit(state.copyWith(boards: fetchedBoards));
       return (state.boards);
     } catch (e) {
       HSDebugLogger.logError("Error $e");
