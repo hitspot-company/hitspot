@@ -146,8 +146,8 @@ class _TrendingSpotsPage extends StatelessWidget {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
       ),
       itemCount: spots.length,
       itemBuilder: (BuildContext context, int index) {
@@ -215,21 +215,23 @@ class _FetchedSpotsPage extends StatelessWidget {
               .animate()
               .fadeIn(duration: 300.ms);
         }
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.85,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+            ),
+            itemCount: spots.length,
+            itemBuilder: (BuildContext context, int index) {
+              return AnimatedSpotTile(
+                spot: spots[index],
+                index: index,
+              );
+            },
           ),
-          itemCount: spots.length,
-          itemBuilder: (BuildContext context, int index) {
-            return AnimatedSpotTile(
-              spot: spots[index],
-              index: index,
-              padding: const EdgeInsets.all(16.0),
-            );
-          },
         );
       },
     );

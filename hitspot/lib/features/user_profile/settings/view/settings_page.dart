@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/settings/bloc/hs_settings_bloc.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
@@ -41,6 +42,12 @@ class SettingsPage extends StatelessWidget {
                     title: 'Switch Theme',
                     subtitle: 'Press here to toggle theme.',
                     onTap: () => settingsCubit.switchTheme(),
+                  ),
+                  SettingsTile(
+                    icon: FontAwesomeIcons.userPen,
+                    title: 'Edit Profile',
+                    subtitle: 'Press here to edit your profile details.',
+                    onTap: navi.toEditProfile,
                   ),
                 ],
               ),

@@ -1,6 +1,6 @@
 part of 'hs_home_cubit.dart';
 
-enum HSHomeStatus { loading, idle, error, refreshing }
+enum HSHomeStatus { loading, idle, error, refreshing, updateRequired }
 
 final class HSHomeState extends Equatable {
   const HSHomeState({
@@ -10,6 +10,7 @@ final class HSHomeState extends Equatable {
     this.nearbySpots = const [],
     this.trendingSpots = const [],
     this.currentPosition,
+    this.hideUploadBar = false,
   });
 
   final HSHomeStatus status;
@@ -17,6 +18,7 @@ final class HSHomeState extends Equatable {
   final List<HSSpot> nearbySpots, trendingSpots;
   final List<Marker> markers;
   final Position? currentPosition;
+  final bool hideUploadBar;
 
   @override
   List<Object?> get props => [
@@ -25,7 +27,8 @@ final class HSHomeState extends Equatable {
         nearbySpots,
         currentPosition,
         markers,
-        trendingSpots
+        trendingSpots,
+        hideUploadBar,
       ];
 
   HSHomeState copyWith({
@@ -35,14 +38,16 @@ final class HSHomeState extends Equatable {
     List<HSSpot>? trendingSpots,
     Position? currentPosition,
     List<Marker>? markers,
+    bool? hideUploadBar,
   }) {
     return HSHomeState(
       status: status ?? this.status,
-      trendingBoards: tredingBoards ?? this.trendingBoards,
+      trendingBoards: tredingBoards ?? trendingBoards,
       nearbySpots: nearbySpots ?? this.nearbySpots,
       currentPosition: currentPosition ?? this.currentPosition,
       markers: markers ?? this.markers,
       trendingSpots: trendingSpots ?? this.trendingSpots,
+      hideUploadBar: hideUploadBar ?? this.hideUploadBar,
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 
@@ -9,7 +11,6 @@ class HSUploadProgressWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<HSSpotUploadCubit>();
     return BlocBuilder<HSSpotUploadCubit, HSSpotUploadState>(
       builder: (context, state) {
         if (state.status == HSUploadStatus.initial) {
@@ -35,23 +36,56 @@ class HSUploadProgressWidget extends StatelessWidget {
             children: [
               LinearProgressIndicator(value: state.progress, color: color),
               const SizedBox(height: 8),
-              if (state.status == HSUploadStatus.success)
-                HSButton.icon(
-                    icon: const Icon(Icons.visibility),
-                    label: const Text('View Spot'),
-                    onPressed: () {
-                      navi.toSpot(sid: state.spotId!);
-                      cubit.reset();
-                    }),
-              if (state.status == HSUploadStatus.failure)
-                ElevatedButton(
-                  onPressed: cubit.reset,
-                  child: const Text('Try Again'),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (state.status == HSUploadStatus.success)
+                    IconButton(
+                        onPressed: () =>
+                            context.read<HSHomeCubit>().hideUploadBar(),
+                        icon: const Icon(FontAwesomeIcons.xmark)),
+                  Align(
+                      alignment: Alignment.centerRight, child: button(status)),
+                ],
+              )
             ],
           ),
         );
       },
+    );
+  }
+
+  HSButton button(HSUploadStatus status) {
+    final cubit = app.context.read<HSSpotUploadCubit>();
+    late final String label;
+    late final IconData icon;
+    late final Function()? onPressed;
+
+    switch (status) {
+      case HSUploadStatus.success:
+        label = 'View Spot';
+        icon = Icons.visibility;
+        onPressed = () => navi.toSpot(sid: cubit.state.spotId!);
+        break;
+      case HSUploadStatus.failure:
+        label = 'Try Again';
+        icon = Icons.refresh;
+        onPressed = () => cubit.reset(); // TODO: Verify
+        break;
+      case HSUploadStatus.inProgress:
+        label = 'Uploading';
+        icon = Icons.timer;
+        onPressed = null;
+      default:
+        label = '';
+        icon = Icons.refresh;
+        onPressed = () {};
+    }
+    return HSButton.icon(
+      icon: Icon(icon),
+      label: Text(label),
+      onPressed: onPressed,
     );
   }
 }

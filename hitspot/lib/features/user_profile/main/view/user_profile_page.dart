@@ -38,16 +38,11 @@ class UserProfilePage extends StatelessWidget {
             right: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                ownProfile
-                    ? IconButton(
-                        onPressed: navi.toEditProfile,
-                        icon: const Icon(FontAwesomeIcons.userPen),
-                      )
-                    : const SizedBox.shrink(),
-                IconButton(
-                  onPressed: navi.toSettings,
-                  icon: const Icon(FontAwesomeIcons.gears),
-                ),
+                if (ownProfile)
+                  IconButton(
+                    onPressed: navi.toSettings,
+                    icon: const Icon(FontAwesomeIcons.sliders),
+                  ),
               ],
             ),
           ),

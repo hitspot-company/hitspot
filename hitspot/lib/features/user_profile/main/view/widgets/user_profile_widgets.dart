@@ -245,22 +245,22 @@ class _TabContent extends StatelessWidget {
               : FontAwesomeIcons.bookmark);
     }
 
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12.0,
-        mainAxisSpacing: 12.0,
-      ),
-      itemCount: elements.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: title == 'Boards'
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+        ),
+        itemCount: elements.length,
+        itemBuilder: (context, index) {
+          return title == 'Boards'
               ? HSBoardGridItem(board: elements[index])
-              : AnimatedSpotTile(spot: elements[index], index: index),
-        );
-      },
+              : AnimatedSpotTile(spot: elements[index], index: index);
+        },
+      ),
     );
   }
 }

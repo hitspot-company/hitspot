@@ -20,8 +20,8 @@ import 'package:hitspot/widgets/spot/hs_upload_progress_widget.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
-
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:upgrader/upgrader.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -30,66 +30,90 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HSHomeCubit>(context);
     Completer<GoogleMapController> mapController = homeCubit.mapController;
-    return HSScaffold(
-      defaultBottombarEnabled: true,
-      body: BlocSelector<HSHomeCubit, HSHomeState, HSHomeStatus>(
-        selector: (state) => state.status,
-        builder: (context, status) {
-          final isLoading = status == HSHomeStatus.loading;
-          return RefreshIndicator(
-            onRefresh: homeCubit.handleRefresh,
+    return BlocSelector<HSHomeCubit, HSHomeState, HSHomeStatus>(
+      selector: (state) => state.status,
+      builder: (context, status) {
+        if (status == HSHomeStatus.updateRequired) {
+          return HSScaffold(
+            defaultBottombarEnabled: false,
+            body: Center(
+                child: UpgradeCard(
+              upgrader: homeCubit.upgrader,
+              onIgnore: homeCubit.updateRefresh,
+              onLater: homeCubit.updateRefresh,
+            )),
+          );
+        }
+        final isLoading = status == HSHomeStatus.loading;
+        return HSScaffold(
+          defaultBottombarEnabled: true,
+          body: RefreshIndicator(
+            onRefresh: () => homeCubit.handleRefresh(true),
             color: HSTheme.instance.mainColor,
             backgroundColor: app.currentTheme.cardColor,
             strokeWidth: 3.0,
             child: CustomScrollView(
               slivers: [
-                SliverAppBar(
-                  automaticallyImplyLeading: false,
-                  titleSpacing: 0.0,
-                  surfaceTintColor: Colors.transparent,
-                  title: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Image.asset(
-                      app.assets.textLogo,
-                      height: 30,
-                      alignment: Alignment.centerLeft,
-                    ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 300.ms)
-                      .slideX(begin: -0.2, end: 0),
-                  actions: <Widget>[
-                    IconButton(
-                      icon: HSUserAvatar(
-                          radius: 30.0, imageUrl: currentUser.avatarUrl),
-                      onPressed: () => navi.toUser(
-                        userID: currentUser.uid!,
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 300.ms)
-                        .slideX(begin: 0.2, end: 0),
-                  ],
-                  floating: true,
-                  pinned: true,
-                ),
                 BlocConsumer<HSSpotUploadCubit, HSSpotUploadState>(
                   listener: (context, state) {
                     if (state.status == HSUploadStatus.success) {
                       homeCubit.handleRefresh();
+                      homeCubit.showUploadBar();
                     }
                   },
                   builder: (context, state) {
-                    final status = state.status;
-                    if (status != HSUploadStatus.initial) {
-                      return SliverMainAxisGroup(
-                        slivers: [
-                          const Gap(16.0).toSliver,
-                          const HSUploadProgressWidget().toSliver,
-                        ],
-                      );
-                    }
-                    return const SizedBox().toSliver;
+                    return BlocSelector<HSHomeCubit, HSHomeState, bool>(
+                      selector: (state) => state.hideUploadBar,
+                      builder: (context, hideUploadBar) {
+                        final status = state.status;
+                        final bool showUploadBar =
+                            status != HSUploadStatus.initial && !hideUploadBar;
+                        return SliverAppBar(
+                          automaticallyImplyLeading: false,
+                          titleSpacing: 0.0,
+                          forceMaterialTransparency: true,
+                          title: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.asset(
+                              app.assets.textLogo,
+                              height: 30,
+                              alignment: Alignment.centerLeft,
+                            ),
+                          )
+                              .animate()
+                              .fadeIn(duration: 300.ms)
+                              .slideX(begin: -0.2, end: 0),
+                          actions: <Widget>[
+                            IconButton(
+                              icon: HSUserAvatar(
+                                  radius: 20.0,
+                                  imageUrl: currentUser.avatarUrl),
+                              onPressed: () => navi.toUser(
+                                userID: currentUser.uid!,
+                              ),
+                            )
+                                .animate()
+                                .fadeIn(duration: 300.ms)
+                                .slideX(begin: 0.2, end: 0),
+                          ],
+                          floating: true,
+                          pinned: true,
+                          bottom: PreferredSize(
+                              preferredSize: showUploadBar
+                                  ? const Size.fromHeight(100.0)
+                                  : const Size.fromHeight(0.0),
+                              child: showUploadBar
+                                  ? const HSUploadProgressWidget()
+                                  : const SizedBox()),
+                          collapsedHeight: showUploadBar ? 60.0 : null,
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: Container(
+                              color: app.currentTheme.scaffoldBackgroundColor,
+                            ),
+                          ),
+                        );
+                      },
+                    );
                   },
                 ),
                 const Gap(16.0).toSliver,
@@ -146,9 +170,9 @@ class HomePage extends StatelessWidget {
                     type: _HomeGridBuilderType.trendingSpots),
               ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
