@@ -9,6 +9,7 @@ import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -90,15 +91,26 @@ class MainSearchDelegate extends SearchDelegate<String> {
   Widget buildSuggestions(BuildContext context) {
     mapSearchCubit.updateQuery(query);
     if (query.isEmpty) {
-      return _TrendingSpotsPage(
-        mapSearchCubit: mapSearchCubit,
-        query: query,
-      );
+      mapSearchCubit.fetchTrendingUsers();
     }
     return BlocSelector<HSMainSearchCubit, HSMainSearchState, List<HSUser>>(
       selector: (state) => state.users,
       builder: (context, fetchedUsers) {
         final List<HSUser> users = fetchedUsers;
+        if (users.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView.separated(
+              itemCount: 3,
+              separatorBuilder: (BuildContext context, int index) {
+                return const Gap(16.0);
+              },
+              itemBuilder: (BuildContext context, int index) {
+                return HSShimmerBox(width: screenWidth, height: 80.0);
+              },
+            ),
+          );
+        }
         return Column(
           children: [
             const Gap(16.0),
@@ -134,9 +146,6 @@ class _TrendingSpotsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<HSSpot> spots = mapSearchCubit.state.trendingSpots;
-    if (query.isEmpty) {
-      return const SizedBox();
-    }
     if (spots.isEmpty) {
       return Text("No spots found for $query", textAlign: TextAlign.center)
           .animate()

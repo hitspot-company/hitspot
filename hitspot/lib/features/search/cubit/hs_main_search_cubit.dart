@@ -19,6 +19,7 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
 
   void _init() {
     fetchTrendingSpots();
+    fetchTrendingUsers();
   }
 
   void updateQuery(String val) {
@@ -101,6 +102,24 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
           .select()
           .textSearch('fts', "$query:*")
           .limit(20);
+      emit(
+          state.copyWith(users: fetchedUsers.map(HSUser.deserialize).toList()));
+    } catch (e) {
+      emit(state.copyWith(users: []));
+      HSDebugLogger.logError("Error $e");
+    }
+  }
+
+  Future<void> fetchTrendingUsers() async {
+    try {
+      final List<Map<String, dynamic>> fetchedUsers = await supabase
+          .from('users')
+          .select()
+          .eq("is_profile_completed", true)
+          .order('followers_count', ascending: false)
+          .limit(20)
+          .select();
+      HSDebugLogger.logSuccess("Fetched users: $fetchedUsers");
       emit(
           state.copyWith(users: fetchedUsers.map(HSUser.deserialize).toList()));
     } catch (e) {
