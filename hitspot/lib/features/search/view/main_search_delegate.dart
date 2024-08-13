@@ -5,14 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
+import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
+import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class MainSearchDelegate extends SearchDelegate<String> {
   MainSearchDelegate(this.mapSearchCubit);
@@ -73,13 +77,18 @@ class MainSearchDelegate extends SearchDelegate<String> {
           ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
           const Gap(16.0),
           Expanded(
-            child: TabBarView(
-              children: [
-                _FetchedSpotsPage(mapSearchCubit: mapSearchCubit, query: query),
-                _FetchedBoardsPage(
-                    mapSearchCubit: mapSearchCubit, query: query),
-                _FetchedTagsPage(mapSearchCubit: mapSearchCubit, query: query),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TabBarView(
+                children: [
+                  _FetchedSpotsPage(
+                      mapSearchCubit: mapSearchCubit, query: query),
+                  _FetchedBoardsPage(
+                      mapSearchCubit: mapSearchCubit, query: query),
+                  _FetchedTagsPage(
+                      mapSearchCubit: mapSearchCubit, query: query),
+                ],
+              ),
             ),
           ),
         ],
@@ -89,83 +98,59 @@ class MainSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    mapSearchCubit.updateQuery(query);
-    if (query.isEmpty) {
-      mapSearchCubit.fetchTrendingUsers();
-    }
-    return BlocSelector<HSMainSearchCubit, HSMainSearchState, List<HSUser>>(
-      selector: (state) => state.users,
-      builder: (context, fetchedUsers) {
-        final List<HSUser> users = fetchedUsers;
-        if (users.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView.separated(
-              itemCount: 3,
-              separatorBuilder: (BuildContext context, int index) {
-                return const Gap(16.0);
-              },
-              itemBuilder: (BuildContext context, int index) {
-                return HSShimmerBox(width: screenWidth, height: 80.0);
-              },
-            ),
+    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.users);
+    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+      buildWhen: (previous, current) =>
+          previous.users != current.users ||
+          previous.trendingUsers != current.trendingUsers ||
+          previous.status != current.status,
+      builder: (context, state) {
+        final List<HSUser> users = state.users;
+        final List<HSUser> trendingUsers = state.trendingUsers;
+        if (mapSearchCubit.isLoading) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: HSLoadingWidget(type: HSLoadingWidgetType.list),
           );
         }
-        return Column(
-          children: [
-            const Gap(16.0),
-            Expanded(
-              child: SizedBox(
-                width: screenWidth,
-                child: ListView.separated(
-                  separatorBuilder: (context, index) => const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Divider(thickness: .1, color: Colors.grey),
-                  ),
-                  itemCount: users.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final user = users[index];
-                    return _AnimatedUserTile(user: user, index: index);
-                  },
-                ),
-              ),
-            ),
-          ],
-        );
+        if (users.isEmpty) {
+          return _AnimatedUsersBuilder(users: trendingUsers);
+        }
+        return _AnimatedUsersBuilder(users: users);
       },
     );
   }
 }
 
-class _TrendingSpotsPage extends StatelessWidget {
-  const _TrendingSpotsPage({required this.mapSearchCubit, required this.query});
+class _AnimatedUsersBuilder extends StatelessWidget {
+  const _AnimatedUsersBuilder({
+    required this.users,
+  });
 
-  final HSMainSearchCubit mapSearchCubit;
-  final String query;
+  final List<HSUser> users;
 
   @override
   Widget build(BuildContext context) {
-    final List<HSSpot> spots = mapSearchCubit.state.trendingSpots;
-    if (spots.isEmpty) {
-      return Text("No spots found for $query", textAlign: TextAlign.center)
-          .animate()
-          .fadeIn(duration: 300.ms)
-          .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1));
-    }
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8.0,
-        mainAxisSpacing: 8.0,
-      ),
-      itemCount: spots.length,
-      itemBuilder: (BuildContext context, int index) {
-        return AnimatedSpotTile(
-          spot: spots[index],
-          index: index,
-          padding: const EdgeInsets.all(8.0),
-        );
-      },
+    return Column(
+      children: [
+        const Gap(16.0),
+        Expanded(
+          child: SizedBox(
+            width: screenWidth,
+            child: ListView.separated(
+              separatorBuilder: (context, index) => const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Divider(thickness: .1, color: Colors.grey),
+              ),
+              itemCount: users.length,
+              itemBuilder: (BuildContext context, int index) {
+                final user = users[index];
+                return _AnimatedUserTile(user: user, index: index);
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -203,46 +188,77 @@ class _FetchedSpotsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    mapSearchCubit.updateQuery(query);
-    if (query.isEmpty) {
-      return _TrendingSpotsPage(
-        mapSearchCubit: mapSearchCubit,
-        query: query,
-      );
-    }
-    return FutureBuilder<List<HSSpot>>(
-      future: mapSearchCubit.fetchSpots(),
-      builder: (BuildContext context, AsyncSnapshot<List<HSSpot>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const HSLoadingIndicator()
-              .animate()
-              .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
+    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.spots);
+    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.spots != current.spots ||
+          previous.trendingSpots != current.trendingSpots,
+      builder: (context, state) {
+        if (mapSearchCubit.isLoading) {
+          return const HSLoadingWidget(
+            type: HSLoadingWidgetType.grid,
+          );
         }
-        final List<HSSpot> spots = snapshot.data ?? [];
-        if (spots.isEmpty) {
-          return Text("No spots found for $query", textAlign: TextAlign.center)
-              .animate()
-              .fadeIn(duration: 300.ms);
+        final List<HSSpot> trendingSpots = state.trendingSpots;
+        if (query.isEmpty) {
+          return _AnimatedSpotsBuilder(spots: trendingSpots);
         }
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.85,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-            ),
-            itemCount: spots.length,
-            itemBuilder: (BuildContext context, int index) {
-              return AnimatedSpotTile(
-                spot: spots[index],
-                index: index,
-              );
-            },
-          ),
-        );
+        if (query.isNotEmpty && state.spots.isEmpty) {
+          return CustomScrollView(
+            shrinkWrap: true,
+            slivers: [
+              HSTextPrompt(
+                      prompt: "No spots found for ",
+                      pressableText: query,
+                      promptColor: app.theme.mainColor,
+                      onTap: null)
+                  .toSliver,
+              const Gap(16.0).toSliver,
+              Text(
+                "Maybe you will like these spots instead",
+                style: textTheme.headlineSmall,
+              ).toSliver,
+              const Gap(16.0).toSliver,
+              SliverFillRemaining(
+                  child: _AnimatedSpotsBuilder(spots: trendingSpots)),
+            ],
+          );
+        }
+        final List<HSSpot> spots = state.spots;
+        return _AnimatedSpotsBuilder(spots: spots);
       },
+    );
+  }
+}
+
+class _AnimatedSpotsBuilder extends StatelessWidget {
+  const _AnimatedSpotsBuilder({
+    required this.spots,
+  });
+
+  final List<HSSpot> spots;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        shrinkWrap: true,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.85,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+        ),
+        itemCount: spots.length,
+        itemBuilder: (BuildContext context, int index) {
+          return AnimatedSpotTile(
+            spot: spots[index],
+            index: index,
+          );
+        },
+      ),
     );
   }
 }
@@ -255,31 +271,70 @@ class _FetchedBoardsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    mapSearchCubit.updateQuery(query);
-    if (query.isEmpty) {
-      mapSearchCubit.fetchTrendingBoards();
-    }
-    return BlocSelector<HSMainSearchCubit, HSMainSearchState, List<HSBoard>>(
-      selector: (state) => state.boards,
+    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.boards);
+    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+      buildWhen: (previous, current) =>
+          previous.boards != current.boards ||
+          previous.trendingBoards != current.trendingBoards ||
+          previous.status != current.status,
       builder: (context, state) {
-        final List<HSBoard> boards = state;
-        if (boards.isEmpty) {
-          return const HSLoadingIndicator()
-              .animate()
-              .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
+        if (mapSearchCubit.isLoading) {
+          return const HSLoadingWidget(
+            type: HSLoadingWidgetType.grid,
+          );
         }
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemCount: boards.length,
-          itemBuilder: (BuildContext context, int index) {
-            return _AnimatedBoardTile(board: boards[index], index: index);
-          },
-        );
+        final List<HSBoard> boards = state.boards;
+        final List<HSBoard> trendingBoards = state.trendingBoards;
+        if (query.isEmpty) {
+          return _AnimatedBoardsBuilder(boards: trendingBoards);
+        }
+        if (query.isNotEmpty && state.boards.isEmpty) {
+          return CustomScrollView(
+            shrinkWrap: true,
+            slivers: [
+              HSTextPrompt(
+                      prompt: "No boards found for ",
+                      pressableText: query,
+                      promptColor: app.theme.mainColor,
+                      onTap: null)
+                  .toSliver,
+              const Gap(16.0).toSliver,
+              Text(
+                "Maybe you will like these boards instead",
+                style: textTheme.headlineSmall,
+              ).toSliver,
+              const Gap(16.0).toSliver,
+              SliverFillRemaining(
+                  child: _AnimatedBoardsBuilder(boards: trendingBoards)),
+            ],
+          );
+        }
+        return _AnimatedBoardsBuilder(boards: boards);
+      },
+    );
+  }
+}
+
+class _AnimatedBoardsBuilder extends StatelessWidget {
+  const _AnimatedBoardsBuilder({
+    super.key,
+    required this.boards,
+  });
+
+  final List<HSBoard> boards;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: boards.length,
+      itemBuilder: (BuildContext context, int index) {
+        return _AnimatedBoardTile(board: boards[index], index: index);
       },
     );
   }
@@ -312,34 +367,69 @@ class _FetchedTagsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    mapSearchCubit.updateQuery(query);
-    if (query.isEmpty) {
-      mapSearchCubit.fetchTrendingTags();
-    }
-    return BlocSelector<HSMainSearchCubit, HSMainSearchState, List<HSTag>>(
-      selector: (state) => state.tags,
+    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.tags);
+    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+      buildWhen: (previous, current) =>
+          previous.tags != current.tags ||
+          previous.status != current.status ||
+          previous.trendingTags != current.trendingTags,
       builder: (context, state) {
-        final List<HSTag> tags = state;
-        if (tags.isEmpty) {
-          return const HSLoadingIndicator()
-              .animate()
-              .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
+        if (mapSearchCubit.isLoading) {
+          return const HSLoadingWidget(
+            type: HSLoadingWidgetType.grid,
+          );
         }
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 2.5,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-            ),
-            itemCount: tags.length,
-            itemBuilder: (BuildContext context, int index) {
-              return _AnimatedTagTile(tag: tags[index], index: index);
-            },
-          ),
-        );
+        final List<HSTag> trendingTags = state.trendingTags;
+        if (query.isEmpty) {
+          return _AnimatedTagsBuilder(tags: trendingTags);
+        }
+        if (query.isNotEmpty && state.tags.isEmpty) {
+          return CustomScrollView(
+            shrinkWrap: true,
+            slivers: [
+              HSTextPrompt(
+                      prompt: "No tags found for ",
+                      pressableText: query,
+                      promptColor: app.theme.mainColor,
+                      onTap: null)
+                  .toSliver,
+              const Gap(16.0).toSliver,
+              Text(
+                "Maybe you will like these tags instead",
+                style: textTheme.headlineSmall,
+              ).toSliver,
+              const Gap(16.0).toSliver,
+              SliverFillRemaining(
+                  child: _AnimatedTagsBuilder(tags: trendingTags)),
+            ],
+          );
+        }
+        final List<HSTag> tags = state.tags;
+        return _AnimatedTagsBuilder(tags: tags);
+      },
+    );
+  }
+}
+
+class _AnimatedTagsBuilder extends StatelessWidget {
+  const _AnimatedTagsBuilder({
+    required this.tags,
+  });
+
+  final List<HSTag> tags;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 2.5,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ),
+      itemCount: tags.length,
+      itemBuilder: (BuildContext context, int index) {
+        return _AnimatedTagTile(tag: tags[index], index: index);
       },
     );
   }
@@ -372,5 +462,41 @@ class _AnimatedTagTile extends StatelessWidget {
         end: const Offset(1, 1),
         duration: 300.ms,
         curve: Curves.easeOutQuad);
+  }
+}
+
+enum HSLoadingWidgetType { list, grid }
+
+class HSLoadingWidget extends StatelessWidget {
+  const HSLoadingWidget({super.key, required this.type});
+
+  final HSLoadingWidgetType type;
+
+  @override
+  Widget build(BuildContext context) {
+    if (type == HSLoadingWidgetType.list) {
+      return ListView.separated(
+        itemCount: 3,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Gap(8.0);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          return HSShimmerBox(width: screenWidth, height: 80.0);
+        },
+      );
+    } else {
+      return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.85,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+        ),
+        itemCount: 5,
+        itemBuilder: (BuildContext context, int index) {
+          return HSShimmerBox(width: screenWidth, height: 80.0);
+        },
+      );
+    }
   }
 }

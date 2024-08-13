@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/tags/explore/cubit/hs_tags_explore_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_button.dart';
+import 'package:hitspot/widgets/hs_icon_prompt.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -28,15 +32,20 @@ class TagsExplorePage extends StatelessWidget {
         builder: (context, state) {
           if (state == HSTagsExploreStatus.loadingSpots ||
               state == HSTagsExploreStatus.loadingTopSpot) {
-            return const Center(child: CircularProgressIndicator())
+            return const Center(child: HSLoadingIndicator())
                 .animate()
                 .fadeIn(duration: 300.ms, curve: Curves.easeInOut);
           } else if (state == HSTagsExploreStatus.error) {
-            return Center(
-              child: Text(
-                'Error fetching spots',
-                style: textTheme.bodyLarge?.copyWith(color: Colors.red),
-              ),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const HSIconPrompt(
+                  message: "No spots with this tag",
+                  iconData: FontAwesomeIcons.xmark,
+                ),
+                const Gap(8.0),
+                HSButton(onPressed: navi.pop, child: const Text("Back"))
+              ],
             )
                 .animate()
                 .fadeIn(duration: 300.ms, curve: Curves.easeInOut)

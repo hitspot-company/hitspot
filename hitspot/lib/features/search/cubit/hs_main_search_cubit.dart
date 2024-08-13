@@ -16,35 +16,67 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
 
   Timer? _debounce;
   final _databaseRepository = app.databaseRepository;
+  bool get isLoading => state.status == HSMainSearchStatus.loading;
 
   void _init() {
-    fetchTrendingSpots();
-    fetchTrendingUsers();
+    _fetchTrendingSpots();
+    _fetchTrendingBoards();
+    _fetchTrendingUsers();
+    _fetchTrendingTags();
   }
 
-  void updateQuery(String val) {
+  void updateQuery(String val, HSMainSearchCubitSearchType type) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () async {
-      emit(state.copyWith(query: val, users: await fetchPredictions()));
+      emit(state.copyWith(query: val));
+      if (val.isNotEmpty) {
+        fetchData(type);
+      }
     });
   }
 
-  Future<List<HSSpot>> fetchTrendingSpots() async {
+  Future<void> fetchData(HSMainSearchCubitSearchType type) async {
+    switch (type) {
+      case HSMainSearchCubitSearchType.spots:
+        _fetchSpots();
+        break;
+      case HSMainSearchCubitSearchType.tags:
+        _fetchTags();
+        break;
+      case HSMainSearchCubitSearchType.boards:
+        _fetchBoards();
+        break;
+      case HSMainSearchCubitSearchType.users:
+        _fetchUsers();
+        break;
+    }
+  }
+
+  void toggleLoading([bool value = false]) => emit(state.copyWith(
+      status: value ? HSMainSearchStatus.loading : HSMainSearchStatus.loaded));
+
+  Future<void> _fetchTrendingSpots() async {
     try {
+      toggleLoading(true);
       final List<HSSpot> fetchedSpots =
           await _databaseRepository.spotFetchTrendingSpots();
       emit(state.copyWith(trendingSpots: fetchedSpots));
+      toggleLoading();
     } catch (e) {
       HSDebugLogger.logError("Error $e");
-      return [];
+      emit(state.copyWith(status: HSMainSearchStatus.error));
     }
-    return (state.trendingSpots);
   }
 
-  Future<List<HSSpot>> fetchSpots() async {
+  Future<void> waitDelay() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+  }
+
+  Future<void> _fetchSpots() async {
     try {
+      toggleLoading(true);
+      await waitDelay();
       final query = state.query;
-      if (query.isEmpty) return state.spots;
       final List<Map<String, dynamic>> fetchedSpots = await supabase
           .from('spots')
           .select()
@@ -57,42 +89,49 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
             await app.databaseRepository.spotfetchSpotWithAuthor(spot: spot));
       }
       emit(state.copyWith(spots: spotsWithImages));
+      toggleLoading();
     } catch (e) {
       HSDebugLogger.logError("Error $e");
-      return [];
+      emit(state.copyWith(status: HSMainSearchStatus.error));
     }
-    return (state.spots);
   }
 
-  Future<List<HSTag>> fetchTags() async {
+  Future<void> _fetchTags() async {
     try {
+      toggleLoading(true);
       final query = state.query;
+      await waitDelay();
       final List<HSTag> fetchedTags =
           await app.databaseRepository.tagSearch(query: query);
       emit(state.copyWith(tags: fetchedTags));
-      return state.tags;
+      toggleLoading();
     } catch (e) {
       HSDebugLogger.logError("Error $e");
-      return [];
+      emit(state.copyWith(status: HSMainSearchStatus.error));
     }
   }
 
-  Future<void> fetchTrendingTags() async {
+  Future<void> _fetchTrendingTags() async {
     try {
+      toggleLoading(true);
       final List<Map<String, dynamic>> fetchedTags = await supabase
           .from('tags')
           .select()
           .order('spots_count', ascending: false)
           .limit(20);
-      emit(state.copyWith(tags: fetchedTags.map(HSTag.deserialize).toList()));
+      emit(state.copyWith(
+          trendingTags: fetchedTags.map(HSTag.deserialize).toList()));
+      toggleLoading();
     } catch (e) {
       HSDebugLogger.logError("Error $e");
-      emit(state.copyWith(tags: []));
+      emit(state.copyWith(status: HSMainSearchStatus.error));
     }
   }
 
-  Future<List<HSBoard>> fetchBoards() async {
+  Future<void> _fetchBoards() async {
     try {
+      toggleLoading(true);
+      await waitDelay();
       final query = state.query;
       final List<Map<String, dynamic>> fetchedBoards = await supabase
           .from('boards')
@@ -101,27 +140,30 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
           .limit(20);
       emit(state.copyWith(
           boards: fetchedBoards.map(HSBoard.deserialize).toList()));
-      return (state.boards);
+      toggleLoading();
     } catch (e) {
       HSDebugLogger.logError("Error $e");
-      return [];
+      emit(state.copyWith(status: HSMainSearchStatus.error));
     }
   }
 
-  Future<List<HSBoard>> fetchTrendingBoards() async {
+  Future<void> _fetchTrendingBoards() async {
     try {
+      toggleLoading(true);
       final fetchedBoards =
           await _databaseRepository.boardFetchTrendingBoards();
-      emit(state.copyWith(boards: fetchedBoards));
-      return (state.boards);
+      emit(state.copyWith(trendingBoards: fetchedBoards));
+      toggleLoading();
     } catch (e) {
       HSDebugLogger.logError("Error $e");
-      return [];
+      emit(state.copyWith(status: HSMainSearchStatus.error));
     }
   }
 
   Future<void> _fetchUsers() async {
     try {
+      toggleLoading(true);
+      await waitDelay();
       final query = state.query;
       final List<Map<String, dynamic>> fetchedUsers = await supabase
           .from('users')
@@ -130,14 +172,16 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
           .limit(20);
       emit(
           state.copyWith(users: fetchedUsers.map(HSUser.deserialize).toList()));
+      toggleLoading();
     } catch (e) {
-      emit(state.copyWith(users: []));
       HSDebugLogger.logError("Error $e");
+      emit(state.copyWith(status: HSMainSearchStatus.error));
     }
   }
 
-  Future<void> fetchTrendingUsers() async {
+  Future<void> _fetchTrendingUsers() async {
     try {
+      toggleLoading(true);
       final List<Map<String, dynamic>> fetchedUsers = await supabase
           .from('users')
           .select()
@@ -145,23 +189,12 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
           .order('followers_count', ascending: false)
           .limit(20)
           .select();
-      HSDebugLogger.logSuccess("Fetched users: $fetchedUsers");
-      emit(
-          state.copyWith(users: fetchedUsers.map(HSUser.deserialize).toList()));
+      emit(state.copyWith(
+          trendingUsers: fetchedUsers.map(HSUser.deserialize).toList()));
+      toggleLoading();
     } catch (e) {
-      emit(state.copyWith(users: []));
       HSDebugLogger.logError("Error $e");
     }
-  }
-
-  Future<List<HSUser>> fetchPredictions() async {
-    if (state.query.isNotEmpty) {
-      if (_debounce?.isActive ?? false) _debounce!.cancel();
-      _debounce = Timer(const Duration(milliseconds: 300), () async {
-        await _fetchUsers();
-      });
-    }
-    return (state.users);
   }
 
   @override
@@ -169,4 +202,11 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
     _debounce?.cancel();
     return super.close();
   }
+}
+
+enum HSMainSearchCubitSearchType {
+  spots,
+  tags,
+  boards,
+  users,
 }
