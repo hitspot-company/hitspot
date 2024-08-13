@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,7 +10,6 @@ import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/firebase_options.dart';
-import 'package:hitspot/utils/notifications/hs_notification_handler.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -20,6 +18,7 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_storage_repository/hs_storage_repository.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:upgrader/upgrader.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -144,7 +144,6 @@ class HSSpotsRepository {
       final sid = spot?.sid ?? spotID!;
       final fetchedSpot = await _supabase
           .rpc('spot_fetch_with_author', params: {'p_spot_id': sid});
-      HSDebugLogger.logInfo("Fetched spot with author: ${fetchedSpot}");
       return HSSpot.deserializeWithAuthor(fetchedSpot.first);
     } catch (_) {
       throw Exception("Could not fetch spot with author: $_");

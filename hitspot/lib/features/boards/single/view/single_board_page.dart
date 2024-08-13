@@ -368,15 +368,22 @@ class AnimatedEditableListView extends StatelessWidget {
 
 class HSSimpleSliverAppBar extends StatelessWidget {
   const HSSimpleSliverAppBar(
-      {super.key, this.height, required this.child, this.leading});
+      {super.key,
+      this.height,
+      required this.child,
+      this.leading,
+      this.pinned = false});
 
   final double? height;
   final Widget child;
   final Widget? leading;
+  final bool pinned;
 
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
+      pinned: pinned,
+      forceMaterialTransparency: true,
       automaticallyImplyLeading: false,
       expandedHeight: height,
       leading: leading,

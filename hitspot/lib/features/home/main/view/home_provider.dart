@@ -10,7 +10,7 @@ class HomeProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HSHomeCubit(),
-      child: const HomePage(),
+      child: HomePage(),
     );
   }
 }
