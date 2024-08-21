@@ -91,11 +91,8 @@ class HSFilesRepository {
         final File image = images[i];
 
         // Create thumbnail
-        final File thumbnail = await FlutterNativeImage.compressImage(
-            image.path,
-            quality: 100,
-            targetHeight: 128,
-            targetWidth: 128);
+        final File thumbnail =
+            await FlutterNativeImage.compressImage(image.path, quality: 25);
 
         final String uploadPath = "${spotImagesUploadPath(uid, sid)}__$i";
         final String thumbnailUploadPath =

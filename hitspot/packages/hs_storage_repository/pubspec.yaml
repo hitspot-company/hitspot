@@ -12,4 +12,5 @@ dependencies:
     path: ../hs_debug_logger
   flutter_native_image: ^0.0.6+1
   pair: ^0.1.2
+  flutter_image_compress: ^2.3.0
 
