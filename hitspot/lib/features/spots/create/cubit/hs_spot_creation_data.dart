@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:isolate';
+import 'package:flutter/services.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_storage_repository/hs_storage_repository.dart';
+import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSSpotCreationData {
@@ -48,7 +50,8 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
     // Upload images
     if (data.imagePaths.isNotEmpty) {
       sendProgress('Uploading images...', .4);
-      final List<String> urls = await storageRepo.spotUploadImages(
+      final List<Pair<String, String>> urls =
+          await storageRepo.spotUploadImages(
         files: data.imagePaths.map((e) => File(e)).toList(),
         uid: data.uid,
         sid: sid,
