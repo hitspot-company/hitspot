@@ -79,7 +79,7 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
     }
     emit(state.copyWith(
         usernameValidationState: HSUsernameValidationState.verifying));
-    await Future.delayed(const Duration(seconds: 2));
+
     if (state.username.isNotValid) {
       emit(state.copyWith(
           usernameValidationState: HSUsernameValidationState.unknown));

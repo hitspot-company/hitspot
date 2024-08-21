@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:hs_storage_repository/src/files/exceptions/hs_file_exception.dart';
+import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSFilesRepository {
@@ -81,16 +83,31 @@ class HSFilesRepository {
 
   String spotImagesUploadPath(String uid, String sid) => "$uid/spots/$sid";
 
-  Future<List<String>> spotUploadImages(
+  Future<List<Pair<String, String>>> spotUploadImages(
       List<File> images, String uid, String sid) async {
     try {
-      final List<String> ret = [];
+      final List<Pair<String, String>> ret = [];
       for (var i = 0; i < images.length; i++) {
         final File image = images[i];
+
+        // Create thumbnail
+        final File thumbnail = await FlutterNativeImage.compressImage(
+            image.path,
+            quality: 100,
+            targetHeight: 128,
+            targetWidth: 128);
+
         final String uploadPath = "${spotImagesUploadPath(uid, sid)}__$i";
+        final String thumbnailUploadPath =
+            "${spotImagesUploadPath(uid, sid)}__${i}_thumbnail";
+
         final String imageUrl =
             await uploadAndFetchPublicUrl(image, "spots", uploadPath, null);
-        ret.add(imageUrl);
+        final String thumbnailUrl = await uploadAndFetchPublicUrl(
+            thumbnail, "spots", thumbnailUploadPath, null);
+        ;
+
+        ret.add(Pair(imageUrl, thumbnailUrl));
       }
       return (ret);
     } catch (_) {

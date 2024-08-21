@@ -2,6 +2,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSSpotsRepository {
@@ -63,13 +64,16 @@ class HSSpotsRepository {
 
   // UPLOAD IMAGES
   Future<void> uploadImages(
-      String spotID, List<String> imageUrls, String uid) async {
+      String spotID, List<Pair<String, String>> imageUrls, String uid) async {
     try {
       for (var i = 0; i < imageUrls.length; i++) {
-        final String url = imageUrls[i];
+        final String url = imageUrls[i].key;
+        final String thumbnailUrl = imageUrls[i].value;
+
         await _supabase.from(_spotsImages).insert({
           "spot_id": spotID,
           "image_url": url,
+          "thumbnail_url": thumbnailUrl,
           "created_by": uid,
           "image_type": "image",
         });

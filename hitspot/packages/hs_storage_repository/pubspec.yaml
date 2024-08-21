@@ -10,4 +10,6 @@ dependencies:
   supabase_flutter: ^2.5.4
   hs_debug_logger:
     path: ../hs_debug_logger
+  flutter_native_image: ^0.0.6+1
+  pair: ^0.1.2
 

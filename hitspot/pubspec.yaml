@@ -97,6 +97,8 @@ dependencies:
   photo_view: ^0.15.0
   zoom_pinch_overlay: ^1.4.3
   upgrader: ^10.3.0
+  flutter_native_image: ^0.0.6+1
+  pair: ^0.1.2
 
 dev_dependencies:
   flutter_test:

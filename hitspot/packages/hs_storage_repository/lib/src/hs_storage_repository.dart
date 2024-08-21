@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:hs_storage_repository/src/buckets/hs_buckets_repository.dart';
 import 'package:hs_storage_repository/src/files/hs_files_repository.dart';
+import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSStorageRepository {
@@ -76,7 +77,7 @@ class HSStorageRepository {
   String boardImageUploadPath({required String uid, required String boardID}) =>
       _filesRepository.boardImageUploadPath(uid, boardID);
 
-  Future<List<String>> spotUploadImages(
+  Future<List<Pair<String, String>>> spotUploadImages(
           {required List<File> files,
           required String uid,
           required String sid}) async =>
