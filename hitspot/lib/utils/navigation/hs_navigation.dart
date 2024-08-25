@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/invitation/view/board_invitation_page.dart';
@@ -301,4 +302,5 @@ class HSNavigation {
       isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
   dynamic toError({String? title, String? message}) =>
       router.replace("/error?title=$title&message=$message");
+  dynamic toCurrentUser() => router.push("/user/${currentUser.uid}");
 }

@@ -32,7 +32,7 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
   final HSLocationRepository _locationRepository = app.locationRepository;
   final searchController = TextEditingController();
   final searchNode = FocusNode();
-  late final Completer<GoogleMapController> _mapController =
+  late Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
   Completer<GoogleMapController> get mapController => _mapController;
   String get query => searchController.text.trim();
@@ -136,7 +136,17 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
     }
   }
 
+  void onMapCreated(GoogleMapController controller) async {
+    if (_mapController.isCompleted) {
+      _mapController = Completer<GoogleMapController>();
+    }
+    _mapController.complete(controller);
+  }
+
   void cancel() => navi.pop(null);
+
+  void resetPosition() async =>
+      app.locationRepository.resetPosition(mapController);
 
   @override
   Future<void> close() {

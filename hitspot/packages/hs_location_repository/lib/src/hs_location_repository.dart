@@ -277,8 +277,13 @@ class HSLocationRepository {
   }
 
   void resetPosition(Completer<GoogleMapController> controller,
-      Position currentPosition) async {
-    await animateCameraToNewLatLng(controller,
-        LatLng(currentPosition.latitude, currentPosition.longitude));
+      [Position? currentPosition]) async {
+    late final Position pos;
+    if (currentPosition == null) {
+      pos = await getCurrentLocation();
+    } else
+      pos = currentPosition;
+    await animateCameraToNewLatLng(
+        controller, LatLng(pos.latitude, pos.longitude));
   }
 }

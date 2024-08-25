@@ -8,7 +8,6 @@ import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/main/cubit/hs_map_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
-import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -18,7 +17,6 @@ import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:page_transition/page_transition.dart';
 
 class MapPage extends StatelessWidget {
   const MapPage({super.key});
@@ -42,7 +40,6 @@ class MapPage extends StatelessWidget {
                 previous.spotsInView != current.spotsInView,
             builder: (context, currentState) {
               final isSelected = currentState.currentlySelectedSpot != null;
-              final isEmpty = currentState.spotsInView.isEmpty;
               return ExpandableBottomSheet(
                 key: mapCubit.sheetKey,
                 enableToggle: true,
@@ -58,6 +55,8 @@ class MapPage extends StatelessWidget {
                             target: mapCubit.state.cameraPosition ??
                                 const LatLng(0.0, 0.0),
                           ),
+                          myLocationButtonEnabled: true,
+                          myLocationButtonCallback: mapCubit.resetPosition,
                           onMapCreated: mapCubit.onMapCreated,
                           onCameraIdle: mapCubit.onCameraIdle,
                           markers: Set.from(markersInView),

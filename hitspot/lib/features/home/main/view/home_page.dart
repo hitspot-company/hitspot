@@ -88,9 +88,7 @@ class HomePage extends StatelessWidget {
                               icon: HSUserAvatar(
                                   radius: 20.0,
                                   imageUrl: currentUser.avatarUrl),
-                              onPressed: () => navi.toUser(
-                                userID: currentUser.uid!,
-                              ),
+                              onPressed: navi.toCurrentUser,
                             )
                                 .animate()
                                 .fadeIn(duration: 300.ms)
