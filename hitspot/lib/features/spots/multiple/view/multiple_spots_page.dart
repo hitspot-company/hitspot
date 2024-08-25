@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -28,13 +29,32 @@ class MultipleSpotsPage extends StatelessWidget {
           } else if (state == HsMultipleSpotsStatus.error) {
             return const Center(child: Text('Failed to load spots.'));
           }
-          return PagedListView<int, HSSpot>(
-            pagingController: cubit.pagingController,
-            builderDelegate: PagedChildBuilderDelegate<HSSpot>(
-              itemBuilder: (context, item, index) => SizedBox(
-                height: 100,
-                width: screenWidth,
-                child: AnimatedSpotTile(spot: item, index: index),
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 32.0),
+            child: PagedGridView<int, HSSpot>(
+              pagingController: cubit.pagingController,
+              builderDelegate: PagedChildBuilderDelegate<HSSpot>(
+                newPageProgressIndicatorBuilder: (context) =>
+                    const HSLoadingIndicator(),
+                firstPageProgressIndicatorBuilder: (context) =>
+                    const HSLoadingIndicator(),
+                itemBuilder: (context, item, index) => SizedBox(
+                  height: 100,
+                  width: screenWidth,
+                  child: AnimatedSpotTile(spot: item, index: index),
+                ),
+              ),
+              gridDelegate: SliverQuiltedGridDelegate(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                repeatPattern: QuiltedGridRepeatPattern.inverted,
+                pattern: [
+                  const QuiltedGridTile(2, 2),
+                  const QuiltedGridTile(1, 1),
+                  const QuiltedGridTile(1, 1),
+                  const QuiltedGridTile(1, 2),
+                ],
               ),
             ),
           );

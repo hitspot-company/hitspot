@@ -5,9 +5,9 @@ import 'package:hitspot/features/spots/multiple/view/multiple_spots_page.dart';
 
 class MultipleSpotsProvider extends StatelessWidget {
   const MultipleSpotsProvider(
-      {super.key, this.type = HsMultipleSpotsType.user, this.userID});
+      {super.key, this.type = HSMultipleSpotsType.userSpots, this.userID});
 
-  final HsMultipleSpotsType type;
+  final HSMultipleSpotsType type;
   final String? userID;
 
   @override

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
@@ -10,6 +11,7 @@ import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
+import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
@@ -161,11 +163,10 @@ class HomePage extends StatelessWidget {
                       .fadeIn(duration: 600.ms)
                       .slideY(begin: 0.2, end: 0),
                 ),
-                const _HomeGridBuilder(type: _HomeGridBuilderType.nearbySpots),
+                const _HomeGridBuilder(type: HomeGridBuilderType.nearbySpots),
                 const _HomeGridBuilder(
-                    type: _HomeGridBuilderType.trendingBoards),
-                const _HomeGridBuilder(
-                    type: _HomeGridBuilderType.trendingSpots),
+                    type: HomeGridBuilderType.trendingBoards),
+                const _HomeGridBuilder(type: HomeGridBuilderType.trendingSpots),
               ],
             ),
           ),
@@ -242,7 +243,7 @@ class HSBoardGridItem extends StatelessWidget {
   }
 }
 
-enum _HomeGridBuilderType { nearbySpots, trendingBoards, trendingSpots }
+enum HomeGridBuilderType { nearbySpots, trendingBoards, trendingSpots }
 
 class _HomeGridBuilder extends StatelessWidget {
   const _HomeGridBuilder({
@@ -251,20 +252,20 @@ class _HomeGridBuilder extends StatelessWidget {
   });
 
   final double defaultBuilderHeight;
-  final _HomeGridBuilderType type;
+  final HomeGridBuilderType type;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HSHomeCubit, HSHomeState>(
       buildWhen: (previous, current) {
         switch (type) {
-          case _HomeGridBuilderType.nearbySpots:
+          case HomeGridBuilderType.nearbySpots:
             return previous.nearbySpots != current.nearbySpots ||
                 previous.status != current.status;
-          case _HomeGridBuilderType.trendingBoards:
+          case HomeGridBuilderType.trendingBoards:
             return previous.trendingBoards != current.trendingBoards ||
                 previous.status != current.status;
-          case _HomeGridBuilderType.trendingSpots:
+          case HomeGridBuilderType.trendingSpots:
             return previous.trendingSpots != current.trendingSpots ||
                 previous.status != current.status;
         }
@@ -274,17 +275,17 @@ class _HomeGridBuilder extends StatelessWidget {
         late final List elements;
         late final String title, subtitle;
         switch (type) {
-          case _HomeGridBuilderType.nearbySpots:
+          case HomeGridBuilderType.nearbySpots:
             elements = state.nearbySpots;
             title = "Nearby Spots";
             subtitle = "Look around you";
             break;
-          case _HomeGridBuilderType.trendingBoards:
+          case HomeGridBuilderType.trendingBoards:
             elements = state.trendingBoards;
             title = "Trending Boards";
             subtitle = "The best collections of spots";
             break;
-          case _HomeGridBuilderType.trendingSpots:
+          case HomeGridBuilderType.trendingSpots:
             elements = state.trendingSpots;
             title = "Trending Spots";
             subtitle = "Our picks for you!";
@@ -349,9 +350,14 @@ class _HomeGridBuilder extends StatelessWidget {
                       mainAxisSpacing: 8.0,
                       crossAxisSpacing: 8.0,
                       crossAxisCount: crossAxisCount),
-                  itemCount: elements.length,
+                  itemCount: elements.length + 1,
                   itemBuilder: (context, index) {
-                    if (type == _HomeGridBuilderType.trendingBoards) {
+                    if (index == elements.length) {
+                      return _HomeMoreTile(
+                        seeMoreType: HSMultipleSpotsType.fromHomeType(type),
+                      );
+                    }
+                    if (type == HomeGridBuilderType.trendingBoards) {
                       return HSBoardGridItem(board: elements[index]);
                     } else {
                       return AnimatedSpotTile(
@@ -364,6 +370,54 @@ class _HomeGridBuilder extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _HomeMoreTile extends StatelessWidget {
+  const _HomeMoreTile({
+    super.key,
+    required this.seeMoreType,
+  });
+
+  final HSMultipleSpotsType seeMoreType;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => navi.toMultipleSpots(seeMoreType),
+      child: SizedBox(
+        width: 60.0,
+        height: 60.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14.0),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                stops: const [0.0, .3, 1.0],
+                colors: [
+                  Colors.black,
+                  Colors.black.withOpacity(.6),
+                  Colors.transparent
+                ],
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(FontAwesomeIcons.chevronRight),
+                const Gap(8.0),
+                Text(
+                  "See More",
+                  style: textTheme.titleSmall!.boldify,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
