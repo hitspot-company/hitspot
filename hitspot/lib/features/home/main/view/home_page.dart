@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:avatar_stack/positions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -354,7 +355,7 @@ class _HomeGridBuilder extends StatelessWidget {
                   itemBuilder: (context, index) {
                     if (index == elements.length) {
                       return _HomeMoreTile(
-                        seeMoreType: HSMultipleSpotsType.fromHomeType(type),
+                        type: HSMultipleSpotsType.fromHomeType(type),
                       );
                     }
                     if (type == HomeGridBuilderType.trendingBoards) {
@@ -377,15 +378,15 @@ class _HomeGridBuilder extends StatelessWidget {
 class _HomeMoreTile extends StatelessWidget {
   const _HomeMoreTile({
     super.key,
-    required this.seeMoreType,
+    required this.type,
   });
 
-  final HSMultipleSpotsType seeMoreType;
+  final HSMultipleSpotsType type;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => navi.toMultipleSpots(seeMoreType),
+      onTap: () => navi.toMultipleSpots(type),
       child: SizedBox(
         width: 60.0,
         height: 60.0,
@@ -404,14 +405,16 @@ class _HomeMoreTile extends StatelessWidget {
                 ],
               ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                const Icon(FontAwesomeIcons.chevronRight),
-                const Gap(8.0),
-                Text(
-                  "See More",
-                  style: textTheme.titleSmall!.boldify,
+                const Center(child: Icon(FontAwesomeIcons.chevronRight)),
+                Positioned(
+                  bottom: 8.0,
+                  child: Text(
+                    "See More",
+                    style: textTheme.titleSmall!.boldify,
+                  ),
                 ),
               ],
             ),

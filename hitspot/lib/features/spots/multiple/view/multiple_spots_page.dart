@@ -31,7 +31,7 @@ class MultipleSpotsPage extends StatelessWidget {
           }
           return Padding(
             padding: const EdgeInsets.only(bottom: 32.0),
-            child: PagedGridView<int, HSSpot>(
+            child: PagedGridView<int, dynamic>(
               pagingController: cubit.pagingController,
               builderDelegate: PagedChildBuilderDelegate<HSSpot>(
                 newPageProgressIndicatorBuilder: (context) =>
