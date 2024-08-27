@@ -334,14 +334,15 @@ class _AnimatedBoardsBuilder extends StatelessWidget {
       ),
       itemCount: boards.length,
       itemBuilder: (BuildContext context, int index) {
-        return _AnimatedBoardTile(board: boards[index], index: index);
+        return AnimatedBoardTile(board: boards[index], index: index);
       },
     );
   }
 }
 
-class _AnimatedBoardTile extends StatelessWidget {
-  const _AnimatedBoardTile({required this.board, required this.index});
+class AnimatedBoardTile extends StatelessWidget {
+  const AnimatedBoardTile(
+      {super.key, required this.board, required this.index});
 
   final HSBoard board;
   final int index;

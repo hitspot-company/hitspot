@@ -111,7 +111,7 @@ class HSMapCubit extends Cubit<HSMapState> {
       selectedSpot: state.selectedSpot));
 
   void closeSheet() {
-    if (sheetKey.currentState?.expansionStatus == ExpansionStatus.expanded) {
+    if (sheetKey.currentState?.expansionStatus != ExpansionStatus.contracted) {
       sheetKey.currentState?.contract();
     }
   }

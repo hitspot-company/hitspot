@@ -11,24 +11,36 @@ part 'hs_multiple_spots_state.dart';
 class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
   HsMultipleSpotsCubit(this._type, {this.userID})
       : super(HsMultipleSpotsState(type: _type)) {
-    pageTitle = _type == HSMultipleSpotsType.userSpots
-        ? '@username Spots'
-        : 'All Spots';
     _init();
   }
 
   final HSMultipleSpotsType _type;
   final String? userID;
-  late final String pageTitle;
   late final HSHitsPage hitsPage;
   final _databaseRepository = app.databaseRepository;
   PagingController<int, dynamic> get pagingController =>
       hitsPage.pagingController;
 
+  String get pageTitle {
+    switch (_type) {
+      case HSMultipleSpotsType.trendingBoards:
+        return "Trending boards";
+      case HSMultipleSpotsType.nearbySpots:
+        return "Nearby spots";
+      case HSMultipleSpotsType.trendingSpots:
+        return "Trending spots";
+      case HSMultipleSpotsType.userSpots:
+        return "@username spots";
+    }
+  }
+
   HSHitsPage get _hitsPage {
     switch (_type) {
       case HSMultipleSpotsType.trendingBoards:
-        return HSHitsPage(pageSize: 10, fetch: _fetchTrendingBoards);
+        return HSHitsPage(
+            pageSize: 10,
+            fetch: _fetchTrendingBoards,
+            type: HSHitsPageType.boards);
       // case HSMultipleSpotsType.nearbySpots: // TODO: Implement
       //   return hitsPage = HSHitsPage(pageSize: 10, fetch: _fetchNearbySpots);
       default:

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/search/view/main_search_delegate.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
@@ -33,16 +34,26 @@ class MultipleSpotsPage extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 32.0),
             child: PagedGridView<int, dynamic>(
               pagingController: cubit.pagingController,
-              builderDelegate: PagedChildBuilderDelegate<HSSpot>(
+              builderDelegate: PagedChildBuilderDelegate<dynamic>(
                 newPageProgressIndicatorBuilder: (context) =>
                     const HSLoadingIndicator(),
                 firstPageProgressIndicatorBuilder: (context) =>
                     const HSLoadingIndicator(),
-                itemBuilder: (context, item, index) => SizedBox(
-                  height: 100,
-                  width: screenWidth,
-                  child: AnimatedSpotTile(spot: item, index: index),
-                ),
+                itemBuilder: (context, item, index) {
+                  if (cubit.hitsPage.type == HSHitsPageType.spots) {
+                    return SizedBox(
+                      height: 100,
+                      width: screenWidth,
+                      child:
+                          AnimatedSpotTile(spot: item as HSSpot, index: index),
+                    );
+                  }
+                  return SizedBox(
+                    height: 100,
+                    width: screenWidth,
+                    child: AnimatedBoardTile(board: item, index: index),
+                  );
+                },
               ),
               gridDelegate: SliverQuiltedGridDelegate(
                 crossAxisCount: 2,

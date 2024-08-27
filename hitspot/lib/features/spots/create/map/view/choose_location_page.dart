@@ -136,7 +136,7 @@ class _BottomBar extends StatelessWidget {
           final bool isSearching = state.isSearching;
           final double searchBarHeight =
               !isSearching ? 180.0 : screenHeight - 100.0;
-
+          final bool canSubmit = state.selectedLocation != null;
           return Container(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.vertical(
@@ -168,7 +168,8 @@ class _BottomBar extends StatelessWidget {
                         child: const Text("Cancel"),
                       ),
                       ElevatedButton(
-                        onPressed: chooseLocationCubit.submit,
+                        onPressed:
+                            canSubmit ? chooseLocationCubit.submit : null,
                         child: const Text("Select"),
                       ),
                     ],

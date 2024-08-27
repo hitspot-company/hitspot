@@ -23,18 +23,25 @@ class NotificationsPage extends StatelessWidget {
         titleText: "Notifications",
         enableDefaultBackButton: true,
       ),
-      body: BlocBuilder<HSNotificationsCubit, HSNotificationsState>(
-        builder: (context, state) {
-          if (state.status == HSNotificationsStatus.loading) {
-            return const _LoadingView();
-          } else if (state.status == HSNotificationsStatus.loaded) {
-            return _LoadedView(state: state);
-          } else {
-            return const Center(
-              child: Text("Error loading notifications"),
-            );
-          }
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: BlocBuilder<HSNotificationsCubit, HSNotificationsState>(
+              builder: (context, state) {
+                if (state.status == HSNotificationsStatus.loading) {
+                  return const _LoadingView();
+                } else if (state.status == HSNotificationsStatus.loaded) {
+                  return _LoadedView(state: state);
+                } else {
+                  return const Center(
+                    child: Text("Error loading notifications"),
+                  );
+                }
+              },
+            ),
+          ),
+          const Gap(16.0),
+        ],
       ),
     );
   }

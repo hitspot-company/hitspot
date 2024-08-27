@@ -55,8 +55,6 @@ class MapPage extends StatelessWidget {
                             target: mapCubit.state.cameraPosition ??
                                 const LatLng(0.0, 0.0),
                           ),
-                          myLocationButtonEnabled: true,
-                          myLocationButtonCallback: mapCubit.resetPosition,
                           onMapCreated: mapCubit.onMapCreated,
                           onCameraIdle: mapCubit.onCameraIdle,
                           markers: Set.from(markersInView),
@@ -325,9 +323,9 @@ class _TopBar extends StatelessWidget {
             selector: (state) => state.sheetExpansionStatus,
             builder: (context, state) {
               final isExpanded =
-                  mapCubit.sheetStatus == ExpansionStatus.expanded;
+                  mapCubit.sheetStatus != ExpansionStatus.contracted;
               final icon = isExpanded ? Icons.close : backIcon.icon;
-              final titleText = isExpanded ? "Fetched Spots" : "";
+              final titleText = isExpanded ? "Fetched spots" : "";
               return Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
@@ -348,9 +346,16 @@ class _TopBar extends StatelessWidget {
                         titleText,
                         style: textTheme.headlineSmall,
                       ).animate().fade(),
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () => mapCubit.searchLocation(context),
+                    Row(
+                      children: [
+                        IconButton(
+                            icon: const Icon(Icons.my_location_outlined),
+                            onPressed: mapCubit.resetPosition),
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () => mapCubit.searchLocation(context),
+                        ),
+                      ],
                     ),
                   ],
                 ),
