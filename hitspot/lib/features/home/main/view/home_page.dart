@@ -196,12 +196,12 @@ class HSBoardGridItem extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              if (board.image != null)
+              if (board.thumbnail != null || board.image != null)
                 Positioned.fill(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      board.image!,
+                      board.thumbnail ?? board.image!,
                       fit: BoxFit.cover,
                     ),
                   ),

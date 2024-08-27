@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -67,14 +68,13 @@ class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
     }
   }
 
-  Future<String> uploadFile(File imageFile, String docID) async {
+  Future<String> uploadFile(File imageFile, String uploadPath) async {
     try {
       final String url =
           await app.storageRepository.fileUploadAndFetchPublicUrl(
         file: imageFile,
         bucketName: app.storageRepository.boardsBucket,
-        uploadPath: app.storageRepository
-            .boardImageUploadPath(uid: currentUser.uid!, boardID: docID),
+        uploadPath: uploadPath,
       );
       return url;
     } catch (_) {
@@ -96,13 +96,25 @@ class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
       final String boardID =
           await _databaseRepository.boardCreate(board: board);
       if (state.image.isNotEmpty) {
-        final String uploadedFileUrl =
-            await uploadFile(File(state.image), boardID);
-        await Future.delayed(const Duration(seconds: 1));
+        // Create thubmnail from iamge
+        final File thumbnail =
+            await FlutterNativeImage.compressImage(state.image, quality: 25);
+
+        final String uploadedFileUrl = await uploadFile(
+            File(state.image),
+            app.storageRepository
+                .boardImageUploadPath(uid: currentUser.uid!, boardID: boardID));
+
+        final String uploadedThumbnailUrl = await uploadFile(thumbnail,
+            "${app.storageRepository.boardImageUploadPath(uid: currentUser.uid!, boardID: boardID)}_thumbnail");
+
         HSDebugLogger.logInfo(
             "serializing board: ${board.copyWith(id: boardID, image: uploadedFileUrl).serialize()}");
         await _databaseRepository.boardUpdate(
-            board: board.copyWith(id: boardID, image: uploadedFileUrl));
+            board: board.copyWith(
+                id: boardID,
+                image: uploadedFileUrl,
+                thumbnail: uploadedThumbnailUrl));
       }
       navi.router.pushReplacement("/board/$boardID?title=${state.title}");
     } on HSBoardException catch (_) {

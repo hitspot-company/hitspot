@@ -20,6 +20,10 @@ class HSSpotsUtils {
         ?.map((item) => item.toString())
         .toList();
 
+    List<String>? thumbnailsUrls = (data['thumbnails'] as List<dynamic>?)
+        ?.map((item) => item.toString())
+        .toList();
+
     List<String>? tagsUrls = (data['tags'] as List<dynamic>?)
         ?.map((item) => item.toString())
         .toList();
@@ -41,6 +45,7 @@ class HSSpotsUtils {
       latitude: data['lat'] ?? data['latitude'],
       longitude: data['long'] ?? data['longitude'],
       images: imagesUrls,
+      thumbnails: thumbnailsUrls,
       tags: tagsUrls,
     );
   }

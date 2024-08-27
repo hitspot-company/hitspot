@@ -93,8 +93,6 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsState> {
         return;
       }
 
-      await Future.delayed(const Duration(seconds: 1));
-
       late HSComment newComment;
 
       if (isReply) {
