@@ -201,7 +201,7 @@ class HSBoardGridItem extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      board.thumbnail ?? board.image!,
+                      board.getThumbnail,
                       fit: BoxFit.cover,
                     ),
                   ),

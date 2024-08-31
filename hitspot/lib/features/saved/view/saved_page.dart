@@ -149,7 +149,7 @@ class _BoardsBuilder extends StatelessWidget {
           leading: AspectRatio(
               aspectRatio: 1.0,
               child: HSImage(
-                imageUrl: boards[index].thumbnail ?? boards[index].image,
+                imageUrl: boards[index].getThumbnail,
                 borderRadius: BorderRadius.circular(10.0),
               )),
           title: Text(board.title!),
