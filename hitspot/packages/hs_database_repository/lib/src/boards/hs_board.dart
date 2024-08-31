@@ -83,6 +83,8 @@ class HSBoard {
   String toString() {
     return "HSBoard(createdBy: $createdBy, id: $id, title: $title, description: $description, color: $color, image: $image, visibility: $visibility, createdAt: $createdAt)";
   }
+
+  String get getThumbnail => thumbnail ?? image!;
 }
 
 extension HSBoardColorExtensions on Color {
