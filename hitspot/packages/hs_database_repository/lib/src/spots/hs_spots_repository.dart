@@ -126,21 +126,6 @@ class HSSpotsRepository {
     }
   }
 
-  Future<List<String>> fetchSpotThumbnails(HSSpot? spot, String? spotID) async {
-    assert(spot != null || spotID != null, "Spot or spotID must be provided");
-    try {
-      final sid = spot?.sid ?? spotID!;
-      final List<Map<String, dynamic>> data =
-          await _supabase.rpc("spot_fetch_images", params: {'p_spot_id': sid});
-      final List<String> thumbnailUrls =
-          data.map((e) => e['thumbnail_url'] as String).toList();
-      return thumbnailUrls;
-    } catch (_) {
-      HSDebugLogger.logError(_.toString());
-      throw Exception("Error fetching spot images: $_");
-    }
-  }
-
   Future<HSSpot> _composeSpotWithImages(
       HSSpot spot, bool fetchThumbnails) async {
     try {

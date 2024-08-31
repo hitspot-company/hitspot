@@ -9,6 +9,7 @@ import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSSpotCreationData {
+  final RootIsolateToken rootIsolateToken;
   final HSSpot spot;
   final List<String> imagePaths;
   final String uid;
@@ -18,6 +19,7 @@ class HSSpotCreationData {
   final Session? currentSession;
 
   HSSpotCreationData({
+    required this.rootIsolateToken,
     required this.spot,
     required this.imagePaths,
     required this.uid,
@@ -29,6 +31,8 @@ class HSSpotCreationData {
 }
 
 Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
+  BackgroundIsolateBinaryMessenger.ensureInitialized(data.rootIsolateToken);
+
   if (data.currentSession == null) {
     throw Exception('User is not authenticated');
   }
@@ -83,7 +87,7 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
     data.sendPort.send({'error': e.toString()});
   }
   HSDebugLogger.logInfo('Spot creation process completed');
-  await Future.delayed(const Duration(seconds: 10));
+  await Future.delayed(const Duration(seconds: 3));
   data.sendPort.send({'exit': true});
   Isolate.exit();
 }
@@ -92,6 +96,7 @@ Future<void> createSpotWithIsolate(
     HSSpotCreationData data, HSSpotUploadCubit cubit) async {
   final ReceivePort receivePort = ReceivePort();
   final isolateData = HSSpotCreationData(
+    rootIsolateToken: data.rootIsolateToken,
     currentSession: data.currentSession,
     supabaseData: data.supabaseData,
     spot: data.spot,

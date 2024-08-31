@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -144,6 +145,11 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
         address: state.spotLocation!.address,
       );
 
+      if (RootIsolateToken.instance == null) {
+        HSDebugLogger.logError("RootIsolateToken is null");
+        return;
+      }
+
       if (prototype != null) {
         // Handle updating existing spot (not using isolate for simplicity)
         await app.databaseRepository
@@ -156,6 +162,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
       } else {
         final receivePort = ReceivePort();
         final spotData = HSSpotCreationData(
+          rootIsolateToken: RootIsolateToken.instance!,
           spot: spot,
           imagePaths: state.images.map((e) => e.path).toList(),
           uid: currentUser.uid!,
