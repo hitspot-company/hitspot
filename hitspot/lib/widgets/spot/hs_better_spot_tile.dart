@@ -51,8 +51,7 @@ class HSBetterSpotTile extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  HSImage(
-                      imageUrl: spot!.thumbnails?.first ?? spot!.images!.first),
+                  HSImage(imageUrl: spot!.getThumbnail),
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(

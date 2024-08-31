@@ -132,6 +132,12 @@ class HSSpot {
     return HSSpotsUtils.deserializeSpotWithAuthor(data);
   }
 
+  String get getThumbnail {
+    if (thumbnails?[0] != null && thumbnails?[0] != "null")
+      return thumbnails![0];
+    return images![0];
+  }
+
   @override
   String toString() {
     return 'HSSpot{sid: $sid, title: $title, description: $description, geohash: $geohash, createdBy: $createdBy, likesCount: $likesCount, commentsCount: $commentsCount, savesCount: $savesCount, tripsCount: $tripsCount, boardsCount: $boardsCount, latitude: $latitude, longitude: $longitude, tags: $tags, images: $images, author: $author, address: $address, sharesCount: $sharesCount}';
