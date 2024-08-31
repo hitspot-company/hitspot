@@ -40,10 +40,12 @@ class HSLocationRepository {
         }
       }
 
-      final locationData = await Geolocator.getCurrentPosition();
+      final locationData = await Geolocator.getCurrentPosition(
+              timeLimit: const Duration(seconds: 5))
+          .onError((a, v) => throw "Reached time limit.");
       return locationData;
     } catch (_) {
-      throw 'Location service is disabled : $_';
+      throw 'Location service is disabled or could not be fetched: $_';
     }
   }
 
