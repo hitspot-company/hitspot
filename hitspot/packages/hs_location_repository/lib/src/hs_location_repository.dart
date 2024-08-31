@@ -41,7 +41,7 @@ class HSLocationRepository {
       }
 
       final locationData = await Geolocator.getCurrentPosition(
-              timeLimit: const Duration(seconds: 5))
+              timeLimit: const Duration(seconds: 3))
           .onError((a, v) => throw "Reached time limit.");
       return locationData;
     } catch (_) {
