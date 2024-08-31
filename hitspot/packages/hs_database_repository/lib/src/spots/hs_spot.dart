@@ -13,7 +13,7 @@ class HSSpot {
       boardsCount,
       sharesCount;
   final double? latitude, longitude;
-  final List<String>? images, tags;
+  final List<String>? images, tags, thumbnails;
   final HSUser? author;
 
   // BOARDS RELATED
@@ -37,6 +37,7 @@ class HSSpot {
     this.latitude,
     this.longitude,
     this.images,
+    this.thumbnails,
     this.spotIndex,
   });
 
@@ -56,6 +57,7 @@ class HSSpot {
     double? latitude,
     double? longitude,
     List<String>? images,
+    List<String>? thumbnails,
     List<String>? tags,
     HSUser? author,
     int? spotIndex,
@@ -76,6 +78,7 @@ class HSSpot {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       images: images ?? this.images,
+      thumbnails: thumbnails ?? this.thumbnails,
       tags: tags ?? this.tags,
       author: author ?? this.author,
       spotIndex: spotIndex ?? this.spotIndex,
@@ -118,6 +121,9 @@ class HSSpot {
       longitude: data['long'] ?? data['longitude'],
       images:
           (data['images'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
+      thumbnails: (data['thumbnails'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList(),
       spotIndex: data['spot_index'],
     );
   }

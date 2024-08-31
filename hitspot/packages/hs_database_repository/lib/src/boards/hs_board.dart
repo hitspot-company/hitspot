@@ -7,7 +7,7 @@ class HSBoard {
   final UserID? createdBy;
   List<HSUser>? collaborators;
   final BoardID? id;
-  final String? title, description, image;
+  final String? title, description, image, thumbnail;
   final Color? color;
   final HSBoardVisibility? visibility;
   final DateTime? createdAt;
@@ -20,6 +20,7 @@ class HSBoard {
       description: data["description"],
       color: data["color"]?.toString().toColor,
       image: data["image"],
+      thumbnail: data["thumbnail"],
       visibility: HSBoardVisibility.deserialize(data["visibility"]),
       createdAt: data["created_at"] != null
           ? DateTime.tryParse(data["created_at"])
@@ -34,6 +35,7 @@ class HSBoard {
       "description": description,
       "color": color?.toHex,
       "image": image,
+      "thumbnail": thumbnail,
       "visibility": visibility!.name,
       "created_at": createdAt?.toIso8601String(),
     };
@@ -47,6 +49,7 @@ class HSBoard {
     String? description,
     Color? color,
     String? image,
+    String? thumbnail,
     dynamic visibility,
     DateTime? createdAt,
   }) =>
@@ -58,6 +61,7 @@ class HSBoard {
         description: description ?? this.description,
         color: color ?? this.color,
         image: image ?? this.image,
+        thumbnail: thumbnail ?? this.thumbnail,
         visibility: visibility ?? this.visibility,
         createdAt: createdAt ?? this.createdAt,
       );
@@ -70,6 +74,7 @@ class HSBoard {
     this.description,
     this.color,
     this.image,
+    this.thumbnail,
     this.visibility,
     this.createdAt,
   });

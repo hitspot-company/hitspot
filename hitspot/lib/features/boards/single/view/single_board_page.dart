@@ -330,12 +330,10 @@ class AnimatedEditableListView extends StatelessWidget {
                                 icon: const Icon(FontAwesomeIcons.xmark),
                               ),
                               const SizedBox(width: 8.0),
-                              IgnorePointer(
-                                child: IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.drag_handle,
-                                  ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.drag_handle,
                                 ),
                               ),
                             ],

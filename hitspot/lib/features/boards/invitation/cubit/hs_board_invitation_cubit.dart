@@ -61,7 +61,9 @@ class HsBoardInvitationCubit extends Cubit<HSBoardInvitationState> {
         boardAuthor = author.username;
       }
 
-      if (board.image != null) {
+      if (board.thumbnail != null) {
+        boardImage = Image.network(board.thumbnail!);
+      } else if (board.image != null) {
         boardImage = Image.network(board.image!);
       }
 

@@ -119,7 +119,6 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
 
   Future<void> _fetchUserData() async {
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
       final user = await app.databaseRepository.userRead(userID: userID);
       final List<HSSpot> userSpots =
           await _databaseRepository.spotfetchUserSpots(user: user);

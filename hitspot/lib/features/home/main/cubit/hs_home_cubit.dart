@@ -102,7 +102,6 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     if (shouldHideUploadBar) {
       hideUploadBar();
     }
-    await Future.delayed(const Duration(seconds: 2));
     state.copyWith(
       status: HSHomeStatus.loading,
       tredingBoards: const [],

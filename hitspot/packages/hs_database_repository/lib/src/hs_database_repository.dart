@@ -8,6 +8,7 @@ import 'package:hs_database_repository/src/recommendation_system/hs_recommendati
 import 'package:hs_database_repository/src/spots/hs_comment.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
+import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
@@ -193,7 +194,7 @@ class HSDatabaseRepsitory {
 
   Future<void> spotUploadImages(
           {required String spotID,
-          required List<String> imageUrls,
+          required List<Pair<String, String>> imageUrls,
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
 

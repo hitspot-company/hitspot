@@ -2,6 +2,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSSpotsRepository {
@@ -63,13 +64,16 @@ class HSSpotsRepository {
 
   // UPLOAD IMAGES
   Future<void> uploadImages(
-      String spotID, List<String> imageUrls, String uid) async {
+      String spotID, List<Pair<String, String>> imageUrls, String uid) async {
     try {
       for (var i = 0; i < imageUrls.length; i++) {
-        final String url = imageUrls[i];
+        final String url = imageUrls[i].key;
+        final String thumbnailUrl = imageUrls[i].value;
+
         await _supabase.from(_spotsImages).insert({
           "spot_id": spotID,
           "image_url": url,
+          "thumbnail_url": thumbnailUrl,
           "created_by": uid,
           "image_type": "image",
         });
@@ -101,14 +105,20 @@ class HSSpotsRepository {
     // TODO: Add map view with clustering (https://pub.dev/packages/google_maps_cluster_manager)
   }
 
-  Future<List<String>> fetchSpotImages(HSSpot? spot, String? spotID) async {
+  Future<List<String>> fetchSpotImages(
+      HSSpot? spot, String? spotID, bool fetchThumbnails) async {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");
     try {
       final sid = spot?.sid ?? spotID!;
       final List<Map<String, dynamic>> data =
           await _supabase.rpc("spot_fetch_images", params: {'p_spot_id': sid});
-      final List<String> imageUrls =
-          data.map((e) => e['image_url'] as String).toList();
+      late List<String> imageUrls;
+
+      if (fetchThumbnails) {
+        imageUrls = data.map((e) => e['thumbnail_url'] as String).toList();
+      } else {
+        imageUrls = data.map((e) => e['image_url'] as String).toList();
+      }
       return imageUrls;
     } catch (_) {
       HSDebugLogger.logError(_.toString());
@@ -116,9 +126,11 @@ class HSSpotsRepository {
     }
   }
 
-  Future<HSSpot> _composeSpotWithImages(HSSpot spot) async {
+  Future<HSSpot> _composeSpotWithImages(
+      HSSpot spot, bool fetchThumbnails) async {
     try {
-      final List<String> images = await fetchSpotImages(spot, null);
+      final List<String> images =
+          await fetchSpotImages(spot, null, fetchThumbnails);
       return spot.copyWith(images: images);
     } catch (_) {
       HSDebugLogger.logError("Error composing spot with images: $_");
@@ -278,7 +290,8 @@ class HSSpotsRepository {
       });
       final spots = data.map(HSSpot.deserialize).toList();
       for (var i = 0; i < spots.length; i++) {
-        final spot = await _composeSpotWithImages(spots[i]);
+        final spot =
+            await _composeSpotWithImages(spots[i], /* with thumbnails */ true);
         spots[i] = spot;
       }
       return (spots);
