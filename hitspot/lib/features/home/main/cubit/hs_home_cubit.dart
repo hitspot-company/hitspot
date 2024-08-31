@@ -40,8 +40,6 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   }
 
   Future<void> fetchUpdateInfo() async {
-    return;
-
     upgrader = Upgrader(
       messages: HSUpgradeMessages(),
       storeController: UpgraderStoreController(
