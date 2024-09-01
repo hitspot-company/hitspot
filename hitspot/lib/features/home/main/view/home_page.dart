@@ -109,7 +109,7 @@ class HomePage extends StatelessWidget {
                           collapsedHeight: showUploadBar ? 60.0 : null,
                           flexibleSpace: FlexibleSpaceBar(
                             background: Container(
-                              color: app.currentTheme.scaffoldBackgroundColor,
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                         );
