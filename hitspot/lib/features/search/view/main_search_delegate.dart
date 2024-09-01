@@ -59,39 +59,48 @@ class MainSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Column(
-        children: [
-          const Gap(16.0),
-          TabBar(
-            dividerHeight: 0.0,
-            indicatorColor: app.theme.mainColor,
-            labelColor: app.theme.mainColor,
-            unselectedLabelColor: Colors.grey,
-            tabs: const [
-              Tab(text: 'Spots'),
-              Tab(text: 'Boards'),
-              Tab(text: 'Tags'),
-            ],
-          ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
-          const Gap(16.0),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TabBarView(
-                children: [
-                  _FetchedSpotsPage(
-                      mapSearchCubit: mapSearchCubit, query: query),
-                  _FetchedBoardsPage(
-                      mapSearchCubit: mapSearchCubit, query: query),
-                  _FetchedTagsPage(
-                      mapSearchCubit: mapSearchCubit, query: query),
-                ],
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        // Check the swipe direction
+        if (details.primaryVelocity! > 0) {
+          // Swipe to the right detected
+          navi.pop();
+        }
+      },
+      child: DefaultTabController(
+        length: 3,
+        child: Column(
+          children: [
+            const Gap(16.0),
+            TabBar(
+              dividerHeight: 0.0,
+              indicatorColor: app.theme.mainColor,
+              labelColor: app.theme.mainColor,
+              unselectedLabelColor: Colors.grey,
+              tabs: const [
+                Tab(text: 'Spots'),
+                Tab(text: 'Boards'),
+                Tab(text: 'Tags'),
+              ],
+            ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+            const Gap(16.0),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TabBarView(
+                  children: [
+                    _FetchedSpotsPage(
+                        mapSearchCubit: mapSearchCubit, query: query),
+                    _FetchedBoardsPage(
+                        mapSearchCubit: mapSearchCubit, query: query),
+                    _FetchedTagsPage(
+                        mapSearchCubit: mapSearchCubit, query: query),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
