@@ -352,7 +352,7 @@ class HSBoardsRepository {
       });
 
       // Generate the magic link
-      final magicLink = 'app.hitspot://invite/$boardId?token=$token';
+      final magicLink = 'https://hitspot.app/invite/$boardId?token=$token';
 
       HSDebugLogger.logSuccess('Generated new invitation: $magicLink');
       return magicLink;

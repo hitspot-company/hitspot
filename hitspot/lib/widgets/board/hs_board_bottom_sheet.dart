@@ -34,11 +34,12 @@ class HSBoardBottomSheet extends StatelessWidget {
               onTap: () =>
                   navi.pushPage(page: CreateBoardProvider(prototype: board)),
             ),
-          HSModalBottomSheetItem(
-            iconData: FontAwesomeIcons.userPlus,
-            title: "Add editor",
-            onTap: inviteCollaborator,
-          ),
+          if (currentUser.uid == board.createdBy)
+            HSModalBottomSheetItem(
+              iconData: FontAwesomeIcons.userPlus,
+              title: "Add editor",
+              onTap: inviteCollaborator,
+            ),
           HSModalBottomSheetItem(
             title: "Share",
             iconData: FontAwesomeIcons.arrowUpRightFromSquare,
