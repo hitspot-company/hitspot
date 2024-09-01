@@ -93,7 +93,6 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
 
   Future<void> refresh() async {
     emit(state.copyWith(status: HSUserProfileStatus.loading));
-    await Future.delayed(const Duration(seconds: 1));
     await _fetchUserData();
   }
 
