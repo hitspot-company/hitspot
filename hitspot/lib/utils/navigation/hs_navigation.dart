@@ -38,6 +38,7 @@ class HSNavigation {
   BuildContext get context => router.configuration.navigatorKey.currentContext!;
 
   dynamic pop([dynamic value = false]) => router.pop(value);
+
   dynamic pushPage({required Widget page}) =>
       router.configuration.navigatorKey.currentState!.push(
         MaterialPageRoute(builder: (_) => page),

@@ -31,7 +31,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
     return GestureDetector(
       onTap: HSScaffold.hideInput,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.9,
+        height: MediaQuery.of(context).size.height * 0.7,
         decoration: BoxDecoration(
           color: app.theme.currentTheme.scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),

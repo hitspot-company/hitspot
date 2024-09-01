@@ -35,7 +35,9 @@ class SingleBoardPage extends StatelessWidget {
         final HSUser? author = state.author;
         if (state.status == HSSingleBoardStatus.error) {
           return HSScaffold(
-            appBar: HSAppBar(enableDefaultBackButton: true),
+            appBar: HSAppBar(
+              enableDefaultBackButton: true,
+            ),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
