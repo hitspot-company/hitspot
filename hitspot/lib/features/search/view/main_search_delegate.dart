@@ -61,71 +61,82 @@ class MainSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Column(
-        children: [
-          const Gap(16.0),
-          TabBar(
-            dividerHeight: 0.0,
-            indicatorColor: app.theme.mainColor,
-            labelColor: app.theme.mainColor,
-            unselectedLabelColor: Colors.grey,
-            tabs: const [
-              Tab(text: 'Users'),
-              Tab(text: 'Spots'),
-              Tab(text: 'Boards'),
-              Tab(text: 'Tags'),
-            ],
-          ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
-          const Gap(16.0),
-          Expanded(
-            child: TabBarView(
-              children: [
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.users != current.users ||
-                      previous.trendingUsers != current.trendingUsers ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedUsersPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
-                  ),
-                ),
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.spots != current.spots ||
-                      previous.trendingSpots != current.trendingSpots ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedSpotsPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
-                  ),
-                ),
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.boards != current.boards ||
-                      previous.trendingBoards != current.trendingBoards ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedBoardsPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
-                  ),
-                ),
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.tags != current.tags ||
-                      previous.trendingTags != current.trendingTags ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedTagsPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
-                  ),
-                ),
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        // Check the swipe direction
+        if (details.primaryVelocity! > 0) {
+          // Swipe to the right detected
+          close(context, "");
+        }
+      },
+      child: DefaultTabController(
+        length: 4,
+        child: Column(
+          children: [
+            const Gap(16.0),
+            TabBar(
+              dividerHeight: 0.0,
+              indicatorColor: app.theme.mainColor,
+              labelColor: app.theme.mainColor,
+              unselectedLabelColor: Colors.grey,
+              physics: const NeverScrollableScrollPhysics(),
+              tabs: const [
+                Tab(text: 'Users'),
+                Tab(text: 'Spots'),
+                Tab(text: 'Boards'),
+                Tab(text: 'Tags'),
               ],
+            ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+            const Gap(16.0),
+            Expanded(
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.users != current.users ||
+                        previous.trendingUsers != current.trendingUsers ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedUsersPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
+                  ),
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.spots != current.spots ||
+                        previous.trendingSpots != current.trendingSpots ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedSpotsPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
+                  ),
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.boards != current.boards ||
+                        previous.trendingBoards != current.trendingBoards ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedBoardsPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
+                  ),
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.tags != current.tags ||
+                        previous.trendingTags != current.trendingTags ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedTagsPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
