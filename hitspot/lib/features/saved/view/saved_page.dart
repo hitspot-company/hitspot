@@ -179,6 +179,10 @@ class _SpotsBuilder extends StatelessWidget {
           if (state.status == HSSavedStatus.loading) {
             return const _LoadingBuilder(type: _LoadingBuilderType.grid);
           }
+          if (state.savedSpots.isEmpty) {
+            return const HSIconPrompt(
+                message: "No saved spots", iconData: FontAwesomeIcons.bookmark);
+          }
           final spots = state.savedSpots;
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
