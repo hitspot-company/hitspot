@@ -105,13 +105,20 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
   Future<void> _addToBoard(HSBoard board) async {
     try {
       emit(state.copyWith(status: HSSingleSpotStatus.addingToBoard));
-      await _databaseRepository.boardAddSpot(
+      bool result = await _databaseRepository.boardAddSpot(
           board: board, spot: state.spot, addedBy: currentUser);
       emit(state.copyWith(status: HSSingleSpotStatus.loaded));
-      app.showToast(
-          toastType: HSToastType.success,
-          title: "Spot added.",
-          description: "Spot added to board ${board.title}");
+      if (result) {
+        app.showToast(
+            toastType: HSToastType.success,
+            title: "Spot added.",
+            description: "Spot added to board ${board.title}");
+      } else {
+        app.showToast(
+            toastType: HSToastType.error,
+            title: "Error",
+            description: "Board ${board.title} already contains this spot!");
+      }
       navi.pop();
     } catch (_) {
       HSDebugLogger.logError(_.toString());
