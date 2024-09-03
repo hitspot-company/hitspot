@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -44,6 +45,7 @@ class MainSearchDelegate extends SearchDelegate<String> {
         icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
+          mapSearchCubit.updateQuery(query);
         },
       ).animate().fadeIn(duration: 300.ms, curve: Curves.easeInOut),
     ];
@@ -59,75 +61,133 @@ class MainSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        // Check the swipe direction
-        if (details.primaryVelocity! > 0) {
-          // Swipe to the right detected
-          navi.pop();
-        }
-      },
-      child: DefaultTabController(
-        length: 3,
-        child: Column(
-          children: [
-            const Gap(16.0),
-            TabBar(
-              dividerHeight: 0.0,
-              indicatorColor: app.theme.mainColor,
-              labelColor: app.theme.mainColor,
-              unselectedLabelColor: Colors.grey,
-              tabs: const [
-                Tab(text: 'Spots'),
-                Tab(text: 'Boards'),
-                Tab(text: 'Tags'),
-              ],
-            ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
-            const Gap(16.0),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TabBarView(
-                  children: [
-                    _FetchedSpotsPage(
-                        mapSearchCubit: mapSearchCubit, query: query),
-                    _FetchedBoardsPage(
-                        mapSearchCubit: mapSearchCubit, query: query),
-                    _FetchedTagsPage(
-                        mapSearchCubit: mapSearchCubit, query: query),
-                  ],
+    return DefaultTabController(
+      length: 4,
+      child: Column(
+        children: [
+          const Gap(16.0),
+          TabBar(
+            dividerHeight: 0.0,
+            indicatorColor: app.theme.mainColor,
+            labelColor: app.theme.mainColor,
+            unselectedLabelColor: Colors.grey,
+            tabs: const [
+              Tab(text: 'Users'),
+              Tab(text: 'Spots'),
+              Tab(text: 'Boards'),
+              Tab(text: 'Tags'),
+            ],
+          ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+          const Gap(16.0),
+          Expanded(
+            child: TabBarView(
+              children: [
+                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                  buildWhen: (previous, current) =>
+                      previous.users != current.users ||
+                      previous.trendingUsers != current.trendingUsers ||
+                      previous.status != current.status,
+                  builder: (context, state) => _FetchedUsersPage(
+                    mapSearchCubit: mapSearchCubit,
+                    query: query,
+                  ),
                 ),
-              ),
+                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                  buildWhen: (previous, current) =>
+                      previous.spots != current.spots ||
+                      previous.trendingSpots != current.trendingSpots ||
+                      previous.status != current.status,
+                  builder: (context, state) => _FetchedSpotsPage(
+                    mapSearchCubit: mapSearchCubit,
+                    query: query,
+                  ),
+                ),
+                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                  buildWhen: (previous, current) =>
+                      previous.boards != current.boards ||
+                      previous.trendingBoards != current.trendingBoards ||
+                      previous.status != current.status,
+                  builder: (context, state) => _FetchedBoardsPage(
+                    mapSearchCubit: mapSearchCubit,
+                    query: query,
+                  ),
+                ),
+                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                  buildWhen: (previous, current) =>
+                      previous.tags != current.tags ||
+                      previous.trendingTags != current.trendingTags ||
+                      previous.status != current.status,
+                  builder: (context, state) => _FetchedTagsPage(
+                    mapSearchCubit: mapSearchCubit,
+                    query: query,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.users);
-    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-      buildWhen: (previous, current) =>
-          previous.users != current.users ||
-          previous.trendingUsers != current.trendingUsers ||
-          previous.status != current.status,
-      builder: (context, state) {
-        final List<HSUser> users = state.users;
-        final List<HSUser> trendingUsers = state.trendingUsers;
-        if (mapSearchCubit.isLoading) {
-          return const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: HSLoadingWidget(type: HSLoadingWidgetType.list),
-          );
-        }
-        if (users.isEmpty) {
-          return _AnimatedUsersBuilder(users: trendingUsers);
-        }
-        return _AnimatedUsersBuilder(users: users);
-      },
-    );
+    mapSearchCubit.updateQuery(query);
+
+    return buildResults(context);
+  }
+}
+
+class _FetchedUsersPage extends StatefulWidget {
+  const _FetchedUsersPage({required this.mapSearchCubit, required this.query});
+
+  final HSMainSearchCubit mapSearchCubit;
+  final String query;
+
+  @override
+  State<_FetchedUsersPage> createState() => _FetchedUsersPageState();
+}
+
+class _FetchedUsersPageState extends State<_FetchedUsersPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final state = widget.mapSearchCubit.state;
+
+    if (widget.mapSearchCubit.isLoading) {
+      return const HSLoadingWidget(type: HSLoadingWidgetType.list);
+    }
+
+    if (widget.query.isNotEmpty && state.users.isEmpty) {
+      return CustomScrollView(
+        shrinkWrap: true,
+        slivers: [
+          HSTextPrompt(
+                  prompt: "No users found for ",
+                  pressableText: widget.query,
+                  promptColor: app.theme.mainColor,
+                  onTap: null)
+              .toSliver,
+          const Gap(16.0).toSliver,
+          Text(
+            "Maybe you will like to see these users instead",
+            style: textTheme.headlineSmall,
+          ).toSliver,
+          const Gap(16.0).toSliver,
+          SliverFillRemaining(
+              child: _AnimatedUsersBuilder(users: state.trendingUsers)),
+        ],
+      );
+    }
+
+    final List<HSUser> users =
+        state.users.isEmpty ? state.trendingUsers : state.users;
+
+    return _AnimatedUsersBuilder(users: users);
   }
 }
 
@@ -189,55 +249,57 @@ class _AnimatedUserTile extends StatelessWidget {
   }
 }
 
-class _FetchedSpotsPage extends StatelessWidget {
+class _FetchedSpotsPage extends StatefulWidget {
   const _FetchedSpotsPage({required this.mapSearchCubit, required this.query});
 
   final HSMainSearchCubit mapSearchCubit;
   final String query;
 
   @override
+  State<_FetchedSpotsPage> createState() => _FetchedSpotsPageState();
+}
+
+class _FetchedSpotsPageState extends State<_FetchedSpotsPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.spots);
-    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-      buildWhen: (previous, current) =>
-          previous.status != current.status ||
-          previous.spots != current.spots ||
-          previous.trendingSpots != current.trendingSpots,
-      builder: (context, state) {
-        if (mapSearchCubit.isLoading) {
-          return const HSLoadingWidget(
-            type: HSLoadingWidgetType.grid,
-          );
-        }
-        final List<HSSpot> trendingSpots = state.trendingSpots;
-        if (query.isEmpty) {
-          return _AnimatedSpotsBuilder(spots: trendingSpots);
-        }
-        if (query.isNotEmpty && state.spots.isEmpty) {
-          return CustomScrollView(
-            shrinkWrap: true,
-            slivers: [
-              HSTextPrompt(
-                      prompt: "No spots found for ",
-                      pressableText: query,
-                      promptColor: app.theme.mainColor,
-                      onTap: null)
-                  .toSliver,
-              const Gap(16.0).toSliver,
-              Text(
-                "Maybe you will like these spots instead",
-                style: textTheme.headlineSmall,
-              ).toSliver,
-              const Gap(16.0).toSliver,
-              SliverFillRemaining(
-                  child: _AnimatedSpotsBuilder(spots: trendingSpots)),
-            ],
-          );
-        }
-        final List<HSSpot> spots = state.spots;
-        return _AnimatedSpotsBuilder(spots: spots);
-      },
-    );
+    super.build(context);
+    final state = widget.mapSearchCubit.state;
+    if (widget.mapSearchCubit.isLoading) {
+      return const HSLoadingWidget(
+        type: HSLoadingWidgetType.grid,
+      );
+    }
+    final List<HSSpot> trendingSpots = state.trendingSpots;
+    if (widget.query.isEmpty) {
+      return _AnimatedSpotsBuilder(spots: trendingSpots);
+    }
+    if (widget.query.isNotEmpty && state.spots.isEmpty) {
+      return CustomScrollView(
+        shrinkWrap: true,
+        slivers: [
+          HSTextPrompt(
+                  prompt: "No spots found for ",
+                  pressableText: widget.query,
+                  promptColor: app.theme.mainColor,
+                  onTap: null)
+              .toSliver,
+          const Gap(16.0).toSliver,
+          Text(
+            "Maybe you will like these spots instead",
+            style: textTheme.headlineSmall,
+          ).toSliver,
+          const Gap(16.0).toSliver,
+          SliverFillRemaining(
+              child: _AnimatedSpotsBuilder(spots: trendingSpots)),
+        ],
+      );
+    }
+    final List<HSSpot> spots = state.spots;
+    return _AnimatedSpotsBuilder(spots: spots);
   }
 }
 
@@ -272,55 +334,58 @@ class _AnimatedSpotsBuilder extends StatelessWidget {
   }
 }
 
-class _FetchedBoardsPage extends StatelessWidget {
+class _FetchedBoardsPage extends StatefulWidget {
   const _FetchedBoardsPage({required this.mapSearchCubit, required this.query});
 
   final HSMainSearchCubit mapSearchCubit;
   final String query;
 
   @override
+  State<_FetchedBoardsPage> createState() => _FetchedBoardsPageState();
+}
+
+class _FetchedBoardsPageState extends State<_FetchedBoardsPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.boards);
-    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-      buildWhen: (previous, current) =>
-          previous.boards != current.boards ||
-          previous.trendingBoards != current.trendingBoards ||
-          previous.status != current.status,
-      builder: (context, state) {
-        if (mapSearchCubit.isLoading) {
-          return const HSLoadingWidget(
-            type: HSLoadingWidgetType.grid,
-          );
-        }
-        final List<HSBoard> boards = state.boards;
-        final List<HSBoard> trendingBoards = state.trendingBoards;
-        if (query.isEmpty) {
-          return _AnimatedBoardsBuilder(boards: trendingBoards);
-        }
-        if (query.isNotEmpty && state.boards.isEmpty) {
-          return CustomScrollView(
-            shrinkWrap: true,
-            slivers: [
-              HSTextPrompt(
-                      prompt: "No boards found for ",
-                      pressableText: query,
-                      promptColor: app.theme.mainColor,
-                      onTap: null)
-                  .toSliver,
-              const Gap(16.0).toSliver,
-              Text(
-                "Maybe you will like these boards instead",
-                style: textTheme.headlineSmall,
-              ).toSliver,
-              const Gap(16.0).toSliver,
-              SliverFillRemaining(
-                  child: _AnimatedBoardsBuilder(boards: trendingBoards)),
-            ],
-          );
-        }
-        return _AnimatedBoardsBuilder(boards: boards);
-      },
-    );
+    super.build(context);
+    final state = widget.mapSearchCubit.state;
+
+    if (widget.mapSearchCubit.isLoading) {
+      return const HSLoadingWidget(
+        type: HSLoadingWidgetType.grid,
+      );
+    }
+    final List<HSBoard> boards = state.boards;
+    final List<HSBoard> trendingBoards = state.trendingBoards;
+    if (widget.query.isEmpty) {
+      return _AnimatedBoardsBuilder(boards: trendingBoards);
+    }
+    if (widget.query.isNotEmpty && state.boards.isEmpty) {
+      return CustomScrollView(
+        shrinkWrap: true,
+        slivers: [
+          HSTextPrompt(
+                  prompt: "No boards found for ",
+                  pressableText: widget.query,
+                  promptColor: app.theme.mainColor,
+                  onTap: null)
+              .toSliver,
+          const Gap(16.0).toSliver,
+          Text(
+            "Maybe you will like these boards instead",
+            style: textTheme.headlineSmall,
+          ).toSliver,
+          const Gap(16.0).toSliver,
+          SliverFillRemaining(
+              child: _AnimatedBoardsBuilder(boards: trendingBoards)),
+        ],
+      );
+    }
+    return _AnimatedBoardsBuilder(boards: boards);
   }
 }
 
@@ -369,55 +434,57 @@ class AnimatedBoardTile extends StatelessWidget {
   }
 }
 
-class _FetchedTagsPage extends StatelessWidget {
+class _FetchedTagsPage extends StatefulWidget {
   const _FetchedTagsPage({required this.mapSearchCubit, required this.query});
 
   final HSMainSearchCubit mapSearchCubit;
   final String query;
 
   @override
+  State<_FetchedTagsPage> createState() => _FetchedTagsPageState();
+}
+
+class _FetchedTagsPageState extends State<_FetchedTagsPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    mapSearchCubit.updateQuery(query, HSMainSearchCubitSearchType.tags);
-    return BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-      buildWhen: (previous, current) =>
-          previous.tags != current.tags ||
-          previous.status != current.status ||
-          previous.trendingTags != current.trendingTags,
-      builder: (context, state) {
-        if (mapSearchCubit.isLoading) {
-          return const HSLoadingWidget(
-            type: HSLoadingWidgetType.grid,
-          );
-        }
-        final List<HSTag> trendingTags = state.trendingTags;
-        if (query.isEmpty) {
-          return _AnimatedTagsBuilder(tags: trendingTags);
-        }
-        if (query.isNotEmpty && state.tags.isEmpty) {
-          return CustomScrollView(
-            shrinkWrap: true,
-            slivers: [
-              HSTextPrompt(
-                      prompt: "No tags found for ",
-                      pressableText: query,
-                      promptColor: app.theme.mainColor,
-                      onTap: null)
-                  .toSliver,
-              const Gap(16.0).toSliver,
-              Text(
-                "Maybe you will like these tags instead",
-                style: textTheme.headlineSmall,
-              ).toSliver,
-              const Gap(16.0).toSliver,
-              SliverFillRemaining(
-                  child: _AnimatedTagsBuilder(tags: trendingTags)),
-            ],
-          );
-        }
-        final List<HSTag> tags = state.tags;
-        return _AnimatedTagsBuilder(tags: tags);
-      },
-    );
+    super.build(context);
+    final state = widget.mapSearchCubit.state;
+
+    if (widget.mapSearchCubit.isLoading) {
+      return const HSLoadingWidget(
+        type: HSLoadingWidgetType.grid,
+      );
+    }
+    final List<HSTag> trendingTags = state.trendingTags;
+    if (widget.query.isEmpty) {
+      return _AnimatedTagsBuilder(tags: trendingTags);
+    }
+    if (widget.query.isNotEmpty && state.tags.isEmpty) {
+      return CustomScrollView(
+        shrinkWrap: true,
+        slivers: [
+          HSTextPrompt(
+                  prompt: "No tags found for ",
+                  pressableText: widget.query,
+                  promptColor: app.theme.mainColor,
+                  onTap: null)
+              .toSliver,
+          const Gap(16.0).toSliver,
+          Text(
+            "Maybe you will like these tags instead",
+            style: textTheme.headlineSmall,
+          ).toSliver,
+          const Gap(16.0).toSliver,
+          SliverFillRemaining(child: _AnimatedTagsBuilder(tags: trendingTags)),
+        ],
+      );
+    }
+    final List<HSTag> tags = state.tags;
+    return _AnimatedTagsBuilder(tags: tags);
   }
 }
 
