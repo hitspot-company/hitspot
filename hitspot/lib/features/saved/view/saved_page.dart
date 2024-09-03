@@ -21,6 +21,7 @@ class SavedPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Saved'),
           bottom: const TabBar(
+            indicatorPadding: EdgeInsets.only(bottom: 6.0),
             tabs: [
               Tab(text: 'Your Boards'),
               Tab(text: 'Saved Boards'),
@@ -137,25 +138,28 @@ class _BoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: boards.length,
-      separatorBuilder: (BuildContext context, int index) {
-        return const Gap(16.0);
-      },
-      itemBuilder: (BuildContext context, int index) {
-        final board = boards[index];
-        return ListTile(
-          onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
-          leading: AspectRatio(
-              aspectRatio: 1.0,
-              child: HSImage(
-                imageUrl: boards[index].getThumbnail,
-                borderRadius: BorderRadius.circular(10.0),
-              )),
-          title: Text(board.title!),
-          subtitle: Text(board.description!),
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: ListView.separated(
+        itemCount: boards.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Gap(16.0);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          final board = boards[index];
+          return ListTile(
+            onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
+            leading: AspectRatio(
+                aspectRatio: 1.0,
+                child: HSImage(
+                  imageUrl: boards[index].getThumbnail,
+                  borderRadius: BorderRadius.circular(10.0),
+                )),
+            title: Text(board.title!),
+            subtitle: Text(board.description!),
+          );
+        },
+      ),
     );
   }
 }
