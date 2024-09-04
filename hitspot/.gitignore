@@ -56,3 +56,5 @@ android/key.properties
 .flaskenv*
 !.env.project
 !.env.vault
+
+ios/Runner.xcodeproj/project.pbxproj

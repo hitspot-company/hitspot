@@ -45,13 +45,6 @@ class HSScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap ?? hideInput,
-      onHorizontalDragEnd: (details) {
-        // Check the swipe direction
-        if (details.primaryVelocity! > 0) {
-          // Swipe to the right detected
-          navi.pop();
-        }
-      },
       child: IgnorePointer(
         ignoring: ignoring,
         child: Scaffold(
