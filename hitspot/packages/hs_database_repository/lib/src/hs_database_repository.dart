@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
+import 'package:hs_database_repository/src/cache/hs_cache_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_database_repository/src/recommendation_system/hs_recommendation_system_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_comment.dart';
@@ -37,12 +38,34 @@ class HSDatabaseRepsitory {
   late final HSTagsRepository _tagsRepository;
   late final HSRecommendationSystemRepository _recommendationSystemRepository;
   late final HSNotificationsRepository _notificationsRepository;
+  final HSCacheRepository _cacheRepository = HSCacheRepository();
 
   Future<void> userCreate({required HSUser user}) async =>
       await _usersRepository.create(user);
 
-  Future<HSUser> userRead({HSUser? user, String? userID}) async =>
-      await _usersRepository.read(user, userID);
+  Future<HSUser> userRead(
+      {HSUser? user, String? userID, bool useCache = false}) async {
+    if (useCache) {
+      final cachedUser = _cacheRepository.getCachedUser(userID ?? user!.uid!);
+
+      if (cachedUser != null) {
+        return cachedUser;
+      }
+    }
+
+    final fetchedUser = await _usersRepository.read(user, userID);
+
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: fetchedUser.uid,
+        user: fetchedUser,
+        userBoards: null,
+        userSpots: null,
+      );
+    }
+
+    return fetchedUser;
+  }
 
   Future<void> userUpdate({required HSUser user}) async =>
       await _usersRepository.update(user);
@@ -51,12 +74,35 @@ class HSDatabaseRepsitory {
       await _usersRepository.isUsernameAvailable(username);
 
   Future<bool?> userIsUserFollowed(
-          {String? followerID,
-          HSUser? follower,
-          String? followedID,
-          HSUser? followed}) async =>
-      await _usersRepository.isUserFollowed(
-          followerID, follower, followedID, followed);
+      {String? followerID,
+      HSUser? follower,
+      String? followedID,
+      HSUser? followed,
+      bool useCache = false}) async {
+    if (useCache) {
+      final cachedIsUserFollowed = _cacheRepository.isUserFollowed(
+          followerID ?? follower!.uid!, followedID ?? followed!.uid!);
+
+      if (cachedIsUserFollowed != null) {
+        return cachedIsUserFollowed;
+      }
+    }
+
+    final isUserFollowed = await _usersRepository.isUserFollowed(
+        followerID, follower, followedID, followed);
+
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: followerID ?? follower!.uid!,
+        user: null,
+        userBoards: null,
+        userSpots: null,
+        isUserFollowed: Pair(followedID ?? followed!.uid!, isUserFollowed!),
+      );
+    }
+
+    return isUserFollowed;
+  }
 
   Future<void> userFollow(
       {required bool isFollowed,
@@ -145,9 +191,31 @@ class HSDatabaseRepsitory {
     String? userID,
     int batchOffset = 0,
     int batchSize = 20,
-  }) async =>
-      await _boardsRepository.fetchUserBoards(
-          user, userID, batchOffset, batchSize);
+    bool useCache = false,
+  }) async {
+    if (useCache) {
+      final cachedBoards =
+          _cacheRepository.getCachedUserBoards(userID ?? user!.uid!);
+
+      if (cachedBoards != null) {
+        return cachedBoards;
+      }
+    }
+
+    final fetchedBoards = await _boardsRepository.fetchUserBoards(
+        user, userID, batchOffset, batchSize);
+
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: userID ?? user!.uid!,
+        user: null,
+        userBoards: fetchedBoards,
+        userSpots: null,
+      );
+    }
+
+    return fetchedBoards;
+  }
 
   Future<String> boardGenerateBoardInvitation(
           {required String boardId}) async =>
@@ -258,12 +326,36 @@ class HSDatabaseRepsitory {
   /// The requester can be the user themselves or another user.
   ///
   /// The requester can specify the batch offset and batch size to fetch the spots in batches for pagination purposes.
-  Future<List<HSSpot>> spotfetchUserSpots(
-          {HSUser? user,
-          String? userID,
-          int batchOffset = 0,
-          int batchSize = 20}) async =>
-      await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
+  Future<List<HSSpot>> spotFetchUserSpots({
+    HSUser? user,
+    String? userID,
+    int batchOffset = 0,
+    int batchSize = 20,
+    bool useCache = false,
+  }) async {
+    if (useCache) {
+      final cachedSpots =
+          _cacheRepository.getCachedUserSpots(userID ?? user!.uid!);
+
+      if (cachedSpots != null) {
+        return cachedSpots;
+      }
+    }
+
+    final fetchedSpots =
+        await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
+
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: userID ?? user!.uid!,
+        user: null,
+        userBoards: null,
+        userSpots: fetchedSpots,
+      );
+    }
+
+    return fetchedSpots;
+  }
 
   Future<HSSpot> spotFetchTopSpotWithTag(String tag) async =>
       await _spotsRepository.fetchTopSpotWithTag(tag);

@@ -44,7 +44,7 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
 
     try {
       final newSpots =
-          await _databaseRepository.spotfetchUserSpots(user: state.user!);
+          await _databaseRepository.spotFetchUserSpots(user: state.user!);
 
       if (newSpots.isEmpty) {
         emit(state.copyWith(
@@ -106,7 +106,7 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
       } else {
         isOwnProfile = false;
       }
-      await _fetchUserData();
+      await _fetchUserData(useCache: true);
     } catch (e) {
       HSDebugLogger.logError("Error initializing user profile: $e");
       navi.toError(
@@ -116,13 +116,14 @@ class HSUserProfileCubit extends Cubit<HSUserProfileState> {
     }
   }
 
-  Future<void> _fetchUserData() async {
+  Future<void> _fetchUserData({bool useCache = false}) async {
     try {
-      final user = await app.databaseRepository.userRead(userID: userID);
-      final List<HSSpot> userSpots =
-          await _databaseRepository.spotfetchUserSpots(user: user);
-      final List<HSBoard> userBoards =
-          await _databaseRepository.boardFetchUserBoards(user: user);
+      final user = await app.databaseRepository
+          .userRead(userID: userID, useCache: useCache);
+      final List<HSSpot> userSpots = await _databaseRepository
+          .spotFetchUserSpots(user: user, useCache: useCache);
+      final List<HSBoard> userBoards = await _databaseRepository
+          .boardFetchUserBoards(user: user, useCache: useCache);
       final bool? isFollowed = await app.databaseRepository
           .userIsUserFollowed(followerID: currentUser.uid, followedID: userID);
       emit(state.copyWith(
