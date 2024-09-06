@@ -6,30 +6,32 @@ import 'package:pair/pair.dart';
 
 const int MAXIMUM_CACHED_USERS = 16;
 
-// TODO: ADD SAVING WITH SHARED PREFERENCES
-
-// POSSIBLE TO CACHE:
-// List<HSSpot>? _trendingSpots;
-// List<HSBoard>? _trendingBoards;
-// List<HSSpot>? _nearbySpots;
+// TODO: ADD SAVING WITH SHARED PREFERENCES - do we really need it?
 
 class _UserCacheData {
-  final HSUser? user;
-  final List<HSSpot>? userSpots;
-  final List<HSBoard>? userBoards;
+  HSUser? user = null;
+  List<HSSpot>? userSpots = null;
+  List<HSBoard>? userBoards = null;
   Map<String, bool> userFollows = {};
 
   _UserCacheData({this.user, this.userSpots, this.userBoards});
 }
 
-class HSCacheRepository {
-  int numberOfCachedUsers = 0;
+class _SavedCacheData {
+  final List<HSBoard>? savedBoards;
+  final List<HSSpot>? savedSpots;
 
+  _SavedCacheData({this.savedBoards, this.savedSpots});
+}
+
+class HSCacheRepository {
   static final HSCacheRepository _instance = HSCacheRepository._internal();
   HSCacheRepository._internal();
   factory HSCacheRepository() => _instance;
 
-  final LinkedHashMap<String, _UserCacheData> _cache = LinkedHashMap();
+  int numberOfCachedUsers = 0;
+  LinkedHashMap<String, _UserCacheData> _usersCache = LinkedHashMap();
+  _SavedCacheData _savedCache = _SavedCacheData();
 
   void cacheUser({
     String? userID,
@@ -40,38 +42,56 @@ class HSCacheRepository {
   }) {
     assert(userID != null || user != null);
 
-    final currentCachedUser = _cache[userID ?? user!.uid!];
+    final currentCachedUser = _usersCache[userID ?? user!.uid!];
     if (currentCachedUser == null) {
       numberOfCachedUsers++;
       // Remove second added user if cache is full (first added is probably user's own profile)
       if (numberOfCachedUsers > MAXIMUM_CACHED_USERS) {
-        _cache.remove(_cache.keys.elementAt(1));
+        _usersCache.remove(_usersCache.keys.elementAt(1));
       }
     }
 
-    _cache[userID ?? user!.uid!] = _UserCacheData(
+    _usersCache[userID ?? user!.uid!] = _UserCacheData(
       user: user ?? currentCachedUser?.user,
       userSpots: userSpots ?? currentCachedUser?.userSpots,
       userBoards: userBoards ?? currentCachedUser?.userBoards,
     );
 
-    _cache[userID ?? user!.uid!]?.userFollows[isUserFollowed?.key ?? ""] =
+    _usersCache[userID ?? user!.uid!]?.userFollows[isUserFollowed?.key ?? ""] =
         isUserFollowed?.value ?? false;
   }
 
   HSUser? getCachedUser(String userID) {
-    return _cache[userID]?.user;
+    return _usersCache[userID]?.user;
   }
 
   List<HSSpot>? getCachedUserSpots(String userID) {
-    return _cache[userID]?.userSpots;
+    return _usersCache[userID]?.userSpots;
   }
 
   List<HSBoard>? getCachedUserBoards(String userID) {
-    return _cache[userID]?.userBoards;
+    return _usersCache[userID]?.userBoards;
   }
 
   bool? isUserFollowed(String followerID, followedID) {
-    return _cache[followerID]?.userFollows[followedID];
+    return _usersCache[followerID]?.userFollows[followedID];
+  }
+
+  void cacheSavedData({
+    List<HSBoard>? savedBoards,
+    List<HSSpot>? savedSpots,
+  }) {
+    _savedCache = _SavedCacheData(
+      savedBoards: savedBoards ?? _savedCache.savedBoards,
+      savedSpots: savedSpots ?? _savedCache.savedSpots,
+    );
+  }
+
+  List<HSBoard>? getCachedSavedBoards() {
+    return _savedCache.savedBoards;
+  }
+
+  List<HSSpot>? getCachedSavedSpots() {
+    return _savedCache.savedSpots;
   }
 }

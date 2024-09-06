@@ -15,6 +15,8 @@ class SavedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HSSavedCubit cubit = context.read<HSSavedCubit>();
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -29,12 +31,21 @@ class SavedPage extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: [
-            _OwnBoardsBuilder(),
-            _SavedBoardsBuilder(),
-            _SpotsBuilder()
-          ],
+        body: RefreshIndicator(
+          onRefresh: cubit.refresh,
+          child: Stack(
+            children: [
+              const TabBarView(
+                physics: NeverScrollableScrollPhysics(),
+                children: [
+                  _OwnBoardsBuilder(),
+                  _SavedBoardsBuilder(),
+                  _SpotsBuilder()
+                ],
+              ),
+              ListView(),
+            ],
+          ),
         ),
       ),
     );
