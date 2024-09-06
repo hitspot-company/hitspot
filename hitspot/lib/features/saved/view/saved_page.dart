@@ -31,21 +31,13 @@ class SavedPage extends StatelessWidget {
             ],
           ),
         ),
-        body: RefreshIndicator(
-          onRefresh: cubit.refresh,
-          child: Stack(
-            children: [
-              const TabBarView(
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  _OwnBoardsBuilder(),
-                  _SavedBoardsBuilder(),
-                  _SpotsBuilder()
-                ],
-              ),
-              ListView(),
-            ],
-          ),
+        body: const TabBarView(
+          physics: NeverScrollableScrollPhysics(),
+          children: [
+            _OwnBoardsBuilder(),
+            _SavedBoardsBuilder(),
+            _SpotsBuilder()
+          ],
         ),
       ),
     );
@@ -149,27 +141,31 @@ class _BoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: ListView.separated(
-        itemCount: boards.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const Gap(16.0);
-        },
-        itemBuilder: (BuildContext context, int index) {
-          final board = boards[index];
-          return ListTile(
-            onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
-            leading: AspectRatio(
-                aspectRatio: 1.0,
-                child: HSImage(
-                  imageUrl: boards[index].getThumbnail,
-                  borderRadius: BorderRadius.circular(10.0),
-                )),
-            title: Text(board.title!),
-            subtitle: Text(board.description!),
-          );
-        },
+    return RefreshIndicator(
+      onRefresh: context.read<HSSavedCubit>().refresh,
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: ListView.separated(
+          itemCount: boards.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const Gap(16.0);
+          },
+          itemBuilder: (BuildContext context, int index) {
+            final board = boards[index];
+            return ListTile(
+              onTap: () =>
+                  navi.toBoard(boardID: board.id!, title: board.title!),
+              leading: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: HSImage(
+                    imageUrl: boards[index].getThumbnail,
+                    borderRadius: BorderRadius.circular(10.0),
+                  )),
+              title: Text(board.title!),
+              subtitle: Text(board.description!),
+            );
+          },
+        ),
       ),
     );
   }
@@ -195,18 +191,21 @@ class _SpotsBuilder extends StatelessWidget {
                 message: "No saved spots", iconData: FontAwesomeIcons.bookmark);
           }
           final spots = state.savedSpots;
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
+          return RefreshIndicator(
+            onRefresh: context.read<HSSavedCubit>().refresh,
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.0,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+              ),
+              itemCount: spots.length,
+              itemBuilder: (BuildContext context, int index) {
+                final spot = spots[index];
+                return AnimatedSpotTile(spot: spot, index: index);
+              },
             ),
-            itemCount: spots.length,
-            itemBuilder: (BuildContext context, int index) {
-              final spot = spots[index];
-              return AnimatedSpotTile(spot: spot, index: index);
-            },
           );
         },
       ),

@@ -73,7 +73,7 @@ class HSCacheRepository {
     return _usersCache[userID]?.userBoards;
   }
 
-  bool? isUserFollowed(String followerID, followedID) {
+  bool? getCachedIsUserFollowed(String followerID, followedID) {
     return _usersCache[followerID]?.userFollows[followedID];
   }
 
