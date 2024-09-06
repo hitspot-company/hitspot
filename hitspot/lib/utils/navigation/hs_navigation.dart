@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/boards/create/view/create_board_provider.dart';
 import 'package:hitspot/features/boards/invitation/view/board_invitation_page.dart';
@@ -17,6 +18,8 @@ import 'package:hitspot/features/notifications/view/notifications_provider.dart'
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
+import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
+import 'package:hitspot/features/spots/multiple/view/multiple_spots_provider.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
 import 'package:hitspot/features/tags/explore/view/tags_explore_provider.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
@@ -292,6 +295,8 @@ class HSNavigation {
   dynamic toNotifications() => router.push('/notifications');
   dynamic toSpotsMap(Position? initialPosition) =>
       pushPage(page: MapProvider(initialCameraPosition: initialPosition));
+  dynamic toMultipleSpots(HSMultipleSpotsType type, [String? userID]) =>
+      pushPage(page: MultipleSpotsProvider(type: type, userID: userID));
   dynamic toTagsExplore(String tag) => router.push('/tags_explore/$tag');
   dynamic toSpot(
           {required String sid,
@@ -301,4 +306,5 @@ class HSNavigation {
       isSubmit ? router.go("/spot/$sid") : router.push('/spot/$sid');
   dynamic toError({String? title, String? message}) =>
       router.replace("/error?title=$title&message=$message");
+  dynamic toCurrentUser() => router.push("/user/${currentUser.uid}");
 }

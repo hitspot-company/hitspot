@@ -84,7 +84,10 @@ class HSBoard {
     return "HSBoard(createdBy: $createdBy, id: $id, title: $title, description: $description, color: $color, image: $image, visibility: $visibility, createdAt: $createdAt)";
   }
 
-  String get getThumbnail => thumbnail ?? image!;
+  String get getThumbnail {
+    if (thumbnail != null && thumbnail != "null") return thumbnail!;
+    return image!;
+  }
 }
 
 extension HSBoardColorExtensions on Color {

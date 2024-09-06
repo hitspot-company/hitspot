@@ -102,8 +102,9 @@ class HSDatabaseRepsitory {
           {HSUser? user, String? userID}) async =>
       await _boardsRepository.fetchSavedBoards(user, userID);
 
-  Future<List<HSBoard>> boardFetchTrendingBoards() async =>
-      await _boardsRepository.fetchTrendingBoards();
+  Future<List<HSBoard>> boardFetchTrendingBoards(
+          {int batchOffset = 0, int batchSize = 10}) async =>
+      await _boardsRepository.fetchTrendingBoards(batchOffset, batchSize);
 
   Future<List<HSSpot>> boardFetchBoardSpots(
           {HSBoard? board, String? boardID}) async =>

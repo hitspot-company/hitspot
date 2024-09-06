@@ -115,7 +115,11 @@ class HSSpotsRepository {
       late List<String> imageUrls;
 
       if (fetchThumbnails) {
-        imageUrls = data.map((e) => e['thumbnail_url'] as String).toList();
+        imageUrls = data
+            .map((e) => (e['thumbnail_url'] != null
+                ? e['thumbnail_url']
+                : e['image_url']) as String)
+            .toList();
       } else {
         imageUrls = data.map((e) => e['image_url'] as String).toList();
       }
@@ -343,6 +347,7 @@ class HSSpotsRepository {
         'p_user_lat': lat,
         'p_user_long': long,
       });
+      HSDebugLogger.logInfo(fetchedSpots.toString());
       return fetchedSpots.map(HSSpot.deserializeWithAuthor).toList();
     } catch (_) {
       throw Exception("Error fetching trending spots: $_");

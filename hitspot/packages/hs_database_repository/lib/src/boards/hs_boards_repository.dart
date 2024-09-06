@@ -188,7 +188,7 @@ class HSBoardsRepository {
 
   // READ TRENDING BOARDS
   Future<List<HSBoard>> fetchTrendingBoards(
-      [int batchOffset = 0, int batchSize = 10]) async {
+      int batchOffset, int batchSize) async {
     try {
       final List<Map<String, dynamic>> fetchedBoards = await _supabase.rpc(
           'board_fetch_trending',

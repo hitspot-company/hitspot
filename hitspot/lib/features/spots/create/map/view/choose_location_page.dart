@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
-import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
@@ -45,17 +43,12 @@ class _MapAndSearchBar extends StatelessWidget {
 
     return BlocBuilder<HSChooseLocationCubit, HSChooseLocationState>(
       builder: (context, state) {
-        Completer<GoogleMapController> mapController =
-            chooseLocationCubit.mapController;
         return Stack(
           children: [
             HSGoogleMap(
-              onMapCreated: (GoogleMapController controller) async {
-                if (mapController.isCompleted) {
-                  mapController = Completer<GoogleMapController>();
-                }
-                mapController.complete(controller);
-              },
+              myLocationButtonEnabled: true,
+              myLocationButtonCallback: chooseLocationCubit.resetPosition,
+              onMapCreated: chooseLocationCubit.onMapCreated,
               initialCameraPosition: CameraPosition(
                 target: state.userLocation.toLatLng,
                 zoom: 16.0,
@@ -143,7 +136,7 @@ class _BottomBar extends StatelessWidget {
           final bool isSearching = state.isSearching;
           final double searchBarHeight =
               !isSearching ? 180.0 : screenHeight - 100.0;
-
+          final bool canSubmit = state.selectedLocation != null;
           return Container(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.vertical(
@@ -175,7 +168,8 @@ class _BottomBar extends StatelessWidget {
                         child: const Text("Cancel"),
                       ),
                       ElevatedButton(
-                        onPressed: chooseLocationCubit.submit,
+                        onPressed:
+                            canSubmit ? chooseLocationCubit.submit : null,
                         child: const Text("Select"),
                       ),
                     ],

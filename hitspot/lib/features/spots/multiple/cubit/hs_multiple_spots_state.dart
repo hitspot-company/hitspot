@@ -6,14 +6,30 @@ enum HsMultipleSpotsView { list, grid }
 
 enum HsMultipleSpotsSort { name, distance }
 
-enum HsMultipleSpotsType { user }
+enum HSMultipleSpotsType {
+  userSpots,
+  trendingSpots,
+  trendingBoards,
+  nearbySpots;
+
+  static HSMultipleSpotsType fromHomeType(HomeGridBuilderType homeType) {
+    switch (homeType) {
+      case HomeGridBuilderType.nearbySpots:
+        return HSMultipleSpotsType.nearbySpots;
+      case HomeGridBuilderType.trendingBoards:
+        return HSMultipleSpotsType.trendingBoards;
+      default:
+        return HSMultipleSpotsType.trendingSpots;
+    }
+  }
+}
 
 final class HsMultipleSpotsState extends Equatable {
   const HsMultipleSpotsState({
     this.status = HsMultipleSpotsStatus.initial,
     this.view = HsMultipleSpotsView.list,
     this.sort = HsMultipleSpotsSort.name,
-    this.type = HsMultipleSpotsType.user,
+    this.type = HSMultipleSpotsType.userSpots,
     this.spots = const <HSSpot>[],
     this.user = const HSUser(),
   });
@@ -21,7 +37,7 @@ final class HsMultipleSpotsState extends Equatable {
   final HsMultipleSpotsStatus status;
   final HsMultipleSpotsView view;
   final HsMultipleSpotsSort sort;
-  final HsMultipleSpotsType type;
+  final HSMultipleSpotsType type;
   final List<HSSpot> spots;
   final HSUser user;
 
@@ -39,7 +55,7 @@ final class HsMultipleSpotsState extends Equatable {
     HsMultipleSpotsStatus? status,
     HsMultipleSpotsView? view,
     HsMultipleSpotsSort? sort,
-    HsMultipleSpotsType? type,
+    HSMultipleSpotsType? type,
     List<HSSpot>? spots,
     HSUser? user,
   }) {

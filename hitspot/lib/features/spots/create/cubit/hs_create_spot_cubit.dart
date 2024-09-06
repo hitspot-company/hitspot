@@ -176,7 +176,7 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
         );
 
         spotUploadCubit.startUpload();
-        navi.pop();
+        navi.go('/');
         await createSpotWithIsolate(spotData, spotUploadCubit);
       }
     } catch (e) {

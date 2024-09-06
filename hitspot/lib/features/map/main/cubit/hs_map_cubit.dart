@@ -27,6 +27,7 @@ class HSMapCubit extends Cubit<HSMapState> {
   GlobalKey<ExpandableBottomSheetState> sheetKey = GlobalKey();
   ExpansionStatus get sheetStatus =>
       sheetKey.currentState?.expansionStatus ?? ExpansionStatus.contracted;
+  final _locationRepository = app.locationRepository;
 
   Future<void> init() async {
     try {
@@ -110,7 +111,7 @@ class HSMapCubit extends Cubit<HSMapState> {
       selectedSpot: state.selectedSpot));
 
   void closeSheet() {
-    if (sheetKey.currentState?.expansionStatus == ExpansionStatus.expanded) {
+    if (sheetKey.currentState?.expansionStatus != ExpansionStatus.contracted) {
       sheetKey.currentState?.contract();
     }
   }
@@ -177,5 +178,11 @@ class HSMapCubit extends Cubit<HSMapState> {
   void hideInfoWindow() {
     final infoWindow = state.infoWindowProvider.updateVisibility(false);
     emit(state.copyWith(infoWindowProvider: infoWindow));
+  }
+
+  void resetPosition() async {
+    HSDebugLogger.logInfo("Reseting pos");
+    _locationRepository.resetPosition(
+        controller, await _locationRepository.getCurrentLocation());
   }
 }

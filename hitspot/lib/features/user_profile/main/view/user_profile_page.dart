@@ -80,7 +80,8 @@ class UserProfilePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
+                  ),
+                  const Gap(16.0).toSliver,
                 ],
               ),
             ),
