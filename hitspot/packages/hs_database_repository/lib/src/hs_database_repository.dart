@@ -78,7 +78,7 @@ class HSDatabaseRepsitory {
       HSUser? followed,
       bool useCache = false}) async {
     if (useCache) {
-      final cachedIsUserFollowed = _cacheRepository.isUserFollowed(
+      final cachedIsUserFollowed = _cacheRepository.getCachedIsUserFollowed(
           followerID ?? follower!.uid!, followedID ?? followed!.uid!);
 
       if (cachedIsUserFollowed != null) {
