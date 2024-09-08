@@ -66,7 +66,7 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
         uid: data.uid,
       );
     }
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     // Upload tags
     if (data.tags.isNotEmpty) {
@@ -87,7 +87,7 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
     data.sendPort.send({'error': e.toString()});
   }
   HSDebugLogger.logInfo('Spot creation process completed');
-  await Future.delayed(const Duration(seconds: 3));
+  await Future.delayed(const Duration(seconds: 1));
   data.sendPort.send({'exit': true});
   Isolate.exit();
 }
