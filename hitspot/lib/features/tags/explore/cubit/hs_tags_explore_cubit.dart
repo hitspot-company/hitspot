@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
@@ -24,7 +25,7 @@ class HSTagsExploreCubit extends Cubit<HSTagsExploreState> {
           await app.databaseRepository.tagFetchTopSpots(tag: tag);
       emit(state.copyWith(status: HSTagsExploreStatus.loaded, spots: topSpots));
     } catch (_) {
-      HSDebugLogger.logError('Error fetching spots');
+      HSDebugLogger.logError('Error fetching spot ${_.toString()}');
       emit(state.copyWith(status: HSTagsExploreStatus.error));
     }
   }

@@ -75,7 +75,7 @@ class HSToasts {
             Text(descriptionText ?? "",
                 style: Theme.of(context).textTheme.titleSmall),
       ),
-      alignment: alignment ?? Alignment.topRight,
+      alignment: alignment ?? Alignment.topCenter,
       animationDuration: Duration(milliseconds: animationDuration ?? 300),
       animationBuilder: (context, animation, alignment, child) {
         return FadeTransition(
@@ -90,7 +90,7 @@ class HSToasts {
       borderRadius: BorderRadius.circular(12),
       showProgressBar: true,
       closeButtonShowType: CloseButtonShowType.onHover,
-      closeOnClick: false,
+      closeOnClick: true,
       pauseOnHover: true,
       dragToClose: true,
     );

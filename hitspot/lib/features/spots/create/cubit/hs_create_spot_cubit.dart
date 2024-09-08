@@ -158,7 +158,8 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
           await uploadTags(prototype!.sid!);
         }
         HSDebugLogger.logSuccess("Spot updated: ${prototype!.sid!}");
-        navi.toSpot(sid: prototype!.sid!, isSubmit: true);
+        navi.go("/user/${currentUser.uid}");
+        navi.push('/spot/${prototype!.sid}');
       } else {
         final receivePort = ReceivePort();
         final spotData = HSSpotCreationData(

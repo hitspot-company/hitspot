@@ -38,6 +38,7 @@ class HSNavigation {
   BuildContext get context => router.configuration.navigatorKey.currentContext!;
 
   dynamic pop([dynamic value = false]) => router.pop(value);
+
   dynamic pushPage({required Widget page}) =>
       router.configuration.navigatorKey.currentState!.push(
         MaterialPageRoute(builder: (_) => page),
@@ -129,10 +130,11 @@ class HSNavigation {
             '/protected/home?from=${state.matchedLocation}',
       ),
       GoRoute(
-        path: '/invite/:boardId',
-        redirect: (context, state) =>
-            '/protected/home?from=${state.matchedLocation}',
-      ),
+          path: '/invite/:boardId',
+          redirect: (context, state) {
+            HSDebugLogger.logInfo("RECEIVED INVITATION!");
+            return '/protected/home?from=${state.matchedLocation}?token=${state.uri.queryParameters["token"]}';
+          }),
       GoRoute(
         path: '/error',
         redirect: (context, state) =>
@@ -221,7 +223,7 @@ class HSNavigation {
                   path: 'invite/:boardId',
                   builder: (context, state) => BoardInvitationPage(
                       boardId: state.pathParameters['boardId'] ?? "",
-                      token: state.uri.queryParameters['token'] ?? ""))
+                      token: state.uri.queryParameters['token'] ?? "")),
             ],
           ),
         ],

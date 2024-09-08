@@ -15,12 +15,15 @@ class SavedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HSSavedCubit cubit = context.read<HSSavedCubit>();
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Saved'),
           bottom: const TabBar(
+            indicatorPadding: EdgeInsets.only(bottom: 6.0),
             tabs: [
               Tab(text: 'Your Boards'),
               Tab(text: 'Saved Boards'),
@@ -29,6 +32,7 @@ class SavedPage extends StatelessWidget {
           ),
         ),
         body: const TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           children: [
             _OwnBoardsBuilder(),
             _SavedBoardsBuilder(),
@@ -137,25 +141,32 @@ class _BoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: boards.length,
-      separatorBuilder: (BuildContext context, int index) {
-        return const Gap(16.0);
-      },
-      itemBuilder: (BuildContext context, int index) {
-        final board = boards[index];
-        return ListTile(
-          onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
-          leading: AspectRatio(
-              aspectRatio: 1.0,
-              child: HSImage(
-                imageUrl: boards[index].getThumbnail,
-                borderRadius: BorderRadius.circular(10.0),
-              )),
-          title: Text(board.title!),
-          subtitle: Text(board.description!),
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: context.read<HSSavedCubit>().refresh,
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: ListView.separated(
+          itemCount: boards.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const Gap(16.0);
+          },
+          itemBuilder: (BuildContext context, int index) {
+            final board = boards[index];
+            return ListTile(
+              onTap: () =>
+                  navi.toBoard(boardID: board.id!, title: board.title!),
+              leading: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: HSImage(
+                    imageUrl: boards[index].getThumbnail,
+                    borderRadius: BorderRadius.circular(10.0),
+                  )),
+              title: Text(board.title!),
+              subtitle: Text(board.description!),
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -175,19 +186,26 @@ class _SpotsBuilder extends StatelessWidget {
           if (state.status == HSSavedStatus.loading) {
             return const _LoadingBuilder(type: _LoadingBuilderType.grid);
           }
+          if (state.savedSpots.isEmpty) {
+            return const HSIconPrompt(
+                message: "No saved spots", iconData: FontAwesomeIcons.bookmark);
+          }
           final spots = state.savedSpots;
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
+          return RefreshIndicator(
+            onRefresh: context.read<HSSavedCubit>().refresh,
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.0,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+              ),
+              itemCount: spots.length,
+              itemBuilder: (BuildContext context, int index) {
+                final spot = spots[index];
+                return AnimatedSpotTile(spot: spot, index: index);
+              },
             ),
-            itemCount: spots.length,
-            itemBuilder: (BuildContext context, int index) {
-              final spot = spots[index];
-              return AnimatedSpotTile(spot: spot, index: index);
-            },
           );
         },
       ),

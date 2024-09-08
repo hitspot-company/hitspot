@@ -144,6 +144,7 @@ class HSCreateBoardCubit extends Cubit<HSCreateBoardState> {
         image: uploadedFileUrl,
       );
       await _databaseRepository.boardUpdate(board: board);
+      navi.go("/user/${currentUser.uid}");
       navi.toBoard(boardID: board.id!, title: board.title!);
     } on HSBoardException catch (_) {
       HSDebugLogger.logError("Error creating board: ${_.message}");

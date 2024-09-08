@@ -13,6 +13,7 @@ import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class SingleSpotCommentsSection extends StatelessWidget {
   const SingleSpotCommentsSection({super.key});
@@ -31,7 +32,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
     return GestureDetector(
       onTap: HSScaffold.hideInput,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.9,
+        height: MediaQuery.of(context).size.height * 0.7,
         decoration: BoxDecoration(
           color: app.theme.currentTheme.scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -298,7 +299,9 @@ class _CommentsPage extends StatelessWidget {
                 ],
               ),
             ),
-            const _CommentInput(),
+            const _CommentInput(
+              hintText: "Write a comment...",
+            ),
           ],
         );
       },
@@ -337,7 +340,8 @@ class _EmptyComments extends StatelessWidget {
 }
 
 class _CommentInput extends StatelessWidget {
-  const _CommentInput();
+  const _CommentInput({required this.hintText});
+  final String hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -347,9 +351,9 @@ class _CommentInput extends StatelessWidget {
           16, 8, 16, MediaQuery.of(context).viewInsets.bottom + 8.0),
       child: HSTextField.filled(
         maxLength: 256,
-        autofocus: true,
+        autofocus: false,
         controller: cubit.commentController,
-        hintText: 'Write a comment...',
+        hintText: hintText,
         onChanged: cubit.commentChanged,
         suffixIcon:
             BlocBuilder<HSSingleSpotCommentsCubit, HSSingleSpotCommentsState>(
@@ -386,6 +390,7 @@ class _ReplyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     HSSingleSpotCommentsCubit singleSpotCommentsCubit =
         BlocProvider.of<HSSingleSpotCommentsCubit>(context);
+    final viewInsets = MediaQuery.of(context).viewInsets;
 
     return BlocBuilder<HSSingleSpotCommentsCubit, HSSingleSpotCommentsState>(
       buildWhen: (previous, current) =>
@@ -396,6 +401,7 @@ class _ReplyPage extends StatelessWidget {
         final HSComment originalComment =
             singleSpotCommentsCubit.state.fetchedComments[
                 singleSpotCommentsCubit.state.indexOfCommentUnderReply];
+        final viewInsets = MediaQuery.of(context).viewInsets;
 
         return Column(
           children: [
@@ -430,7 +436,17 @@ class _ReplyPage extends StatelessWidget {
               const Expanded(child: _LoadingComments()),
             if ((state.status == HSSingleSpotCommentsStatus.loaded) &&
                 state.fetchedReplies.isEmpty)
-              const Expanded(child: _EmptyComments("No replies yet")),
+              Expanded(
+                child: viewInsets.bottom == 0
+                    ? const _EmptyComments("No replies yet")
+                    : const AnimatedOpacity(
+                        opacity: 0.0,
+                        duration: Duration(
+                            milliseconds:
+                                200), // Fade-out duration when the keyboard appears
+                        child: _EmptyComments("No replies yet"),
+                      ),
+              ),
             if (state.fetchedReplies.isNotEmpty)
               Expanded(
                 child: Column(
@@ -465,8 +481,8 @@ class _ReplyPage extends StatelessWidget {
                 ),
               ),
             const _CommentInput(
-                // hintText: "Write a reply...",
-                ),
+              hintText: "Write a reply...",
+            ),
           ],
         );
       },

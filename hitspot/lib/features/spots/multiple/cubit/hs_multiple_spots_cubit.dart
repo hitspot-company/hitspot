@@ -61,7 +61,6 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
 
   Future<List<HSSpot>> _fetchTrendingSpots(int size, int offset) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
       List<HSSpot> spots = await _databaseRepository.spotFetchTrendingSpots(
           batchSize: size, batchOffset: offset);
       return (spots);
@@ -88,7 +87,6 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
 
   Future<List<HSBoard>> _fetchTrendingBoards(int size, int offset) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
       List<HSBoard> boards =
           await _databaseRepository.boardFetchTrendingBoards();
       return (boards);

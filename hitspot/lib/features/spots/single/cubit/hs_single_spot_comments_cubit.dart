@@ -59,8 +59,6 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsState> {
       }
     }
 
-    await Future<void>.delayed(const Duration(seconds: 1));
-
     if (isReply) {
       emit(state.copyWith(
           fetchedReplies: [...state.fetchedReplies, ...comments],

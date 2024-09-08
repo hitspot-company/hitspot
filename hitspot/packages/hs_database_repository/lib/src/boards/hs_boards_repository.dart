@@ -267,7 +267,7 @@ class HSBoardsRepository {
     }
   }
 
-  Future<void> addSpot(HSBoard? board, String? boardID, HSSpot? spot,
+  Future<bool> addSpot(HSBoard? board, String? boardID, HSSpot? spot,
       String? spotID, HSUser? addedBy, String? addedByID) async {
     try {
       assert(board != null || boardID != null,
@@ -278,7 +278,7 @@ class HSBoardsRepository {
       final bid = board?.id ?? boardID!;
       final sid = spot?.sid ?? spotID!;
       final uid = addedBy?.uid ?? addedByID!;
-      await _supabase.rpc('board_add_spot', params: {
+      return await _supabase.rpc('board_add_spot', params: {
         "p_board_id": bid,
         "p_spot_id": sid,
         "p_added_by": uid,
@@ -352,7 +352,7 @@ class HSBoardsRepository {
       });
 
       // Generate the magic link
-      final magicLink = 'app.hitspot://invite/$boardId?token=$token';
+      final magicLink = 'https://hitspot.app/invite/$boardId?token=$token';
 
       HSDebugLogger.logSuccess('Generated new invitation: $magicLink');
       return magicLink;
