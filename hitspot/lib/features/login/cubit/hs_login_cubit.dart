@@ -68,9 +68,11 @@ class HSLoginCubit extends Cubit<HSLoginState> {
     try {
       await _authenticationRepository.logInWithGoogle();
       emit(state.copyWith(status: FormzSubmissionStatus.success));
-    } on LogInWithGoogleFailure catch (e) {
-      if (!e.isDefault) _showErrorSnackbar(e.message);
-      _emitFailure();
+      // }
+      // on LogInWithGoogleFailure catch (e) {
+      //   HSDebugLogger.logError(e.message);
+      //   if (!e.isDefault) _showErrorSnackbar(e.message);
+      //   _emitFailure();
     } catch (_) {
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }

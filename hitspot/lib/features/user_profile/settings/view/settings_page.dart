@@ -54,15 +54,17 @@ class SettingsPage extends StatelessWidget {
               ThemedSettingsSection(
                 title: 'Permissions',
                 tiles: [
-                  const SettingsTile(
+                  SettingsTile(
                     icon: FontAwesomeIcons.bell,
                     title: 'Push Notifications',
-                    enabled: false,
+                    onTap: () => settingsCubit
+                        .launchSettings(HSLaunchSettingsType.notifications),
                   ),
-                  const SettingsTile(
+                  SettingsTile(
                     icon: FontAwesomeIcons.mapPin,
                     title: 'Location',
-                    enabled: false,
+                    onTap: () => settingsCubit
+                        .launchSettings(HSLaunchSettingsType.location),
                   ),
                   SettingsTile(
                     icon: FontAwesomeIcons.images,
