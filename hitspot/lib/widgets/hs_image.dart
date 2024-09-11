@@ -55,8 +55,7 @@ class HSImage extends StatelessWidget {
 
 class _HSImage extends StatelessWidget {
   const _HSImage(
-      {super.key,
-      this.imageUrl,
+      {this.imageUrl,
       this.height,
       this.width,
       this.fit,

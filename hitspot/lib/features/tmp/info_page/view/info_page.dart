@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 
@@ -16,7 +15,7 @@ class InfoPage extends StatelessWidget {
         enableDefaultBackButton: true,
       ),
       body: Center(
-        child: Text(infoText, style: textTheme.displayLarge),
+        child: Text(infoText, style: Theme.of(context).textTheme.displayLarge),
       ),
     );
   }

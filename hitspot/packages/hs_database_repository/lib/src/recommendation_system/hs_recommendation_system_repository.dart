@@ -2,7 +2,6 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'hs_interaction_type.dart';
 
 bool isGatheringInformationOn = true;
 

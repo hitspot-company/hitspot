@@ -7,7 +7,7 @@ import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 HSApp get app => HSApp();
-TextTheme get textTheme => app.textTheme;
+// TextTheme get textTheme => app.textTheme;
 ThemeData get currentTheme => app.currentTheme;
 HSTheme get appTheme => app.theme;
 HSNavigation get navi => app.navigation;

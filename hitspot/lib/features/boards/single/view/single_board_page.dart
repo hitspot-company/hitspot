@@ -51,7 +51,7 @@ class SingleBoardPage extends StatelessWidget {
                   const Gap(16),
                   Text(
                     'Something went wrong.',
-                    style: textTheme.headlineSmall,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
                   const Gap(16),
                   HSButton(
@@ -165,7 +165,7 @@ class SingleBoardPage extends StatelessWidget {
                             const Gap(16.0),
                             AutoSizeText(
                               author?.username ?? "",
-                              style: textTheme.headlineMedium,
+                              style: Theme.of(context).textTheme.headlineMedium,
                               maxLines: 1,
                             ),
                             const Spacer(),
@@ -396,7 +396,7 @@ class HSSimpleSliverAppBar extends StatelessWidget {
 
 class _SaveActionButton extends StatelessWidget {
   const _SaveActionButton(
-      {this.accentColor, required this.status, required this.singleBoardCubit});
+      {required this.status, required this.singleBoardCubit, this.accentColor});
 
   final HSSingleBoardStatus status;
   final HSSingleBoardCubit singleBoardCubit;

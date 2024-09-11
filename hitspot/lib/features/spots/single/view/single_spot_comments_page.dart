@@ -13,7 +13,6 @@ import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:image_cropper/image_cropper.dart';
 
 class SingleSpotCommentsSection extends StatelessWidget {
   const SingleSpotCommentsSection({super.key});
@@ -62,9 +61,7 @@ class SingleSpotCommentsSection extends StatelessWidget {
 }
 
 class _LoadingComments extends StatelessWidget {
-  const _LoadingComments({
-    super.key,
-  });
+  const _LoadingComments();
 
   @override
   Widget build(BuildContext context) {

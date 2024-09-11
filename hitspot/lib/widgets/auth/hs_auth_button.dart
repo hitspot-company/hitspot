@@ -28,8 +28,10 @@ class HSAuthButton extends StatelessWidget {
                 size: 24.0,
               )
             : Text(buttonText,
-                style: textTheme.headlineSmall!
-                    .copyWith(color: currentTheme.colorScheme.background)),
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall!
+                    .copyWith(color: currentTheme.colorScheme.surface)),
       ),
     );
   }

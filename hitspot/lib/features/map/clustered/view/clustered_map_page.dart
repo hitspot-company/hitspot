@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -8,7 +6,7 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 
 class MapPage extends StatefulWidget {
   final List<HSSpot> spots;
-  const MapPage({Key? key, required this.spots}) : super(key: key);
+  const MapPage({super.key, required this.spots});
 
   @override
   _MapPageState createState() => _MapPageState();
@@ -22,7 +20,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Dynamic Clustered Map')),
+      appBar: AppBar(title: const Text('Dynamic Clustered Map')),
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(

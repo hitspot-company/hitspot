@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:avatar_stack/positions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -251,8 +250,8 @@ enum HomeGridBuilderType { nearbySpots, trendingBoards, trendingSpots }
 
 class _HomeGridBuilder extends StatelessWidget {
   const _HomeGridBuilder({
-    this.defaultBuilderHeight = 140.0,
     required this.type,
+    this.defaultBuilderHeight = 140.0,
   });
 
   final double defaultBuilderHeight;
@@ -334,7 +333,7 @@ class _HomeGridBuilder extends StatelessWidget {
         return SliverMainAxisGroup(
           slivers: [
             const Gap(32.0).toSliver,
-            Text(title, style: textTheme.headlineMedium)
+            Text(title, style: Theme.of(context).textTheme.headlineMedium)
                 .animate()
                 .fadeIn(duration: 500.ms)
                 .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1))
@@ -380,7 +379,6 @@ class _HomeGridBuilder extends StatelessWidget {
 
 class _HomeMoreTile extends StatelessWidget {
   const _HomeMoreTile({
-    super.key,
     required this.type,
   });
 
@@ -397,16 +395,8 @@ class _HomeMoreTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.0),
           child: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-                stops: const [0.0, .3, 1.0],
-                colors: [
-                  Colors.black,
-                  Colors.black.withOpacity(.6),
-                  Colors.transparent
-                ],
-              ),
+              borderRadius: BorderRadius.circular(14.0),
+              color: app.textFieldFillColor,
             ),
             child: Stack(
               alignment: Alignment.center,
@@ -416,7 +406,7 @@ class _HomeMoreTile extends StatelessWidget {
                   bottom: 8.0,
                   child: Text(
                     "See More",
-                    style: textTheme.titleSmall!.boldify,
+                    style: Theme.of(context).textTheme.titleSmall!.boldify,
                   ),
                 ),
               ],

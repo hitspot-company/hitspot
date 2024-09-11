@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/widgets/hs_shimmer.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';
@@ -128,7 +127,9 @@ class _EmptyMessage extends StatelessWidget {
             padding: const EdgeInsets.only(top: 16.0),
             child: Text(
               emptyMessage,
-              style: textTheme.headlineSmall!
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall!
                   .copyWith(fontWeight: FontWeight.normal),
             ),
           ),

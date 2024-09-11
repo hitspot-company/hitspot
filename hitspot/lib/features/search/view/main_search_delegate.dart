@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,14 +9,11 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
-import 'package:hitspot/widgets/hs_icon_prompt.dart';
-import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class MainSearchDelegate extends SearchDelegate<String> {
   MainSearchDelegate(this.mapSearchCubit);
@@ -179,7 +175,7 @@ class _FetchedUsersPageState extends State<_FetchedUsersPage>
           const Gap(16.0).toSliver,
           Text(
             "Maybe you will like to see these users instead",
-            style: textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ).toSliver,
           const Gap(16.0).toSliver,
           SliverFillRemaining(
@@ -294,7 +290,7 @@ class _FetchedSpotsPageState extends State<_FetchedSpotsPage>
           const Gap(16.0).toSliver,
           Text(
             "Maybe you will like these spots instead",
-            style: textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ).toSliver,
           const Gap(16.0).toSliver,
           SliverFillRemaining(
@@ -381,7 +377,7 @@ class _FetchedBoardsPageState extends State<_FetchedBoardsPage>
           const Gap(16.0).toSliver,
           Text(
             "Maybe you will like these boards instead",
-            style: textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ).toSliver,
           const Gap(16.0).toSliver,
           SliverFillRemaining(
@@ -395,7 +391,6 @@ class _FetchedBoardsPageState extends State<_FetchedBoardsPage>
 
 class _AnimatedBoardsBuilder extends StatelessWidget {
   const _AnimatedBoardsBuilder({
-    super.key,
     required this.boards,
   });
 
@@ -480,7 +475,7 @@ class _FetchedTagsPageState extends State<_FetchedTagsPage>
           const Gap(16.0).toSliver,
           Text(
             "Maybe you will like these tags instead",
-            style: textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ).toSliver,
           const Gap(16.0).toSliver,
           SliverFillRemaining(child: _AnimatedTagsBuilder(tags: trendingTags)),

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -60,7 +58,7 @@ class _HSSpotInfoWindowState extends State<HSSpotInfoWindow> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(widget.spot.title!,
-                        style: textTheme.headlineSmall),
+                        style: Theme.of(context).textTheme.headlineSmall),
                   ),
                   Container(
                     height: 100,
@@ -74,7 +72,7 @@ class _HSSpotInfoWindowState extends State<HSSpotInfoWindow> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 8.0),
                       child: Text(widget.spot.author?.username ?? "",
-                          style: textTheme.bodyMedium))
+                          style: Theme.of(context).textTheme.bodyMedium))
                 ],
               ),
             ),
@@ -92,7 +90,7 @@ class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
     hexColor = hexColor.toUpperCase().replaceAll("#", "");
     if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
+      hexColor = "FF$hexColor";
     }
     return int.parse(hexColor, radix: 16);
   }

@@ -12,6 +12,8 @@ class HSChooseUsers extends StatelessWidget {
 }
 
 class AddFriendsPage extends StatefulWidget {
+  const AddFriendsPage({super.key});
+
   @override
   _AddFriendsPageState createState() => _AddFriendsPageState();
 }
@@ -24,14 +26,14 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Friends'),
+        title: const Text('Add Friends'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             _buildFriendsInput(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildFriendsList(),
           ],
         ),
@@ -42,7 +44,7 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
   Widget _buildFriendsInput() {
     return TextField(
       controller: _controller,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         hintText: 'Type friend\'s name',
         border: OutlineInputBorder(),
       ),

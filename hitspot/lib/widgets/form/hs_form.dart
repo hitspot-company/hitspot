@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
@@ -16,7 +15,11 @@ class HSFormCaption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(text,
-        style: textTheme.bodyLarge!.hintify.copyWith(color: color));
+        style: Theme.of(context)
+            .textTheme
+            .bodyLarge!
+            .hintify
+            .copyWith(color: color));
   }
 }
 
@@ -34,11 +37,11 @@ class HSFormHeadline extends StatelessWidget {
     late final TextStyle? textStyle;
     switch (headlineType) {
       case HSFormHeadlineType.display:
-        textStyle = textTheme.headlineLarge!;
+        textStyle = Theme.of(context).textTheme.headlineLarge!;
       case HSFormHeadlineType.normal:
-        textStyle = textTheme.headlineMedium;
+        textStyle = Theme.of(context).textTheme.headlineMedium;
       case HSFormHeadlineType.small:
-        textStyle = textTheme.headlineSmall;
+        textStyle = Theme.of(context).textTheme.headlineSmall;
     }
     return Text(text, style: textStyle);
   }

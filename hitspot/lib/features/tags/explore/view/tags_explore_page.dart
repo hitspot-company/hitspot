@@ -123,7 +123,10 @@ class _AnimatedTopSpot extends StatelessWidget {
           child: Center(
             child: Text(
               "#$tag",
-              style: textTheme.displayMedium?.copyWith(color: Colors.white),
+              style: Theme.of(context)
+                  .textTheme
+                  .displayMedium
+                  ?.copyWith(color: Colors.white),
             ),
           ),
         )
@@ -135,7 +138,7 @@ class _AnimatedTopSpot extends StatelessWidget {
                 prompt: "@${topSpot.author?.username}'s ",
                 pressableText: topSpot.title!,
                 promptColor: app.theme.mainColor,
-                textStyle: textTheme.bodyMedium,
+                textStyle: Theme.of(context).textTheme.bodyMedium,
                 onTap: () => navi.toSpot(sid: topSpot.sid!))
             .animate()
             .fadeIn(duration: 300.ms, delay: 200.ms)
