@@ -81,50 +81,53 @@ class MainSearchDelegate extends SearchDelegate<String> {
           ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
           const Gap(16.0),
           Expanded(
-            child: TabBarView(
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.users != current.users ||
-                      previous.trendingUsers != current.trendingUsers ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedUsersPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.users != current.users ||
+                        previous.trendingUsers != current.trendingUsers ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedUsersPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
                   ),
-                ),
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.spots != current.spots ||
-                      previous.trendingSpots != current.trendingSpots ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedSpotsPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.spots != current.spots ||
+                        previous.trendingSpots != current.trendingSpots ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedSpotsPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
                   ),
-                ),
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.boards != current.boards ||
-                      previous.trendingBoards != current.trendingBoards ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedBoardsPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.boards != current.boards ||
+                        previous.trendingBoards != current.trendingBoards ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedBoardsPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
                   ),
-                ),
-                BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
-                  buildWhen: (previous, current) =>
-                      previous.tags != current.tags ||
-                      previous.trendingTags != current.trendingTags ||
-                      previous.status != current.status,
-                  builder: (context, state) => _FetchedTagsPage(
-                    mapSearchCubit: mapSearchCubit,
-                    query: query,
+                  BlocBuilder<HSMainSearchCubit, HSMainSearchState>(
+                    buildWhen: (previous, current) =>
+                        previous.tags != current.tags ||
+                        previous.trendingTags != current.trendingTags ||
+                        previous.status != current.status,
+                    builder: (context, state) => _FetchedTagsPage(
+                      mapSearchCubit: mapSearchCubit,
+                      query: query,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -135,7 +138,6 @@ class MainSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     mapSearchCubit.updateQuery(query);
-
     return buildResults(context);
   }
 }

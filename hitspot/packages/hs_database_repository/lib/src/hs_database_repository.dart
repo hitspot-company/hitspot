@@ -285,6 +285,7 @@ class HSDatabaseRepsitory {
   Future<List<HSSpot>> spotFetchSpotsWithinRadius(
           {required double lat, required double long, double? radius}) async =>
       await _spotsRepository.fetchSpotsWithinRadius(lat, long, radius);
+
   Future<HSUser> spotFetchAuthor({HSSpot? spot, String? authorID}) async =>
       await _spotsRepository.fetchSpotAuthor(spot, authorID);
 

@@ -18,7 +18,6 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:hs_storage_repository/hs_storage_repository.dart';
 import 'package:hs_theme_repository/hs_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:upgrader/upgrader.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -94,7 +94,6 @@ class HSSpotsRepository {
         'p_long': long,
         'p_radius': radius ?? DEFAULT_RADIUS,
       });
-
       final List<HSSpot> spots =
           data.map(HSSpot.deserializeWithAuthor).toList();
       return (spots);
@@ -347,7 +346,6 @@ class HSSpotsRepository {
         'p_user_lat': lat,
         'p_user_long': long,
       });
-      HSDebugLogger.logInfo(fetchedSpots.toString());
       return fetchedSpots.map(HSSpot.deserializeWithAuthor).toList();
     } catch (_) {
       throw Exception("Error fetching trending spots: $_");

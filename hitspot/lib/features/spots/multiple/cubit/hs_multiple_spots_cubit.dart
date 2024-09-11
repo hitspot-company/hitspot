@@ -41,8 +41,9 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
             pageSize: 10,
             fetch: _fetchTrendingBoards,
             type: HSHitsPageType.boards);
-      // case HSMultipleSpotsType.nearbySpots: // TODO: Implement
-      //   return hitsPage = HSHitsPage(pageSize: 10, fetch: _fetchNearbySpots);
+      case HSMultipleSpotsType.nearbySpots:
+        return HSHitsPage(
+            pageSize: 10, fetch: _fetchNearbySpots, type: HSHitsPageType.spots);
       default:
         return HSHitsPage(pageSize: 10, fetch: _fetchTrendingSpots);
     }
@@ -70,20 +71,20 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
     }
   }
 
-  // Future<List<HSSpot>> _fetchNearbySpots(int size, int offset) async {
-  //   try {
-  //     assert(
-  //         app.currentPosition != null, "The current position cannot be null");
-  //     await Future.delayed(const Duration(milliseconds: 300));
-  //     List<HSSpot> spots = await _databaseRepository.spotFetchSpotsWithinRadius(
-  //         lat: app.currentPosition!.latitude,
-  //         long: app.currentPosition!.longitude);
-  //     return (spots);
-  //   } catch (e) {
-  //     HSDebugLogger.logError("Error fetching trending spots: $e");
-  //     return [];
-  //   }
-  // }
+  Future<List<HSSpot>> _fetchNearbySpots(int size, int offset) async {
+    try {
+      assert(
+          app.currentPosition != null, "The current position cannot be null");
+      List<HSSpot> spots = await _databaseRepository.spotFetchSpotsWithinRadius(
+          lat: app.currentPosition!.latitude,
+          long: app.currentPosition!.longitude,
+          radius: 500000);
+      return (spots);
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching trending spots: $e");
+      return [];
+    }
+  }
 
   Future<List<HSBoard>> _fetchTrendingBoards(int size, int offset) async {
     try {
