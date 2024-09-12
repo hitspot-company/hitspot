@@ -18,7 +18,8 @@ class MagicLinkSentPage extends StatelessWidget {
     final magiclinkCubit = BlocProvider.of<HSMagicLinkCubit>(context);
     return HSScaffold(
       appBar: HSAppBar(
-        title: Text("Magic Link Sent", style: textTheme.headlineSmall),
+        title: Text("Magic Link Sent",
+            style: Theme.of(context).textTheme.headlineSmall),
         enableDefaultBackButton: true,
         defaultBackButtonCallback: () {
           app.authenticationBloc
@@ -33,7 +34,7 @@ class MagicLinkSentPage extends StatelessWidget {
             child: Text.rich(
               TextSpan(
                 text: "We have sent a",
-                style: textTheme.headlineLarge,
+                style: Theme.of(context).textTheme.headlineLarge,
                 children: [
                   TextSpan(
                     text: " magic link",
@@ -47,7 +48,7 @@ class MagicLinkSentPage extends StatelessWidget {
                   TextSpan(
                       text:
                           "Please check your inbox and click the link to securely sign in.",
-                      style: textTheme.bodyMedium),
+                      style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
               textAlign: TextAlign.center,
@@ -64,7 +65,7 @@ class MagicLinkSentPage extends StatelessWidget {
           Center(
             child: Text(
               "Or use the one time code.",
-              style: textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           )
               .animate()

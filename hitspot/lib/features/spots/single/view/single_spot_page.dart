@@ -69,7 +69,7 @@ class SingleSpotPage extends StatelessWidget {
                     const Gap(16),
                     Text(
                       'Something went wrong.',
-                      style: textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
                     const Gap(16),
                     HSButton(
@@ -95,7 +95,7 @@ class SingleSpotPage extends StatelessWidget {
               slivers: [
                 Text(
                   "${spot.title}",
-                  style: textTheme.displayMedium,
+                  style: Theme.of(context).textTheme.displayMedium,
                 )
                     .animate()
                     .fadeIn(duration: 300.ms, delay: 100.ms)
@@ -236,7 +236,7 @@ class _AnimatedMapView extends StatelessWidget {
 }
 
 class _AnimatedTagsBuilder extends StatelessWidget {
-  const _AnimatedTagsBuilder({super.key});
+  const _AnimatedTagsBuilder();
 
   @override
   Widget build(BuildContext context) {

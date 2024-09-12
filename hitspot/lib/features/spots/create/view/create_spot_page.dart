@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -159,7 +158,7 @@ class _ThirdPage extends StatelessWidget {
 }
 
 class _SelectedTagsBuilder extends StatelessWidget {
-  const _SelectedTagsBuilder({super.key});
+  const _SelectedTagsBuilder();
 
   @override
   Widget build(BuildContext context) {
@@ -213,43 +212,43 @@ class _TagsBuilder extends StatelessWidget {
           if (state.isLoading) {
             return const HSLoadingIndicator();
           }
-          if (queriedTags.isEmpty && state.tagsQuery.isNotEmpty) {
-            return Column(
-              children: [
-                const AutoSizeText(
-                  "This tag does not exist yet. Would you like to add it?",
-                  maxLines: 1,
-                ),
-                const SizedBox(height: 8.0),
-                HSButton(
-                  onPressed: () {
-                    context
-                        .read<HSCreateSpotCubit>()
-                        .selectTag(state.tagsQuery);
-                  },
-                  child: const Text("Add new tag"),
-                ),
-              ],
-            );
-          }
+          final bool isUniqueTag = !queriedTags.contains(state.tagsQuery);
 
-          return Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: queriedTags.map((tag) {
-              final isSelected = selectedTags.contains(tag);
-              return ChoiceChip(
-                selected: isSelected,
-                onSelected: (selected) {
-                  if (selected) {
-                    context.read<HSCreateSpotCubit>().selectTag(tag);
-                  } else {
-                    context.read<HSCreateSpotCubit>().deselectTag(tag);
-                  }
-                },
-                label: Text('#$tag'),
-              );
-            }).toList(),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                children: queriedTags.map((tag) {
+                  final isSelected = selectedTags.contains(tag);
+                  return ChoiceChip(
+                    backgroundColor: appTheme.textfieldFillColor,
+                    side: BorderSide.none,
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) {
+                        context.read<HSCreateSpotCubit>().selectTag(tag);
+                      } else {
+                        context.read<HSCreateSpotCubit>().deselectTag(tag);
+                      }
+                    },
+                    label: Text('#$tag'),
+                  );
+                }).toList(),
+              ),
+              if (isUniqueTag && state.tagsQuery.isNotEmpty)
+                Center(
+                  child: HSButton(
+                    onPressed: () {
+                      context
+                          .read<HSCreateSpotCubit>()
+                          .selectTag(state.tagsQuery);
+                    },
+                    child: const Text("Add new tag"),
+                  ),
+                ),
+            ],
           );
         },
       ),

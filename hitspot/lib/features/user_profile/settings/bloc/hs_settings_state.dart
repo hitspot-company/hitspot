@@ -1,6 +1,6 @@
 part of 'hs_settings_bloc.dart';
 
-enum HSLaunchSettingsType { gallery }
+enum HSLaunchSettingsType { gallery, location, notifications }
 
 enum HSThemeMode { light, dark, auto }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -23,21 +22,23 @@ class HSAnnouncementDetailDialog extends StatelessWidget {
             children: [
               Text(
                 announcement.title!,
-                style: textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
               ),
               const SizedBox(height: 24),
-              _buildInfoRow('Type', announcement.announcementType!.name),
-              _buildInfoRow('Created', _formatDate(announcement.createdAt!)),
+              _buildInfoRow(
+                  'Type', announcement.announcementType!.name, context),
+              _buildInfoRow(
+                  'Created', _formatDate(announcement.createdAt!), context),
               const SizedBox(height: 24),
               Text(
                 'Message',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
               ),
               const SizedBox(height: 8),
               Text(announcement.content!),
@@ -64,7 +65,7 @@ class HSAnnouncementDetailDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -74,14 +75,16 @@ class HSAnnouncementDetailDialog extends StatelessWidget {
             width: 100,
             child: Text(
               '$label:',
-              style:
-                  textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
         ],
@@ -94,8 +97,8 @@ class HSAnnouncementDetailDialog extends StatelessWidget {
   }
 
   Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       print('Could not launch $url');
     }

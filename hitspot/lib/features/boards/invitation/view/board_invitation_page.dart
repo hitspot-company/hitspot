@@ -3,15 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/app/hs_app.dart';
 import 'package:hitspot/features/boards/invitation/cubit/hs_board_invitation_cubit.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BoardInvitationPage extends StatelessWidget {
   final String boardId;
   final String token;
 
   const BoardInvitationPage(
-      {Key? key, required this.boardId, required this.token})
-      : super(key: key);
+      {super.key, required this.boardId, required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +20,7 @@ class BoardInvitationPage extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Board Invitation'),
+          title: const Text('Board Invitation'),
           elevation: 0,
           backgroundColor: Colors.transparent,
           foregroundColor: Theme.of(context).primaryColor,
@@ -51,13 +49,14 @@ class BoardInvitationPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                       child: state.boardImage!,
                     ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
                     state.boardTitle ?? "",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
@@ -68,14 +67,14 @@ class BoardInvitationPage extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: state.boardAuthor ?? "",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        TextSpan(
+                        const TextSpan(
                             text: ' invited you to collaborate on this board!'),
                       ],
                     ),
                   ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                   Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -87,13 +86,13 @@ class BoardInvitationPage extends StatelessWidget {
                             onPressed: () => context
                                 .read<HsBoardInvitationCubit>()
                                 .acceptInvitation(),
-                            child: Text('Accept Invitation'),
                             style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
+                            child: const Text('Accept Invitation'),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -107,10 +106,10 @@ class BoardInvitationPage extends StatelessWidget {
                                   .declineInvitation();
                               navi.pop();
                             },
-                            child: Text('Decline'),
                             style: TextButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
+                            child: const Text('Decline'),
                           ),
                         ),
                       ],
@@ -129,34 +128,34 @@ class BoardInvitationPage extends StatelessWidget {
 class InvalidInvitationPage extends StatelessWidget {
   final String message;
 
-  const InvalidInvitationPage({Key? key, required this.message})
-      : super(key: key);
+  const InvalidInvitationPage({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 80, color: Colors.red),
-            SizedBox(height: 20),
+            const Icon(Icons.error_outline, size: 80, color: Colors.red),
+            const SizedBox(height: 20),
             Text(
               message,
-              style: TextStyle(color: Colors.red, fontSize: 18),
+              style: const TextStyle(color: Colors.red, fontSize: 18),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () => navi.pop(),
-              child: Text('Go back'),
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
+              child: const Text('Go back'),
             ),
           ],
         ),

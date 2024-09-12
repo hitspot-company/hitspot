@@ -83,7 +83,8 @@ class _LoadedView extends StatelessWidget {
             slivers: [
               SliverList(
                 delegate: SliverChildListDelegate([
-                  Text("Announcements", style: textTheme.headlineMedium),
+                  Text("Announcements",
+                      style: Theme.of(context).textTheme.headlineMedium),
                   const Gap(16.0),
                 ]),
               ),
@@ -115,7 +116,8 @@ class _LoadedView extends StatelessWidget {
           SliverMainAxisGroup(slivers: [
             SliverList(
               delegate: SliverChildListDelegate([
-                Text("Notifications", style: textTheme.headlineMedium),
+                Text("Notifications",
+                    style: Theme.of(context).textTheme.headlineMedium),
                 const Gap(16.0),
               ]),
             ),

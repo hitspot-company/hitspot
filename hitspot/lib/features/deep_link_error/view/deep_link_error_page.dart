@@ -30,7 +30,7 @@ class DeepLinkErrorPage extends StatelessWidget {
             const Gap(16),
             Text(
               message ?? 'Something went wrong.',
-              style: textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineSmall,
             ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
             const Gap(16),
             HSButton(

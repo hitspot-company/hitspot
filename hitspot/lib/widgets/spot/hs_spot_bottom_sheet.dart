@@ -83,7 +83,7 @@ class HSSpotAddToBoardSheet extends StatelessWidget {
             const Gap(16.0),
             Text(
               "Choose a board",
-              style: textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             const Gap(16.0),
             if (boards.isEmpty)

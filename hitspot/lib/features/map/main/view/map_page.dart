@@ -344,7 +344,7 @@ class _TopBar extends StatelessWidget {
                     if (titleText.isNotEmpty)
                       Text(
                         titleText,
-                        style: textTheme.headlineSmall,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ).animate().fade(),
                     Row(
                       children: [

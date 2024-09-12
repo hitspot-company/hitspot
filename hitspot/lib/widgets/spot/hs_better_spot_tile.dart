@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
@@ -73,7 +72,10 @@ class HSBetterSpotTile extends StatelessWidget {
                       left: 8.0,
                       child: AutoSizeText(
                         spot!.title!,
-                        style: textTheme.titleLarge!.colorify(Colors.white),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge!
+                            .colorify(Colors.white),
                         maxLines: 2,
                       ),
                     )

@@ -8,7 +8,6 @@ import 'package:hitspot/features/boards/create/cubit/hs_create_board_cubit.dart'
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
-import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
@@ -164,7 +163,7 @@ class _SecondPage extends StatelessWidget {
                     child: Center(
                       child: Text(
                         isImageSelected ? "Change Image" : "Select an Image",
-                        style: textTheme.titleLarge,
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ),
                   ),
@@ -238,7 +237,7 @@ class _ThirdPage extends StatelessWidget {
                     return RadioListTile<HSBoardVisibility>(
                       contentPadding: const EdgeInsets.all(0.0),
                       title: Text(visibility.name.capitalize,
-                          style: textTheme.titleMedium),
+                          style: Theme.of(context).textTheme.titleMedium),
                       subtitle: Text(visibility.description),
                       value: visibility,
                       groupValue: boardVisibility,
@@ -275,11 +274,6 @@ class _ThirdPage extends StatelessWidget {
                     child: HSLoadingIndicator(
                       size: 24.0,
                     ),
-                  );
-                case HSCreateBoardUploadState.error:
-                  return const HSButton(
-                    onPressed: null,
-                    child: Text("Error"),
                   );
               }
             },

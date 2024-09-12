@@ -26,6 +26,12 @@ class HsSettingsBloc extends Bloc<HsSettingsEvent, HsSettingsState> {
       case HSLaunchSettingsType.gallery:
         AppSettings.openAppSettings(type: AppSettingsType.settings);
         break;
+      case HSLaunchSettingsType.location:
+        AppSettings.openAppSettings(type: AppSettingsType.location);
+        break;
+      case HSLaunchSettingsType.notifications:
+        AppSettings.openAppSettings(type: AppSettingsType.notification);
+        break;
     }
   }
 

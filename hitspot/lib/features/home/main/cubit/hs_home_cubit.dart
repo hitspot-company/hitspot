@@ -122,7 +122,10 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       final lat = currentPosition.latitude;
       final long = currentPosition.longitude;
       final List<HSSpot> nearbySpots = await app.databaseRepository
-          .spotFetchSpotsWithinRadius(lat: lat, long: long);
+          .spotFetchSpotsWithinRadius(
+              lat: lat,
+              long: long,
+              radius: 500000); // TODO: Change radius (now its 500km)
       placeMarkers();
       emit(state.copyWith(
           nearbySpots: nearbySpots, currentPosition: currentPosition));

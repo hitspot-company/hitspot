@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hitspot/constants/constants.dart';
 
 class HSButton extends StatelessWidget {
   const HSButton({

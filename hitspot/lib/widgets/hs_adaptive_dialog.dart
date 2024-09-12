@@ -28,7 +28,7 @@ class HSAdaptiveDialog extends StatelessWidget {
 }
 
 class _DialogAction extends StatelessWidget {
-  const _DialogAction({super.key, required this.text, required this.onPressed});
+  const _DialogAction({required this.text, required this.onPressed});
 
   final String text;
   final VoidCallback onPressed;
