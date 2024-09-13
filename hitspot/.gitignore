@@ -58,3 +58,4 @@ android/key.properties
 !.env.vault
 
 ios/Runner.xcodeproj/project.pbxproj
+ios/Podfile.lock

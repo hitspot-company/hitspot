@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -15,17 +14,20 @@ class ChooseLocationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HSScaffold(
-      resizeToAvoidBottomInset: false,
-      sidePadding: 0.0,
-      topSafe: false,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          _MapAndSearchBar(),
-          const _AnimatedPin(),
-          const _BottomBar(),
-        ],
+    return PopScope(
+      canPop: false,
+      child: HSScaffold(
+        resizeToAvoidBottomInset: false,
+        sidePadding: 0.0,
+        topSafe: false,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            _MapAndSearchBar(),
+            const _AnimatedPin(),
+            const _BottomBar(),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/home/main/view/home_provider.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -143,7 +144,7 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
     _mapController.complete(controller);
   }
 
-  void cancel() => navi.pop(null);
+  void cancel() => navi.go('/');
 
   void resetPosition() async =>
       app.locationRepository.resetPosition(mapController);

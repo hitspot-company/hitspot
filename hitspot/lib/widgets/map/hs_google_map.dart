@@ -69,15 +69,20 @@ class HSGoogleMap extends StatelessWidget {
                   cameraTargetBounds ?? CameraTargetBounds.unbounded,
             ),
             if (myLocationButtonEnabled)
-              Align(
-                alignment: myLocationButtonPosition ?? Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FloatingActionButton(
-                    backgroundColor: currentTheme.scaffoldBackgroundColor,
-                    foregroundColor: Colors.white,
-                    onPressed: myLocationButtonCallback,
-                    child: const Icon(Icons.my_location_outlined),
+              Positioned(
+                bottom: 180,
+                left: 0,
+                right: 0,
+                child: Align(
+                  alignment: myLocationButtonPosition ?? Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FloatingActionButton(
+                      backgroundColor: currentTheme.scaffoldBackgroundColor,
+                      foregroundColor: Colors.white,
+                      onPressed: myLocationButtonCallback,
+                      child: const Icon(Icons.my_location_outlined),
+                    ),
                   ),
                 ),
               )
