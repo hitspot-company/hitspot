@@ -47,6 +47,7 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
         controller,
         LatLng(spot.latitude!, spot.longitude!),
       );
+      _generateNewMarkers(spot);
     }
   }
 
@@ -105,15 +106,19 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
     try {
       final index = state.spots.indexOf(spot);
       pageController.jumpToPage(index);
-      List<Marker> markers = app.assets.generateMarkers(state.spots,
-          currentPosition: state.currentPosition?.toLatLng,
-          onTap: _onMarkerTapped,
-          selectedSpotID: spot.sid);
-
-      emit(state.copyWith(markers: markers.toSet()));
+      _generateNewMarkers(spot);
     } catch (_) {
       HSDebugLogger.logError("Error tapping marker");
     }
+  }
+
+  void _generateNewMarkers(HSSpot spot) {
+    List<Marker> markers = app.assets.generateMarkers(state.spots,
+        currentPosition: state.currentPosition?.toLatLng,
+        onTap: _onMarkerTapped,
+        selectedSpotID: spot.sid);
+
+    emit(state.copyWith(markers: markers.toSet()));
   }
 
   void resetCamera() async {
