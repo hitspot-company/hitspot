@@ -43,14 +43,23 @@ class HSAssets {
 
   Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
       String assetName, int size) async {
-    // Get the properly scaled image
     try {
+      // Scale to get better quality
+      final double scaleFactor = 2.0;
+
       final image = await getImageFromSvg(
-          assetName, size.toDouble(), size.toDouble(),
-          colorFilter: null);
+        assetName,
+        size.toDouble() * scaleFactor,
+        size.toDouble() * scaleFactor,
+        scale: 12.0,
+        colorFilter: null,
+      );
+
+      // Convert the image to ByteData format (PNG)
       final ByteData? bytes =
           await image.toByteData(format: ui.ImageByteFormat.png);
-      return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
+
+      return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
     } catch (e) {
       throw Exception('Error loading SVG asset: $e');
     }
