@@ -1,4 +1,3 @@
-
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/src/utils/utils.dart';
 import 'package:intl/intl.dart';

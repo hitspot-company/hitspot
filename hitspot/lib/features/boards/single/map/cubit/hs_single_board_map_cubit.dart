@@ -54,19 +54,7 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   void onMapCreated(GoogleMapController cont) async {
     if (controller.isCompleted) return;
     controller.complete(cont);
-    if (state.currentPosition != null && state.markers.isNotEmpty) {
-      _locationRepository.zoomOutToFitAllMarkers(
-          await controller.future, state.markers.toSet(),
-          currentPosition: state.currentPosition);
-    } else if (state.currentPosition != null) {
-      _locationRepository.animateCameraToNewLatLng(
-          controller, state.currentPosition!.toLatLng);
-    } else if (state.markers.isNotEmpty) {
-      _locationRepository.zoomOutToFitAllMarkers(
-        await controller.future,
-        state.markers.toSet(),
-      );
-    }
+    resetCamera();
   }
 
   Future<void> loadCurrentPosition() async {
@@ -124,9 +112,9 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   void resetCamera() async {
     try {
       if (state.currentPosition != null && state.markers.isNotEmpty) {
-        _locationRepository.zoomOutToFitAllMarkers(
-            await controller.future, state.markers.toSet(),
-            currentPosition: state.currentPosition);
+        final HSSpot firstSpot = state.spots.first;
+        _locationRepository.animateCameraToNewLatLng(
+            controller, LatLng(firstSpot.latitude!, firstSpot.longitude!));
       }
     } catch (_) {
       HSDebugLogger.logError("Error resetting camera");
