@@ -271,7 +271,7 @@ class HSLocationRepository {
 
     // Create camera update
     CameraUpdate cameraUpdate =
-        CameraUpdate.newLatLngBounds(bounds, 50.0); // 50 is padding
+        CameraUpdate.newLatLngBounds(bounds, /* padding */ 100.0);
 
     // Move camera to fit bounds
     controller.animateCamera(cameraUpdate);

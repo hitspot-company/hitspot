@@ -73,7 +73,6 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
       }
     } catch (_) {
       HSDebugLogger.logError("Error: $_");
-      navi.pop();
     }
   }
 

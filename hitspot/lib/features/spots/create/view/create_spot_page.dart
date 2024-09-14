@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_create_spot_cubit.dart';
+import 'package:hitspot/features/spots/create/map/view/choose_location_page.dart';
+import 'package:hitspot/features/spots/create/map/view/choose_location_provider.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -11,6 +14,7 @@ import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
+import 'package:page_transition/page_transition.dart';
 
 class CreateSpotPage extends StatelessWidget {
   const CreateSpotPage({super.key});
@@ -22,6 +26,20 @@ class CreateSpotPage extends StatelessWidget {
         appBar: HSAppBar(
           titleText: 'Create Spot',
           enableDefaultBackButton: true,
+          defaultBackButtonCallback: () {
+            if (createSpotCubit.pageController.page == 0) {
+              app.navigation.pushTransition(
+                PageTransitionType.fade,
+                ChooseLocationProvider(
+                    initialUserLocation:
+                        createSpotCubit.state.currentLocation!),
+              );
+            } else {
+              createSpotCubit.pageController.previousPage(
+                  curve: Curves.easeIn,
+                  duration: const Duration(milliseconds: 300));
+            }
+          },
         ),
         body: BlocSelector<HSCreateSpotCubit, HSCreateSpotState, bool>(
           selector: (state) =>
