@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,12 +8,14 @@ import 'package:formz/formz.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/login/cubit/hs_login_cubit.dart';
+import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/auth/hs_auth_button.dart';
 import 'package:hitspot/widgets/auth/hs_auth_horizontal_divider.dart';
 import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
 import 'package:hitspot/widgets/auth/hs_auth_social_buttons.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -68,29 +71,38 @@ class LoginForm extends StatelessWidget {
 class _Footer extends StatelessWidget {
   const _Footer();
 
-  final String info =
-      "Hitspot uses cookies for analytics, personalised content and ads. By using Hitspot's services you agree to this use of cookies.";
-  final String pressableText = " Learn more";
-
   @override
   Widget build(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        text: info,
-        children: [
-          TextSpan(
-            text: pressableText,
-            style: const TextStyle(
-              color: Color.fromARGB(255, 130, 130, 130),
-              fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text.rich(
+        TextSpan(
+          text: "By creating an account you agree to our",
+          children: [
+            TextSpan(
+                text: " Terms of Service",
+                style: app.textTheme.bodySmall!
+                    .colorify(HSTheme.instance.mainColor)
+                    .boldify,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => launchUrlString(
+                      'https://hitspot.app/terms-of-service.pdf')),
+            const TextSpan(
+              text: " and",
             ),
-          ),
-        ],
+            TextSpan(
+              text: " Privacy Policy",
+              style: app.textTheme.bodySmall!
+                  .colorify(HSTheme.instance.mainColor)
+                  .boldify,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () =>
+                    launchUrlString('https://hitspot.app/privacy-policy.pdf'),
+            ),
+          ],
+        ),
+        textAlign: TextAlign.center,
       ),
-      style: const TextStyle(
-        color: Colors.grey,
-      ),
-      textAlign: TextAlign.center,
     );
   }
 }

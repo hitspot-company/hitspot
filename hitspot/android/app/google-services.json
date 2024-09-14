@@ -14,55 +14,19 @@
       },
       "oauth_client": [
         {
+          "client_id": "145078839676-qa2t53a93dgk4f7tk9tltp3s0fr22t24.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.hitspot",
+            "certificate_hash": "20cc48d6b0a2706bef3d185f3b45189b3feadc6b"
+          }
+        },
+        {
           "client_id": "145078839676-rv8v1i3oa91aj19gntuj3q1t9muk6jeg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "app.hitspot",
             "certificate_hash": "af73d8134775522deff11a0d05f372d35437c287"
-          }
-        },
-        {
-          "client_id": "145078839676-l5r4lqmkn18llatpeqo2b0or1u7ei0d8.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAmfr06x8ufZJg8rJZdJtTpEgZXJszJI1M"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "145078839676-cu1rrvvm3dcfgqjcona6ilt0m4jng5av.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "145078839676-36cce3q17bap6mp1giqn0o1828h5vebd.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "jnenczak.hitspot"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:145078839676:android:66659f5c349007e9135cf9",
-        "android_client_info": {
-          "package_name": "com.company.hitspot"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "145078839676-910bgn5cutvou0jkev4i7jgp8u50jnp0.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.company.hitspot",
-            "certificate_hash": "f4edc2ec2535f12dce9a0262b5d7f1fa441c9f0c"
           }
         },
         {

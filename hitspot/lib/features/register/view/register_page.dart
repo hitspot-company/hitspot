@@ -8,6 +8,7 @@ import 'package:hitspot/features/register/view/register_form.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/auth/hs_auth_page_title.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -38,13 +39,13 @@ class RegisterPage extends StatelessWidget {
                   text: "By creating an account you agree to our",
                   children: [
                     TextSpan(
-                      text: " Terms of Service",
-                      style: app.textTheme.bodySmall!
-                          .colorify(HSTheme.instance.mainColor)
-                          .boldify,
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () => print("TOS"),
-                    ),
+                        text: " Terms of Service",
+                        style: app.textTheme.bodySmall!
+                            .colorify(HSTheme.instance.mainColor)
+                            .boldify,
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => launchUrlString(
+                              'https://hitspot.app/terms-of-service.pdf')),
                     const TextSpan(
                       text: " and",
                     ),
@@ -54,7 +55,8 @@ class RegisterPage extends StatelessWidget {
                           .colorify(HSTheme.instance.mainColor)
                           .boldify,
                       recognizer: TapGestureRecognizer()
-                        ..onTap = () => print("PP"),
+                        ..onTap = () => launchUrlString(
+                            'https://hitspot.app/privacy-policy.pdf'),
                     ),
                   ],
                 ),

@@ -7,6 +7,8 @@ import 'package:hitspot/features/user_profile/settings/bloc/hs_settings_bloc.dar
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -74,18 +76,22 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const ThemedSettingsSection(
+              ThemedSettingsSection(
                 title: 'Legal',
                 tiles: [
                   SettingsTile(
                     icon: FontAwesomeIcons.file,
-                    title: 'Terms and Conditions',
-                    enabled: false,
+                    title: 'Terms of Service',
+                    enabled: true,
+                    onTap: () => launchUrlString(
+                        'https://hitspot.app/terms-of-service.pdf'),
                   ),
                   SettingsTile(
                     icon: FontAwesomeIcons.file,
                     title: 'Privacy Policy',
-                    enabled: false,
+                    enabled: true,
+                    onTap: () => launchUrlString(
+                        'https://hitspot.app/privacy-policy.pdf'),
                   ),
                 ],
               ),
