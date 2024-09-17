@@ -30,3 +30,5 @@ class HSConnectivityLocationChangedEvent extends HSConnectivityLocationEvent {
 
   HSConnectivityLocationChangedEvent(this.location);
 }
+
+class HSConnectivityRefresh extends HSConnectivityLocationEvent {}

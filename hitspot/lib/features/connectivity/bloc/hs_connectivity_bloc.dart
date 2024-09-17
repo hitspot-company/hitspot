@@ -39,6 +39,10 @@ class HSConnectivityLocationBloc
     on<HSConnectivityFcmTokenChangedEvent>((event, emit) {
       emit(state.copyWith(fcmToken: event.fcmToken));
     });
+    on<HSConnectivityRefresh>((event, emit) {
+      ;
+      add(HSConnectivityRequestNotificationPermissionEvent());
+    });
 
     // FCM Handlers
     FirebaseMessaging.onBackgroundMessage(HSNotificationHandler.messageHandler);
@@ -102,7 +106,6 @@ class HSConnectivityLocationBloc
         speedAccuracy: 0.0,
       )));
     }
-    add(HSConnectivityRequestNotificationPermissionEvent());
   }
 
   Future<void> _onCheckConnectivity(HSConnectivityCheckConnectivityEvent event,
