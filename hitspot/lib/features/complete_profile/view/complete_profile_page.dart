@@ -313,8 +313,6 @@ class _UsernameInput extends StatelessWidget {
     }
     if (error == null) return null;
     switch (error) {
-      case HSUsernameValidationError.notLowerCase:
-        return "No uppercase letters.";
       case HSUsernameValidationError.short:
         return "At least 5 characters.";
       case HSUsernameValidationError.long:

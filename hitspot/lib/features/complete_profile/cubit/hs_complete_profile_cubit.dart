@@ -111,7 +111,7 @@ class HSCompleteProfileCubit extends Cubit<HSCompleteProfileState> {
       }
 
       final HSUser user = currentUser.copyWith(
-        username: state.usernameVal,
+        username: state.usernameVal?.toLowerCase(),
         fullName: state.fullnameVal,
         biogram: state.biogramVal,
         birthday: state.birthdayVal,
