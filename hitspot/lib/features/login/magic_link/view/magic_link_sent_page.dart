@@ -18,7 +18,7 @@ class MagicLinkSentPage extends StatelessWidget {
     final magiclinkCubit = BlocProvider.of<HSMagicLinkCubit>(context);
     return HSScaffold(
       appBar: HSAppBar(
-        title: Text("Magic Link Sent",
+        title: Text("One Time Password Sent",
             style: Theme.of(context).textTheme.headlineSmall),
         enableDefaultBackButton: true,
         defaultBackButtonCallback: () {
@@ -37,17 +37,20 @@ class MagicLinkSentPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineLarge,
                 children: [
                   TextSpan(
-                    text: " magic link",
+                    text: " one time password",
                     style: TextStyle(color: app.theme.mainColor),
                   ),
                   const TextSpan(text: " to "),
                   TextSpan(
-                    text: " ${magiclinkCubit.email}.\n\n",
+                    text: " ${magiclinkCubit.email}",
                     style: TextStyle(color: app.theme.mainColor),
                   ),
                   TextSpan(
-                      text:
-                          "Please check your inbox and click the link to securely sign in.",
+                    text: ".\n\n",
+                    style: app.textTheme.headlineLarge,
+                  ),
+                  TextSpan(
+                      text: "Please check your inbox and enter the code.",
                       style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
@@ -62,16 +65,6 @@ class MagicLinkSentPage extends StatelessWidget {
                   duration: 600.ms,
                   curve: Curves.easeOutQuad),
           const Gap(32.0),
-          Center(
-            child: Text(
-              "Or use the one time code.",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          )
-              .animate()
-              .fadeIn(delay: 300.ms, duration: 600.ms)
-              .slideY(begin: 0.2, end: 0, delay: 300.ms, duration: 600.ms),
-          const Gap(24.0),
           BlocSelector<HSMagicLinkCubit, HSMagicLinkState, String?>(
             selector: (state) =>
                 state.errorMessage.isNotEmpty ? state.errorMessage : null,

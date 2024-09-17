@@ -140,7 +140,7 @@ class _EmailInput extends StatelessWidget {
 class _LoginButton extends StatelessWidget {
   const _LoginButton(this._loginCubit);
   final HSLoginCubit _loginCubit;
-  final String buttonText = "Send Magic Link";
+  final String buttonText = "Continue with email";
 
   @override
   Widget build(BuildContext context) {
