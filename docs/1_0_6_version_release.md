@@ -36,7 +36,7 @@ The **Map Page** should auto-zoom itself to show the closest spots on *entered /
 ### UI Fixes
 Consider and implement UI fixes suggested by the beta testers.
 
-- [ ] Fix login by magic link
+- [ x ] Fix login by magic link
 
 ### Board Map Auto-Zoom
 Implement the removed feature of zooming out to see all spots included in a board.
@@ -50,6 +50,8 @@ Add a searchbar to the saved spots / boards page.
 ### Followers / Following Page
 Implement a page displaying the followers / followed users that can be accessed from the user profile page.
 
+### Editing spot
+- [ ] Implement editing images added to the spot
 
 ### Likers Page
 Implement a page displaying the people that have liked a spot.
@@ -64,6 +66,6 @@ Implement bug fixes:
 - [ ] Following / followers triggers not working on follow / unfollow
 - [ ] The FCM Token is only registered on app entry -> should be on login
 - [ ] When cancelling editing, user is moved to home page, when should be to his profile
-- [ ] When editing spot previously selected location should be displayed
+- [ x ] When editing spot previously selected location should be displayed
 - [ ] Something is wrong gathering interactions - only comments are tracked
 - [ x ] Big letters in username should be allowed, but automatically changed to lowercase
