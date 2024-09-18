@@ -323,27 +323,8 @@ class HSBoardsRepository {
     }
   }
 
-  Future<String> generateBoardInvitation(String boardId) async {
+  Future<String> generateBoardInvitation(String boardId, String token) async {
     try {
-      // TODO: Talk with Kuba about it
-      late String token;
-      bool isUnique = false;
-
-      // Generate a unique token and ensure it's not already in the database
-      while (!isUnique) {
-        token = Uuid().v4();
-
-        final existingInvitation = await _supabase
-            .from('board_invitations')
-            .select()
-            .eq('token', token)
-            .maybeSingle();
-
-        if (existingInvitation == null) {
-          isUnique = true;
-        }
-      }
-
       // Store the invitation details
       await _supabase.from('board_invitations').insert({
         'board_id': boardId,

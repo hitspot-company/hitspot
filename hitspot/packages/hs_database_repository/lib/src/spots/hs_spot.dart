@@ -92,8 +92,9 @@ class HSSpot {
     );
   }
 
-  Map<String, dynamic> serialize() {
+  Map<String, dynamic> serialize({String? id}) {
     return {
+      'id': id ?? sid,
       'title': title,
       'description': description,
       'geohash': geohash,

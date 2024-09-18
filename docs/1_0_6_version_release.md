@@ -64,8 +64,8 @@ Implement transaction for creating a spot
 Implement bug fixes:
 - [ ] Sometimes the address contains empty strings resulting in an order of empty commas
 - [ ] Following / followers triggers not working on follow / unfollow
-- [ ] The FCM Token is only registered on app entry -> should be on login
-- [ ] When cancelling editing, user is moved to home page, when should be to his profile
+- [ x ] The FCM Token is only registered on app entry -> should be on login
+- [ ] When cancelling editing spot, user is moved to home page, when should be to his profile
 - [ x ] When editing spot previously selected location should be displayed
 - [ ] Something is wrong gathering interactions - only comments are tracked
 - [ x ] Big letters in username should be allowed, but automatically changed to lowercase
