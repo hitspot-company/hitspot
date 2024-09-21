@@ -4,6 +4,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HSPickers {
   // SINGLETON

@@ -17,6 +17,7 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 part 'hs_create_spot_state.dart';
 
@@ -90,6 +91,17 @@ class HSCreateSpotCubit extends Cubit<HSCreateSpotState> {
 
   Future<void> _chooseImages() async {
     try {
+      HSDebugLogger.logInfo("Permission status");
+      final permissionStatus = await Permission.photos.request();
+      HSDebugLogger.logInfo("Permission status: $permissionStatus");
+      if (!permissionStatus.isLimited && !permissionStatus.isGranted) {
+        HSDebugLogger.logError("Gallery access not granted");
+        navi.toError(
+            title: "Gallery access not granted",
+            message:
+                "The Hitspot app needs access to your gallery to upload images");
+        return;
+      }
       final List<XFile> images = await app.pickers.multipleImages(
           cropAspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1));
       emit(state.copyWith(
