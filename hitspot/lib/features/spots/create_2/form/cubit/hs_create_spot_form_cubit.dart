@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:equatable/equatable.dart';
@@ -13,6 +14,7 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pair/pair.dart';
 
 part 'hs_create_spot_form_state.dart';
 
@@ -93,12 +95,12 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
       }
 
       if (prototype != null) {
-        // Handle updating existing spot (not using isolate for simplicity)
-        await app.databaseRepository
-            .spotUpdate(spot: spot.copyWith(sid: prototype!.sid!));
-        if (state.selectedTags.isNotEmpty) {
-          await uploadTags(prototype!.sid!);
-        }
+        final spotWithPrototype = spot.copyWith(
+            sid: prototype!.sid,
+            latitude: lat,
+            longitude: long,
+            tags: spot.tags);
+        await _updateSpot(spotWithPrototype);
         HSDebugLogger.logSuccess("Spot updated: ${prototype!.sid!}");
         navi.go("/user/${currentUser.uid}");
         navi.push('/spot/${prototype!.sid}');
@@ -123,6 +125,28 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
     } catch (e) {
       HSDebugLogger.logError("Could not submit spot: $e");
       emit(state.copyWith(status: HSCreateSpotFormStatus.error));
+    }
+  }
+
+  Future<void> _updateSpot(HSSpot spot) async {
+    final List<Pair<String, String>> urls =
+        await app.storageRepository.spotUploadImages(
+      files: state.images.map((e) => File(e.path)).toList(),
+      uid: app.currentUser.uid!,
+      sid: spot.sid!,
+    );
+    await _databaseRepository.spotUploadImages(
+      spotID: spot.sid!,
+      imageUrls: urls,
+      uid: app.currentUser.uid!,
+    );
+    await app.databaseRepository.spotUpdate(spot: spot);
+    if (state.selectedTags.isNotEmpty) {
+      HSDebugLogger.logInfo(
+          "Before removing duplicates: ${state.selectedTags}");
+      state.selectedTags.removeWhere((element) => spot.tags!.contains(element));
+      HSDebugLogger.logInfo("After removing duplicates: ${state.selectedTags}");
+      await uploadTags(prototype!.sid!);
     }
   }
 

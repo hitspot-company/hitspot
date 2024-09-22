@@ -71,18 +71,18 @@ class SingleBoardPage extends StatelessWidget {
           child: HSScaffold(
             onTap: singleBoardCubit.exitEditMode,
             appBar: HSAppBar(
-              enableDefaultBackButton: true,
-              right: IconButton(
-                onPressed: singleBoardCubit.showBottomSheet,
-                icon: const Icon(FontAwesomeIcons.ellipsisVertical),
-              )
-                  .animate()
-                  .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                  .scale(
-                    begin: const Offset(0.8, 0.8),
-                    end: const Offset(1, 1),
-                  ),
-            ),
+                enableDefaultBackButton: true,
+                right: IconButton(
+                  onPressed:
+                      !isLoading ? singleBoardCubit.showBottomSheet : null,
+                  icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+                )
+                    .animate()
+                    .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                    .scale(
+                      begin: const Offset(0.8, 0.8),
+                      end: const Offset(1, 1),
+                    )),
             body: CustomScrollView(
               controller: _scrollController,
               slivers: [

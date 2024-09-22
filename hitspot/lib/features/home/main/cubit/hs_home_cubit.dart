@@ -23,6 +23,11 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   Completer<GoogleMapController> get mapController => _mapController;
   final _databaseRepository = app.databaseRepository;
 
+  bool get isPageEmpty =>
+      state.trendingSpots.isEmpty &&
+      state.nearbySpots.isEmpty &&
+      state.trendingBoards.isEmpty;
+
   void lateFetchNearby() => _fetchNearbySpots();
 
   String get appcastURL =>

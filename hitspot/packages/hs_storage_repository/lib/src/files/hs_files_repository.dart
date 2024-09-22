@@ -110,4 +110,15 @@ class HSFilesRepository {
       throw ("Could not upload spot images: $_");
     }
   }
+
+  Future<void> reorderImages(String url1, String url2) async {
+    try {
+      await _supabase.storage.from("spots").move(url1, "${url1}_temp");
+      await _supabase.storage.from("spots").move(url2, url1);
+      await _supabase.storage.from("spots").move("${url1}_temp", url2);
+    } catch (_) {
+      throw HSFileException(
+          details: _.toString(), message: "Could not reorder images");
+    }
+  }
 }

@@ -166,6 +166,7 @@ class _FourthPage extends StatelessWidget {
         const HSFormCaption(text: "Tell the world more about yourself!"),
         const Gap(8.0),
         HSTextField(
+          autofocus: true,
           onChanged: _completeProfileCubit.updateBiogram,
           maxLines: 6,
           maxLength: 256,
