@@ -139,6 +139,7 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
       for (var i = 0; i < spot.images!.length; i++) {
         final image = spot.images![i];
         await CachedNetworkImage.evictFromCache(image);
+        await CachedNetworkImage.evictFromCache("${image}_thumbnail");
       }
     }
     if (spot.tags != state.selectedTags) {
