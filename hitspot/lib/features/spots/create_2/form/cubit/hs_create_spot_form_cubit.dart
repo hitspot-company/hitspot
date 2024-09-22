@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -99,6 +100,8 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
             sid: prototype!.sid,
             latitude: lat,
             longitude: long,
+            images: prototype!.images,
+            thumbnails: prototype!.thumbnails,
             tags: spot.tags);
         await _updateSpot(spotWithPrototype);
         HSDebugLogger.logSuccess("Spot updated: ${prototype!.sid!}");
@@ -129,6 +132,13 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
   }
 
   Future<void> _updateSpot(HSSpot spot) async {
+    await app.storageRepository
+        .spotDeleteImages(images: spot.images, thumbnails: spot.thumbnails);
+    await _databaseRepository.spotDeleteImages(spot: spot);
+    for (var i = 0; i < spot.images!.length; i++) {
+      final image = spot.images![i];
+      await CachedNetworkImage.evictFromCache(image);
+    }
     final List<Pair<String, String>> urls =
         await app.storageRepository.spotUploadImages(
       files: state.images.map((e) => File(e.path)).toList(),

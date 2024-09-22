@@ -84,6 +84,15 @@ class HSSpotsRepository {
     }
   }
 
+  Future<void> deleteImages(HSSpot? spot, String? spotID) async {
+    try {
+      final sid = spot?.sid ?? spotID!;
+      await _supabase.from(_spotsImages).delete().eq("spot_id", sid);
+    } catch (e) {
+      throw Exception("Error deleting images: $e");
+    }
+  }
+
   Future<List<HSSpot>> fetchSpotsWithinRadius(double lat, double long,
       [double? radius]) async {
     const double DEFAULT_RADIUS = 1000 * 50; // 50km

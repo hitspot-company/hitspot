@@ -83,6 +83,11 @@ class HSStorageRepository {
           required String sid}) async =>
       await _filesRepository.spotUploadImages(files, uid, sid);
 
-  Future<void> reorderImages(String url1, String url2) async =>
-      await _filesRepository.reorderImages(url1, url2);
+  Future<void> spotDeleteImages(
+          {List<String>? images, List<String>? thumbnails}) async =>
+      await _filesRepository.spotDeleteImages(images, thumbnails);
+
+  // TODO: Add implementation
+  // Future<void> reorderImages(String url1, String url2) async =>
+  //     await _filesRepository.reorderImages(url1, url2);
 }

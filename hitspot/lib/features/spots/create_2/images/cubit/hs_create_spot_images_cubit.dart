@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create_2/location/view/create_spot_location_provider.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
@@ -19,8 +18,15 @@ class HsCreateSpotImagesCubit extends Cubit<HsCreateSpotImagesState> {
 
   final HSSpot? prototype;
 
-  Future<void> chooseImages() async {
-    if (prototype != null) {
+  bool Function(int) itemDragEnable() {
+    if (state.images.isNotEmpty) {
+      return (index) => true;
+    }
+    return (index) => false;
+  }
+
+  Future<void> chooseImages([bool force = false]) async {
+    if (prototype != null && !force) {
       emit(state.copyWith(
         status: HsCreateSpotImagesStatus.ready,
         imageUrls: prototype!.images,
@@ -39,6 +45,7 @@ class HsCreateSpotImagesCubit extends Cubit<HsCreateSpotImagesState> {
         if (images.isNotEmpty) {
           emit(state.copyWith(
             images: images,
+            imageUrls: [],
             status: HsCreateSpotImagesStatus.ready,
           ));
         }
@@ -56,25 +63,6 @@ class HsCreateSpotImagesCubit extends Cubit<HsCreateSpotImagesState> {
     final List<dynamic> allImages = [...state.images, ...state.imageUrls];
     final item = allImages.removeAt(oldIndex);
     allImages.insert(newIndex, item);
-
-    if (allImages.elementAt(newIndex).runtimeType == String) {
-      try {
-        final url1 = allImages
-            .elementAt(oldIndex)
-            .toString()
-            .split("storage/v1/object/")
-            .last;
-        final url2 = allImages
-            .elementAt(newIndex)
-            .toString()
-            .split("storage/v1/object/")
-            .last;
-        print("Reordering images: $url1, $url2");
-        await app.storageRepository.reorderImages(url1, url2);
-      } catch (e) {
-        HSDebugLogger.logError("Could not reorder images: $e");
-      }
-    }
 
     emit(state.copyWith(
       images: allImages.whereType<XFile>().toList(),

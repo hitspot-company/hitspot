@@ -37,6 +37,9 @@ class CreateSpotImagesPage extends StatelessWidget {
               return Column(
                 children: [
                   ReorderableGridView(
+                    itemDragEnable: state.images.isNotEmpty
+                        ? (index) => true
+                        : (index) => false,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
@@ -65,17 +68,18 @@ class CreateSpotImagesPage extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Drag and drop to reorder",
-                    style: TextStyle(
+                  Text(
+                    "Drag and drop to reorder${state.imageUrls.isNotEmpty ? ' is not supported for network images' : ''}",
+                    style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 16,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32.0),
                   HSFormButtonsRow(
                     left: HSFormButton(
-                        onPressed: cubit.chooseImages,
+                        onPressed: () => cubit.chooseImages(true),
                         child: const Text("Select photos")),
                     right: HSFormButton(
                         onPressed: cubit.next, child: const Text("Next")),

@@ -1,4 +1,3 @@
-
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
@@ -270,6 +269,9 @@ class HSDatabaseRepsitory {
           required List<Pair<String, String>> imageUrls,
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
+
+  Future<void> spotDeleteImages({HSSpot? spot, String? spotID}) async =>
+      await _spotsRepository.deleteImages(spot, spotID);
 
   Future<HSComment> spotAddComment(
           {required String spotID,
