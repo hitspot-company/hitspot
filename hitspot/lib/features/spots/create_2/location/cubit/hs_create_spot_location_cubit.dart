@@ -30,7 +30,7 @@ class HsCreateSpotLocationCubit extends Cubit<HsCreateSpotLocationState> {
     Position? currentLocation;
 
     // Handle the prototype check
-    if (prototype != null) {
+    if (prototype != null && images.isEmpty) {
       currentLocation = posFromLatLng(
           latitude: prototype?.latitude, longitude: prototype?.longitude);
     }
