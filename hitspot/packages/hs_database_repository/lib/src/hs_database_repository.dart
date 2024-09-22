@@ -3,7 +3,6 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/cache/hs_cache_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
-import 'package:hs_database_repository/src/recommendation_system/hs_recommendation_system_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
 import 'package:pair/pair.dart';
@@ -19,9 +18,7 @@ class HSDatabaseRepsitory {
         HSBoardsRepository(_supabaseClient, boards, _notificationsRepository);
     _spotsRepository =
         HSSpotsRepository(_supabaseClient, spots, _notificationsRepository);
-    _tagsRepository = HSTagsRepository(_supabaseClient, spots);
-    _recommendationSystemRepository =
-        HSRecommendationSystemRepository(_supabaseClient);
+    this._tagsRepository = HSTagsRepository(_supabaseClient, spots);
   }
 
   static const String users = "users";
@@ -34,7 +31,6 @@ class HSDatabaseRepsitory {
   late final HSBoardsRepository _boardsRepository;
   late final HSSpotsRepository _spotsRepository;
   late final HSTagsRepository _tagsRepository;
-  late final HSRecommendationSystemRepository _recommendationSystemRepository;
   late final HSNotificationsRepository _notificationsRepository;
   final HSCacheRepository _cacheRepository = HSCacheRepository();
 
@@ -504,12 +500,6 @@ class HSDatabaseRepsitory {
           int batchSize = 20,
           int batchOffset = 0}) async =>
       await _tagsRepository.fetchTopSpots(tag, batchSize, batchOffset);
-
-  Future<void> recommendationSystemCaptureEvent(
-          {required String userId,
-          required HSSpot spot,
-          required HSInteractionType event}) async =>
-      await _recommendationSystemRepository.captureEvent(userId, spot, event);
 
   Future<void> notifactionChangeFcmToken(
           {required String userID, required String fcmToken}) async =>

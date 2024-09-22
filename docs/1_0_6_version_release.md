@@ -69,3 +69,4 @@ Implement bug fixes:
 - [ x ] When editing spot previously selected location should be displayed
 - [ ] Something is wrong gathering interactions - only comments are tracked
 - [ x ] Big letters in username should be allowed, but automatically changed to lowercase
+- [ ] Fix not allowing big letters in email
