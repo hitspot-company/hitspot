@@ -53,37 +53,39 @@ class HSLocationRepository {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
 
-      var address = '';
-
-      if (placemarks.isNotEmpty) {
-        // Concatenate non-null components of the address
-        var streets = placemarks.reversed
-            .map((placemark) => placemark.street)
-            .where((street) => street != null && street != '');
-
-        // Filter out unwanted parts
-        streets = streets.where((street) =>
-            street!.toLowerCase() !=
-            placemarks.reversed.last.locality!
-                .toLowerCase()); // Remove city names
-        streets = streets
-            .where((street) => !street!.contains('+')); // Remove street codes
-
-        address += streets.join(', ');
-
-        address += ', ${placemarks.reversed.last.subLocality ?? ''}';
-        address += ', ${placemarks.reversed.last.locality ?? ''}';
-        address += ', ${placemarks.reversed.last.subAdministrativeArea ?? ''}';
-        address += ', ${placemarks.reversed.last.administrativeArea ?? ''}';
-        address += ', ${placemarks.reversed.last.postalCode ?? ''}';
-        address += ', ${placemarks.reversed.last.country ?? ''}';
+      if (placemarks.isEmpty) {
+        return 'No address found';
       }
+
+      Placemark placemark = placemarks.reversed.last;
+
+      // Helper function to clean and format address parts
+      String formatPart(String? part) =>
+          (part != null && part.isNotEmpty) ? part : '';
+
+      // Extracting relevant parts from the placemark
+      List<String> addressParts = [
+        formatPart(placemark.street),
+        formatPart(placemark.subLocality),
+        formatPart(placemark.locality),
+        formatPart(placemark.subAdministrativeArea),
+        formatPart(placemark.administrativeArea),
+        formatPart(placemark.postalCode),
+        formatPart(placemark.country),
+      ];
+
+      // Remove duplicates and empty parts
+      addressParts =
+          addressParts.toSet().where((part) => part.isNotEmpty).toList();
+
+      // Join parts with ', '
+      String address = addressParts.join(', ');
 
       print("Your Address for ($lat, $long) is: $address");
 
       return address;
-    } catch (_) {
-      throw "Could not fetch address : $_";
+    } catch (error) {
+      throw "Could not fetch address: $error";
     }
   }
 

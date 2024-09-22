@@ -102,7 +102,6 @@ class HSFilesRepository {
             await uploadAndFetchPublicUrl(image, "spots", uploadPath, null);
         final String thumbnailUrl = await uploadAndFetchPublicUrl(
             thumbnail, "spots", thumbnailUploadPath, null);
-        ;
 
         ret.add(Pair(imageUrl, thumbnailUrl));
       }

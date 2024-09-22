@@ -18,6 +18,7 @@ import 'package:hitspot/features/notifications/view/notifications_provider.dart'
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
 import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
+import 'package:hitspot/features/spots/create_2/images/view/create_spot_images_provider.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/features/spots/multiple/view/multiple_spots_provider.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
@@ -54,11 +55,13 @@ class HSNavigation {
             reverseDuration: const Duration(milliseconds: 350),
             alignment: Alignment.bottomCenter),
       );
-  dynamic go(String location) => router.go(location);
+  dynamic go(String location) => context.go(location);
   dynamic replacePage({required Widget page}) =>
       router.configuration.navigatorKey.currentState!.pushReplacement(
         MaterialPageRoute(builder: (_) => page),
       );
+
+  dynamic replace(String location) => GoRouter.of(context).replace(location);
 
   final GoRouter router = GoRouter(
     initialLocation: "/splash",
@@ -209,7 +212,7 @@ class HSNavigation {
               ),
               GoRoute(
                 path: 'create_spot',
-                builder: (context, state) => const CreateSpotProvider(),
+                builder: (context, state) => const CreateSpotImagesProvider(),
               ),
               GoRoute(
                 path: 'saved',

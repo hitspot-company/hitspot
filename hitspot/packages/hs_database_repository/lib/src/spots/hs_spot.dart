@@ -131,8 +131,9 @@ class HSSpot {
   }
 
   String get getThumbnail {
-    if (thumbnails?[0] != null && thumbnails?[0] != "null")
+    if (thumbnails?[0] != null && thumbnails?[0] != "null") {
       return thumbnails![0];
+    }
     return images![0];
   }
 

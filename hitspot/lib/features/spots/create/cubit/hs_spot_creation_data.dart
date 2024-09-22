@@ -11,9 +11,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class HSSpotCreationData {
   final RootIsolateToken rootIsolateToken;
   final HSSpot spot;
-  final List<String> imagePaths;
+  // final List<String> imagePaths;
   final String uid;
-  final List<String> tags;
+  // final List<String> tags;
   final SendPort sendPort;
   final Map<String, dynamic> supabaseData;
   final Session? currentSession;
@@ -21,9 +21,9 @@ class HSSpotCreationData {
   HSSpotCreationData({
     required this.rootIsolateToken,
     required this.spot,
-    required this.imagePaths,
+    // required this.imagePaths,
     required this.uid,
-    required this.tags,
+    // required this.tags,
     required this.sendPort,
     required this.supabaseData,
     required this.currentSession,
@@ -32,7 +32,6 @@ class HSSpotCreationData {
 
 Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
   BackgroundIsolateBinaryMessenger.ensureInitialized(data.rootIsolateToken);
-
   if (data.currentSession == null) {
     throw Exception('User is not authenticated');
   }
@@ -52,11 +51,11 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
     final String sid = await databaseRepo.spotCreate(spot: data.spot);
 
     // Upload images
-    if (data.imagePaths.isNotEmpty) {
+    if (data.spot.images!.isNotEmpty) {
       sendProgress('Uploading images...', .4);
       final List<Pair<String, String>> urls =
           await storageRepo.spotUploadImages(
-        files: data.imagePaths.map((e) => File(e)).toList(),
+        files: data.spot.images!.map((e) => File(e)).toList(),
         uid: data.uid,
         sid: sid,
       );
@@ -69,9 +68,9 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
     // Upload tags
-    if (data.tags.isNotEmpty) {
+    if (data.spot.tags!.isNotEmpty) {
       sendProgress('Uploading tags...', 0.9);
-      for (var tag in data.tags) {
+      for (var tag in data.spot.tags!) {
         await databaseRepo.tagSpotCreate(
           value: tag,
           spotID: sid,
@@ -100,9 +99,7 @@ Future<void> createSpotWithIsolate(
     currentSession: data.currentSession,
     supabaseData: data.supabaseData,
     spot: data.spot,
-    imagePaths: data.imagePaths,
     uid: data.uid,
-    tags: data.tags,
     sendPort: receivePort.sendPort,
   );
 

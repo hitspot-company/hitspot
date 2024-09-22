@@ -144,7 +144,7 @@ class HSChooseLocationCubit extends Cubit<HSChooseLocationState> {
     _mapController.complete(controller);
   }
 
-  void cancel() => navi.go('/');
+  void cancel() => navi.pop(null);
 
   void resetPosition() async =>
       app.locationRepository.resetPosition(mapController);
