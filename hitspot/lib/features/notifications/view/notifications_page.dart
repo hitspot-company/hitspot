@@ -76,8 +76,24 @@ class _LoadedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<HSNotificationsCubit>();
+    final announcements = state.announcements;
+    final notifications = state.notifications;
+    final bool isEmpty = announcements.isEmpty && notifications.isEmpty;
     return CustomScrollView(
       slivers: [
+        if (isEmpty)
+          const SliverFillRemaining(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(FontAwesomeIcons.bellSlash, size: 64.0),
+                  Gap(16.0),
+                  Text("No notifications yet"),
+                ],
+              ),
+            ),
+          ),
         if (cubit.state.announcements.isNotEmpty)
           SliverMainAxisGroup(
             slivers: [
