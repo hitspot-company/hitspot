@@ -20,7 +20,13 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
   HsCreateSpotFormCubit(
       {this.prototype, required this.images, required this.location})
       : super(const HSCreateSpotFormState()) {
-    emit(state.copyWith(spotLocation: location, images: images));
+    emit(state.copyWith(
+      spotLocation: location,
+      images: images,
+      title: prototype?.title,
+      description: prototype?.description,
+      selectedTags: prototype?.tags,
+    ));
   }
 
   final HSSpot? prototype;
