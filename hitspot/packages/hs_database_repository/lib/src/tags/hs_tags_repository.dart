@@ -138,4 +138,25 @@ class HSTagsRepository {
       throw Exception("Error searching tags: $_");
     }
   }
+
+  // TODO: Replace with RPC
+  Future<void> deleteSpotTags(
+      HSSpot? spot, String? spotID, List<String>? tags) async {
+    try {
+      final sid = spot?.sid ?? spotID;
+      if (tags != null && tags.isNotEmpty) {
+        for (var i = 0; i < tags.length; i++) {
+          await _supabase
+              .from("spots_tags")
+              .delete()
+              .eq('spot_id', sid!)
+              .eq('tag_value', tags[i]);
+        }
+      } else {
+        await _supabase.from('spots_tags').delete().eq('spot_id', sid!);
+      }
+    } catch (_) {
+      throw Exception("Error deleting spot tags: $_");
+    }
+  }
 }

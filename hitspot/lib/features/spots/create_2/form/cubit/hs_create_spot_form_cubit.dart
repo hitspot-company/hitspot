@@ -102,7 +102,7 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
             longitude: long,
             images: prototype!.images,
             thumbnails: prototype!.thumbnails,
-            tags: spot.tags);
+            tags: prototype!.tags);
         await _updateSpot(spotWithPrototype);
         HSDebugLogger.logSuccess("Spot updated: ${prototype!.sid!}");
         navi.go("/user/${currentUser.uid}");
@@ -131,13 +131,37 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
     }
   }
 
+  Future<void> _clearSpotData(HSSpot spot) async {
+    if (state.images.isNotEmpty) {
+      await app.storageRepository
+          .spotDeleteImages(images: spot.images, thumbnails: spot.thumbnails);
+      await _databaseRepository.spotDeleteImages(spot: spot);
+      for (var i = 0; i < spot.images!.length; i++) {
+        final image = spot.images![i];
+        await CachedNetworkImage.evictFromCache(image);
+      }
+    }
+    if (spot.tags != state.selectedTags) {
+      final List<String> tagsToRemove =
+          spot.tags!.where((e) => !state.selectedTags.contains(e)).toList();
+      HSDebugLogger.logInfo("Tags to remove: $tagsToRemove");
+      await _databaseRepository.tagDeleteSpotTags(
+          spot: spot, tags: tagsToRemove);
+    }
+  }
+
   Future<void> _updateSpot(HSSpot spot) async {
-    await app.storageRepository
-        .spotDeleteImages(images: spot.images, thumbnails: spot.thumbnails);
-    await _databaseRepository.spotDeleteImages(spot: spot);
-    for (var i = 0; i < spot.images!.length; i++) {
-      final image = spot.images![i];
-      await CachedNetworkImage.evictFromCache(image);
+    await _clearSpotData(spot);
+    if (state.selectedTags.isNotEmpty) {
+      late final List<String> tagsToUpload;
+      if (prototype!.tags != null) {
+        tagsToUpload = state.selectedTags
+            .where((e) => !prototype!.tags!.contains(e))
+            .toList();
+      } else {
+        tagsToUpload = state.selectedTags;
+      }
+      await uploadTags(prototype!.sid!, tagsToUpload);
     }
     final List<Pair<String, String>> urls =
         await app.storageRepository.spotUploadImages(
@@ -151,13 +175,6 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
       uid: app.currentUser.uid!,
     );
     await app.databaseRepository.spotUpdate(spot: spot);
-    if (state.selectedTags.isNotEmpty) {
-      HSDebugLogger.logInfo(
-          "Before removing duplicates: ${state.selectedTags}");
-      state.selectedTags.removeWhere((element) => spot.tags!.contains(element));
-      HSDebugLogger.logInfo("After removing duplicates: ${state.selectedTags}");
-      await uploadTags(prototype!.sid!);
-    }
   }
 
   Future<void> _fetchTags() async {
@@ -189,9 +206,8 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
     emit(state.copyWith(selectedTags: newSelectedTags));
   }
 
-  Future<void> uploadTags(String spotID) async {
+  Future<void> uploadTags(String spotID, List<String> tags) async {
     try {
-      final List<String> tags = state.selectedTags;
       for (var i = 0; i < tags.length; i++) {
         await _databaseRepository.tagSpotCreate(
             value: tags[i], spotID: spotID, userID: currentUser.uid!);

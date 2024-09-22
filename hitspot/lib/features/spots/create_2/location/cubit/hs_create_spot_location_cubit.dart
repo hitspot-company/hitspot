@@ -28,24 +28,25 @@ class HsCreateSpotLocationCubit extends Cubit<HsCreateSpotLocationState> {
   Future<void> _chooseLocation() async {
     emit(state.copyWith(status: HsCreateSpotLocationStatus.choosingLocation));
     Position? currentLocation;
-    for (final image in images) {
-      final gps = await _getGPSCoordinates(File(image.path));
-      if (gps != null) {
-        currentLocation = Position(
-          latitude: gps.latitude,
-          longitude: gps.longitude,
-          altitude: 0.0,
-          accuracy: 0.0,
-          speed: 0.0,
-          speedAccuracy: 0.0,
-          heading: 0.0,
-          timestamp: DateTime.now(),
-          altitudeAccuracy: 0.0,
-          headingAccuracy: 0.0,
-        );
-        break;
+
+    // Handle the prototype check
+    if (prototype != null) {
+      currentLocation = posFromLatLng(
+          latitude: prototype?.latitude, longitude: prototype?.longitude);
+    }
+
+    // Fallback to images
+    if (currentLocation == null) {
+      for (final image in images) {
+        final gps = await _getGPSCoordinates(File(image.path));
+        if (gps != null) {
+          currentLocation = posFromLatLng(latLng: gps);
+          break;
+        }
       }
     }
+
+    // Fallback to app.currentPosition and location permission check
     if (currentLocation == null) {
       currentLocation = app.currentPosition;
       final permissionStatus = await Permission.location.request();
@@ -53,17 +54,23 @@ class HsCreateSpotLocationCubit extends Cubit<HsCreateSpotLocationState> {
           currentLocation == null) {
         try {
           final location = await app.locationRepository.getCurrentLocation();
-          currentLocation = location;
+          currentLocation = location; // Default if location is still null
         } catch (e) {
           HSDebugLogger.logInfo("Error while getting current location: $e");
+          currentLocation = kDefaultPosition; // Use default location on error
         }
       } else {
         currentLocation = kDefaultPosition;
       }
     }
+
+    await Future.delayed(const Duration(
+        seconds: 1)); // DON'T REMOVE THIS - the navigator needs time to build
     final HSLocation? result = await navi.pushTransition(
-        PageTransitionType.fade,
-        ChooseLocationProvider(initialUserLocation: currentLocation!));
+      PageTransitionType.fade,
+      ChooseLocationProvider(initialUserLocation: currentLocation),
+    );
+
     if (result != null) {
       HSDebugLogger.logSuccess("Received location: $result");
       var res = await navi.pushTransition(
@@ -121,5 +128,23 @@ class HsCreateSpotLocationCubit extends Cubit<HsCreateSpotLocationState> {
     final latitude = dmsToDD(gpsLatitude, gpsLatitudeRef);
     final longitude = dmsToDD(gpsLongitude, gpsLongitudeRef);
     return LatLng(latitude, longitude);
+  }
+
+  Position posFromLatLng(
+      {LatLng? latLng, double? latitude, double? longitude}) {
+    final double lat = latitude ?? latLng?.latitude ?? 0.0;
+    final double long = longitude ?? latLng?.longitude ?? 0.0;
+    return Position(
+      latitude: lat,
+      longitude: long,
+      altitude: 0.0,
+      accuracy: 0.0,
+      speed: 0.0,
+      speedAccuracy: 0.0,
+      heading: 0.0,
+      timestamp: DateTime.now(),
+      altitudeAccuracy: 0.0,
+      headingAccuracy: 0.0,
+    );
   }
 }

@@ -46,7 +46,6 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
         tags: tags,
         status: HSSingleSpotStatus.loaded,
       ));
-      HSDebugLogger.logInfo(spot.images.toString());
     } catch (_) {
       HSDebugLogger.logError("Error fetching spot: $_");
       navi.toError(
