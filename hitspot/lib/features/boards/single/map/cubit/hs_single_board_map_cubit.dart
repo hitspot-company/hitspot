@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
-import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -33,6 +32,8 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       loadMarkers();
       pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
+      await _locationRepository.zoomToFitSpots(
+          state.spots, await controller.future); // TODO: test this
     } catch (e) {
       HSDebugLogger.logError("Error initializing board map: $e");
       emit(state.copyWith(status: HSSingleBoardMapStatus.error));

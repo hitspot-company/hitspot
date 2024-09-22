@@ -8,6 +8,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
+import 'package:hitspot/main.dart';
 import 'package:hitspot/widgets/map/hs_spot_info_window.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -42,9 +43,11 @@ class HSMapCubit extends Cubit<HSMapState> {
         cameraPosition = LatLng(
             app.currentPosition!.latitude, app.currentPosition!.longitude);
       } else {
-        cameraPosition =
-            const LatLng(60.0, 60.0); // TODO: Change to place with most spots
+        cameraPosition = LatLng(kDefaultLatitude,
+            kDefaultLongitude); // TODO: Change to place with most spots
       }
+      emit(state.copyWith(cameraPosition: cameraPosition));
+      await _fetchClosestSpots();
       emit(state.copyWith(
           cameraPosition: cameraPosition,
           currentPosition: _initialCameraPosition));
@@ -53,6 +56,27 @@ class HSMapCubit extends Cubit<HSMapState> {
       HSDebugLogger.logError("Error initializing map: $e");
     }
   }
+
+  Future<void> _fetchClosestSpots() async {
+    try {
+      emit(state.copyWith(status: HSMapStatus.fetchingSpots));
+      final List<Map<String, dynamic>> spots =
+          await supabase.rpc('spot_fetch_closest', params: {
+        'p_user_lat': state.cameraPosition!.latitude,
+        'p_user_long': state.cameraPosition!.longitude,
+        'p_batch_size': 20,
+        'p_batch_offset': 0,
+      });
+      final res = spots.map((e) => HSSpot.deserializeWithAuthor(e)).toList();
+      emit(state.copyWith(spotsInView: res));
+      _locationRepository.zoomToFitSpots(res, await controller.future);
+      placeMarkers();
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching spots: $e");
+    }
+  }
+
+  // Function to calculate LatLngBounds and zoom out to fit all spots
 
   Future<void> fetchSpots() async {
     try {

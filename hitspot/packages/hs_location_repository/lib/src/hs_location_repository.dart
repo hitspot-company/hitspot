@@ -234,50 +234,57 @@ class HSLocationRepository {
     );
   }
 
-  void zoomOutToFitAllMarkers(
-      GoogleMapController controller, Set<Marker> markers,
-      {Position? currentPosition}) {
-    if (markers.isEmpty) return;
+  Future<void> zoomToFitSpots(
+      List<HSSpot> spots, GoogleMapController controller) async {
+    if (spots.isEmpty) return;
 
-    double minLat;
-    double maxLat;
-    double minLng;
-    double maxLng;
+    List<LatLng> spotPositions =
+        spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
 
-    // Start with the user position
-    if (currentPosition != null) {
-      minLat = currentPosition.latitude;
-      maxLat = currentPosition.latitude;
-      minLng = currentPosition.longitude;
-      maxLng = currentPosition.longitude;
-    } else {
-      minLat = markers.first.position.latitude;
-      maxLat = markers.first.position.latitude;
-      minLng = markers.first.position.longitude;
-      maxLng = markers.first.position.longitude;
+    LatLngBounds bounds = _getLatLngBounds(spotPositions);
+    LatLng center = LatLng(
+      (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+      (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+    );
+
+    double zoom = 21; // Start with maximum zoom
+    bool allVisible = false;
+
+    while (!allVisible && zoom > 0) {
+      await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
+      LatLngBounds visibleRegion = await controller.getVisibleRegion();
+
+      allVisible = spotPositions.every((spot) =>
+          spot.latitude >= visibleRegion.southwest.latitude &&
+          spot.latitude <= visibleRegion.northeast.latitude &&
+          spot.longitude >= visibleRegion.southwest.longitude &&
+          spot.longitude <= visibleRegion.northeast.longitude);
+
+      if (!allVisible) zoom -= 0.5;
     }
 
-    // Iterate through all markers to find the bounding box
-    for (Marker marker in markers) {
-      minLat = min(minLat, marker.position.latitude);
-      maxLat = max(maxLat, marker.position.latitude);
-      minLng = min(minLng, marker.position.longitude);
-      maxLng = max(maxLng, marker.position.longitude);
+    // Add a little padding
+    controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom - 0.5));
+  }
+
+  // Calculate LatLngBounds that includes all the spots
+  LatLngBounds _getLatLngBounds(List<LatLng> spots) {
+    double minLat = spots[0].latitude;
+    double maxLat = spots[0].latitude;
+    double minLng = spots[0].longitude;
+    double maxLng = spots[0].longitude;
+
+    for (LatLng spot in spots) {
+      if (spot.latitude < minLat) minLat = spot.latitude;
+      if (spot.latitude > maxLat) maxLat = spot.latitude;
+      if (spot.longitude < minLng) minLng = spot.longitude;
+      if (spot.longitude > maxLng) maxLng = spot.longitude;
     }
 
-    // Create the bounds
-    LatLngBounds bounds = LatLngBounds(
+    return LatLngBounds(
       southwest: LatLng(minLat, minLng),
       northeast: LatLng(maxLat, maxLng),
     );
-
-    // Create camera update
-    CameraUpdate cameraUpdate =
-        CameraUpdate.newLatLngBounds(bounds, /* padding */ 100.0);
-
-    // Move camera to fit bounds
-    controller.animateCamera(cameraUpdate);
-    print("Zooming out to fit all markers");
   }
 
   void resetPosition(Completer<GoogleMapController> controller,
