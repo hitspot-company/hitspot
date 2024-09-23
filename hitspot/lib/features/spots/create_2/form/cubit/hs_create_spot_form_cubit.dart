@@ -146,8 +146,10 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
       final List<String> tagsToRemove =
           spot.tags!.where((e) => !state.selectedTags.contains(e)).toList();
       HSDebugLogger.logInfo("Tags to remove: $tagsToRemove");
-      await _databaseRepository.tagDeleteSpotTags(
-          spot: spot, tags: tagsToRemove);
+      if (tagsToRemove.isNotEmpty) {
+        await _databaseRepository.tagDeleteSpotTags(
+            spot: spot, tags: tagsToRemove);
+      }
     }
   }
 

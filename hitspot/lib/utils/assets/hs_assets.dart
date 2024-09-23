@@ -26,10 +26,18 @@ class HSAssets {
   static const String dotSelected = "$mapIconsPath/dot_selected.svg";
   static const String dotVerified = "$mapIconsPath/dot_verified.svg";
   static const String dotUnverified = "$mapIconsPath/dot_unverified.svg";
+  static const String generalMarker = "$mapIconsPath/map_general.svg";
+  static const String favoriteMarker = "$mapIconsPath/map_favorite.svg";
+  static const String barMarker = "$mapIconsPath/map_bar.svg";
+  // static const String dotUnverified = "$mapIconsPath/dot_unverified.svg";
 
   late final BitmapDescriptor _unverifiedMarker,
       _verifiedMarker,
-      _selectedMarker;
+      _selectedMarker,
+      _generalMarker,
+      _currentLocationMarker,
+      _favoriteMarker,
+      _barMarker;
   final int markerSizeMedium = 20;
 
   void _initialiseMarkerBitmap() async {
@@ -39,13 +47,21 @@ class HSAssets {
         .then((value) => _unverifiedMarker = value);
     await _bitmapDescriptorFromSvgAsset(dotSelected, markerSizeMedium)
         .then((value) => _selectedMarker = value);
+    await _bitmapDescriptorFromSvgAsset(generalMarker, markerSizeMedium)
+        .then((value) => _generalMarker = value);
+    await _bitmapDescriptorFromSvgAsset(favoriteMarker, markerSizeMedium)
+        .then((value) => _favoriteMarker = value);
+    await _bitmapDescriptorFromSvgAsset(barMarker, markerSizeMedium)
+        .then((value) => _barMarker = value);
+    // await _bitmapDescriptorFromSvgAsset(dotSelected, markerSizeMedium)
+    //     .then((value) => _selectedMarker = value);
   }
 
   Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
       String assetName, int size) async {
     try {
       // Scale to get better quality
-      final double scaleFactor = 2.0;
+      final double scaleFactor = 3.0;
 
       final image = await getImageFromSvg(
         assetName,
@@ -59,19 +75,24 @@ class HSAssets {
       final ByteData? bytes =
           await image.toByteData(format: ui.ImageByteFormat.png);
 
-      return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+      return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
     } catch (e) {
       throw Exception('Error loading SVG asset: $e');
     }
   }
 
   BitmapDescriptor _getSpotMarker(HSSpot spot, {bool isSelected = false}) {
+    final tags = spot.tags ?? [];
+    if (tags.isNotEmpty &&
+        (tags.contains('bar') || tags.contains('nightlife'))) {
+      return _barMarker;
+    }
     if (spot.likesCount! > 10) {
-      return _verifiedMarker;
+      return _favoriteMarker;
     } else if (isSelected) {
       return _selectedMarker;
     }
-    return _unverifiedMarker;
+    return _generalMarker;
   }
 
   Marker createSpotMarker(HSSpot spot,

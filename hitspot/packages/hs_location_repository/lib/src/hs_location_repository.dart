@@ -235,11 +235,17 @@ class HSLocationRepository {
   }
 
   Future<void> zoomToFitSpots(
-      List<HSSpot> spots, GoogleMapController controller) async {
+      List<HSSpot> spots, GoogleMapController controller,
+      {Position? currentPosition}) async {
     if (spots.isEmpty) return;
 
     List<LatLng> spotPositions =
         spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+
+    if (currentPosition != null) {
+      spotPositions
+          .add(LatLng(currentPosition.latitude, currentPosition.longitude));
+    }
 
     LatLngBounds bounds = _getLatLngBounds(spotPositions);
     LatLng center = LatLng(
@@ -264,7 +270,7 @@ class HSLocationRepository {
     }
 
     // Add a little padding
-    controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom - 0.5));
+    controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom - .6));
   }
 
   // Calculate LatLngBounds that includes all the spots

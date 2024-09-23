@@ -66,10 +66,12 @@ class HSMapCubit extends Cubit<HSMapState> {
         'p_user_long': state.cameraPosition!.longitude,
         'p_batch_size': 20,
         'p_batch_offset': 0,
+        'p_distance_km': 1000,
       });
       final res = spots.map((e) => HSSpot.deserializeWithAuthor(e)).toList();
+      await _locationRepository.zoomToFitSpots(res, await controller.future,
+          currentPosition: app.currentPosition);
       emit(state.copyWith(spotsInView: res));
-      _locationRepository.zoomToFitSpots(res, await controller.future);
       placeMarkers();
     } catch (e) {
       HSDebugLogger.logError("Error fetching spots: $e");
@@ -109,7 +111,7 @@ class HSMapCubit extends Cubit<HSMapState> {
     fetchSpots();
   }
 
-  void placeMarkers() {
+  void placeMarkers() async {
     final List<HSSpot> spots = state.spotsInView;
     List<Marker> markers = app.assets.generateMarkers(spots,
         currentPosition: state.currentPosition?.toLatLng,

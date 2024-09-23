@@ -60,7 +60,7 @@ class HsCreateSpotLocationCubit extends Cubit<HsCreateSpotLocationState> {
           currentLocation = kDefaultPosition; // Use default location on error
         }
       } else {
-        currentLocation = kDefaultPosition;
+        currentLocation ??= kDefaultPosition;
       }
     }
 
