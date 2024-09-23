@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
-import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/main.dart';
+import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/widgets/map/hs_spot_info_window.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -29,11 +30,15 @@ class HSMapCubit extends Cubit<HSMapState> {
   ExpansionStatus get sheetStatus =>
       sheetKey.currentState?.expansionStatus ?? ExpansionStatus.contracted;
   final _locationRepository = app.locationRepository;
+  late final BitmapDescriptor _generalMarker;
 
   Future<void> init() async {
     try {
       emit(state.copyWith(status: HSMapStatus.loading));
       late final LatLng cameraPosition;
+      final imageConfiguration = createLocalImageConfiguration(app.context);
+      _generalMarker = await BitmapDescriptor.asset(
+          imageConfiguration, HSAssets.generalMarker);
       if (_initialCameraPosition != null) {
         cameraPosition = LatLng(
           _initialCameraPosition.latitude,
@@ -111,12 +116,30 @@ class HSMapCubit extends Cubit<HSMapState> {
     fetchSpots();
   }
 
-  void placeMarkers() async {
+  Future<BitmapDescriptor> getImage(String assetPath) async {
+    final asset = await rootBundle.load(assetPath);
+    final icon = BitmapDescriptor.bytes(asset.buffer.asUint8List(),
+        height: 100, width: 100);
+    return icon;
+  }
+
+  void placeMarkers() {
     final List<HSSpot> spots = state.spotsInView;
-    List<Marker> markers = app.assets.generateMarkers(spots,
-        currentPosition: state.currentPosition?.toLatLng,
-        onTap: onMarkerTapped,
-        selectedSpotID: state.selectedSpot.sid);
+    final marker = _generalMarker;
+    final List<Marker> markers = spots
+        .map(
+          (e) => Marker(
+            markerId: MarkerId(e.sid!),
+            position: LatLng(e.latitude!, e.longitude!),
+            icon: marker,
+            onTap: () => onMarkerTapped(e),
+          ),
+        )
+        .toList();
+    // List<Marker> markers = app.assets.generateMarkers(spots,
+    //     currentPosition: state.currentPosition?.toLatLng,
+    //     onTap: onMarkerTapped,
+    //     selectedSpotID: state.selectedSpot.sid);
     emit(state.copyWith(markersInView: markers));
   }
 
