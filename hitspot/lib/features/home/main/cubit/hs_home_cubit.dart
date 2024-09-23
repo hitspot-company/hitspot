@@ -130,10 +130,10 @@ class HSHomeCubit extends Cubit<HSHomeState> {
           .spotFetchSpotsWithinRadius(
               lat: lat,
               long: long,
-              radius: 500000); // TODO: Change radius (now its 500km)
-      placeMarkers();
+              radius: 500 * 1000); // TODO: Change radius (now its 500km)
       emit(state.copyWith(
           nearbySpots: nearbySpots, currentPosition: currentPosition));
+      placeMarkers();
     } catch (_) {
       HSDebugLogger.logError("Error fetching nearby spots: $_");
     }

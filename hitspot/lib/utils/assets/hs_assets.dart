@@ -75,7 +75,7 @@ class HSAssets {
       final ByteData? bytes =
           await image.toByteData(format: ui.ImageByteFormat.png);
 
-      return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
+      return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
     } catch (e) {
       throw Exception('Error loading SVG asset: $e');
     }
