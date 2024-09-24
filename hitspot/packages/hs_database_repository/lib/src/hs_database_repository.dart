@@ -11,15 +11,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
   HSDatabaseRepsitory(this._supabaseClient) {
-    this._notificationsRepository = HSNotificationsRepository(_supabaseClient);
-    this._usersRepository =
+    _notificationsRepository = HSNotificationsRepository(_supabaseClient);
+    _usersRepository =
         HSUsersRepository(_supabaseClient, users, _notificationsRepository);
-    this._boardsRepository =
+    _boardsRepository =
         HSBoardsRepository(_supabaseClient, boards, _notificationsRepository);
-    this._spotsRepository =
+    _spotsRepository =
         HSSpotsRepository(_supabaseClient, spots, _notificationsRepository);
-    this._tagsRepository = HSTagsRepository(_supabaseClient, spots);
-    this._recommendationSystemRepository =
+    _tagsRepository = HSTagsRepository(_supabaseClient, spots);
+    _recommendationSystemRepository =
         HSRecommendationSystemRepository(_supabaseClient);
   }
 
@@ -409,6 +409,15 @@ class HSDatabaseRepsitory {
 
     return savedSpots;
   }
+
+  Future<List<HSSpot>> spotFetchClosest(
+          {required double lat,
+          required double long,
+          int batchSize = 20,
+          int batchOffset = 0,
+          double distance = 60.0}) async =>
+      await _spotsRepository.fetchClosest(
+          lat, long, batchSize, batchOffset, distance);
 
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);

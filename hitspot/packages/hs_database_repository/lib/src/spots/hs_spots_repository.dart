@@ -479,4 +479,26 @@ class HSSpotsRepository {
       throw Exception("Error fetching saved spots: $_");
     }
   }
+
+  Future<List<HSSpot>> fetchClosest(
+    double lat,
+    double long,
+    int batchSize,
+    int batchOffset,
+    double distance,
+  ) async {
+    try {
+      final List<Map<String, dynamic>> spots =
+          await _supabase.rpc('spot_fetch_closest', params: {
+        'p_user_lat': lat,
+        'p_user_long': long,
+        'p_batch_size': batchSize,
+        'p_batch_offset': batchOffset,
+        'p_distance_km': distance,
+      });
+      return (spots.map((e) => HSSpot.deserializeWithAuthor(e)).toList());
+    } catch (_) {
+      throw Exception("Error fetching saved spots: $_");
+    }
+  }
 }

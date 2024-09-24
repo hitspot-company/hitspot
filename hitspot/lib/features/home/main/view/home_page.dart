@@ -8,6 +8,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
+import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
 import 'package:hitspot/features/map/main/view/map_page.dart';
 import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
@@ -137,7 +138,8 @@ class HomePage extends StatelessWidget {
                           }
                           return GestureDetector(
                             onTap: () => navi.pushTransition(
-                                PageTransitionType.fade, const MapProvider()),
+                                PageTransitionType.fade,
+                                const ClusterMapProvider()),
                             child: AbsorbPointer(
                               absorbing: true,
                               child: HSGoogleMap(
