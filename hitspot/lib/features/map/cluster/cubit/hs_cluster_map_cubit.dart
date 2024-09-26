@@ -103,11 +103,11 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     emit(state.copyWith(cameraPosition: position));
   }
 
-  List fetchFilters() {
+  List<String> fetchFilters() {
     final tags =
         state.visibleSpots.expand((spot) => spot.tags ?? []).toSet().toList();
-    HSDebugLogger.logInfo("Tags: $tags");
     tags.sort();
-    return tags;
+    HSDebugLogger.logInfo("Tags: $tags");
+    return tags.cast<String>();
   }
 }
