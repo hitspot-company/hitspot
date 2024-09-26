@@ -315,7 +315,7 @@ class HSDatabaseRepsitory {
           {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
       await _spotsRepository.saveUnsave(spot, spotID, user, userID);
 
-  Future<List<HSSpot>> spotFetchSpotsInView({
+  Future<List<HSSpot>> spotFetchInBounds({
     required double minLat,
     required double minLong,
     required double maxLat,

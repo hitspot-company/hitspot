@@ -58,7 +58,7 @@ class HSMapCubit extends Cubit<HSMapState> {
     try {
       emit(state.copyWith(status: HSMapStatus.fetchingSpots));
       final LatLngBounds bounds = state.bounds!;
-      final spots = await _databaseRepository.spotFetchSpotsInView(
+      final spots = await _databaseRepository.spotFetchInBounds(
         minLat: bounds.southwest.latitude,
         minLong: bounds.southwest.longitude,
         maxLat: bounds.northeast.latitude,

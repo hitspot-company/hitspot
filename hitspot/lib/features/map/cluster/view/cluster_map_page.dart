@@ -29,13 +29,29 @@ class ClusterMapPage extends StatelessWidget {
               initialCameraPosition: cubit.initialCameraPosition,
               myLocationButtonEnabled: false,
               myLocationEnabled: true,
+              onMapCreated: (controller) {
+                if (!cubit.mapController.isCompleted) {
+                  cubit.mapController.complete(controller);
+                }
+              },
+              markers: cubit.state.markers,
+              onCameraIdle: cubit.onCameraIdle,
             );
           },
         ),
         Positioned(
+          left: 16.0,
+          child: SafeArea(
+            child: FloatingActionButton(
+              onPressed: navi.pop,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: backIcon,
+            ),
+          ),
+        ),
+        Positioned(
           bottom: 0.0,
           child: Material(
-            color: Colors.transparent,
             child: Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
@@ -51,6 +67,7 @@ class ClusterMapPage extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 8.0),
                     child: HSTextField.filled(
                       hintText: 'Search...',
+                      suffixIcon: const Icon(Icons.search),
                       readOnly: true,
                       onTap: () => showSearch(
                         context: context,
@@ -64,8 +81,10 @@ class ClusterMapPage extends StatelessWidget {
                       thickness: .4,
                     ),
                   ),
-                  SizedBox(
-                    height: 100.0,
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom + 16.0,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -102,7 +121,6 @@ class ClusterMapPage extends StatelessWidget {
 
 class _MapButton extends StatelessWidget {
   const _MapButton({
-    super.key,
     required this.icon,
     this.backgroundColor,
     required this.text,

@@ -319,6 +319,16 @@ class HSSpotsRepository {
     double maxLong,
   ) async {
     try {
+      if (minLat > maxLat) {
+        final temp = minLat;
+        minLat = maxLat;
+        maxLat = temp;
+      }
+      if (minLong > maxLong) {
+        final temp = minLong;
+        minLong = maxLong;
+        maxLong = temp;
+      }
       final List<Map<String, dynamic>> data =
           await _supabase.rpc('spot_fetch_within_bounding_box', params: {
         'p_min_lat': minLat,
