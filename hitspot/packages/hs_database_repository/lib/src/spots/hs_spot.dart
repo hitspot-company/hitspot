@@ -170,6 +170,14 @@ class HSSpot {
       return NumberFormat.decimalPattern().format(number);
     }
   }
+
+  @override
+  operator ==(Object other) {
+    return other is HSSpot && other.sid == sid;
+  }
+
+  @override
+  int get hashCode => Object.hash(sid, createdBy);
 }
 
 extension HSSpotExtension on HSSpot {
