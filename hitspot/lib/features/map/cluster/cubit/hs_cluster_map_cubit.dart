@@ -44,20 +44,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     ));
   }
 
-  // Future<BitmapDescriptor> _getMarkerIcon() async {
-  //   final asset = await rootBundle.load('assets/map/truck.png');
-  //   final icon = BitmapDescriptor.fromBytes(asset.buffer.asUint8List());
-  //   return icon;
-  // }
-
-  // Future<BitmapDescriptor> _getMarkerIcon() async {
-  //   final BitmapDescriptor customIcon = await BitmapDescriptor.asset(
-  //     const ImageConfiguration(size: Size(100, 100)),
-  //     'assets/map/truck.png',
-  //   );
-  //   return customIcon;
-  // }
-
   void onCameraIdle() async {
     HSDebugLogger.logInfo("Camera Idle");
     emit(state.copyWith(status: HSClusterMapStatus.refreshing));
@@ -85,9 +71,18 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
           title: e.title!,
           snippet: e.address,
         ),
+        onTap: () => _onMarkerTapped(e),
       );
     }).toSet();
     emit(state.copyWith(markers: markers));
+  }
+
+  void _onMarkerTapped(HSSpot spot) async {
+    await _locationRepository.animateCameraToNewLatLng(
+        mapController, LatLng(spot.latitude!, spot.longitude!), 18.0);
+    emit(state.copyWith(
+        showInfoWindow: true,
+        markerLocation: LatLng(spot.latitude!, spot.longitude!)));
   }
 
   Future<Position> _getPosition() async {
@@ -101,9 +96,9 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   void onCameraMoved(CameraPosition position) {
     final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
+    HSDebugLogger.logInfo("zoom: ${position.zoom}");
     if (markerLevel != state.markerLevel) {
-      HSDebugLogger.logInfo(
-          "Marker Level Changed: $markerLevel, zoom: ${position.zoom}");
+      HSDebugLogger.logInfo("Marker Level Changed: $markerLevel");
       emit(state.copyWith(markerLevel: markerLevel));
       _placeMarkers();
     }

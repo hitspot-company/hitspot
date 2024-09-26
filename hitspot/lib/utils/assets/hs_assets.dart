@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'dart:ui' as ui;
 
@@ -229,9 +230,9 @@ class HSSpotMarker {
   }
 
   static getMarkerLevel(double zoom) {
-    if (zoom >= 16) {
+    if (zoom >= 18) {
       return HSSpotMarkerLevel.high;
-    } else if (zoom >= 13) {
+    } else if (zoom >= 15) {
       return HSSpotMarkerLevel.medium;
     } else {
       return HSSpotMarkerLevel.low;

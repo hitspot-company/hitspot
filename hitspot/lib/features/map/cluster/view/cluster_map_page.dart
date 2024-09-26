@@ -8,6 +8,7 @@ import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 class ClusterMapPage extends StatelessWidget {
