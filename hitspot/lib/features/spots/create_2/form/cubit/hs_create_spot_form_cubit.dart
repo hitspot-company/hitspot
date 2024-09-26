@@ -213,7 +213,7 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
     try {
       for (var i = 0; i < tags.length; i++) {
         await _databaseRepository.tagSpotCreate(
-            value: tags[i], spotID: spotID, userID: currentUser.uid!);
+            value: tags[i].trim(), spotID: spotID, userID: currentUser.uid!);
       }
       HSDebugLogger.logSuccess("Uploaded tags: $tags");
     } catch (_) {

@@ -68,6 +68,7 @@ class AnimatedMapOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<HsClusterMapCubit>();
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -162,7 +163,7 @@ class AnimatedMapOverlay extends StatelessWidget {
                       _MapButton(
                         icon: FontAwesomeIcons.filter,
                         text: 'Filter',
-                        onPressed: () {},
+                        onPressed: cubit.fetchFilters,
                       ),
                     ],
                   ),
