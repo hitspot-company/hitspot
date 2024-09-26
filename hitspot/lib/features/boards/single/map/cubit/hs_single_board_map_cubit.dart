@@ -82,9 +82,9 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
 
   void loadMarkers() async {
     try {
-      List<Marker> markers = app.assets.generateMarkers(state.spots,
-          onTap: _onMarkerTapped, selectedSpotID: state.spots.first.sid);
-      emit(state.copyWith(markers: markers.toSet()));
+      // List<Marker> markers = app.assets.generateMarkers(state.spots,
+      //     onTap: _onMarkerTapped, selectedSpotID: state.spots.first.sid);
+      // emit(state.copyWith(markers: markers.toSet()));
     } catch (_) {
       HSDebugLogger.logError("Error loading markers");
       rethrow;
@@ -102,12 +102,12 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   }
 
   void _generateNewMarkers(HSSpot spot) {
-    List<Marker> markers = app.assets.generateMarkers(state.spots,
-        currentPosition: state.currentPosition?.toLatLng,
-        onTap: _onMarkerTapped,
-        selectedSpotID: spot.sid);
+    // List<Marker> markers = app.assets.generateMarkers(state.spots,
+    //     currentPosition: state.currentPosition?.toLatLng,
+    //     onTap: _onMarkerTapped,
+    //     selectedSpotID: spot.sid);
 
-    emit(state.copyWith(markers: markers.toSet()));
+    // emit(state.copyWith(markers: markers.toSet()));
   }
 
   void resetCamera() async {

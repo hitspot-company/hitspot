@@ -152,12 +152,12 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   }
 
   void placeMarkers() {
-    final List<HSSpot> spots = state.nearbySpots;
-    List<Marker> markers = app.assets.generateMarkers(
-      spots,
-      currentPosition: state.currentPosition?.toLatLng,
-    );
-    emit(state.copyWith(markers: markers));
+    // final List<HSSpot> spots = state.nearbySpots;
+    // List<Marker> markers = app.assets.generateMarkers(
+    //   spots,
+    //   currentPosition: state.currentPosition?.toLatLng,
+    // );
+    // emit(state.copyWith(markers: markers));
   }
 
   Future<void> animateCameraToNewLatLng(LatLng location) async {

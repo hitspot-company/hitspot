@@ -86,12 +86,12 @@ class HSMapCubit extends Cubit<HSMapState> {
   }
 
   void placeMarkers() {
-    final List<HSSpot> spots = state.spotsInView;
-    List<Marker> markers = app.assets.generateMarkers(spots,
-        currentPosition: state.currentPosition?.toLatLng,
-        onTap: onMarkerTapped,
-        selectedSpotID: state.selectedSpot.sid);
-    emit(state.copyWith(markersInView: markers));
+    // final List<HSSpot> spots = state.spotsInView;
+    // List<Marker> markers = app.assets.generateMarkers(spots,
+    //     currentPosition: state.currentPosition?.toLatLng,
+    //     onTap: onMarkerTapped,
+    //     selectedSpotID: state.selectedSpot.sid);
+    // emit(state.copyWith(markersInView: markers));
   }
 
   void toggleIsMoving([bool? isMoving]) {

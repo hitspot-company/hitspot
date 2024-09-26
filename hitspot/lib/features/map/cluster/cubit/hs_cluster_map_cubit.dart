@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -18,7 +19,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   final _databaseRepository = app.databaseRepository;
   final _locationRepository = app.locationRepository;
-  late final BitmapDescriptor _markerIcon;
   late final Position _currentPosition;
   final Completer<GoogleMapController> mapController =
       Completer<GoogleMapController>();
@@ -75,18 +75,18 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void _placeMarkers() {
-    final markers = state.visibleSpots
-        .map((e) => Marker(
-              markerId: MarkerId(e.sid!),
-              position: LatLng(e.latitude!, e.longitude!),
-              icon: _markerIcon,
-              infoWindow: InfoWindow(
-                title: e.title!,
-                snippet: e.address,
-              ),
-            ))
-        .toSet();
-    emit(state.copyWith(markers: markers));
+    // final markers = state.visibleSpots
+    //     .map((e) => Marker(
+    //           markerId: MarkerId(e.sid!),
+    //           position: LatLng(e.latitude!, e.longitude!),
+    //           icon: app.assets.getSpotMarker(e),
+    //           infoWindow: InfoWindow(
+    //             title: e.title!,
+    //             snippet: e.address,
+    //           ),
+    //         ))
+    //     .toSet();
+    // emit(state.copyWith(markers: markers));
   }
 
   Future<Position> _getPosition() async {
@@ -97,4 +97,21 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       return (kDefaultPosition);
     }
   }
+
+  void onCameraMoved(CameraPosition position) {
+    emit(state.copyWith(cameraPosition: position));
+  }
+
+  // void _resizeMarkers() {
+  //   final zoom = state.cameraPosition.zoom;
+  //   final size = calculateMarkerSize(zoom);
+  //   final newMarkers = state.markers
+  //       .map((e) => e.copyWith(
+  //             icon: e.icon!.copyWith(
+  //               size: Size(size, size),
+  //             ),
+  //           ))
+  //       .toSet();
+  //   emit(state.copyWith(markers: newMarkers));
+  // }
 }

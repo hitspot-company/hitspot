@@ -8,9 +8,7 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 import 'dart:ui' as ui;
 
 class HSAssets {
-  HSAssets._internal() {
-    _initialiseMarkerBitmap();
-  }
+  HSAssets._internal();
   static final HSAssets _instance = HSAssets._internal();
   static HSAssets get instance => _instance;
 
@@ -29,42 +27,52 @@ class HSAssets {
   static const String generalMarker = "$mapIconsPath/map_general.svg";
   static const String favoriteMarker = "$mapIconsPath/map_favorite.svg";
   static const String barMarker = "$mapIconsPath/map_bar.svg";
-  // static const String dotUnverified = "$mapIconsPath/dot_unverified.svg";
 
-  late final BitmapDescriptor _unverifiedMarker,
-      _verifiedMarker,
-      _selectedMarker,
-      _generalMarker,
-      _currentLocationMarker,
-      _favoriteMarker,
-      _barMarker;
-  final int markerSizeMedium = 20;
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
+}
 
-  void _initialiseMarkerBitmap() async {
-    await _bitmapDescriptorFromSvgAsset(dotVerified, markerSizeMedium)
-        .then((value) => _verifiedMarker = value);
-    await _bitmapDescriptorFromSvgAsset(dotUnverified, markerSizeMedium)
-        .then((value) => _unverifiedMarker = value);
-    await _bitmapDescriptorFromSvgAsset(dotSelected, markerSizeMedium)
-        .then((value) => _selectedMarker = value);
-    await _bitmapDescriptorFromSvgAsset(generalMarker, markerSizeMedium)
-        .then((value) => _generalMarker = value);
-    await _bitmapDescriptorFromSvgAsset(favoriteMarker, markerSizeMedium)
-        .then((value) => _favoriteMarker = value);
-    await _bitmapDescriptorFromSvgAsset(barMarker, markerSizeMedium)
-        .then((value) => _barMarker = value);
-    // await _bitmapDescriptorFromSvgAsset(dotSelected, markerSizeMedium)
-    //     .then((value) => _selectedMarker = value);
+enum HSSpotMarkerLevel { low, medium, high }
+
+enum HSSpotMarkerType { bar, favorite, general, night }
+
+class HSSpotMarker {
+  final HSSpot spot;
+  late final BitmapDescriptor icon;
+  final String iconPath;
+  final LatLng position;
+  final Function(HSSpot spot) onTap;
+  final HSSpotMarkerLevel level;
+  late final HSSpotMarkerType type;
+
+  HSSpotMarker({
+    required this.spot,
+    required this.iconPath,
+    required this.position,
+    required this.onTap,
+    required this.level,
+  }) {
+    _init();
   }
 
-  Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
-      String assetName, int size) async {
+  void _init() async {
+    icon = await _generateBitmap();
+    type = getMarkerType();
+  }
+
+  Future<BitmapDescriptor> _generateBitmap() async {
     try {
-      // Scale to get better quality
-      final double scaleFactor = 3.0;
+      const double scaleFactor = 3.0;
+      final double size = markerSize;
 
       final image = await getImageFromSvg(
-        assetName,
+        iconPath,
         size.toDouble() * scaleFactor,
         size.toDouble() * scaleFactor,
         scale: 12.0,
@@ -75,53 +83,11 @@ class HSAssets {
       final ByteData? bytes =
           await image.toByteData(format: ui.ImageByteFormat.png);
 
-      return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+      return BitmapDescriptor.bytes(
+          bytes!.buffer.asUint8List()); // TOOD: Veridfy (was toBytes)
     } catch (e) {
       throw Exception('Error loading SVG asset: $e');
     }
-  }
-
-  BitmapDescriptor _getSpotMarker(HSSpot spot, {bool isSelected = false}) {
-    final tags = spot.tags ?? [];
-    if (tags.isNotEmpty &&
-        (tags.contains('bar') || tags.contains('nightlife'))) {
-      return _barMarker;
-    }
-    if (spot.likesCount! > 10) {
-      return _favoriteMarker;
-    } else if (isSelected) {
-      return _selectedMarker;
-    }
-    return _generalMarker;
-  }
-
-  Marker createSpotMarker(HSSpot spot,
-      {LatLng? currentPosition,
-      Function(HSSpot spot)? onTap,
-      HSSpotMarkerType type = HSSpotMarkerType.unverified}) {
-    return Marker(
-      markerId: MarkerId(spot.hashCode.toString()),
-      icon: _getSpotMarker(spot, isSelected: type == HSSpotMarkerType.selected),
-      position: LatLng(spot.latitude!, spot.longitude!),
-      onTap: () {
-        if (onTap != null) onTap(spot);
-      },
-    );
-  }
-
-  List<Marker> generateMarkers(List<HSSpot> spots,
-      {LatLng? currentPosition,
-      Function(HSSpot)? onTap,
-      String? selectedSpotID}) {
-    List<Marker> generatedMapMarkers = [];
-    for (var i = 0; i < spots.length; i++) {
-      final type = selectedSpotID == spots[i].sid
-          ? HSSpotMarkerType.selected
-          : HSSpotMarkerType.unverified;
-      generatedMapMarkers.add(createSpotMarker(spots[i],
-          currentPosition: currentPosition, onTap: onTap, type: type));
-    }
-    return generatedMapMarkers;
   }
 
   static Future<ui.Image> getImageFromSvg(
@@ -202,12 +168,23 @@ class HSAssets {
     return await picture.toImage(targetWidth.ceil(), targetHeight.ceil());
   }
 
-  double calculateDistance(lat1, lon1, lat2, lon2) {
-    var p = 0.017453292519943295;
-    var c = cos;
-    var a = 0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-    return 12742 * asin(sqrt(a));
+  double get markerSize {
+    if (level == HSSpotMarkerLevel.low) {
+      return 20.0;
+    } else if (level == HSSpotMarkerLevel.medium) {
+      return 30.0;
+    } else {
+      return 40.0;
+    }
+  }
+
+  HSSpotMarkerType getMarkerType() {
+    if (spot.tags!.contains('bar') || spot.tags!.contains('nightlife')) {
+      return HSSpotMarkerType.bar;
+    } else if (spot.likesCount! > 10) {
+      return HSSpotMarkerType.favorite;
+    } else {
+      return HSSpotMarkerType.general;
+    }
   }
 }
