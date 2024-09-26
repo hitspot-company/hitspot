@@ -3,13 +3,11 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
-import 'package:hitspot/main.dart';
-import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/widgets/map/hs_spot_info_window.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -30,15 +28,11 @@ class HSMapCubit extends Cubit<HSMapState> {
   ExpansionStatus get sheetStatus =>
       sheetKey.currentState?.expansionStatus ?? ExpansionStatus.contracted;
   final _locationRepository = app.locationRepository;
-  late final BitmapDescriptor _generalMarker;
 
   Future<void> init() async {
     try {
       emit(state.copyWith(status: HSMapStatus.loading));
       late final LatLng cameraPosition;
-      final imageConfiguration = createLocalImageConfiguration(app.context);
-      _generalMarker = await BitmapDescriptor.asset(
-          imageConfiguration, HSAssets.generalMarker);
       if (_initialCameraPosition != null) {
         cameraPosition = LatLng(
           _initialCameraPosition.latitude,
@@ -48,11 +42,9 @@ class HSMapCubit extends Cubit<HSMapState> {
         cameraPosition = LatLng(
             app.currentPosition!.latitude, app.currentPosition!.longitude);
       } else {
-        cameraPosition = LatLng(kDefaultLatitude,
-            kDefaultLongitude); // TODO: Change to place with most spots
+        cameraPosition =
+            const LatLng(60.0, 60.0); // TODO: Change to place with most spots
       }
-      emit(state.copyWith(cameraPosition: cameraPosition));
-      await _fetchClosestSpots();
       emit(state.copyWith(
           cameraPosition: cameraPosition,
           currentPosition: _initialCameraPosition));
@@ -61,29 +53,6 @@ class HSMapCubit extends Cubit<HSMapState> {
       HSDebugLogger.logError("Error initializing map: $e");
     }
   }
-
-  Future<void> _fetchClosestSpots() async {
-    try {
-      emit(state.copyWith(status: HSMapStatus.fetchingSpots));
-      final List<Map<String, dynamic>> spots =
-          await supabase.rpc('spot_fetch_closest', params: {
-        'p_user_lat': state.cameraPosition!.latitude,
-        'p_user_long': state.cameraPosition!.longitude,
-        'p_batch_size': 20,
-        'p_batch_offset': 0,
-        'p_distance_km': 1000,
-      });
-      final res = spots.map((e) => HSSpot.deserializeWithAuthor(e)).toList();
-      await _locationRepository.zoomToFitSpots(res, await controller.future,
-          currentPosition: app.currentPosition);
-      emit(state.copyWith(spotsInView: res));
-      placeMarkers();
-    } catch (e) {
-      HSDebugLogger.logError("Error fetching spots: $e");
-    }
-  }
-
-  // Function to calculate LatLngBounds and zoom out to fit all spots
 
   Future<void> fetchSpots() async {
     try {
@@ -116,30 +85,12 @@ class HSMapCubit extends Cubit<HSMapState> {
     fetchSpots();
   }
 
-  Future<BitmapDescriptor> getImage(String assetPath) async {
-    final asset = await rootBundle.load(assetPath);
-    final icon = BitmapDescriptor.bytes(asset.buffer.asUint8List(),
-        height: 100, width: 100);
-    return icon;
-  }
-
   void placeMarkers() {
     final List<HSSpot> spots = state.spotsInView;
-    final marker = _generalMarker;
-    final List<Marker> markers = spots
-        .map(
-          (e) => Marker(
-            markerId: MarkerId(e.sid!),
-            position: LatLng(e.latitude!, e.longitude!),
-            icon: marker,
-            onTap: () => onMarkerTapped(e),
-          ),
-        )
-        .toList();
-    // List<Marker> markers = app.assets.generateMarkers(spots,
-    //     currentPosition: state.currentPosition?.toLatLng,
-    //     onTap: onMarkerTapped,
-    //     selectedSpotID: state.selectedSpot.sid);
+    List<Marker> markers = app.assets.generateMarkers(spots,
+        currentPosition: state.currentPosition?.toLatLng,
+        onTap: onMarkerTapped,
+        selectedSpotID: state.selectedSpot.sid);
     emit(state.copyWith(markersInView: markers));
   }
 

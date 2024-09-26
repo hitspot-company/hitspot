@@ -139,7 +139,8 @@ class HomePage extends StatelessWidget {
                           return GestureDetector(
                             onTap: () => navi.pushTransition(
                                 PageTransitionType.fade,
-                                const ClusterMapProvider()),
+                                const MapProvider() // ClusterMapProvider()
+                                ),
                             child: AbsorbPointer(
                               absorbing: true,
                               child: HSGoogleMap(
