@@ -75,18 +75,19 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void _placeMarkers() {
-    // final markers = state.visibleSpots
-    //     .map((e) => Marker(
-    //           markerId: MarkerId(e.sid!),
-    //           position: LatLng(e.latitude!, e.longitude!),
-    //           icon: app.assets.getSpotMarker(e),
-    //           infoWindow: InfoWindow(
-    //             title: e.title!,
-    //             snippet: e.address,
-    //           ),
-    //         ))
-    //     .toSet();
-    // emit(state.copyWith(markers: markers));
+    final markers = state.visibleSpots.map((e) {
+      final markerIcon = app.assets.getMarkerIcon(e, state.markerLevel);
+      return Marker(
+        markerId: MarkerId(e.sid!),
+        position: LatLng(e.latitude!, e.longitude!),
+        icon: markerIcon,
+        infoWindow: InfoWindow(
+          title: e.title!,
+          snippet: e.address,
+        ),
+      );
+    }).toSet();
+    emit(state.copyWith(markers: markers));
   }
 
   Future<Position> _getPosition() async {
@@ -99,19 +100,13 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void onCameraMoved(CameraPosition position) {
+    final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
+    if (markerLevel != state.markerLevel) {
+      HSDebugLogger.logInfo(
+          "Marker Level Changed: $markerLevel, zoom: ${position.zoom}");
+      emit(state.copyWith(markerLevel: markerLevel));
+      _placeMarkers();
+    }
     emit(state.copyWith(cameraPosition: position));
   }
-
-  // void _resizeMarkers() {
-  //   final zoom = state.cameraPosition.zoom;
-  //   final size = calculateMarkerSize(zoom);
-  //   final newMarkers = state.markers
-  //       .map((e) => e.copyWith(
-  //             icon: e.icon!.copyWith(
-  //               size: Size(size, size),
-  //             ),
-  //           ))
-  //       .toSet();
-  //   emit(state.copyWith(markers: newMarkers));
-  // }
 }

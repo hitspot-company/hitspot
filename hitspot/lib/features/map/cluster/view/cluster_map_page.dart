@@ -36,6 +36,7 @@ class ClusterMapPage extends StatelessWidget {
               },
               markers: cubit.state.markers,
               onCameraIdle: cubit.onCameraIdle,
+              onCameraMove: cubit.onCameraMoved,
             );
           },
         ),
