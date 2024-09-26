@@ -67,10 +67,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
         markerId: MarkerId(e.sid!),
         position: LatLng(e.latitude!, e.longitude!),
         icon: markerIcon,
-        infoWindow: InfoWindow(
-          title: e.title!,
-          snippet: e.address,
-        ),
         onTap: () => _onMarkerTapped(e),
       );
     }).toSet();
@@ -79,10 +75,12 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   void _onMarkerTapped(HSSpot spot) async {
     await _locationRepository.animateCameraToNewLatLng(
-        mapController, LatLng(spot.latitude!, spot.longitude!), 18.0);
-    emit(state.copyWith(
-        showInfoWindow: true,
-        markerLocation: LatLng(spot.latitude!, spot.longitude!)));
+        mapController, LatLng(spot.latitude! - .0001, spot.longitude!), 18.0);
+    emit(state.copyWith(selectedSpot: spot));
+  }
+
+  void resetSelectedSpot() {
+    emit(state.copyWith(selectedSpot: const HSSpot()));
   }
 
   Future<Position> _getPosition() async {

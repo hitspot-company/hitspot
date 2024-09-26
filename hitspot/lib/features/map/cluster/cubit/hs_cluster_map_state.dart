@@ -13,8 +13,7 @@ final class HsClusterMapState extends Equatable {
       target: LatLng(0, 0),
       zoom: 0,
     ),
-    this.markerLocation = const LatLng(0, 0),
-    this.showInfoWindow = false,
+    this.selectedSpot = const HSSpot(),
   });
 
   final HSClusterMapStatus status;
@@ -22,8 +21,9 @@ final class HsClusterMapState extends Equatable {
   final Set<Marker> markers;
   final CameraPosition cameraPosition;
   final HSSpotMarkerLevel markerLevel;
-  final LatLng markerLocation;
-  final bool showInfoWindow;
+  final HSSpot selectedSpot;
+
+  bool get isSpotSelected => selectedSpot.sid != null;
 
   @override
   List<Object> get props => [
@@ -33,8 +33,7 @@ final class HsClusterMapState extends Equatable {
         cachedSpots,
         cameraPosition,
         markerLevel,
-        markerLocation,
-        showInfoWindow
+        selectedSpot,
       ];
 
   HsClusterMapState copyWith({
@@ -44,8 +43,7 @@ final class HsClusterMapState extends Equatable {
     CameraPosition? cameraPosition,
     List<HSSpot>? cachedSpots,
     HSSpotMarkerLevel? markerLevel,
-    LatLng? markerLocation,
-    bool? showInfoWindow,
+    HSSpot? selectedSpot,
   }) {
     return HsClusterMapState(
       status: status ?? this.status,
@@ -54,8 +52,7 @@ final class HsClusterMapState extends Equatable {
       cachedSpots: cachedSpots ?? this.cachedSpots,
       cameraPosition: cameraPosition ?? this.cameraPosition,
       markerLevel: markerLevel ?? this.markerLevel,
-      markerLocation: markerLocation ?? this.markerLocation,
-      showInfoWindow: showInfoWindow ?? this.showInfoWindow,
+      selectedSpot: selectedSpot ?? this.selectedSpot,
     );
   }
 }
