@@ -1,20 +1,13 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/cluster/cubit/hs_cluster_map_cubit.dart';
-import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
-import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
-import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
-import 'package:hitspot/widgets/spot/hs_better_spot_tile.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 class ClusterMapPage extends StatelessWidget {
   const ClusterMapPage({super.key});
@@ -130,10 +123,7 @@ class AnimatedMapOverlay extends StatelessWidget {
                     hintText: 'Search...',
                     suffixIcon: const Icon(Icons.search),
                     readOnly: true,
-                    onTap: () => showSearch(
-                      context: context,
-                      delegate: MapSearchDelegate(HSMapSearchCubit()),
-                    ),
+                    onTap: () => cubit.fetchSearch(context),
                   ),
                 ),
                 const Padding(
@@ -161,10 +151,9 @@ class AnimatedMapOverlay extends StatelessWidget {
                         },
                       ),
                       _MapButton(
-                        icon: FontAwesomeIcons.filter,
-                        text: 'Filter',
-                        onPressed: cubit.fetchFilters,
-                      ),
+                          icon: FontAwesomeIcons.filter,
+                          text: 'Filter',
+                          onPressed: () => cubit.showFilters(context)),
                     ],
                   ),
                 ),
@@ -207,6 +196,68 @@ class _MapButton extends StatelessWidget {
           icon: Icon(icon),
         ),
         Text(text),
+      ],
+    );
+  }
+}
+
+class HSFilterPopup extends StatefulWidget {
+  final List<String> filterOptions;
+
+  const HSFilterPopup({super.key, required this.filterOptions});
+
+  @override
+  State<HSFilterPopup> createState() => _HSFilterPopupState();
+}
+
+class _HSFilterPopupState extends State<HSFilterPopup> {
+  late List<bool> _isChecked;
+
+  @override
+  void initState() {
+    super.initState();
+    _isChecked = List<bool>.filled(widget.filterOptions.length, false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Select Filters'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: List.generate(
+            widget.filterOptions.length,
+            (index) => CheckboxListTile(
+              title: Text(widget.filterOptions[index]),
+              value: _isChecked[index],
+              onChanged: (bool? value) {
+                setState(() {
+                  _isChecked[index] = value!;
+                });
+              },
+            ),
+          ),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('Apply'),
+          onPressed: () {
+            List<String> selectedFilters = [];
+            for (int i = 0; i < _isChecked.length; i++) {
+              if (_isChecked[i]) {
+                selectedFilters.add(widget.filterOptions[i]);
+              }
+            }
+            Navigator.of(context).pop(selectedFilters);
+          },
+        ),
       ],
     );
   }

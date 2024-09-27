@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/map/cluster/view/cluster_map_page.dart';
+import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
+import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -59,7 +61,10 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void _placeMarkers() {
-    final markers = state.visibleSpots.map((e) {
+    final markers = state.visibleSpots.where((spot) {
+      if (state.filters.isEmpty) return true;
+      return spot.tags?.any((tag) => state.filters.contains(tag)) ?? false;
+    }).map((e) {
       final markerIcon = app.assets.getMarkerIcon(e,
           level: state.markerLevel, isSelected: state.selectedSpot == e);
       return Marker(
@@ -113,5 +118,41 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     tags.sort();
     HSDebugLogger.logInfo("Tags: $tags");
     return tags.cast<String>();
+  }
+
+  Future<void> fetchSearch(BuildContext context) async {
+    try {
+      final HSPrediction? result = await showSearch(
+        context: context,
+        delegate: MapSearchDelegate(HSMapSearchCubit()),
+      );
+      if (result != null && result.placeID.isNotEmpty) {
+        final HSPlaceDetails placeDetails = await _locationRepository
+            .fetchPlaceDetails(placeID: result.placeID);
+        _toggleSelectedSpot();
+        await _locationRepository.animateCameraToNewLatLng(mapController,
+            LatLng(placeDetails.latitude, placeDetails.longitude), 13.0);
+      }
+    } catch (e) {
+      HSDebugLogger.logError(e.toString());
+    }
+  }
+
+  void showFilters(BuildContext context) async {
+    List<String> filterOptions = fetchFilters();
+
+    final List<String>? result = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return HSFilterPopup(filterOptions: filterOptions);
+      },
+    );
+
+    if (result != null && result.isNotEmpty) {
+      emit(state.copyWith(status: HSClusterMapStatus.refreshing));
+      emit(state.copyWith(filters: result));
+      _placeMarkers();
+      emit(state.copyWith(status: HSClusterMapStatus.loaded));
+    }
   }
 }

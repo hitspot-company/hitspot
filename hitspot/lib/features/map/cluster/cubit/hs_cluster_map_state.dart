@@ -14,6 +14,7 @@ final class HsClusterMapState extends Equatable {
       zoom: 0,
     ),
     this.selectedSpot = const HSSpot(),
+    this.filters = const [],
   });
 
   final HSClusterMapStatus status;
@@ -22,6 +23,7 @@ final class HsClusterMapState extends Equatable {
   final CameraPosition cameraPosition;
   final HSSpotMarkerLevel markerLevel;
   final HSSpot selectedSpot;
+  final List<String> filters;
 
   bool get isSpotSelected => selectedSpot.sid != null;
 
@@ -34,6 +36,7 @@ final class HsClusterMapState extends Equatable {
         cameraPosition,
         markerLevel,
         selectedSpot,
+        filters,
       ];
 
   HsClusterMapState copyWith({
@@ -44,6 +47,7 @@ final class HsClusterMapState extends Equatable {
     List<HSSpot>? cachedSpots,
     HSSpotMarkerLevel? markerLevel,
     HSSpot? selectedSpot,
+    List<String>? filters,
   }) {
     return HsClusterMapState(
       status: status ?? this.status,
@@ -53,6 +57,7 @@ final class HsClusterMapState extends Equatable {
       cameraPosition: cameraPosition ?? this.cameraPosition,
       markerLevel: markerLevel ?? this.markerLevel,
       selectedSpot: selectedSpot ?? this.selectedSpot,
+      filters: filters ?? this.filters,
     );
   }
 }
