@@ -215,11 +215,13 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   Future<void> shareSpot(HSSpot spot) async {
     try {
+      emit(state.copyWith(status: HSClusterMapStatus.sharing));
       await Share.share("https://hitspot.app/spot/${spot.sid}",
           subject: "Hey! Check out ${spot.title} at ${spot.address}");
     } catch (_) {
       HSDebugLogger.logError("Could not share spot: $_");
     }
+    emit(state.copyWith(status: HSClusterMapStatus.loaded));
   }
 
   Future<void> saveSpot(HSSpot spot) async {
@@ -242,6 +244,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   Future<void> launchMaps(HSSpot spot) async {
     try {
+      emit(state.copyWith(status: HSClusterMapStatus.openingDirections));
       await _locationRepository.launchMaps(
         coords: LatLng(spot.latitude!, spot.longitude!),
         description: spot.address!,
@@ -250,6 +253,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     } catch (e) {
       HSDebugLogger.logError("Failed to launch maps: $e");
     }
+    emit(state.copyWith(status: HSClusterMapStatus.loaded));
   }
 
   @override

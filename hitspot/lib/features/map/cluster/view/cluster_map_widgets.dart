@@ -96,33 +96,25 @@ class MapBottomSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
-                child: _buildActionButton(Icons.directions, 'Directions',
-                    () => cubit.launchMaps(spot)),
+                child: _ReactiveSpotButton(
+                    reactiveStatus: HSClusterMapStatus.openingDirections,
+                    icon: Icons.directions,
+                    label: "Directions",
+                    onPressed: () => cubit.launchMaps(spot)),
               ),
               Expanded(
-                  child: BlocBuilder<HsClusterMapCubit, HsClusterMapState>(
-                buildWhen: (previous, current) =>
-                    (previous.status == HSClusterMapStatus.loaded &&
-                        current.status == HSClusterMapStatus.saving) ||
-                    (previous.status == HSClusterMapStatus.saving &&
-                        current.status == HSClusterMapStatus.loaded),
-                builder: (context, state) {
-                  final bool isSaving =
-                      cubit.state.status == HSClusterMapStatus.saving;
-                  if (isSaving) {
-                    return const HSLoadingIndicator(size: 24.0);
-                  }
-                  final savedSpots = cubit.state.savedSpots;
-                  final bool isSaved = savedSpots.contains(spot);
-                  final Color? color = isSaved ? appTheme.mainColor : null;
-                  return _buildActionButton(
-                      Icons.bookmark, 'Save', () => cubit.saveSpot(spot),
-                      color: color);
-                },
-              )),
+                child: _ReactiveSpotButton(
+                    reactiveStatus: HSClusterMapStatus.saving,
+                    icon: Icons.bookmark,
+                    label: "Save",
+                    onPressed: () => cubit.saveSpot(spot)),
+              ),
               Expanded(
-                child: _buildActionButton(
-                    Icons.share, 'Share', () => cubit.shareSpot(spot)),
+                child: _ReactiveSpotButton(
+                    reactiveStatus: HSClusterMapStatus.sharing,
+                    icon: Icons.share,
+                    label: "Share",
+                    onPressed: () => cubit.shareSpot(spot)),
               ),
             ],
           ),
@@ -182,21 +174,10 @@ class MapBottomSheet extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: BlocSelector<HsClusterMapCubit, HsClusterMapState,
-                List<HSSpot>>(
-              selector: (state) => state.savedSpots,
-              builder: (context, savedSpots) {
-                // final bool isSaved = savedSpots.contains(spot);
-                // final Color? color = isSaved ? appTheme.mainColor : null;
-                return _MapButton(
-                  icon: FontAwesomeIcons.locationCrosshairs,
-                  text: 'Nearby',
-                  onPressed: cubit.findNearby,
-                );
-                // _buildActionButton(
-                //     Icons.bookmark, 'Save', () => cubit.saveSpot(spot),
-                //     color: color);
-              },
+            child: _MapButton(
+              icon: FontAwesomeIcons.locationCrosshairs,
+              text: 'Nearby',
+              onPressed: cubit.findNearby,
             ),
           ),
           Expanded(
@@ -210,19 +191,46 @@ class MapBottomSheet extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildActionButton(IconData icon, String label, VoidCallback onPressed,
-      {Color? color}) {
-    return InkWell(
-      onTap: onPressed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(fontSize: 12)),
-        ],
-      ),
+class _ReactiveSpotButton extends StatelessWidget {
+  const _ReactiveSpotButton(
+      {required this.reactiveStatus,
+      required this.icon,
+      required this.label,
+      required this.onPressed});
+
+  final HSClusterMapStatus reactiveStatus;
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  // final Function(bool) isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HsClusterMapCubit, HsClusterMapState>(
+      buildWhen: (previous, current) =>
+          (previous.status == HSClusterMapStatus.loaded &&
+              current.status == reactiveStatus) ||
+          (previous.status == reactiveStatus &&
+              current.status == HSClusterMapStatus.loaded),
+      builder: (context, state) {
+        final bool inProgress = state.status == reactiveStatus;
+        if (inProgress) {
+          return const HSLoadingIndicator(size: 24.0);
+        }
+        return InkWell(
+          onTap: onPressed,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: inProgress ? appTheme.mainColor : null),
+              const SizedBox(height: 4),
+              Text(label, style: const TextStyle(fontSize: 12)),
+            ],
+          ),
+        );
+      },
     );
   }
 }
