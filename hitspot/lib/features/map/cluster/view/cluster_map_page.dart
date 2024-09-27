@@ -214,22 +214,23 @@ class HSFilterPopup extends StatefulWidget {
 
 class _HSFilterPopupState extends State<HSFilterPopup> {
   late List<String> _selectedFilters;
+  late List<String> _allOptions;
 
   @override
   void initState() {
     super.initState();
     _selectedFilters = List.from(widget.selected);
+    _allOptions = {...widget.filterOptions, ..._selectedFilters}.toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final allOptions = {...widget.filterOptions, ..._selectedFilters}.toList();
     return AlertDialog(
       title: const Text('Select Filters'),
       content: SingleChildScrollView(
         child: Wrap(
           spacing: 8.0,
-          children: allOptions.map((option) {
+          children: _allOptions.map((option) {
             final isSelected = _selectedFilters.contains(option);
             return ChoiceChip(
               label: Text(option),

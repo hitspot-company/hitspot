@@ -149,7 +149,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       },
     );
 
-    if (result != null && result.isNotEmpty) {
+    if (result != null) {
       emit(state.copyWith(status: HSClusterMapStatus.refreshing));
       emit(state.copyWith(filters: result));
       _placeMarkers();
