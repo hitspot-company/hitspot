@@ -203,8 +203,10 @@ class _MapButton extends StatelessWidget {
 
 class HSFilterPopup extends StatefulWidget {
   final List<String> filterOptions;
+  final List<String> selected;
 
-  const HSFilterPopup({super.key, required this.filterOptions});
+  const HSFilterPopup(
+      {super.key, required this.filterOptions, this.selected = const []});
 
   @override
   State<HSFilterPopup> createState() => _HSFilterPopupState();
@@ -216,7 +218,9 @@ class _HSFilterPopupState extends State<HSFilterPopup> {
   @override
   void initState() {
     super.initState();
-    _isChecked = List<bool>.filled(widget.filterOptions.length, false);
+    _isChecked = widget.filterOptions
+        .map((option) => widget.selected.contains(option))
+        .toList();
   }
 
   @override

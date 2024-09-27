@@ -144,7 +144,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     final List<String>? result = await showDialog<List<String>>(
       context: context,
       builder: (BuildContext context) {
-        return HSFilterPopup(filterOptions: filterOptions);
+        return HSFilterPopup(
+            filterOptions: filterOptions, selected: state.filters);
       },
     );
 
