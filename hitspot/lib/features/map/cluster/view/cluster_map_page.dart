@@ -213,34 +213,38 @@ class HSFilterPopup extends StatefulWidget {
 }
 
 class _HSFilterPopupState extends State<HSFilterPopup> {
-  late List<bool> _isChecked;
+  late List<String> _selectedFilters;
 
   @override
   void initState() {
     super.initState();
-    _isChecked = widget.filterOptions
-        .map((option) => widget.selected.contains(option))
-        .toList();
+    _selectedFilters = List.from(widget.selected);
   }
 
   @override
   Widget build(BuildContext context) {
+    final allOptions = {...widget.filterOptions, ..._selectedFilters}.toList();
     return AlertDialog(
       title: const Text('Select Filters'),
       content: SingleChildScrollView(
-        child: ListBody(
-          children: List.generate(
-            widget.filterOptions.length,
-            (index) => CheckboxListTile(
-              title: Text(widget.filterOptions[index]),
-              value: _isChecked[index],
-              onChanged: (bool? value) {
+        child: Wrap(
+          spacing: 8.0,
+          children: allOptions.map((option) {
+            final isSelected = _selectedFilters.contains(option);
+            return ChoiceChip(
+              label: Text(option),
+              selected: isSelected,
+              onSelected: (selected) {
                 setState(() {
-                  _isChecked[index] = value!;
+                  if (selected) {
+                    _selectedFilters.add(option);
+                  } else {
+                    _selectedFilters.remove(option);
+                  }
                 });
               },
-            ),
-          ),
+            );
+          }).toList(),
         ),
       ),
       actions: <Widget>[
@@ -253,13 +257,7 @@ class _HSFilterPopupState extends State<HSFilterPopup> {
         TextButton(
           child: const Text('Apply'),
           onPressed: () {
-            List<String> selectedFilters = [];
-            for (int i = 0; i < _isChecked.length; i++) {
-              if (_isChecked[i]) {
-                selectedFilters.add(widget.filterOptions[i]);
-              }
-            }
-            Navigator.of(context).pop(selectedFilters);
+            Navigator.of(context).pop(_selectedFilters);
           },
         ),
       ],
