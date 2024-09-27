@@ -33,7 +33,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   void _init() async {
     emit(state.copyWith(status: HSClusterMapStatus.loading));
     _currentPosition = await _getPosition();
-    // _markerIcon = await _getMarkerIcon();
     final spots = await _databaseRepository.spotFetchClosest(
       lat: _currentPosition.latitude,
       long: _currentPosition.longitude,
@@ -45,7 +44,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void onCameraIdle() async {
-    HSDebugLogger.logInfo("Camera Idle");
     emit(state.copyWith(status: HSClusterMapStatus.refreshing));
     final controller = await mapController.future;
     final center = await controller.getVisibleRegion();
@@ -62,7 +60,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   void _placeMarkers() {
     final markers = state.visibleSpots.map((e) {
-      final markerIcon = app.assets.getMarkerIcon(e, state.markerLevel);
+      final markerIcon = app.assets.getMarkerIcon(e,
+          level: state.markerLevel, isSelected: state.selectedSpot == e);
       return Marker(
         markerId: MarkerId(e.sid!),
         position: LatLng(e.latitude!, e.longitude!),
@@ -74,13 +73,20 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void _onMarkerTapped(HSSpot spot) async {
+    _toggleSelectedSpot(spot);
     await _locationRepository.animateCameraToNewLatLng(
         mapController, LatLng(spot.latitude! - .0001, spot.longitude!), 18.0);
-    emit(state.copyWith(selectedSpot: spot));
+  }
+
+  void _toggleSelectedSpot([HSSpot? spot]) {
+    emit(state.copyWith(status: HSClusterMapStatus.refreshing));
+    emit(state.copyWith(selectedSpot: spot ?? const HSSpot()));
+    _placeMarkers();
+    emit(state.copyWith(status: HSClusterMapStatus.loaded));
   }
 
   void resetSelectedSpot() {
-    emit(state.copyWith(selectedSpot: const HSSpot()));
+    _toggleSelectedSpot();
   }
 
   Future<Position> _getPosition() async {
@@ -94,9 +100,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   void onCameraMoved(CameraPosition position) {
     final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
-    HSDebugLogger.logInfo("zoom: ${position.zoom}");
     if (markerLevel != state.markerLevel) {
-      HSDebugLogger.logInfo("Marker Level Changed: $markerLevel");
       emit(state.copyWith(markerLevel: markerLevel));
       _placeMarkers();
     }

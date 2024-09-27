@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'dart:ui' as ui;
 
@@ -23,13 +22,15 @@ class HSAssets {
 
   // MAP MARKERS
   static const String mapIconsPath = "assets/map";
-  static const String mapPinPath = "$mapIconsPath/pin.svg";
-  static const String dotSelectedPath = "$mapIconsPath/dot_selected.svg";
-  static const String dotVerifiedPath = "$mapIconsPath/dot_verified.svg";
-  static const String dotUnverifiedPath = "$mapIconsPath/dot_unverified.svg";
-  static const String generalMarkerPath = "$mapIconsPath/map_general.svg";
-  static const String favoriteMarkerPath = "$mapIconsPath/map_favorite.svg";
-  static const String barMarkerPath = "$mapIconsPath/map_bar.svg";
+  static const String generalMarkerPath = "$mapIconsPath/marker_general.svg";
+  static const String favoriteMarkerPath = "$mapIconsPath/marker_favorite.svg";
+  static const String barMarkerPath = "$mapIconsPath/marker_bar.svg";
+  static const String generalMarkerSelectedPath =
+      "$mapIconsPath/marker_selected_general.svg";
+  static const String favoriteMarkerSelectedPath =
+      "$mapIconsPath/marker_selected_favorite.svg";
+  static const String barMarkerSelectedPath =
+      "$mapIconsPath/marker_selected_bar.svg";
 
   late final HSSpotMarker barMarker;
   late final HSSpotMarker favoriteMarker;
@@ -42,16 +43,17 @@ class HSAssets {
   }
 
   BitmapDescriptor getMarkerIcon(HSSpot spot,
-      [HSSpotMarkerLevel level = HSSpotMarkerLevel.high]) {
+      {HSSpotMarkerLevel level = HSSpotMarkerLevel.high,
+      bool isSelected = false}) {
     switch (HSSpotMarker.getMarkerType(spot)) {
       case HSSpotMarkerType.bar:
-        return barMarker.fromLevel(level);
+        return barMarker.fromLevel(level, isSelected);
       case HSSpotMarkerType.favorite:
-        return favoriteMarker.fromLevel(level);
+        return favoriteMarker.fromLevel(level, isSelected);
       case HSSpotMarkerType.general:
-        return generalMarker.fromLevel(level);
+        return generalMarker.fromLevel(level, isSelected);
       default:
-        return generalMarker.fromLevel(level);
+        return generalMarker.fromLevel(level, isSelected);
     }
   }
 
@@ -73,6 +75,7 @@ class HSSpotMarker {
   final BitmapDescriptor? icon;
   late final HSSpotMarkerType type;
   final Map<HSSpotMarkerLevel, BitmapDescriptor> markers = {};
+  final Map<HSSpotMarkerLevel, BitmapDescriptor> selectedMarkers = {};
 
   HSSpotMarker({
     required this.type,
@@ -85,17 +88,21 @@ class HSSpotMarker {
     for (var i = 0; i < 3; i++) {
       final level = HSSpotMarkerLevel.values[i];
       final icon = await _generateBitmap(level);
+      final selectedIcon = await _generateBitmap(level, true);
       markers.update(level, (value) => icon, ifAbsent: () => icon);
+      selectedMarkers.update(level, (value) => selectedIcon,
+          ifAbsent: () => selectedIcon);
     }
   }
 
-  Future<BitmapDescriptor> _generateBitmap(HSSpotMarkerLevel level) async {
+  Future<BitmapDescriptor> _generateBitmap(HSSpotMarkerLevel level,
+      [bool selected = false]) async {
     try {
       const double scaleFactor = 3.0;
       final double size = markerSize(level);
 
       final image = await getImageFromSvg(
-        iconPath,
+        getIconPath(selected),
         size.toDouble() * scaleFactor,
         size.toDouble() * scaleFactor,
         colorFilter: null,
@@ -200,12 +207,26 @@ class HSSpotMarker {
     }
   }
 
-  BitmapDescriptor fromLevel(HSSpotMarkerLevel level) => markers[level]!;
+  BitmapDescriptor fromLevel(HSSpotMarkerLevel level,
+          [bool isSelected = false]) =>
+      isSelected ? selectedMarkers[level]! : markers[level]!;
   BitmapDescriptor get medium => markers[HSSpotMarkerLevel.medium]!;
   BitmapDescriptor get high => markers[HSSpotMarkerLevel.high]!;
   BitmapDescriptor get low => markers[HSSpotMarkerLevel.low]!;
 
-  String get iconPath {
+  String getIconPath([bool isSelected = false]) {
+    if (isSelected) {
+      switch (type) {
+        case HSSpotMarkerType.bar:
+          return HSAssets.barMarkerSelectedPath;
+        case HSSpotMarkerType.favorite:
+          return HSAssets.favoriteMarkerSelectedPath;
+        case HSSpotMarkerType.general:
+          return HSAssets.generalMarkerSelectedPath;
+        default:
+          return HSAssets.generalMarkerSelectedPath;
+      }
+    }
     switch (type) {
       case HSSpotMarkerType.bar:
         return HSAssets.barMarkerPath;
