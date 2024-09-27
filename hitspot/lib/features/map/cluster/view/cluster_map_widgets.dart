@@ -15,10 +15,8 @@ class MapBottomSheet extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(24.0),
-              topRight: Radius.circular(24.0),
-            ),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(24.0)),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
@@ -30,46 +28,201 @@ class MapBottomSheet extends StatelessWidget {
           ),
           child: SingleChildScrollView(
             controller: scrollController,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHandle(),
-                _buildSearchBar(context),
-                _buildActionButtons(context),
-                const Divider(thickness: 0.5, height: 1),
-                _buildSpotInfo(context),
-                // _buildHeader(context),
-                // const Divider(thickness: 0.5, height: 1),
-                // _buildExpandedContent(context),
-              ],
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _Handle(),
+                  const _SearchBar(),
+                  const _ActionButtons(),
+                  const Divider(thickness: 0.5, height: 1),
+                  const _SpotInfo(),
+                  const Divider(thickness: 0.5, height: 1),
+                  const SizedBox(height: 16),
+                  Text("Visible Spots",
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  const _SpotList(),
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
+}
 
-  Widget _buildSpotInfo(BuildContext context) {
+class _SpotList extends StatelessWidget {
+  const _SpotList();
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.watch<HsClusterMapCubit>();
+    return BlocSelector<HsClusterMapCubit, HsClusterMapState, List<HSSpot>>(
+      selector: (state) => state.visibleSpots,
+      builder: (context, spots) {
+        if (cubit.state.isSpotSelected) {
+          spots.remove(cubit.state.selectedSpot);
+        }
+        if (spots.isEmpty) {
+          return Text("No spots found",
+              style: Theme.of(context).textTheme.bodyMedium!.hintify);
+        }
+        return ListView.separated(
+          shrinkWrap: true,
+          padding: const EdgeInsets.only(top: 24.0),
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: spots.length,
+          separatorBuilder: (context, index) => const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Divider(
+                thickness: .5,
+              )), // SizedBox(height: 16.0),
+          itemBuilder: (context, index) {
+            final spot = spots[index];
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HSSpotTile(
+                  extent: 160.0,
+                  spot: spot,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: spot.getTags.map((tag) {
+                    return Chip(
+                      side: BorderSide.none,
+                      label: Text("#$tag"),
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .secondary
+                          .withOpacity(.2),
+                    );
+                  }).toList(),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _Handle extends StatelessWidget {
+  const _Handle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(top: 8),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchBar extends StatelessWidget {
+  const _SearchBar();
+
+  @override
+  Widget build(BuildContext context) {
     final cubit = context.read<HsClusterMapCubit>();
+    return TextField(
+      decoration: InputDecoration(
+        hintText: 'Search for spots...',
+        suffixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      readOnly: true,
+      onTap: () => cubit.fetchSearch(context),
+    );
+  }
+}
+
+class _ActionButtons extends StatelessWidget {
+  const _ActionButtons();
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<HsClusterMapCubit>();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Expanded(
+            child: _MapButton(
+              icon: FontAwesomeIcons.map,
+              backgroundColor: Theme.of(context).primaryColor,
+              text: 'Map',
+              onPressed: cubit.map,
+            ),
+          ),
+          Expanded(
+            child: _MapButton(
+              icon: FontAwesomeIcons.locationCrosshairs,
+              text: 'Nearby',
+              onPressed: cubit.findNearby,
+            ),
+          ),
+          Expanded(
+            child: _MapButton(
+              icon: FontAwesomeIcons.sliders,
+              text: 'Filter',
+              onPressed: () => cubit.showFilters(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SpotInfo extends StatelessWidget {
+  const _SpotInfo();
+
+  @override
+  Widget build(BuildContext context) {
     return BlocSelector<HsClusterMapCubit, HsClusterMapState, bool>(
       selector: (state) => state.isSpotSelected,
       builder: (context, isSpotSelected) {
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
-          child: isSpotSelected
-              ? _buildSpotDetails(context, cubit)
-              : const SizedBox(),
+          child:
+              isSpotSelected ? const _SpotDetails() : const SizedBox.shrink(),
         );
       },
     );
   }
+}
 
-  Widget _buildSpotDetails(BuildContext context, HsClusterMapCubit cubit) {
+class _SpotDetails extends StatelessWidget {
+  const _SpotDetails();
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<HsClusterMapCubit>();
     final spot = cubit.state.selectedSpot;
     return Padding(
       key: ValueKey(spot.sid!),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -124,75 +277,6 @@ class MapBottomSheet extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildHandle() {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.only(top: 8),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    final cubit = context.read<HsClusterMapCubit>();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search for spots...',
-          suffixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
-          filled: true,
-          fillColor: Colors.grey[200],
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-        ),
-        readOnly: true,
-        onTap: () => cubit.fetchSearch(context),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
-    final cubit = context.read<HsClusterMapCubit>();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Expanded(
-            child: _MapButton(
-              icon: FontAwesomeIcons.map,
-              backgroundColor: Theme.of(context).primaryColor,
-              text: 'Map',
-              onPressed: cubit.map,
-            ),
-          ),
-          Expanded(
-            child: _MapButton(
-              icon: FontAwesomeIcons.locationCrosshairs,
-              text: 'Nearby',
-              onPressed: cubit.findNearby,
-            ),
-          ),
-          Expanded(
-            child: _MapButton(
-              icon: FontAwesomeIcons.sliders,
-              text: 'Filter',
-              onPressed: () => cubit.showFilters(context),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _ReactiveSpotButton extends StatelessWidget {
@@ -202,8 +286,7 @@ class _ReactiveSpotButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isActiveCondition,
-    Key? key,
-  }) : super(key: key);
+  });
 
   final HSClusterMapStatus reactiveStatus;
   final IconData icon;
@@ -356,87 +439,6 @@ class _HSFilterPopupState extends State<HSFilterPopup> {
           },
         ),
       ],
-    );
-  }
-}
-
-class _CompactOverlay extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final cubit = context.read<HsClusterMapCubit>();
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24.0),
-          topRight: Radius.circular(24.0),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildDragHandle(),
-          _buildSearchBar(context, cubit),
-          const Divider(thickness: 0.5, height: 1),
-          _buildActionButtons(context, cubit),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDragHandle() {
-    return Container(
-      width: 40,
-      height: 4,
-      margin: const EdgeInsets.only(top: 12, bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(2),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context, HsClusterMapCubit cubit) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: HSTextField.filled(
-        hintText: 'Search for spots...',
-        suffixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
-        readOnly: true,
-        onTap: () => cubit.fetchSearch(context),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context, HsClusterMapCubit cubit) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
-        top: 16,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _MapButton(
-            icon: FontAwesomeIcons.map,
-            backgroundColor: Theme.of(context).primaryColor,
-            text: 'Map',
-            onPressed: () {},
-          ),
-          _MapButton(
-            icon: FontAwesomeIcons.locationCrosshairs,
-            text: 'Nearby',
-            onPressed: cubit.findNearby,
-          ),
-          _MapButton(
-            icon: FontAwesomeIcons.sliders,
-            text: 'Filter',
-            onPressed: () => cubit.showFilters(context),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -17,6 +17,8 @@ class HSSpot {
   // BOARDS RELATED
   final int? spotIndex;
 
+  List<String> get getTags => tags ?? [];
+
   const HSSpot({
     this.sid,
     this.address,
