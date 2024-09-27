@@ -107,6 +107,8 @@ class MapBottomSheet extends StatelessWidget {
                     reactiveStatus: HSClusterMapStatus.saving,
                     icon: Icons.bookmark,
                     label: "Save",
+                    isActiveCondition: (state) =>
+                        state.savedSpots.contains(spot),
                     onPressed: () => cubit.saveSpot(spot)),
               ),
               Expanded(
@@ -194,17 +196,20 @@ class MapBottomSheet extends StatelessWidget {
 }
 
 class _ReactiveSpotButton extends StatelessWidget {
-  const _ReactiveSpotButton(
-      {required this.reactiveStatus,
-      required this.icon,
-      required this.label,
-      required this.onPressed});
+  const _ReactiveSpotButton({
+    required this.reactiveStatus,
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.isActiveCondition,
+    Key? key,
+  }) : super(key: key);
 
   final HSClusterMapStatus reactiveStatus;
   final IconData icon;
   final String label;
   final VoidCallback onPressed;
-  // final Function(bool) isActive;
+  final bool Function(HsClusterMapState)? isActiveCondition;
 
   @override
   Widget build(BuildContext context) {
@@ -216,15 +221,25 @@ class _ReactiveSpotButton extends StatelessWidget {
               current.status == HSClusterMapStatus.loaded),
       builder: (context, state) {
         final bool inProgress = state.status == reactiveStatus;
+
         if (inProgress) {
           return const HSLoadingIndicator(size: 24.0);
         }
+
+        late final Color? color;
+        if (isActiveCondition != null) {
+          final isActive = isActiveCondition!(state);
+          color = isActive ? appTheme.mainColor : null;
+        } else {
+          color = null;
+        }
+
         return InkWell(
           onTap: onPressed,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: inProgress ? appTheme.mainColor : null),
+              Icon(icon, color: color),
               const SizedBox(height: 4),
               Text(label, style: const TextStyle(fontSize: 12)),
             ],
