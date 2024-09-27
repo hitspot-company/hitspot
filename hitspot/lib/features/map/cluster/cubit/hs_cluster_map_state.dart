@@ -1,6 +1,16 @@
 part of 'hs_cluster_map_cubit.dart';
 
-enum HSClusterMapStatus { initial, loading, loaded, refreshing, error, nearby }
+enum HSClusterMapStatus {
+  initial,
+  loading,
+  loaded,
+  refreshing,
+  error,
+  nearby,
+  saving,
+  openingDirections,
+  sharing,
+}
 
 final class HsClusterMapState extends Equatable {
   const HsClusterMapState({
@@ -15,6 +25,7 @@ final class HsClusterMapState extends Equatable {
     ),
     this.selectedSpot = const HSSpot(),
     this.filters = const [],
+    this.savedSpots = const [],
   });
 
   final HSClusterMapStatus status;
@@ -24,8 +35,14 @@ final class HsClusterMapState extends Equatable {
   final HSSpotMarkerLevel markerLevel;
   final HSSpot selectedSpot;
   final List<String> filters;
+  final List<HSSpot> savedSpots;
 
   bool get isSpotSelected => selectedSpot.sid != null;
+  bool get isSaving => status == HSClusterMapStatus.saving;
+  bool get isLoaded => status == HSClusterMapStatus.loaded;
+  bool get isSharing => status == HSClusterMapStatus.sharing;
+  bool get isOpeningDirections =>
+      status == HSClusterMapStatus.openingDirections;
 
   @override
   List<Object> get props => [
@@ -37,6 +54,7 @@ final class HsClusterMapState extends Equatable {
         markerLevel,
         selectedSpot,
         filters,
+        savedSpots,
       ];
 
   HsClusterMapState copyWith({
@@ -48,6 +66,7 @@ final class HsClusterMapState extends Equatable {
     HSSpotMarkerLevel? markerLevel,
     HSSpot? selectedSpot,
     List<String>? filters,
+    List<HSSpot>? savedSpots,
   }) {
     return HsClusterMapState(
       status: status ?? this.status,
@@ -58,6 +77,7 @@ final class HsClusterMapState extends Equatable {
       markerLevel: markerLevel ?? this.markerLevel,
       selectedSpot: selectedSpot ?? this.selectedSpot,
       filters: filters ?? this.filters,
+      savedSpots: savedSpots ?? this.savedSpots,
     );
   }
 }
