@@ -298,9 +298,10 @@ class HSLocationRepository {
     late final Position pos;
     if (currentPosition == null) {
       pos = await getCurrentLocation();
-    } else
+    } else {
       pos = currentPosition;
+    }
     await animateCameraToNewLatLng(
-        controller, LatLng(pos.latitude, pos.longitude));
+        controller, LatLng(pos.latitude, pos.longitude), 13);
   }
 }

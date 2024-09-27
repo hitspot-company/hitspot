@@ -50,6 +50,16 @@ class ClusterMapPage extends StatelessWidget {
             ),
           ),
         ),
+        Positioned(
+          right: 16.0,
+          child: SafeArea(
+            child: FloatingActionButton(
+              onPressed: cubit.animateToCurrentLocation,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              child: const Icon(Icons.my_location),
+            ),
+          ),
+        ),
         const AnimatedMapOverlay(),
       ],
     );
@@ -63,23 +73,21 @@ class AnimatedMapOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<HsClusterMapCubit>();
     return AnimatedPositioned(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOutCubic,
       bottom: 0.0,
       left: 0.0,
       right: 0.0,
       child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(
             opacity: animation,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.95, end: 1.0).animate(
-                CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeOutCubic,
-                ),
-              ),
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(animation),
               child: child,
             ),
           );
@@ -87,76 +95,27 @@ class AnimatedMapOverlay extends StatelessWidget {
         child: Material(
           key: ValueKey<bool>(context
               .select((HsClusterMapCubit cubit) => cubit.state.isSpotSelected)),
+          elevation: 8,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
+          ),
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).cardColor,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
+                topLeft: Radius.circular(24.0),
+                topRight: Radius.circular(24.0),
               ),
             ),
-            width: screenWidth,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                BlocSelector<HsClusterMapCubit, HsClusterMapState, bool>(
-                  selector: (state) => state.isSpotSelected,
-                  builder: (context, isSpotSelected) {
-                    if (isSpotSelected) {
-                      final spot =
-                          context.read<HsClusterMapCubit>().state.selectedSpot;
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: HSSpotTile(
-                          index: 0,
-                          spot: spot,
-                          extent: 120.0,
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 8.0),
-                  child: HSTextField.filled(
-                    hintText: 'Search...',
-                    suffixIcon: const Icon(Icons.search),
-                    readOnly: true,
-                    onTap: () => cubit.fetchSearch(context),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Divider(thickness: .4),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom + 16.0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _MapButton(
-                        icon: FontAwesomeIcons.map,
-                        backgroundColor: Theme.of(context).primaryColor,
-                        text: 'Map',
-                        onPressed: () {},
-                      ),
-                      _MapButton(
-                        icon: FontAwesomeIcons.arrowsUpDownLeftRight,
-                        text: 'Nearby',
-                        onPressed: () {
-                          // Add your onPressed logic here
-                        },
-                      ),
-                      _MapButton(
-                          icon: FontAwesomeIcons.filter,
-                          text: 'Filter',
-                          onPressed: () => cubit.showFilters(context)),
-                    ],
-                  ),
-                ),
+                _buildDragHandle(),
+                _buildSelectedSpot(context),
+                _buildSearchBar(context, cubit),
+                const Divider(thickness: 0.5, height: 1),
+                _buildActionButtons(context, cubit),
               ],
             ),
           ),
@@ -164,39 +123,134 @@ class AnimatedMapOverlay extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildDragHandle() {
+    return Container(
+      width: 40,
+      height: 4,
+      margin: const EdgeInsets.only(top: 12, bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+
+  Widget _buildSelectedSpot(BuildContext context) {
+    return BlocSelector<HsClusterMapCubit, HsClusterMapState, bool>(
+      selector: (state) => state.isSpotSelected,
+      builder: (context, isSpotSelected) {
+        if (isSpotSelected) {
+          final spot = context.read<HsClusterMapCubit>().state.selectedSpot;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: HSSpotTile(
+              index: 0,
+              spot: spot,
+              extent: 120.0,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context, HsClusterMapCubit cubit) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: HSTextField.filled(
+        hintText: 'Search for spots...',
+        suffixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
+        // suffixIcon: Icon(Icons.mic, color: Theme.of(context).hintColor),
+        readOnly: true,
+        onTap: () => cubit.fetchSearch(context),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, HsClusterMapCubit cubit) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        bottom: MediaQuery.of(context).padding.bottom + 16,
+        top: 16,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _MapButton(
+            icon: FontAwesomeIcons.map,
+            backgroundColor: Theme.of(context).primaryColor,
+            text: 'Map',
+            onPressed: () {},
+          ),
+          _MapButton(
+            icon: FontAwesomeIcons.locationCrosshairs,
+            text: 'Nearby',
+            onPressed: cubit.findNearby,
+          ),
+          _MapButton(
+            icon: FontAwesomeIcons.sliders,
+            text: 'Filter',
+            onPressed: () => cubit.showFilters(context),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _MapButton extends StatelessWidget {
-  const _MapButton({
-    required this.icon,
-    this.backgroundColor,
-    required this.text,
-    this.onPressed,
-  });
-
   final IconData icon;
-  final Color? backgroundColor;
   final String text;
-  final VoidCallback? onPressed;
+  final VoidCallback onPressed;
+  final Color? backgroundColor;
+
+  const _MapButton({
+    Key? key,
+    required this.icon,
+    required this.text,
+    required this.onPressed,
+    this.backgroundColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton.filled(
-          style: IconButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            backgroundColor:
-                backgroundColor ?? appTheme.mainColor.withOpacity(0.4),
+    return Material(
+      color: backgroundColor ?? Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FaIcon(
+                icon,
+                size: 20,
+                color: backgroundColor != null
+                    ? Colors.white
+                    : Theme.of(context).iconTheme.color,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: backgroundColor != null
+                      ? Colors.white
+                      : Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ],
           ),
-          onPressed: onPressed,
-          icon: Icon(icon),
         ),
-        Text(text),
-      ],
+      ),
     );
   }
 }

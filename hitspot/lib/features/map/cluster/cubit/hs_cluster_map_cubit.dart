@@ -39,10 +39,12 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       lat: _currentPosition.latitude,
       long: _currentPosition.longitude,
     );
-    emit(state.copyWith(
-      status: HSClusterMapStatus.loaded,
-      visibleSpots: spots,
-    ));
+    emit(state.copyWith(visibleSpots: spots));
+    if (spots.isNotEmpty) {
+      await _locationRepository.zoomToFitSpots(
+          spots, await mapController.future);
+    }
+    emit(state.copyWith(status: HSClusterMapStatus.loaded));
   }
 
   void onCameraIdle() async {
@@ -154,6 +156,30 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       emit(state.copyWith(filters: result));
       _placeMarkers();
       emit(state.copyWith(status: HSClusterMapStatus.loaded));
+    }
+  }
+
+  void findNearby() async {
+    try {
+      final latlng = state.cameraPosition.target;
+      final nearbySpots = await _databaseRepository.spotFetchClosest(
+          lat: latlng.latitude, long: latlng.longitude, distance: 100);
+      if (nearbySpots.isNotEmpty) {
+        await _locationRepository.zoomToFitSpots(
+            nearbySpots, await mapController.future,
+            currentPosition: _currentPosition);
+      }
+    } catch (e) {
+      HSDebugLogger.logError("Failed to get nearby spots: $e");
+    }
+  }
+
+  Future<void> animateToCurrentLocation() async {
+    try {
+      final currentPosition = await _getPosition();
+      _locationRepository.resetPosition(mapController, currentPosition);
+    } catch (e) {
+      HSDebugLogger.logError("Failed to animate to current location: $e");
     }
   }
 }
