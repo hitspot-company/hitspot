@@ -270,7 +270,7 @@ class HSLocationRepository {
     }
 
     // Add a little padding
-    controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom - .6));
+    await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom - .6));
   }
 
   // Calculate LatLngBounds that includes all the spots

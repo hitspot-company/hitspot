@@ -19,6 +19,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     _init();
   }
 
+  static const DEFAULT_MARKER_PADDING = .0001;
   final _databaseRepository = app.databaseRepository;
   final _locationRepository = app.locationRepository;
   late final Position _currentPosition;
@@ -48,6 +49,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void onCameraIdle() async {
+    if (state.status == HSClusterMapStatus.nearby) return;
     emit(state.copyWith(status: HSClusterMapStatus.refreshing));
     final controller = await mapController.future;
     final center = await controller.getVisibleRegion();
@@ -81,8 +83,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   void _onMarkerTapped(HSSpot spot) async {
     _toggleSelectedSpot(spot);
-    await _locationRepository.animateCameraToNewLatLng(
-        mapController, LatLng(spot.latitude! - .0001, spot.longitude!), 18.0);
+    await _locationRepository.animateCameraToNewLatLng(mapController,
+        LatLng(spot.latitude! - DEFAULT_MARKER_PADDING, spot.longitude!), 18.0);
   }
 
   void _toggleSelectedSpot([HSSpot? spot]) {
@@ -118,7 +120,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     final tags =
         state.visibleSpots.expand((spot) => spot.tags ?? []).toSet().toList();
     tags.sort();
-    HSDebugLogger.logInfo("Tags: $tags");
     return tags.cast<String>();
   }
 
@@ -161,14 +162,18 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   void findNearby() async {
     try {
+      _toggleSelectedSpot();
+      emit(state.copyWith(status: HSClusterMapStatus.nearby));
       final latlng = state.cameraPosition.target;
       final nearbySpots = await _databaseRepository.spotFetchClosest(
-          lat: latlng.latitude, long: latlng.longitude, distance: 100);
+          lat: latlng.latitude, long: latlng.longitude);
       if (nearbySpots.isNotEmpty) {
+        emit(state.copyWith(visibleSpots: nearbySpots));
         await _locationRepository.zoomToFitSpots(
-            nearbySpots, await mapController.future,
-            currentPosition: _currentPosition);
+            nearbySpots, await mapController.future);
+        _placeMarkers();
       }
+      emit(state.copyWith(status: HSClusterMapStatus.loaded));
     } catch (e) {
       HSDebugLogger.logError("Failed to get nearby spots: $e");
     }

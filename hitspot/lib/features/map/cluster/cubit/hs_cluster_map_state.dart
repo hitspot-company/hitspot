@@ -1,6 +1,6 @@
 part of 'hs_cluster_map_cubit.dart';
 
-enum HSClusterMapStatus { initial, loading, loaded, refreshing, error }
+enum HSClusterMapStatus { initial, loading, loaded, refreshing, error, nearby }
 
 final class HsClusterMapState extends Equatable {
   const HsClusterMapState({

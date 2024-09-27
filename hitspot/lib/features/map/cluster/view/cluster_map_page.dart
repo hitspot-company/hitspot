@@ -44,6 +44,7 @@ class ClusterMapPage extends StatelessWidget {
           left: 16.0,
           child: SafeArea(
             child: FloatingActionButton(
+              heroTag: 'back',
               onPressed: navi.pop,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: backIcon,
@@ -54,6 +55,7 @@ class ClusterMapPage extends StatelessWidget {
           right: 16.0,
           child: SafeArea(
             child: FloatingActionButton(
+              heroTag: 'myLocation',
               onPressed: cubit.animateToCurrentLocation,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: const Icon(Icons.my_location),
@@ -209,12 +211,11 @@ class _MapButton extends StatelessWidget {
   final Color? backgroundColor;
 
   const _MapButton({
-    Key? key,
     required this.icon,
     required this.text,
     required this.onPressed,
     this.backgroundColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
