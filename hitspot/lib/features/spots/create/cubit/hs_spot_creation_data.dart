@@ -121,4 +121,5 @@ Future<void> createSpotWithIsolate(
       }
     }
   }
+  receivePort.close();
 }

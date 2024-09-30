@@ -26,6 +26,7 @@ import 'package:hitspot/features/tags/explore/view/tags_explore_provider.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
 import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
+import 'package:hitspot/features/user_profile/updated/view/user_profile_provider_updated.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -171,11 +172,15 @@ class HSNavigation {
               return null;
             },
             routes: [
+              // GoRoute(
+              //   path: 'user/:userID',
+              //   builder: (context, state) => UserProfileProvider(
+              //       userID: state.pathParameters['userID']!),
+              // ),
               GoRoute(
-                path: 'user/:userID',
-                builder: (context, state) => UserProfileProvider(
-                    userID: state.pathParameters['userID']!),
-              ),
+                  path: 'user/:userID',
+                  builder: (context, state) => UserProfileProviderUpdated(
+                      userID: state.pathParameters['userID']!)),
               GoRoute(
                 path: 'edit_profile',
                 builder: (context, state) => const EditProfileProvider(),

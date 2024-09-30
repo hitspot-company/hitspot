@@ -45,20 +45,25 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void _init() async {
-    emit(state.copyWith(status: HSClusterMapStatus.loading));
-    _currentPosition = await _getPosition();
-    final spots = await _databaseRepository.spotFetchClosest(
-      lat: _currentPosition.latitude,
-      long: _currentPosition.longitude,
-    );
-    final savedSpots =
-        await _databaseRepository.spotFetchSaved(userID: app.currentUser.uid!);
-    emit(state.copyWith(visibleSpots: spots, savedSpots: savedSpots));
-    if (spots.isNotEmpty) {
-      await _locationRepository.zoomToFitSpots(
-          spots, await mapController.future);
+    try {
+      emit(state.copyWith(status: HSClusterMapStatus.loading));
+      _currentPosition = await _getPosition();
+      final spots = await _databaseRepository.spotFetchClosest(
+        lat: _currentPosition.latitude,
+        long: _currentPosition.longitude,
+      );
+      final savedSpots = await _databaseRepository.spotFetchSaved(
+          userID: app.currentUser.uid!);
+      emit(state.copyWith(visibleSpots: spots, savedSpots: savedSpots));
+      emit(state.copyWith(status: HSClusterMapStatus.loaded));
+      if (spots.isNotEmpty) {
+        await _locationRepository.zoomToFitSpots(
+            spots, await mapController.future);
+      }
+    } catch (e) {
+      HSDebugLogger.logError("Failed to initialize map: $e");
+      emit(state.copyWith(status: HSClusterMapStatus.error));
     }
-    emit(state.copyWith(status: HSClusterMapStatus.loaded));
   }
 
   void onCameraIdle() async {

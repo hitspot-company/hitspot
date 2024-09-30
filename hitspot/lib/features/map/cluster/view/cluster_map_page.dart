@@ -4,14 +4,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/cluster/cubit/hs_cluster_map_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
-import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
-import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
-import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
