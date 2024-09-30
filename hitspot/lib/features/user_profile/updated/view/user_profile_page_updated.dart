@@ -46,6 +46,7 @@ class UserProfilePageUpdated extends StatelessWidget {
                     (BuildContext context, bool innerBoxIsScrolled) {
                   return [
                     SliverAppBar(
+                      surfaceTintColor: Colors.transparent,
                       floating: false,
                       pinned: true,
                       title: Text("@${user.username}",

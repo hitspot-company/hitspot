@@ -57,8 +57,10 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       emit(state.copyWith(visibleSpots: spots, savedSpots: savedSpots));
       emit(state.copyWith(status: HSClusterMapStatus.loaded));
       if (spots.isNotEmpty) {
+        emit(state.copyWith(status: HSClusterMapStatus.nearby));
         await _locationRepository.zoomToFitSpots(
             spots, await mapController.future);
+        emit(state.copyWith(status: HSClusterMapStatus.loaded));
       }
     } catch (e) {
       HSDebugLogger.logError("Failed to initialize map: $e");
