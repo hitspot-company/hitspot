@@ -42,8 +42,6 @@ class MapBottomSheet extends StatelessWidget {
                   const _SpotInfo(),
                   const Divider(thickness: 0.5, height: 1),
                   const SizedBox(height: 16),
-                  Text("Visible Spots",
-                      style: Theme.of(context).textTheme.headlineSmall),
                   const _SpotList(),
                 ],
               ),
@@ -68,46 +66,52 @@ class _SpotList extends StatelessWidget {
           spots.remove(cubit.state.selectedSpot);
         }
         if (spots.isEmpty) {
-          return Text("No spots found",
-              style: Theme.of(context).textTheme.bodyMedium!.hintify);
+          return const SizedBox.shrink();
         }
-        return ListView.separated(
-          shrinkWrap: true,
-          padding: const EdgeInsets.only(top: 24.0),
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: spots.length,
-          separatorBuilder: (context, index) => const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Divider(
-                thickness: .5,
-              )), // SizedBox(height: 16.0),
-          itemBuilder: (context, index) {
-            final spot = spots[index];
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HSSpotTile(
-                  extent: 160.0,
-                  spot: spot,
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
-                  children: spot.getTags.map((tag) {
-                    return Chip(
-                      side: BorderSide.none,
-                      label: Text("#$tag"),
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withOpacity(.2),
-                    );
-                  }).toList(),
-                ),
-              ],
-            );
-          },
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Visible Spots",
+                style: Theme.of(context).textTheme.headlineMedium),
+            ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(top: 24.0),
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: spots.length,
+              separatorBuilder: (context, index) => const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Divider(
+                    thickness: .5,
+                  )), // SizedBox(height: 16.0),
+              itemBuilder: (context, index) {
+                final spot = spots[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HSSpotTile(
+                      extent: 160.0,
+                      spot: spot,
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: spot.getTags.map((tag) {
+                        return Chip(
+                          side: BorderSide.none,
+                          label: Text("#$tag"),
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .secondary
+                              .withOpacity(.2),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
         );
       },
     );
@@ -220,60 +224,73 @@ class _SpotDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<HsClusterMapCubit>();
     final spot = cubit.state.selectedSpot;
-    return Padding(
-      key: ValueKey(spot.sid!),
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          HSImage(
-            borderRadius: BorderRadius.circular(8),
-            width: screenWidth,
-            height: 140,
-            imageUrl: spot.getThumbnail,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            spot.title!,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          const SizedBox(height: 8),
-          Text(spot.address!,
-              style: Theme.of(context).textTheme.bodySmall!.hintify),
-          const SizedBox(height: 8),
-          HsUserTile(user: spot.author!),
-          const SizedBox(height: 8),
-          const Divider(thickness: .5),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Expanded(
-                child: _ReactiveSpotButton(
-                    reactiveStatus: HSClusterMapStatus.openingDirections,
-                    icon: Icons.directions,
-                    label: "Directions",
-                    onPressed: () => cubit.launchMaps(spot)),
-              ),
-              Expanded(
-                child: _ReactiveSpotButton(
-                    reactiveStatus: HSClusterMapStatus.saving,
-                    icon: Icons.bookmark,
-                    label: "Save",
-                    isActiveCondition: (state) =>
-                        state.savedSpots.contains(spot),
-                    onPressed: () => cubit.saveSpot(spot)),
-              ),
-              Expanded(
-                child: _ReactiveSpotButton(
-                    reactiveStatus: HSClusterMapStatus.sharing,
-                    icon: Icons.share,
-                    label: "Share",
-                    onPressed: () => cubit.shareSpot(spot)),
-              ),
-            ],
-          ),
-        ],
+    return InkWell(
+      onTap: () => navi.toSpot(sid: spot.sid!),
+      child: Padding(
+        key: ValueKey(spot.sid!),
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            HSImage(
+              borderRadius: BorderRadius.circular(8),
+              width: screenWidth,
+              height: 140,
+              imageUrl: spot.getThumbnail,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              spot.title!,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            Text(spot.address!,
+                style: Theme.of(context).textTheme.bodySmall!.hintify),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                HsUserTile(user: spot.author!),
+                const Spacer(),
+                HSButton.icon(
+                  label: const Text("Show on map"),
+                  icon: const Icon(FontAwesomeIcons.mapPin),
+                  onPressed: cubit.showSpotOnMap,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Divider(thickness: .5),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: _ReactiveSpotButton(
+                      reactiveStatus: HSClusterMapStatus.openingDirections,
+                      icon: Icons.directions,
+                      label: "Directions",
+                      onPressed: () => cubit.launchMaps(spot)),
+                ),
+                Expanded(
+                  child: _ReactiveSpotButton(
+                      reactiveStatus: HSClusterMapStatus.saving,
+                      icon: Icons.bookmark,
+                      label: "Save",
+                      isActiveCondition: (state) =>
+                          state.savedSpots.contains(spot),
+                      onPressed: () => cubit.saveSpot(spot)),
+                ),
+                Expanded(
+                  child: _ReactiveSpotButton(
+                      reactiveStatus: HSClusterMapStatus.sharing,
+                      icon: Icons.share,
+                      label: "Share",
+                      onPressed: () => cubit.shareSpot(spot)),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

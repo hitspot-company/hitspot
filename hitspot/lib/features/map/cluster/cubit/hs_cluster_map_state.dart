@@ -10,6 +10,7 @@ enum HSClusterMapStatus {
   saving,
   openingDirections,
   sharing,
+  ignoringRefresh,
 }
 
 final class HsClusterMapState extends Equatable {

@@ -9,8 +9,6 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
 import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
-import 'package:hitspot/features/map/main/view/map_page.dart';
-import 'package:hitspot/features/map/main/view/map_provider.dart';
 import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';

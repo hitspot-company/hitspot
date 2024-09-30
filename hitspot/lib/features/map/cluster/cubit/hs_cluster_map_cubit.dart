@@ -69,7 +69,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void onCameraIdle() async {
-    if (state.status == HSClusterMapStatus.nearby) return;
+    if (state.status == HSClusterMapStatus.nearby ||
+        state.status == HSClusterMapStatus.ignoringRefresh) return;
     emit(state.copyWith(status: HSClusterMapStatus.refreshing));
     final controller = await mapController.future;
     final center = await controller.getVisibleRegion();
@@ -109,10 +110,10 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
         duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
-  void closeSheet() async {
+  void closeSheet([bool toggleSelected = true]) async {
     await scrollController.animateTo(0,
         duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    _toggleSelectedSpot();
+    if (toggleSelected) _toggleSelectedSpot();
   }
 
   void _toggleSelectedSpot([HSSpot? spot]) {
@@ -136,6 +137,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void onCameraMoved(CameraPosition position) {
+    if (state.status == HSClusterMapStatus.nearby ||
+        state.status == HSClusterMapStatus.ignoringRefresh) return;
     final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
     if (markerLevel != state.markerLevel) {
       emit(state.copyWith(markerLevel: markerLevel));
@@ -202,7 +205,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       if (nearbySpots.isNotEmpty) {
         emit(state.copyWith(visibleSpots: nearbySpots));
         await _locationRepository.zoomToFitSpots(
-            nearbySpots, await mapController.future);
+            nearbySpots, await mapController.future,
+            padding: .3);
         _placeMarkers();
       }
       emit(state.copyWith(status: HSClusterMapStatus.loaded));
@@ -263,10 +267,37 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     emit(state.copyWith(status: HSClusterMapStatus.loaded));
   }
 
+  void showSpotOnMap() async {
+    try {
+      emit(state.copyWith(status: HSClusterMapStatus.ignoringRefresh));
+      final spot = state.selectedSpot;
+      await _locationRepository.animateCameraToNewLatLng(
+          mapController,
+          LatLng(spot.latitude! - DEFAULT_MARKER_PADDING, spot.longitude!),
+          18.0);
+      closeSheet(false);
+      emit(state.copyWith(status: HSClusterMapStatus.loaded));
+    } catch (e) {
+      HSDebugLogger.logError("Failed to show spot on map: $e");
+    }
+  }
+
   @override
   Future<void> close() async {
     await mapController.future.then((v) => v.dispose());
     scrollController.dispose();
     return super.close();
+  }
+}
+
+extension on HSSpot {
+  Marker toMarker(HSSpotMarkerLevel level, bool isSelected) {
+    final markerIcon =
+        app.assets.getMarkerIcon(this, level: level, isSelected: isSelected);
+    return Marker(
+      markerId: MarkerId(sid!),
+      position: LatLng(latitude!, longitude!),
+      icon: markerIcon,
+    );
   }
 }

@@ -13,21 +13,18 @@ import 'package:hitspot/features/deep_link_error/view/deep_link_error_page.dart'
 import 'package:hitspot/features/home/main/view/home_provider.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
-import 'package:hitspot/features/map/main/view/map_provider.dart';
+import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
 import 'package:hitspot/features/notifications/view/notifications_provider.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
-import 'package:hitspot/features/spots/create/view/create_spot_provider.dart';
 import 'package:hitspot/features/spots/create_2/images/view/create_spot_images_provider.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/features/spots/multiple/view/multiple_spots_provider.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
 import 'package:hitspot/features/tags/explore/view/tags_explore_provider.dart';
 import 'package:hitspot/features/user_profile/edit_profile/view/edit_profile_provider.dart';
-import 'package:hitspot/features/user_profile/main/view/user_profile_provider.dart';
 import 'package:hitspot/features/user_profile/settings/view/settings_provider.dart';
 import 'package:hitspot/features/user_profile/updated/view/user_profile_provider_updated.dart';
-import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 
@@ -303,8 +300,7 @@ class HSNavigation {
   dynamic toEditProfile() => router.push('/edit_profile');
   dynamic toCreateSpot() => router.push('/create_spot');
   dynamic toNotifications() => router.push('/notifications');
-  dynamic toSpotsMap(Position? initialPosition) =>
-      pushPage(page: MapProvider(initialCameraPosition: initialPosition));
+  dynamic toSpotsMap() => pushPage(page: const ClusterMapProvider());
   dynamic toMultipleSpots(HSMultipleSpotsType type, [String? userID]) =>
       pushPage(page: MultipleSpotsProvider(type: type, userID: userID));
   dynamic toTagsExplore(String tag) => router.push('/tags_explore/$tag');

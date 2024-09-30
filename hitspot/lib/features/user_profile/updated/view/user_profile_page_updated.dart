@@ -58,7 +58,9 @@ class UserProfilePageUpdated extends StatelessWidget {
                         ),
                       ],
                     ),
-                    HSUserAvatar(radius: 70.0, imageUrl: user.avatarUrl)
+                    Center(
+                            child: HSUserAvatar(
+                                radius: 70.0, imageUrl: user.avatarUrl))
                         .toSliver,
                     const SizedBox(height: 16).toSliver,
                     Center(
