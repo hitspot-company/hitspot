@@ -310,8 +310,7 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
                     loadingStatus: HSSingleSpotStatus.liking,
                     delay: 450.ms,
                   ),
-                  Text(singleSpotCubit.state.spot.formattedLikesCount,
-                      style: const TextStyle(fontSize: 12.0)),
+                  const _Counter(_CounterType.likes),
                 ],
               ),
               Column(
@@ -332,8 +331,7 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
                     loadingStatus: HSSingleSpotStatus.commenting,
                     delay: 500.ms,
                   ),
-                  Text(singleSpotCubit.state.spot.formattedCommentsCount,
-                      style: const TextStyle(fontSize: 12.0)),
+                  const _Counter(_CounterType.comments),
                 ],
               ),
               Column(

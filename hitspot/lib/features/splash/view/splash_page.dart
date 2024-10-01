@@ -24,6 +24,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _controller.removeListener(_listenAndNavigate);
     _controller.dispose();
     super.dispose();
   }
