@@ -195,6 +195,15 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     closeSheet();
   }
 
+  void changeMapType() {
+    emit(state.copyWith(status: HSClusterMapStatus.refreshing));
+    emit(state.copyWith(
+        mapType: state.mapType == MapType.normal
+            ? MapType.satellite
+            : MapType.normal));
+    emit(state.copyWith(status: HSClusterMapStatus.loaded));
+  }
+
   void findNearby() async {
     try {
       closeSheet();

@@ -27,6 +27,7 @@ final class HsClusterMapState extends Equatable {
     this.selectedSpot = const HSSpot(),
     this.filters = const [],
     this.savedSpots = const [],
+    this.mapType = MapType.normal,
   });
 
   final HSClusterMapStatus status;
@@ -37,6 +38,7 @@ final class HsClusterMapState extends Equatable {
   final HSSpot selectedSpot;
   final List<String> filters;
   final List<HSSpot> savedSpots;
+  final MapType mapType;
 
   bool get isSpotSelected => selectedSpot.sid != null;
   bool get isSaving => status == HSClusterMapStatus.saving;
@@ -56,6 +58,7 @@ final class HsClusterMapState extends Equatable {
         selectedSpot,
         filters,
         savedSpots,
+        mapType,
       ];
 
   HsClusterMapState copyWith({
@@ -68,6 +71,7 @@ final class HsClusterMapState extends Equatable {
     HSSpot? selectedSpot,
     List<String>? filters,
     List<HSSpot>? savedSpots,
+    MapType? mapType,
   }) {
     return HsClusterMapState(
       status: status ?? this.status,
@@ -79,6 +83,7 @@ final class HsClusterMapState extends Equatable {
       selectedSpot: selectedSpot ?? this.selectedSpot,
       filters: filters ?? this.filters,
       savedSpots: savedSpots ?? this.savedSpots,
+      mapType: mapType ?? this.mapType,
     );
   }
 }

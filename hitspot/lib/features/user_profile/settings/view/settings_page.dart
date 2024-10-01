@@ -7,7 +7,6 @@ import 'package:hitspot/features/user_profile/settings/bloc/hs_settings_bloc.dar
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -134,23 +133,18 @@ class ThemedSettingsSection extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Container(
-        color: theme.brightness == Brightness.light
-            ? theme.scaffoldBackgroundColor
-            : theme.highlightColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                title,
-                style: theme.textTheme.headlineSmall,
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              title,
+              style: theme.textTheme.headlineSmall,
             ),
-            ...tiles,
-          ],
-        ),
+          ),
+          ...tiles,
+        ],
       ),
     );
   }

@@ -6,6 +6,8 @@ class MapBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<HsClusterMapCubit>();
+    final theme = Theme.of(context);
+    final bool isLightTheme = theme.brightness == Brightness.light;
     return DraggableScrollableSheet(
       controller: cubit.scrollController,
       initialChildSize: HsClusterMapCubit.SHEET_MIN_SIZE,
@@ -18,31 +20,31 @@ class MapBottomSheet extends StatelessWidget {
             borderRadius:
                 const BorderRadius.vertical(top: Radius.circular(24.0)),
             boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              ),
+              if (isLightTheme)
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
+                ),
             ],
           ),
           child: SingleChildScrollView(
             controller: scrollController,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _Handle(),
-                  const _SearchBar(),
-                  const _ActionButtons(),
-                  const Divider(thickness: 0.5, height: 1),
-                  const _SpotInfo(),
-                  const Divider(thickness: 0.5, height: 1),
-                  const SizedBox(height: 16),
-                  const _SpotList(),
+                  _Handle(),
+                  _SearchBar(),
+                  _ActionButtons(),
+                  Divider(thickness: 0.5, height: 1),
+                  _SpotInfo(),
+                  Divider(thickness: 0.5, height: 1),
+                  SizedBox(height: 16),
+                  _SpotList(),
                 ],
               ),
             ),
@@ -143,18 +145,9 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<HsClusterMapCubit>();
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Search for spots...',
-        suffixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      readOnly: true,
+    return HSTextField.filled(
+      hintText: 'Search for spots...',
+      suffixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
       onTap: () => cubit.fetchSearch(context),
     );
   }
@@ -182,8 +175,8 @@ class _ActionButtons extends StatelessWidget {
           Expanded(
             child: _MapButton(
               icon: FontAwesomeIcons.locationCrosshairs,
-              text: 'Nearby',
-              onPressed: cubit.findNearby,
+              text: 'My Location',
+              onPressed: cubit.animateToCurrentLocation,
             ),
           ),
           Expanded(

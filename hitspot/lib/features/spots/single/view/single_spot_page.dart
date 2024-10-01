@@ -165,6 +165,8 @@ class _AnimatedImageTile extends StatelessWidget {
           images: cubit.state.spot.images!,
           initialIndex: cubit.state.spot.images!.indexOf(imageUrl),
           type: HSImageGalleryType.network,
+          backgroundDecoration:
+              BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
         ),
       ),
       child: Hero(

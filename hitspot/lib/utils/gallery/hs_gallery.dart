@@ -58,37 +58,66 @@ class HSGalleryBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PhotoViewGallery.builder(
-      scrollPhysics: const BouncingScrollPhysics(),
-      builder: (BuildContext context, int index) {
-        final imageProvider = type == HSImageGalleryType.network
-            ? CachedNetworkImageProvider(images[index])
-            : AssetImage(images[index]) as ImageProvider;
+    return Material(
+      color: backgroundDecoration?.color,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(FontAwesomeIcons.xmark),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: PhotoViewGallery.builder(
+                scrollPhysics: const BouncingScrollPhysics(),
+                builder: (BuildContext context, int index) {
+                  final imageProvider = type == HSImageGalleryType.network
+                      ? CachedNetworkImageProvider(images[index])
+                      : AssetImage(images[index]) as ImageProvider;
 
-        return PhotoViewGalleryPageOptions(
-          imageProvider: imageProvider,
-          initialScale: PhotoViewComputedScale.contained,
-          minScale: PhotoViewComputedScale.contained,
-          maxScale: PhotoViewComputedScale.contained,
-          heroAttributes: PhotoViewHeroAttributes(tag: images[index]),
-        );
-      },
-      itemCount: images.length,
-      loadingBuilder: (context, event) => Center(
-        child: SizedBox(
-          width: 20.0,
-          height: 20.0,
-          child: CircularProgressIndicator(
-            value: event == null
-                ? 0
-                : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
-          ),
+                  return PhotoViewGalleryPageOptions(
+                    imageProvider: imageProvider,
+                    initialScale: PhotoViewComputedScale.contained,
+                    minScale: PhotoViewComputedScale.contained,
+                    maxScale: PhotoViewComputedScale.contained,
+                    heroAttributes: PhotoViewHeroAttributes(tag: images[index]),
+                  );
+                },
+                itemCount: images.length,
+                loadingBuilder: (context, event) => Center(
+                  child: SizedBox(
+                    width: 20.0,
+                    height: 20.0,
+                    child: CircularProgressIndicator(
+                      value: event == null
+                          ? 0
+                          : event.cumulativeBytesLoaded /
+                              event.expectedTotalBytes!,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(appTheme.mainColor),
+                    ),
+                  ),
+                ),
+                backgroundDecoration: backgroundDecoration,
+                pageController:
+                    pageController ?? PageController(initialPage: initialIndex),
+                onPageChanged: onPageChanged,
+              ),
+            ),
+          ],
         ),
       ),
-      backgroundDecoration: backgroundDecoration,
-      pageController:
-          pageController ?? PageController(initialPage: initialIndex),
-      onPageChanged: onPageChanged,
     );
   }
 }

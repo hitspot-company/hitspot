@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,9 +10,9 @@ import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
+import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 part 'cluster_map_widgets.dart';
@@ -37,10 +36,12 @@ class ClusterMapPage extends StatelessWidget {
                 return const HSScaffold(body: HSLoadingIndicator());
               }
               return GoogleMap(
+                fortyFiveDegreeImageryEnabled: true,
                 style: context.read<HSThemeBloc>().state.mapStyle,
                 initialCameraPosition: cubit.initialCameraPosition,
                 myLocationButtonEnabled: false,
                 myLocationEnabled: true,
+                mapType: cubit.state.mapType,
                 onTap: (argument) => cubit.closeSheet(),
                 onMapCreated: (controller) {
                   if (!cubit.mapController.isCompleted) {
@@ -68,10 +69,10 @@ class ClusterMapPage extends StatelessWidget {
             right: 16.0,
             child: SafeArea(
               child: FloatingActionButton(
-                heroTag: 'myLocation',
-                onPressed: cubit.animateToCurrentLocation,
+                heroTag: 'mapType',
+                onPressed: cubit.changeMapType,
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                child: const Icon(Icons.my_location),
+                child: const Icon(Icons.border_all),
               ),
             ),
           ),
