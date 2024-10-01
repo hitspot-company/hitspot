@@ -15,6 +15,7 @@ class HsUserProfileUpdatedCubit extends Cubit<HsUserProfileUpdatedState> {
 
   final String userID;
   final _databaseRepository = app.databaseRepository;
+  bool get isCurrentUser => userID == currentUser.uid;
 
   void _init() async {
     try {

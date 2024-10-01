@@ -17,6 +17,7 @@ class UserProfilePageUpdated extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = BlocProvider.of<HsUserProfileUpdatedCubit>(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -52,10 +53,11 @@ class UserProfilePageUpdated extends StatelessWidget {
                       title: Text("@${user.username}",
                           style: Theme.of(context).textTheme.headlineMedium),
                       actions: [
-                        IconButton(
-                          icon: const Icon(Icons.more_vert),
-                          onPressed: () {},
-                        ),
+                        if (cubit.isCurrentUser)
+                          IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: navi.toSettings,
+                          ),
                       ],
                     ),
                     Center(

@@ -27,7 +27,7 @@ class EditValuePage extends StatelessWidget {
           body: Column(
             children: [
               const Gap(16.0),
-              HSTextField(
+              HSTextField.filled(
                 maxLines: state.fieldName == "biogram" ? 5 : 1,
                 autofocus: true,
                 onChanged: editValueCubit.changeValue,
