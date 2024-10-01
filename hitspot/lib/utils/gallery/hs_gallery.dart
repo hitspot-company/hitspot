@@ -37,3 +37,56 @@ class HSGallery {
     Overlay.of(app.context).insert(_overlayEntry!);
   }
 }
+
+class HSGalleryBuilder extends StatelessWidget {
+  final List<String> images;
+  final HSImageGalleryType type;
+  final BoxDecoration? backgroundDecoration;
+  final PageController? pageController;
+  final Function(int)? onPageChanged;
+  final int initialIndex;
+
+  const HSGalleryBuilder({
+    super.key,
+    required this.images,
+    this.type = HSImageGalleryType.network,
+    this.backgroundDecoration,
+    this.pageController,
+    this.onPageChanged,
+    this.initialIndex = 0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PhotoViewGallery.builder(
+      scrollPhysics: const BouncingScrollPhysics(),
+      builder: (BuildContext context, int index) {
+        final imageProvider = type == HSImageGalleryType.network
+            ? CachedNetworkImageProvider(images[index])
+            : AssetImage(images[index]) as ImageProvider;
+
+        return PhotoViewGalleryPageOptions(
+          imageProvider: imageProvider,
+          initialScale: PhotoViewComputedScale.contained * 0.8,
+          heroAttributes: PhotoViewHeroAttributes(tag: images[index]),
+        );
+      },
+      itemCount: images.length,
+      loadingBuilder: (context, event) => Center(
+        child: Container(
+          width: 20.0,
+          height: 20.0,
+          child: CircularProgressIndicator(
+            value: event == null
+                ? 0
+                : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+          ),
+        ),
+      ),
+      backgroundDecoration: backgroundDecoration,
+      pageController:
+          pageController ?? PageController(initialPage: initialIndex),
+      onPageChanged: onPageChanged,
+    );
+  }
+}

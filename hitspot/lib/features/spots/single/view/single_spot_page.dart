@@ -12,7 +12,6 @@ import 'package:hitspot/features/spots/single/view/single_spot_comments_page.dar
 import 'package:hitspot/utils/gallery/hs_gallery.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
-import 'package:hitspot/widgets/hs_hourglass.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
