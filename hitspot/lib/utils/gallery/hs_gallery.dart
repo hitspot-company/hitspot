@@ -67,13 +67,15 @@ class HSGalleryBuilder extends StatelessWidget {
 
         return PhotoViewGalleryPageOptions(
           imageProvider: imageProvider,
-          initialScale: PhotoViewComputedScale.contained * 0.8,
+          initialScale: PhotoViewComputedScale.contained,
+          minScale: PhotoViewComputedScale.contained,
+          maxScale: PhotoViewComputedScale.contained,
           heroAttributes: PhotoViewHeroAttributes(tag: images[index]),
         );
       },
       itemCount: images.length,
       loadingBuilder: (context, event) => Center(
-        child: Container(
+        child: SizedBox(
           width: 20.0,
           height: 20.0,
           child: CircularProgressIndicator(
