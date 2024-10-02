@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
-import 'package:hitspot/features/user_profile/updated/cubit/hs_user_profile_updated_cubit.dart';
+import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_updated_cubit.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';

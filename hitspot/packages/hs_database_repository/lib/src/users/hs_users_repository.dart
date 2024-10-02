@@ -1,4 +1,4 @@
-import 'package:hs_authentication_repository/src/models/hs_user.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_database_repository/src/users/exceptions/hs_update_user_failure.dart';
@@ -129,6 +129,39 @@ class HSUsersRepository {
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       rethrow;
+    }
+  }
+
+  Future<List<HSUser>> fetchSpotLikers(
+      HSSpot? spot, String? spotID, int? batchSize, int? batchOffset) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final String spotUID = spot?.sid ?? spotID!;
+      final List<Map<String, dynamic>> fetched = await _supabase
+          .rpc("spot_fetch_likers", params: {
+        "p_spot_id": spotUID,
+        "p_batch_size": batchSize,
+        "p_batch_offset": batchOffset
+      });
+      if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
+      return fetched.map((e) => HSUser.deserialize(e)).toList();
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching spot likers: $e");
+      throw HSReadUserFailure(customDetails: e.toString());
+    }
+  }
+
+  Future<List<HSUser>> fetchFollowers(HSUser? user, String? userID) async {
+    try {
+      assert(user != null || userID != null, "User or userID must be provided");
+      final String uid = user?.uid ?? userID!;
+      final List<Map<String, dynamic>> fetched = await _supabase
+          .rpc("user_fetch_followers", params: {"p_user_id": uid});
+      if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
+      return fetched.map((e) => HSUser.deserialize(e)).toList();
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching followers: $e");
+      throw HSReadUserFailure(customDetails: e.toString());
     }
   }
 }
