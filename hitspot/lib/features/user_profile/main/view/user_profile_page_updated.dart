@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_updated_cubit.dart';
+import 'package:hitspot/features/user_profile/multiple/cubit/hs_user_profile_multiple_cubit.dart';
+import 'package:hitspot/features/user_profile/multiple/view/user_profile_multiple_provider.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -61,9 +63,11 @@ class UserProfilePageUpdated extends StatelessWidget {
                       ],
                     ),
                     Center(
-                            child: HSUserAvatar(
-                                radius: 70.0, imageUrl: user.avatarUrl))
-                        .toSliver,
+                        child: HSUserAvatar(
+                      radius: 70.0,
+                      imageUrl: user.avatarUrl,
+                      iconSize: 40.0,
+                    )).toSliver,
                     const SizedBox(height: 16).toSliver,
                     Center(
                             child: Text(user.name!,
@@ -80,9 +84,11 @@ class UserProfilePageUpdated extends StatelessWidget {
                       children: [
                         _UserProfileUpdatedStatItem(
                             value: 'Followers',
+                            type: HSUserProfileMultipleType.followers,
                             label: followersCount.toString()),
                         _UserProfileUpdatedStatItem(
                             value: 'Following',
+                            type: HSUserProfileMultipleType.following,
                             label: followingCount.toString()),
                         _UserProfileUpdatedStatItem(
                             value: 'Spots', label: spotsCount.toString()),

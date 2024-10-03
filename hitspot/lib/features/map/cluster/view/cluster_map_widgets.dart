@@ -9,6 +9,11 @@ class MapBottomSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final bool isLightTheme = theme.brightness == Brightness.light;
     return DraggableScrollableSheet(
+      snap: true,
+      snapSizes: const [
+        HsClusterMapCubit.SHEET_MIN_SIZE,
+        HsClusterMapCubit.SHEET_MAX_SIZE,
+      ],
       controller: cubit.scrollController,
       initialChildSize: HsClusterMapCubit.SHEET_MIN_SIZE,
       minChildSize: HsClusterMapCubit.SHEET_MIN_SIZE,
@@ -170,6 +175,7 @@ class _ActionButtons extends StatelessWidget {
               backgroundColor: Theme.of(context).primaryColor,
               text: 'Map',
               onPressed: cubit.map,
+              foregroundColor: appTheme.mainColor,
             ),
           ),
           Expanded(
@@ -347,13 +353,14 @@ class _MapButton extends StatelessWidget {
   final IconData icon;
   final String text;
   final VoidCallback onPressed;
-  final Color? backgroundColor;
+  final Color? backgroundColor, foregroundColor;
 
   const _MapButton({
     required this.icon,
     required this.text,
     required this.onPressed,
     this.backgroundColor,
+    this.foregroundColor,
   });
 
   @override
@@ -371,6 +378,7 @@ class _MapButton extends StatelessWidget {
               FaIcon(
                 icon,
                 size: 20,
+                color: foregroundColor,
               ),
               const SizedBox(height: 4),
               Text(

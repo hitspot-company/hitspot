@@ -8,6 +8,7 @@ import 'package:hitspot/features/map/cluster/view/cluster_map_page.dart';
 import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -164,6 +165,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
         final HSPlaceDetails placeDetails = await _locationRepository
             .fetchPlaceDetails(placeID: result.placeID);
         _toggleSelectedSpot();
+        closeSheet();
+        HSScaffold.hideInput();
         await _locationRepository.animateCameraToNewLatLng(mapController,
             LatLng(placeDetails.latitude, placeDetails.longitude), 13.0);
       }

@@ -33,25 +33,39 @@ class _UserProfileUpdatedHeader extends StatelessWidget {
 }
 
 class _UserProfileUpdatedStatItem extends StatelessWidget {
-  const _UserProfileUpdatedStatItem({required this.value, required this.label});
+  const _UserProfileUpdatedStatItem(
+      {required this.value, required this.label, this.type});
 
   final String value, label;
+  final HSUserProfileMultipleType? type;
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<HsUserProfileUpdatedCubit>();
     return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-        ],
+      child: GestureDetector(
+        onTap: () {
+          if (type != null) {
+            navi.pushPage(
+                page: UserProfileMultipleProvider(
+              type: type!,
+              userID: cubit.userID,
+            ));
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              value,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+          ],
+        ),
       ),
     );
   }

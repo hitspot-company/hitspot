@@ -141,15 +141,21 @@ class HSUsersRepository {
           .from('spot_likes')
           .select()
           .eq('spot_id', spotUID)
-          .range(batchOffset, batchOffset + batchSize);
+          .order('created_at', ascending: false)
+          .range(batchOffset, batchOffset + batchSize)
+          .select();
       // final List<Map<String, dynamic>> fetched = await _supabase
       //     .rpc("spot_fetch_likers", params: {
       //   "p_spot_id": spotUID,
       //   "p_batch_size": batchSize,
       //   "p_batch_offset": batchOffset
       // });
-      if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
-      return fetched.map((e) => HSUser.deserialize(e)).toList();
+      // final result = await Future.wait(fetched
+      //     .map((e) async => await read(null, e['followed_id']))
+      //     .toList());
+      final result = await Future.wait(
+          fetched.map((e) async => await read(null, e['user_id'])).toList());
+      return result;
     } catch (e) {
       HSDebugLogger.logError("Error fetching spot likers: $e");
       throw HSReadUserFailure(customDetails: e.toString());
@@ -165,15 +171,19 @@ class HSUsersRepository {
           .from('user_follows')
           .select()
           .eq('followed_id', uid)
-          .range(batchOffset, batchOffset + batchSize);
+          .order('created_at', ascending: false)
+          .range(batchOffset, batchOffset + batchSize)
+          .select();
       // final List<Map<String, dynamic>> fetched = await _supabase
       //     .rpc("user_fetch_followers", params: {
       //   "p_user_id": uid,
       //   "p_batch_size": batchSize,
       //   "p_batch_offset": batchOffset
       // });
-      if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
-      return fetched.map((e) => HSUser.deserialize(e)).toList();
+      final result = await Future.wait(fetched
+          .map((e) async => await read(null, e['follower_id']))
+          .toList());
+      return result;
     } catch (e) {
       HSDebugLogger.logError("Error fetching followers: $e");
       throw HSReadUserFailure(customDetails: e.toString());
@@ -189,15 +199,20 @@ class HSUsersRepository {
           .from('user_follows')
           .select()
           .eq('follower_id', uid)
-          .range(batchOffset, batchOffset + batchSize);
+          .order('created_at', ascending: false)
+          .range(batchOffset, batchOffset + batchSize)
+          .select();
+      final result = await Future.wait(fetched
+          .map((e) async => await read(null, e['followed_id']))
+          .toList());
+
       // final List<Map<String, dynamic>> fetched = await _supabase
       //     .rpc("user_fetch_followed", params: {
       //   "p_user_id": uid,
       //   "p_batch_size": batchSize,
       //   "p_batch_offset": batchOffset
       // });
-      if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
-      return fetched.map((e) => HSUser.deserialize(e)).toList();
+      return result;
     } catch (e) {
       HSDebugLogger.logError("Error fetching followers: $e");
       throw HSReadUserFailure(customDetails: e.toString());
