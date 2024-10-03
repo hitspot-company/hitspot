@@ -113,6 +113,30 @@ class HSDatabaseRepsitory {
     }
   }
 
+  Future<List<HSUser>> userFetchFollowed(
+          {HSUser? user,
+          String? userID,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _usersRepository.fetchFollowed(
+          user, userID, batchSize, batchOffset);
+
+  Future<List<HSUser>> userFetchFollowers(
+          {HSUser? user,
+          String? userID,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _usersRepository.fetchFollowers(
+          user, userID, batchSize, batchOffset);
+
+  Future<List<HSUser>> userFetchSpotLikers(
+          {HSSpot? spot,
+          String? spotID,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _usersRepository.fetchSpotLikers(
+          spot, spotID, batchSize, batchOffset);
+
   Future<String> boardCreate({required HSBoard board}) async =>
       await _boardsRepository.create(board);
 

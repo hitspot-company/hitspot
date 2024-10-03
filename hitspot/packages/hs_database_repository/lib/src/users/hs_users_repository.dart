@@ -133,16 +133,21 @@ class HSUsersRepository {
   }
 
   Future<List<HSUser>> fetchSpotLikers(
-      HSSpot? spot, String? spotID, int? batchSize, int? batchOffset) async {
+      HSSpot? spot, String? spotID, int batchSize, int batchOffset) async {
     try {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final String spotUID = spot?.sid ?? spotID!;
       final List<Map<String, dynamic>> fetched = await _supabase
-          .rpc("spot_fetch_likers", params: {
-        "p_spot_id": spotUID,
-        "p_batch_size": batchSize,
-        "p_batch_offset": batchOffset
-      });
+          .from('spot_likes')
+          .select()
+          .eq('spot_id', spotUID)
+          .range(batchOffset, batchOffset + batchSize);
+      // final List<Map<String, dynamic>> fetched = await _supabase
+      //     .rpc("spot_fetch_likers", params: {
+      //   "p_spot_id": spotUID,
+      //   "p_batch_size": batchSize,
+      //   "p_batch_offset": batchOffset
+      // });
       if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
       return fetched.map((e) => HSUser.deserialize(e)).toList();
     } catch (e) {
@@ -151,12 +156,46 @@ class HSUsersRepository {
     }
   }
 
-  Future<List<HSUser>> fetchFollowers(HSUser? user, String? userID) async {
+  Future<List<HSUser>> fetchFollowers(
+      HSUser? user, String? userID, int batchSize, int batchOffset) async {
     try {
       assert(user != null || userID != null, "User or userID must be provided");
       final String uid = user?.uid ?? userID!;
       final List<Map<String, dynamic>> fetched = await _supabase
-          .rpc("user_fetch_followers", params: {"p_user_id": uid});
+          .from('user_follows')
+          .select()
+          .eq('followed_id', uid)
+          .range(batchOffset, batchOffset + batchSize);
+      // final List<Map<String, dynamic>> fetched = await _supabase
+      //     .rpc("user_fetch_followers", params: {
+      //   "p_user_id": uid,
+      //   "p_batch_size": batchSize,
+      //   "p_batch_offset": batchOffset
+      // });
+      if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
+      return fetched.map((e) => HSUser.deserialize(e)).toList();
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching followers: $e");
+      throw HSReadUserFailure(customDetails: e.toString());
+    }
+  }
+
+  Future<List<HSUser>> fetchFollowed(
+      HSUser? user, String? userID, int batchSize, int batchOffset) async {
+    try {
+      assert(user != null || userID != null, "User or userID must be provided");
+      final String uid = user?.uid ?? userID!;
+      final List<Map<String, dynamic>> fetched = await _supabase
+          .from('user_follows')
+          .select()
+          .eq('follower_id', uid)
+          .range(batchOffset, batchOffset + batchSize);
+      // final List<Map<String, dynamic>> fetched = await _supabase
+      //     .rpc("user_fetch_followed", params: {
+      //   "p_user_id": uid,
+      //   "p_batch_size": batchSize,
+      //   "p_batch_offset": batchOffset
+      // });
       if (fetched.isEmpty) throw const HSReadUserFailure(code: 404);
       return fetched.map((e) => HSUser.deserialize(e)).toList();
     } catch (e) {
