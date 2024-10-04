@@ -70,7 +70,7 @@ class _Builder extends StatelessWidget {
                 onTap: () => navi.toUser(userID: user.uid!),
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child: HsUserTile(user: user),
+                  child: HSUserTile(user: user),
                 ),
               );
             },

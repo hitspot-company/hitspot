@@ -248,7 +248,7 @@ class _SpotDetails extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                HsUserTile(user: spot.author!),
+                HSUserTile(user: spot.author!),
                 const Spacer(),
                 HSButton.icon(
                   label: const Text("Show on map"),

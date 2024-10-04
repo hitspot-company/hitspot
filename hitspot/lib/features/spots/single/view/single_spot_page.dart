@@ -15,11 +15,15 @@ import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
+part 'single_spot_widgets.dart';
 
 class SingleSpotPage extends StatelessWidget {
   const SingleSpotPage({super.key});
@@ -289,12 +293,12 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        HsUserTile(
+        _UserTile(
+          height: 100,
+          avatarRadius: 40,
+          iconSize: 40,
           user: singleSpotCubit.state.spot.author!,
-        )
-            .animate()
-            .fadeIn(duration: 300.ms, delay: 400.ms)
-            .slideX(begin: -0.2, end: 0),
+        ),
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

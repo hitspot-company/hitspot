@@ -60,7 +60,7 @@ class _LoadingView extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: HSShimmerBox(width: screenWidth, height: 60.0),
             ),
-            childCount: 10,
+            childCount: 3,
           ),
         ),
       ],
@@ -142,6 +142,7 @@ class _LoadedView extends StatelessWidget {
                 (context, index) {
                   final notification = state.notifications[index];
                   return ListTile(
+                    contentPadding: const EdgeInsets.all(0.0),
                     onTap: () => cubit.openNotification(notification),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
