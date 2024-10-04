@@ -9,7 +9,7 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/home/main/view/home_page.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
 import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
-import 'package:hitspot/widgets/hs_user_avatar.dart';
+import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
@@ -232,20 +232,15 @@ class _AnimatedUserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () => navi.toUser(userID: user.uid!),
-      title: Text(user.username!),
-      subtitle: Text(user.name!),
-      leading: HSUserAvatar(
-        radius: 24.0,
-        imageUrl: user.avatarUrl,
-      ),
-    ).animate().fadeIn(duration: 300.ms, delay: (50 * index).ms).slideX(
-        begin: -0.2,
-        end: 0,
-        duration: 300.ms,
-        delay: (50 * index).ms,
-        curve: Curves.easeOutQuad);
+    return HSUserTile(user: user)
+        .animate()
+        .fadeIn(duration: 300.ms, delay: (50 * index).ms)
+        .slideX(
+            begin: -0.2,
+            end: 0,
+            duration: 300.ms,
+            delay: (50 * index).ms,
+            curve: Curves.easeOutQuad);
   }
 }
 

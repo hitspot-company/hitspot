@@ -303,17 +303,21 @@ class _UserProfileUpdatedBiogram extends StatelessWidget {
     if (user.biogram == null || user.biogram!.isEmpty) {
       return const SizedBox.shrink().toSliver;
     }
-    return SliverMainAxisGroup(slivers: [
-      const SizedBox(height: 8).toSliver,
-      Center(
-        child: Text(
-          user.biogram!,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(color: Colors.grey),
-        ).animate().fadeIn(duration: 300.ms),
-      ).toSliver,
-    ]);
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      sliver: SliverMainAxisGroup(slivers: [
+        const SizedBox(height: 8).toSliver,
+        Center(
+          child: Text(
+            user.biogram!,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(color: Colors.grey),
+            textAlign: TextAlign.center,
+          ).animate().fadeIn(duration: 300.ms),
+        ).toSliver,
+      ]),
+    );
   }
 }

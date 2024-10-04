@@ -170,7 +170,7 @@ class HSMainSearchCubit extends Cubit<HSMainSearchState> {
           .select()
           .eq("is_profile_completed", true)
           .order('followers_count', ascending: false)
-          .limit(20)
+          .limit(10)
           .select();
       emit(state.copyWith(
           trendingUsers: fetchedUsers.map(HSUser.deserialize).toList()));

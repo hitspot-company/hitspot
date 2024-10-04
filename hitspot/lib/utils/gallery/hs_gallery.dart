@@ -23,18 +23,13 @@ class HSGallery {
     Function(int)? onPageChanged,
     int initialIndex = 0,
   }) {
-    _overlayEntry = OverlayEntry(
-      builder: (context) => _ImageGalleryOverlay(
-        images: images,
-        type: type,
-        backgroundDecoration: backgroundDecoration,
-        pageController: pageController,
-        onPageChanged: onPageChanged,
-        initialIndex: initialIndex,
-      ),
-    );
-
-    Overlay.of(app.context).insert(_overlayEntry!);
+    navi.pushPage(
+        page: HSGalleryBuilder(
+      images: images,
+      initialIndex: initialIndex,
+      type: type,
+      backgroundDecoration: backgroundDecoration,
+    ));
   }
 }
 
