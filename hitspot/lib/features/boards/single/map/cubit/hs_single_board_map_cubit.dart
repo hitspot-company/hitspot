@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/wrappers/map/cubit/hs_map_wrapper_cubit.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -12,7 +13,8 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 part 'hs_single_board_map_state.dart';
 
 class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
-  HSSingleBoardMapCubit({required this.board, required this.boardID})
+  HSSingleBoardMapCubit(
+      {required this.mapWrapper, required this.board, required this.boardID})
       : super(const HSSingleBoardMapState()) {
     _init();
   }
@@ -20,6 +22,7 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   final String boardID;
   final HSBoard board;
   final Completer<GoogleMapController> controller = Completer();
+  final HSMapWrapperCubit mapWrapper;
   final _locationRepository = app.locationRepository;
   final _databaseRepository = app.databaseRepository;
   final pageController = PageController();
@@ -29,6 +32,7 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       emit(state.copyWith(status: HSSingleBoardMapStatus.loading));
       await loadCurrentPosition();
       await loadSpots();
+      mapWrapper.setOnMarkerTapped(_onMarkerTapped);
       loadMarkers();
       pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
@@ -50,12 +54,6 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       );
       _generateNewMarkers(spot);
     }
-  }
-
-  void onMapCreated(GoogleMapController cont) async {
-    if (controller.isCompleted) return;
-    controller.complete(cont);
-    resetCamera();
   }
 
   Future<void> loadCurrentPosition() async {
