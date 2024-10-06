@@ -11,13 +11,23 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
-class SavedPage extends StatelessWidget {
-  const SavedPage({super.key});
+class SavedPage extends StatefulWidget {
+  SavedPage({super.key});
+
+  @override
+  State<SavedPage> createState() => _SavedPageState();
+  final TextEditingController controller = TextEditingController();
+}
+
+class _SavedPageState extends State<SavedPage> {
+  @override
+  void dispose() {
+    widget.controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    HSSavedCubit cubit = context.read<HSSavedCubit>();
-
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -32,12 +42,18 @@ class SavedPage extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          physics: NeverScrollableScrollPhysics(),
+        body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
           children: [
-            _OwnBoardsBuilder(),
-            _SavedBoardsBuilder(),
-            _SpotsBuilder()
+            _OwnBoardsBuilder(
+              controller: widget.controller,
+            ),
+            _SavedBoardsBuilder(
+              controller: widget.controller,
+            ),
+            _SpotsBuilder(
+              controller: widget.controller,
+            )
           ],
         ),
       ),
@@ -81,13 +97,14 @@ class _LoadingBuilder extends StatelessWidget {
 }
 
 class _SavedBoardsBuilder extends StatelessWidget {
-  const _SavedBoardsBuilder();
+  const _SavedBoardsBuilder({required this.controller});
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const _SearchBar(),
+        _SearchBar(controller: controller),
         Expanded(
           child: BlocBuilder<HSSavedCubit, HSSavedState>(
             buildWhen: (previous, current) =>
@@ -113,7 +130,8 @@ class _SavedBoardsBuilder extends StatelessWidget {
 }
 
 class _OwnBoardsBuilder extends StatelessWidget {
-  const _OwnBoardsBuilder();
+  const _OwnBoardsBuilder({required this.controller});
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +139,7 @@ class _OwnBoardsBuilder extends StatelessWidget {
       onRefresh: context.read<HSSavedCubit>().refresh,
       child: Column(
         children: [
-          const _SearchBar(),
+          _SearchBar(controller: controller),
           Expanded(
             child: BlocBuilder<HSSavedCubit, HSSavedState>(
               buildWhen: (previous, current) =>
@@ -183,7 +201,8 @@ class _BoardsBuilder extends StatelessWidget {
 }
 
 class _SpotsBuilder extends StatelessWidget {
-  const _SpotsBuilder();
+  const _SpotsBuilder({required this.controller});
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +210,9 @@ class _SpotsBuilder extends StatelessWidget {
       onRefresh: context.read<HSSavedCubit>().refresh,
       child: Column(
         children: [
-          const _SearchBar(),
+          _SearchBar(
+            controller: controller,
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -236,7 +257,8 @@ class _SpotsBuilder extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar();
+  const _SearchBar({required this.controller});
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +269,8 @@ class _SearchBar extends StatelessWidget {
       child: HSSearchBar(
           initialValue: searchCubit.state.query,
           height: 50.0,
-          onChanged: (value) => searchCubit.updateQuery(value)),
+          onChanged: (value) => searchCubit.updateQuery(value),
+          controller: controller),
     );
   }
 }
