@@ -6,6 +6,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
 import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
+import 'package:hitspot/widgets/hs_search_bar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -84,23 +85,29 @@ class _SavedBoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HSSavedCubit, HSSavedState>(
-      buildWhen: (previous, current) =>
-          previous.savedBoards != current.savedBoards ||
-          previous.status != current.status,
-      builder: (context, state) {
-        final isLoading = state.status == HSSavedStatus.loading;
-        final isEmpty = state.savedBoards.isEmpty;
-        if (isLoading) {
-          return const _LoadingBuilder();
-        }
-        if (isEmpty) {
-          return const HSIconPrompt(
-              message: "No saved boards", iconData: FontAwesomeIcons.bookmark);
-        }
-        final boards = state.savedBoards;
-        return _BoardsBuilder(boards: boards);
-      },
+    return Column(
+      children: [
+        const _SearchBar(),
+        Expanded(
+          child: BlocBuilder<HSSavedCubit, HSSavedState>(
+            buildWhen: (previous, current) =>
+                previous.searchedSavedBoardsResults !=
+                    current.searchedSavedBoardsResults ||
+                previous.status != current.status,
+            builder: (context, state) {
+              if (state.status == HSSavedStatus.loading) {
+                return const _LoadingBuilder();
+              }
+              if (state.savedBoards.isEmpty) {
+                return const HSIconPrompt(
+                    message: "No saved boards",
+                    iconData: FontAwesomeIcons.bookmark);
+              }
+              return _BoardsBuilder(boards: state.searchedSavedBoardsResults);
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -110,24 +117,32 @@ class _OwnBoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HSSavedCubit, HSSavedState>(
-      buildWhen: (previous, current) =>
-          previous.ownBoards != current.ownBoards ||
-          previous.status != current.status,
-      builder: (context, state) {
-        final isLoading = state.status == HSSavedStatus.loading;
-        final isEmpty = state.ownBoards.isEmpty;
-        if (isLoading) {
-          return const _LoadingBuilder();
-        }
-        if (isEmpty) {
-          return const HSIconPrompt(
-              message: "You don't have any boards",
-              iconData: FontAwesomeIcons.bookmark);
-        }
-        final boards = state.ownBoards;
-        return _BoardsBuilder(boards: boards);
-      },
+    return RefreshIndicator(
+      onRefresh: context.read<HSSavedCubit>().refresh,
+      child: Column(
+        children: [
+          const _SearchBar(),
+          Expanded(
+            child: BlocBuilder<HSSavedCubit, HSSavedState>(
+              buildWhen: (previous, current) =>
+                  previous.searchedBoardsResults !=
+                      current.searchedBoardsResults ||
+                  previous.status != current.status,
+              builder: (context, state) {
+                if (state.status == HSSavedStatus.loading) {
+                  return const _LoadingBuilder();
+                }
+                if (state.ownBoards.isEmpty) {
+                  return const HSIconPrompt(
+                      message: "You don't have any boards",
+                      iconData: FontAwesomeIcons.bookmark);
+                }
+                return _BoardsBuilder(boards: state.searchedBoardsResults);
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -141,31 +156,27 @@ class _BoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: context.read<HSSavedCubit>().refresh,
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: ListView.separated(
-          itemCount: boards.length,
-          separatorBuilder: (BuildContext context, int index) {
-            return const Gap(16.0);
-          },
-          itemBuilder: (BuildContext context, int index) {
-            final board = boards[index];
-            return ListTile(
-              onTap: () =>
-                  navi.toBoard(boardID: board.id!, title: board.title!),
-              leading: AspectRatio(
-                  aspectRatio: 1.0,
-                  child: HSImage(
-                    imageUrl: boards[index].getThumbnail,
-                    borderRadius: BorderRadius.circular(10.0),
-                  )),
-              title: Text(board.title!),
-              subtitle: Text(board.description!),
-            );
-          },
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: ListView.separated(
+        itemCount: boards.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return const Gap(16.0);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          final board = boards[index];
+          return ListTile(
+            onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
+            leading: AspectRatio(
+                aspectRatio: 1.0,
+                child: HSImage(
+                  imageUrl: boards[index].getThumbnail,
+                  borderRadius: BorderRadius.circular(10.0),
+                )),
+            title: Text(board.title!),
+            subtitle: Text(board.description!),
+          );
+        },
       ),
     );
   }
@@ -176,39 +187,67 @@ class _SpotsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: BlocBuilder<HSSavedCubit, HSSavedState>(
-        buildWhen: (previous, current) =>
-            previous.savedSpots != current.savedSpots ||
-            previous.status != current.status,
-        builder: (context, state) {
-          if (state.status == HSSavedStatus.loading) {
-            return const _LoadingBuilder(type: _LoadingBuilderType.grid);
-          }
-          if (state.savedSpots.isEmpty) {
-            return const HSIconPrompt(
-                message: "No saved spots", iconData: FontAwesomeIcons.bookmark);
-          }
-          final spots = state.savedSpots;
-          return RefreshIndicator(
-            onRefresh: context.read<HSSavedCubit>().refresh,
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 1.0,
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
+    return RefreshIndicator(
+      onRefresh: context.read<HSSavedCubit>().refresh,
+      child: Column(
+        children: [
+          const _SearchBar(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: BlocBuilder<HSSavedCubit, HSSavedState>(
+                buildWhen: (previous, current) =>
+                    previous.searchedSavedSpotsResults !=
+                        current.searchedSavedSpotsResults ||
+                    previous.status != current.status,
+                builder: (context, state) {
+                  if (state.status == HSSavedStatus.loading) {
+                    return const _LoadingBuilder(
+                        type: _LoadingBuilderType.grid);
+                  }
+                  if (state.searchedSavedSpotsResults.isEmpty) {
+                    return const HSIconPrompt(
+                        message: "No saved spots",
+                        iconData: FontAwesomeIcons.bookmark);
+                  }
+                  final spots = state.searchedSavedSpotsResults;
+                  return GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1.0,
+                      crossAxisSpacing: 16.0,
+                      mainAxisSpacing: 16.0,
+                    ),
+                    itemCount: spots.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final spot = spots[index];
+                      return AnimatedSpotTile(spot: spot, index: index);
+                    },
+                  );
+                },
               ),
-              itemCount: spots.length,
-              itemBuilder: (BuildContext context, int index) {
-                final spot = spots[index];
-                return AnimatedSpotTile(spot: spot, index: index);
-              },
             ),
-          );
-        },
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _SearchBar extends StatelessWidget {
+  const _SearchBar();
+
+  @override
+  Widget build(BuildContext context) {
+    final HSSavedCubit searchCubit = context.read<HSSavedCubit>();
+
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: HSSearchBar(
+          initialValue: searchCubit.state.query,
+          height: 50.0,
+          onChanged: (value) => searchCubit.updateQuery(value)),
     );
   }
 }

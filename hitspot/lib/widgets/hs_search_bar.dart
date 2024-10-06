@@ -7,26 +7,31 @@ import 'package:hitspot/features/search/view/main_search_delegate.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 
 class HSSearchBar extends StatelessWidget {
-  const HSSearchBar({super.key, required this.height});
+  const HSSearchBar(
+      {super.key,
+      required this.initialValue,
+      required this.height,
+      required this.onChanged});
 
+  final String initialValue;
   final double height;
+  final void Function(String) onChanged;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
       child: HSTextField(
-        readOnly: true,
-        suffixIcon: const Icon(
+        initialValue: initialValue,
+        readOnly: false,
+        suffixIcon: Icon(
           FontAwesomeIcons.magnifyingGlass,
-          color: Colors.grey,
+          color: Colors.grey[700],
         ),
-        fillColor: appTheme.textfieldFillColor,
+        fillColor:
+            Theme.of(context).textTheme.bodySmall!.color!.withOpacity(0.1),
         hintText: "Search...",
-        onTap: () => showSearch(
-            context: context,
-            delegate: MainSearchDelegate(
-                BlocProvider.of<HSMainSearchCubit>(context))),
+        onChanged: onChanged,
       ),
     );
   }
