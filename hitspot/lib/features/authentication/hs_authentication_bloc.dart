@@ -44,9 +44,6 @@ class HSAuthenticationBloc
     on<HSAuthenticationMagicLinkSentEvent>(
       (event, emit) => emit(HSAuthenticationMagicLinkSentState(event.email)),
     );
-    on<HSAuthenticationMagicLinkCancelled>(
-      (event, emit) => emit(const HSAuthenticationInitial()),
-    );
     on<HSAuthenticationLogoutEvent>((event, emit) async {
       try {
         await app.authenticationRepository.signOut();

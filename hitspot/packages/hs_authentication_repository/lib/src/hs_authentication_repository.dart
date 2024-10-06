@@ -146,7 +146,6 @@ class HSAuthenticationRepository {
     try {
       await _supabaseClient.auth.signInWithOtp(
         email: email,
-        emailRedirectTo: kIsWeb ? null : 'https://hitspot.app/login-callback',
       );
     } catch (_) {
       throw HSAuthenticationException.magicLink(details: _.toString());

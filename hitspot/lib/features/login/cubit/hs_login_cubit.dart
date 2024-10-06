@@ -52,6 +52,9 @@ class HSLoginCubit extends Cubit<HSLoginState> {
           email: state.email.value);
       app.authenticationBloc
           .add(HSAuthenticationMagicLinkSentEvent(state.email.value));
+
+      navi.push("/auth/magic_link_sent");
+
       emit(state.copyWith(status: FormzSubmissionStatus.success));
       return;
     } on LogInWithEmailAndPasswordFailure catch (e) {

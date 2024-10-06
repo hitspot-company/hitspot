@@ -21,10 +21,7 @@ class MagicLinkSentPage extends StatelessWidget {
         title: Text("One Time Password Sent",
             style: Theme.of(context).textTheme.headlineSmall),
         enableDefaultBackButton: true,
-        defaultBackButtonCallback: () {
-          app.authenticationBloc
-              .add(const HSAuthenticationMagicLinkCancelled());
-        },
+        defaultBackButtonCallback: () => navi.pop(),
       ),
       body: ListView(
         children: [
@@ -65,10 +62,20 @@ class MagicLinkSentPage extends StatelessWidget {
                   duration: 600.ms,
                   curve: Curves.easeOutQuad),
           const Gap(32.0),
-          BlocSelector<HSMagicLinkCubit, HSMagicLinkState, String?>(
+          BlocSelector<HSMagicLinkCubit, HSMagicLinkState, HSMagicLinkError?>(
             selector: (state) =>
-                state.errorMessage.isNotEmpty ? state.errorMessage : null,
-            builder: (context, errorMessage) {
+                (state.error != HSMagicLinkError.none) ? state.error : null,
+            builder: (context, error) {
+              late String errorMessage;
+
+              if (error == HSMagicLinkError.invalidOTP) {
+                errorMessage = "OTP is invalid or has expired";
+              } else if (error == HSMagicLinkError.emptyOTP) {
+                errorMessage = "OTP cannot be empty";
+              } else {
+                errorMessage = "";
+              }
+
               return HSTextField.filled(
                 hintText: "0123",
                 errorText: errorMessage,

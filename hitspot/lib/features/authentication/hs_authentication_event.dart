@@ -11,10 +11,6 @@ final class HSAuthenticationLogoutEvent extends HSAuthenticationEvent {
   const HSAuthenticationLogoutEvent();
 }
 
-final class HSAuthenticationMagicLinkCancelled extends HSAuthenticationEvent {
-  const HSAuthenticationMagicLinkCancelled();
-}
-
 final class HSAuthenticationUserChangedEvent extends HSAuthenticationEvent {
   const HSAuthenticationUserChangedEvent({required this.user});
 
