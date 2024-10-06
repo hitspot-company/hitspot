@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 enum HSNotificationType {
   spotlike,
   spotcomment,
+  spotcreation,
   userfollow,
   boardlike,
   boardinvitation,
@@ -16,6 +17,8 @@ enum HSNotificationType {
         return 'spot_like';
       case HSNotificationType.spotcomment:
         return 'spot_comment';
+      case HSNotificationType.spotcreation:
+        return 'spot_creation';
       case HSNotificationType.userfollow:
         return 'user_follow';
       case HSNotificationType.boardlike:
@@ -33,6 +36,8 @@ enum HSNotificationType {
         return HSNotificationType.spotlike;
       case 'spot_comment':
         return HSNotificationType.spotcomment;
+      case 'spot_creation':
+        return HSNotificationType.spotcreation;
       case 'user_follow':
         return HSNotificationType.userfollow;
       case 'board_like':
@@ -149,6 +154,8 @@ class HSNotification {
         return 'Spot liked';
       case HSNotificationType.spotcomment:
         return 'Spot commented';
+      case HSNotificationType.spotcreation:
+        return 'Spot created';
       case HSNotificationType.userfollow:
         return 'New follow';
       case HSNotificationType.boardlike:
@@ -167,6 +174,8 @@ class HSNotification {
         return '$fromUsername liked your spot';
       case HSNotificationType.spotcomment:
         return '$fromUsername commented on your spot';
+      case HSNotificationType.spotcreation:
+        return '$fromUsername created new spot';
       case HSNotificationType.userfollow:
         return '$fromUsername started following you';
       case HSNotificationType.boardlike:
@@ -184,6 +193,8 @@ class HSNotification {
         return FontAwesomeIcons.solidHeart;
       case HSNotificationType.spotcomment:
         return FontAwesomeIcons.solidComment;
+      case HSNotificationType.spotcreation:
+        return FontAwesomeIcons.earthAfrica;
       case HSNotificationType.userfollow:
         return FontAwesomeIcons.userPlus;
       case HSNotificationType.boardinvitation:
