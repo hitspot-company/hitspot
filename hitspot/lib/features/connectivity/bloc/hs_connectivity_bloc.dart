@@ -18,6 +18,9 @@ class HSConnectivityLocationBloc
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   StreamSubscription<Position>? _positionSubscription;
   StreamSubscription<dynamic>? _fcmTokenSubscription;
+  // When user gets a notification it often triggers multiple times
+  // therefore we need to keep track of the notifications we have already shown
+  Map<String, bool> _notificationShown = {};
 
   HSConnectivityLocationBloc()
       : super(HSConnectivityLocationState(
@@ -40,7 +43,6 @@ class HSConnectivityLocationBloc
       emit(state.copyWith(fcmToken: event.fcmToken));
     });
     on<HSConnectivityRefresh>((event, emit) {
-      ;
       add(HSConnectivityRequestNotificationPermissionEvent());
     });
 
@@ -59,14 +61,22 @@ class HSConnectivityLocationBloc
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       HSDebugLogger.logInfo("Foreground message: ${message.data}");
       final notification = message.notification;
-      if (notification != null) {
-        app.showToast(
-            toastType: HSToastType.pushNotification,
-            title: notification.title ?? "",
-            primaryColor: app.currentTheme.cardColor,
-            onTap: () => HSNotificationHandler.messageHandler(message),
-            description: notification.body ?? "");
+
+      if (notification == null) {
+        return;
       }
+
+      if (_notificationShown[message.messageId ?? ""] ?? false) {
+        return;
+      }
+
+      app.showToast(
+          toastType: HSToastType.pushNotification,
+          title: notification.title ?? "",
+          primaryColor: app.currentTheme.cardColor,
+          onTap: () => HSNotificationHandler.messageHandler(message),
+          description: notification.body ?? "");
+      _notificationShown[message.messageId ?? ""] = true;
     });
 
     add(HSConnectivityCheckConnectivityEvent());
