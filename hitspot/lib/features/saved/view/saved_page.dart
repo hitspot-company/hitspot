@@ -102,29 +102,33 @@ class _SavedBoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _SearchBar(controller: controller),
-        Expanded(
-          child: BlocBuilder<HSSavedCubit, HSSavedState>(
-            buildWhen: (previous, current) =>
-                previous.searchedSavedBoardsResults !=
-                    current.searchedSavedBoardsResults ||
-                previous.status != current.status,
-            builder: (context, state) {
-              if (state.status == HSSavedStatus.loading) {
-                return const _LoadingBuilder();
-              }
-              if (state.savedBoards.isEmpty) {
-                return const HSIconPrompt(
-                    message: "No saved boards",
-                    iconData: FontAwesomeIcons.bookmark);
-              }
-              return _BoardsBuilder(boards: state.searchedSavedBoardsResults);
-            },
+    return RefreshIndicator(
+      onRefresh: context.read<HSSavedCubit>().refresh,
+      child: Column(
+        children: [
+          _SearchBar(controller: controller),
+          Expanded(
+            child: BlocBuilder<HSSavedCubit, HSSavedState>(
+              buildWhen: (previous, current) =>
+                  previous.searchedSavedBoardsResults !=
+                      current.searchedSavedBoardsResults ||
+                  previous.status != current.status,
+              builder: (context, state) {
+                if (state.status == HSSavedStatus.loading) {
+                  return const _LoadingBuilder();
+                }
+                if (state.savedBoards.isEmpty) {
+                  return const HSIconPrompt(
+                      useWithRefresh: true,
+                      message: "No saved boards",
+                      iconData: FontAwesomeIcons.bookmark);
+                }
+                return _BoardsBuilder(boards: state.searchedSavedBoardsResults);
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -152,6 +156,7 @@ class _OwnBoardsBuilder extends StatelessWidget {
                 }
                 if (state.ownBoards.isEmpty) {
                   return const HSIconPrompt(
+                      useWithRefresh: true,
                       message: "You don't have any boards",
                       iconData: FontAwesomeIcons.bookmark);
                 }
@@ -228,6 +233,7 @@ class _SpotsBuilder extends StatelessWidget {
                   }
                   if (state.searchedSavedSpotsResults.isEmpty) {
                     return const HSIconPrompt(
+                        useWithRefresh: true,
                         message: "No saved spots",
                         iconData: FontAwesomeIcons.bookmark);
                   }
