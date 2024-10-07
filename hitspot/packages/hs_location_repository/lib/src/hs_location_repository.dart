@@ -256,6 +256,17 @@ class HSLocationRepository {
     double zoom = 21; // Start with maximum zoom
     bool allVisible = false;
 
+    // Check if all spots are visible at the current zoom level
+    LatLngBounds initialVisibleRegion = await controller.getVisibleRegion();
+    allVisible = spotPositions.every((spot) =>
+        spot.latitude >= initialVisibleRegion.southwest.latitude &&
+        spot.latitude <= initialVisibleRegion.northeast.latitude &&
+        spot.longitude >= initialVisibleRegion.southwest.longitude &&
+        spot.longitude <= initialVisibleRegion.northeast.longitude);
+
+    if (allVisible) return;
+
+    // If not all spots are visible, zoom out
     while (!allVisible && zoom > 0) {
       await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
       LatLngBounds visibleRegion = await controller.getVisibleRegion();

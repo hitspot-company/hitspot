@@ -89,11 +89,11 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
-  Future<void> zoomInToMarker() async {
+  Future<void> zoomInToMarker([double zoom = 18.0]) async {
     try {
       if (state.selectedSpot.sid != null) {
         final spot = state.selectedSpot;
-        await moveCamera(LatLng(spot.latitude!, spot.longitude!), 18.0);
+        await moveCamera(LatLng(spot.latitude!, spot.longitude!), zoom);
       }
     } catch (e) {
       HSDebugLogger.logError("Error zooming in to marker: $e");

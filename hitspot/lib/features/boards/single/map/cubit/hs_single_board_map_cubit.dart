@@ -36,8 +36,7 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       mapWrapper.setOnMarkerTapped(_onMarkerTapped);
       mapWrapper.setVisibleSpots(spots);
       mapWrapper.updateMarkers(spots);
-      //   loadMarkers();
-      //   pageController.addListener(_pageListener);
+      pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
       //   await _locationRepository.zoomToFitSpots(
       //       state.spots, await controller.future); // TODO: test this
@@ -45,6 +44,14 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       HSDebugLogger.logError("Error initializing board map: $e");
       emit(state.copyWith(status: HSSingleBoardMapStatus.error));
     }
+  }
+
+  void _pageListener() {
+    final index = pageController.page?.round() ?? 0;
+    final spot = mapWrapper.state.visibleSpots[index];
+    mapWrapper.setSelectedSpot(spot);
+    mapWrapper.updateMarkers();
+    mapWrapper.zoomInToMarker(15.0);
   }
 
   Future<void> loadCurrentPosition() async {
@@ -60,8 +67,8 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
 
   void _onMarkerTapped(HSSpot spot) {
     try {
-      //   final index = state.spots.indexOf(spot);
-      //   pageController.jumpToPage(index);
+      final index = state.spots.indexOf(spot);
+      pageController.jumpToPage(index);
       mapWrapper.setSelectedSpot(spot);
       mapWrapper.updateMarkers();
       mapWrapper.zoomInToMarker();
