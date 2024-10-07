@@ -21,7 +21,6 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
 
   final String boardID;
   final HSBoard board;
-  final Completer<GoogleMapController> controller = Completer();
   final HSMapWrapperCubit mapWrapper;
   final _locationRepository = app.locationRepository;
   final _databaseRepository = app.databaseRepository;
@@ -30,7 +29,6 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   void _init() async {
     try {
       emit(state.copyWith(status: HSSingleBoardMapStatus.loading));
-      //   await loadCurrentPosition();
       final spots =
           await _databaseRepository.boardFetchBoardSpots(boardID: boardID);
       mapWrapper.setOnMarkerTapped(_onMarkerTapped);
@@ -38,8 +36,8 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       mapWrapper.updateMarkers(spots);
       pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
-      //   await _locationRepository.zoomToFitSpots(
-      //       state.spots, await controller.future); // TODO: test this
+      await Future.delayed(const Duration(milliseconds: 300));
+      await mapWrapper.zoomOut();
     } catch (e) {
       HSDebugLogger.logError("Error initializing board map: $e");
       emit(state.copyWith(status: HSSingleBoardMapStatus.error));

@@ -100,7 +100,7 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
-  Future<void> zoomOut() async {
+  Future<void> zoomOut({bool force = false}) async {
     try {
       await _locationRepository.zoomToFitSpots(
           state.visibleSpots, mapController);

@@ -264,8 +264,6 @@ class HSLocationRepository {
         spot.longitude >= initialVisibleRegion.southwest.longitude &&
         spot.longitude <= initialVisibleRegion.northeast.longitude);
 
-    if (allVisible) return;
-
     // If not all spots are visible, zoom out
     while (!allVisible && zoom > 0) {
       await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
@@ -281,8 +279,10 @@ class HSLocationRepository {
     }
 
     // Add a little padding
-    await controller.moveCamera(
-        CameraUpdate.newLatLngZoom(center, zoom - .6 - (padding ?? 0.0)));
+    if (!allVisible) {
+      await controller.animateCamera(
+          CameraUpdate.newLatLngZoom(center, zoom - .6 - (padding ?? 0.0)));
+    }
   }
 
   // Calculate LatLngBounds that includes all the spots

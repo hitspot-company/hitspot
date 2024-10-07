@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
+import 'package:flutter/material.dart';
 
 enum HSToastType { success, error, warning, pushNotification }
 
@@ -34,23 +34,32 @@ class HSToasts {
       case HSToastType.success:
         chosenType = ToastificationType.success;
         toastIcon = icon ?? const Icon(FontAwesomeIcons.check);
-        toastColor = primaryColor ?? Colors.green;
+        toastColor = primaryColor ?? Theme.of(context).scaffoldBackgroundColor;
         break;
       case HSToastType.error:
         chosenType = ToastificationType.error;
-        toastIcon = icon ?? const Icon(FontAwesomeIcons.exclamation);
-        toastColor = primaryColor ?? Colors.red;
+        toastIcon =
+            icon ?? const Icon(FontAwesomeIcons.exclamation, color: Colors.red);
+        toastColor = primaryColor ?? Theme.of(context).scaffoldBackgroundColor;
         break;
       case HSToastType.warning:
         chosenType = ToastificationType.warning;
-        toastIcon = icon ?? const Icon(FontAwesomeIcons.triangleExclamation);
-        toastColor = primaryColor ?? Colors.yellow;
+        toastIcon = icon ??
+            const Icon(
+              FontAwesomeIcons.triangleExclamation,
+              color: Colors.yellow,
+            );
+        toastColor = primaryColor ?? Theme.of(context).scaffoldBackgroundColor;
         break;
 
       case HSToastType.pushNotification:
         chosenType = ToastificationType.info;
-        toastIcon = icon ?? const Icon(FontAwesomeIcons.bell);
-        toastColor = primaryColor!;
+        toastIcon = icon ??
+            Icon(
+              FontAwesomeIcons.bell,
+              color: Theme.of(context).highlightColor,
+            );
+        toastColor = primaryColor ?? Theme.of(context).highlightColor;
         break;
     }
 
@@ -75,7 +84,7 @@ class HSToasts {
             Text(descriptionText ?? "",
                 style: Theme.of(context).textTheme.titleSmall),
       ),
-      alignment: alignment ?? Alignment.topCenter,
+      alignment: alignment ?? Alignment.bottomCenter,
       animationDuration: Duration(milliseconds: animationDuration ?? 300),
       animationBuilder: (context, animation, alignment, child) {
         return FadeTransition(
