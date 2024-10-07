@@ -30,29 +30,20 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   void _init() async {
     try {
       emit(state.copyWith(status: HSSingleBoardMapStatus.loading));
-      await loadCurrentPosition();
-      await loadSpots();
+      //   await loadCurrentPosition();
+      final spots =
+          await _databaseRepository.boardFetchBoardSpots(boardID: boardID);
       mapWrapper.setOnMarkerTapped(_onMarkerTapped);
-      loadMarkers();
-      pageController.addListener(_pageListener);
+      mapWrapper.setVisibleSpots(spots);
+      mapWrapper.updateMarkers(spots);
+      //   loadMarkers();
+      //   pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
-      await _locationRepository.zoomToFitSpots(
-          state.spots, await controller.future); // TODO: test this
+      //   await _locationRepository.zoomToFitSpots(
+      //       state.spots, await controller.future); // TODO: test this
     } catch (e) {
       HSDebugLogger.logError("Error initializing board map: $e");
       emit(state.copyWith(status: HSSingleBoardMapStatus.error));
-    }
-  }
-
-  void _pageListener() async {
-    final index = pageController.page?.round();
-    if (index != null) {
-      final spot = state.spots[index];
-      _locationRepository.animateCameraToNewLatLng(
-        controller,
-        LatLng(spot.latitude!, spot.longitude!),
-      );
-      _generateNewMarkers(spot);
     }
   }
 
@@ -67,64 +58,30 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
     }
   }
 
-  Future<void> loadSpots() async {
-    try {
-      final spots =
-          await _databaseRepository.boardFetchBoardSpots(boardID: boardID);
-      emit(state.copyWith(spots: spots));
-    } catch (_) {
-      HSDebugLogger.logError("Error loading spots");
-      rethrow;
-    }
-  }
-
-  void loadMarkers() async {
-    try {
-      final markers = state.spots.map((e) {
-        final markerIcon = app.assets.getMarkerIcon(e,
-            level: HSSpotMarkerLevel.medium, isSelected: false);
-        return Marker(
-          markerId: MarkerId(e.sid!),
-          position: LatLng(e.latitude!, e.longitude!),
-          icon: markerIcon,
-          onTap: () => _onMarkerTapped(e),
-        );
-      }).toSet();
-      emit(state.copyWith(markers: markers));
-    } catch (_) {
-      HSDebugLogger.logError("Error loading markers");
-      rethrow;
-    }
-  }
-
   void _onMarkerTapped(HSSpot spot) {
     try {
-      final index = state.spots.indexOf(spot);
-      pageController.jumpToPage(index);
-      _generateNewMarkers(spot);
-    } catch (_) {
-      HSDebugLogger.logError("Error tapping marker");
+      //   final index = state.spots.indexOf(spot);
+      //   pageController.jumpToPage(index);
+      mapWrapper.setSelectedSpot(spot);
+      mapWrapper.updateMarkers();
+      mapWrapper.zoomInToMarker();
+    } catch (e) {
+      HSDebugLogger.logError("Error tapping marker: $e");
     }
-  }
-
-  void _generateNewMarkers(HSSpot spot) {
-    // List<Marker> markers = app.assets.generateMarkers(state.spots,
-    //     currentPosition: state.currentPosition?.toLatLng,
-    //     onTap: _onMarkerTapped,
-    //     selectedSpotID: spot.sid);
-
-    // emit(state.copyWith(markers: markers.toSet()));
   }
 
   void resetCamera() async {
     try {
-      if (state.currentPosition != null && state.markers.isNotEmpty) {
-        final HSSpot firstSpot = state.spots.first;
-        _locationRepository.animateCameraToNewLatLng(
-            controller, LatLng(firstSpot.latitude!, firstSpot.longitude!));
-      }
+      await mapWrapper.zoomOut();
     } catch (_) {
       HSDebugLogger.logError("Error resetting camera");
     }
+  }
+
+  @override
+  Future<void> close() {
+    pageController.dispose();
+    mapWrapper.close();
+    return super.close();
   }
 }

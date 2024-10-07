@@ -6,6 +6,7 @@ import 'package:hitspot/features/boards/single/map/cubit/hs_single_board_map_cub
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/wrappers/map/cubit/hs_map_wrapper_cubit.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
 class SingleBoardMapPage extends StatelessWidget {
@@ -39,10 +40,20 @@ class SingleBoardMapPage extends StatelessWidget {
             } else if (status == HSSingleBoardMapStatus.error) {
               return const Center(child: Text('Error loading map'));
             }
-            return GoogleMap(
-                onMapCreated: cubit.mapWrapper.onMapCreated,
-                initialCameraPosition:
-                    const CameraPosition(target: LatLng(0.0, 0.0)));
+            return BlocBuilder<HSMapWrapperCubit, HSMapWrapperState>(
+              buildWhen: (previous, current) =>
+                  previous.markers != current.markers ||
+                  previous.markerLevel != current.markerLevel,
+              builder: (context, state) {
+                return GoogleMap(
+                    markers: state.markers,
+                    onMapCreated: cubit.mapWrapper.onMapCreated,
+                    onCameraIdle: cubit.mapWrapper.onCameraIdle,
+                    onCameraMove: cubit.mapWrapper.onCameraMove,
+                    initialCameraPosition:
+                        const CameraPosition(target: LatLng(0.0, 0.0)));
+              },
+            );
             // BlocBuilder<HSSingleBoardMapCubit, HSSingleBoardMapState>(
             //   buildWhen: (previous, current) =>
             //       previous.markers != current.markers,

@@ -3,6 +3,7 @@ part of 'hs_map_wrapper_cubit.dart';
 enum HSMapWrapperStatus {
   initial,
   loading,
+  initialised,
   loaded,
   refreshing,
   error,
