@@ -13,6 +13,7 @@ final class HsUserProfileUpdatedState extends Equatable {
     this.following = const [],
     this.spots = const [],
     this.boards = const [],
+    this.isFollowed = false,
   });
 
   final int followersCount, followingCount, spotsCount;
@@ -21,6 +22,7 @@ final class HsUserProfileUpdatedState extends Equatable {
   final List<HSSpot> spots;
   final List<HSBoard> boards;
   final HSUser user;
+  final bool isFollowed;
 
   bool get isLoading => status == HSUserProfileUpdatedStatus.loading;
   bool get isRefreshing => status == HSUserProfileUpdatedStatus.refteshing;
@@ -34,6 +36,12 @@ final class HsUserProfileUpdatedState extends Equatable {
         followingCount,
         spotsCount,
         status,
+        followers,
+        following,
+        spots,
+        boards,
+        user,
+        isFollowed
       ];
 
   HsUserProfileUpdatedState copyWith({
@@ -46,6 +54,7 @@ final class HsUserProfileUpdatedState extends Equatable {
     List<HSSpot>? spots,
     List<HSBoard>? boards,
     HSUser? user,
+    bool? isFollowed,
   }) {
     return HsUserProfileUpdatedState(
       followersCount: followersCount ?? this.followersCount,
@@ -57,6 +66,7 @@ final class HsUserProfileUpdatedState extends Equatable {
       spots: spots ?? this.spots,
       boards: boards ?? this.boards,
       user: user ?? this.user,
+      isFollowed: isFollowed ?? this.isFollowed,
     );
   }
 }

@@ -25,11 +25,15 @@ class HsUserProfileUpdatedCubit extends Cubit<HsUserProfileUpdatedState> {
           await _databaseRepository.spotFetchUserSpots(userID: userID);
       final boards =
           await _databaseRepository.boardFetchUserBoards(userID: userID);
+
+      final isFollowed = await _databaseRepository.userIsUserFollowed(
+          followedID: userID, followerID: currentUser.uid);
       emit(state.copyWith(
         user: user,
         followersCount: user.followers,
         followingCount: user.following,
         spots: spots,
+        isFollowed: isFollowed,
         boards: boards,
         spotsCount: spots.length,
         status: HSUserProfileUpdatedStatus.ready,
@@ -37,6 +41,24 @@ class HsUserProfileUpdatedCubit extends Cubit<HsUserProfileUpdatedState> {
     } catch (e) {
       emit(state.copyWith(status: HSUserProfileUpdatedStatus.error));
       HSDebugLogger.logError('Failed to load user profile $e');
+    }
+  }
+
+  Future<void> followUnfollow() async {
+    try {
+      emit(state.copyWith(status: HSUserProfileUpdatedStatus.follow));
+      await _databaseRepository.userFollow(
+          followedID: userID,
+          followerID: currentUser.uid,
+          isFollowed: state.isFollowed);
+      emit(state.copyWith(
+        followersCount: state.followersCount + (state.isFollowed ? -1 : 1),
+        isFollowed: !state.isFollowed,
+        status: HSUserProfileUpdatedStatus.ready,
+      ));
+    } catch (e) {
+      emit(state.copyWith(status: HSUserProfileUpdatedStatus.error));
+      HSDebugLogger.logError('Failed to follow/unfollow user $e');
     }
   }
 }

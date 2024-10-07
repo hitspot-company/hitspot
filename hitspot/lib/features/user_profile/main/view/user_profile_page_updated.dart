@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -94,6 +95,29 @@ class UserProfilePageUpdated extends StatelessWidget {
                             value: 'Spots', label: spotsCount.toString()),
                       ],
                     ).animate().fadeIn(delay: 600.ms).toSliver,
+                    const SizedBox(height: 16.0).toSliver,
+                    if (!cubit.isCurrentUser)
+                      SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          sliver: BlocSelector<HsUserProfileUpdatedCubit,
+                              HsUserProfileUpdatedState, bool>(
+                            selector: (state) => state.isFollowed,
+                            builder: (context, isFollowed) {
+                              if (isFollowed) {
+                                return CupertinoButton(
+                                  onPressed: cubit.followUnfollow,
+                                  color: Theme.of(context).highlightColor,
+                                  child: const Text("Following"),
+                                );
+                              }
+                              return CupertinoButton(
+                                onPressed: cubit.followUnfollow,
+                                color: appTheme.mainColor,
+                                child: const Text("Follow"),
+                              );
+                            },
+                          ).toSliver),
+                    const SizedBox(height: 16.0).toSliver,
                     SliverPersistentHeader(
                       delegate: _SliverAppBarDelegate(
                         const TabBar(
