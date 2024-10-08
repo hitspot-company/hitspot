@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:math' as math;
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +26,8 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   final _databaseRepository = app.databaseRepository;
   final pageController = PageController();
 
+  List<HSSpot> get spots => mapWrapper.state.visibleSpots;
+
   void _init() async {
     try {
       emit(state.copyWith(status: HSSingleBoardMapStatus.loading));
@@ -34,14 +36,35 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       mapWrapper.setOnMarkerTapped(_onMarkerTapped);
       mapWrapper.setVisibleSpots(spots);
       mapWrapper.updateMarkers(spots);
+      mapWrapper.setInitialCameraPosition(getInitialCameraPosition(spots));
       pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
-      await Future.delayed(const Duration(milliseconds: 300));
-      await mapWrapper.zoomOut();
     } catch (e) {
       HSDebugLogger.logError("Error initializing board map: $e");
       emit(state.copyWith(status: HSSingleBoardMapStatus.error));
     }
+  }
+
+  CameraPosition getInitialCameraPosition(List<HSSpot> spots) {
+    const padding = 0.1;
+    final latlngs =
+        spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+    final bounds = _locationRepository.getLatLngBounds(latlngs);
+    final center = LatLng(
+      (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+      (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+    );
+
+    final latDelta = bounds.northeast.latitude - bounds.southwest.latitude;
+    final lngDelta = bounds.northeast.longitude - bounds.southwest.longitude;
+
+    final maxDelta = latDelta > lngDelta ? latDelta : lngDelta;
+    final zoom = math.log(360 / (maxDelta + padding)) / math.ln2;
+
+    return CameraPosition(
+      target: center,
+      zoom: zoom,
+    );
   }
 
   void _pageListener() {
@@ -65,11 +88,8 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
 
   void _onMarkerTapped(HSSpot spot) {
     try {
-      final index = state.spots.indexOf(spot);
+      final index = spots.indexOf(spot);
       pageController.jumpToPage(index);
-      mapWrapper.setSelectedSpot(spot);
-      mapWrapper.updateMarkers();
-      mapWrapper.zoomInToMarker();
     } catch (e) {
       HSDebugLogger.logError("Error tapping marker: $e");
     }
@@ -77,7 +97,8 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
 
   void resetCamera() async {
     try {
-      await mapWrapper.zoomOut();
+      await mapWrapper.moveCamera(mapWrapper.initialCameraPosition.target,
+          mapWrapper.initialCameraPosition.zoom);
     } catch (_) {
       HSDebugLogger.logError("Error resetting camera");
     }

@@ -237,35 +237,68 @@ class HSLocationRepository {
   Future<void> zoomToFitSpots(
       List<HSSpot> spots, GoogleMapController controller,
       {Position? currentPosition, double? padding}) async {
-    if (spots.isEmpty) return;
+    // if (spots.isEmpty) return;
 
-    List<LatLng> spotPositions =
-        spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+    // List<LatLng> spotPositions =
+    //     spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
 
-    if (currentPosition != null) {
-      spotPositions
-          .add(LatLng(currentPosition.latitude, currentPosition.longitude));
-    }
+    // if (currentPosition != null) {
+    //   spotPositions
+    //       .add(LatLng(currentPosition.latitude, currentPosition.longitude));
+    // }
 
-    LatLngBounds bounds = _getLatLngBounds(spotPositions);
-    LatLng center = LatLng(
-      (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
-      (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
-    );
+    // LatLngBounds bounds = getLatLngBounds(spotPositions);
+    // LatLng center = LatLng(
+    //   (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+    //   (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+    // );
 
-    double zoom = 21; // Start with maximum zoom
+    // double zoom = 21; // Start with maximum zoom
+    // bool allVisible = false;
+
+    // // Check if all spots are visible at the current zoom level
+    // LatLngBounds initialVisibleRegion = await controller.getVisibleRegion();
+    // allVisible = spotPositions.every((spot) =>
+    //     spot.latitude >= initialVisibleRegion.southwest.latitude &&
+    //     spot.latitude <= initialVisibleRegion.northeast.latitude &&
+    //     spot.longitude >= initialVisibleRegion.southwest.longitude &&
+    //     spot.longitude <= initialVisibleRegion.northeast.longitude);
+
+    // // If not all spots are visible, zoom out
+    // if (!allVisible) {
+    //   await _zoomOut(controller, spotPositions, center);
+    // } else {
+    //   await _zoomIn(controller, spotPositions, center);
+    // }
+
+    // // Add a little padding
+    // await controller.animateCamera(
+    //     CameraUpdate.newLatLngZoom(center, zoom - .6 - (padding ?? 0.0)));
+  }
+
+  Future<void> _zoomIn(GoogleMapController controller,
+      List<LatLng> spotPositions, LatLng center) async {
+    double zoom = await controller.getZoomLevel();
     bool allVisible = false;
+    while (zoom < 21) {
+      await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
+      LatLngBounds visibleRegion = await controller.getVisibleRegion();
 
-    // Check if all spots are visible at the current zoom level
-    LatLngBounds initialVisibleRegion = await controller.getVisibleRegion();
-    allVisible = spotPositions.every((spot) =>
-        spot.latitude >= initialVisibleRegion.southwest.latitude &&
-        spot.latitude <= initialVisibleRegion.northeast.latitude &&
-        spot.longitude >= initialVisibleRegion.southwest.longitude &&
-        spot.longitude <= initialVisibleRegion.northeast.longitude);
+      allVisible = spotPositions.every((spot) =>
+          spot.latitude >= visibleRegion.southwest.latitude &&
+          spot.latitude <= visibleRegion.northeast.latitude &&
+          spot.longitude >= visibleRegion.southwest.longitude &&
+          spot.longitude <= visibleRegion.northeast.longitude);
 
-    // If not all spots are visible, zoom out
-    while (!allVisible && zoom > 0) {
+      if (allVisible) zoom += 0.5;
+    }
+  }
+
+  Future<void> _zoomOut(GoogleMapController controller,
+      List<LatLng> spotPositions, LatLng center) async {
+    double zoom = await controller.getZoomLevel();
+    bool allVisible = false;
+    while (zoom > 0) {
       await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
       LatLngBounds visibleRegion = await controller.getVisibleRegion();
 
@@ -277,16 +310,10 @@ class HSLocationRepository {
 
       if (!allVisible) zoom -= 0.5;
     }
-
-    // Add a little padding
-    if (!allVisible) {
-      await controller.animateCamera(
-          CameraUpdate.newLatLngZoom(center, zoom - .6 - (padding ?? 0.0)));
-    }
   }
 
   // Calculate LatLngBounds that includes all the spots
-  LatLngBounds _getLatLngBounds(List<LatLng> spots) {
+  LatLngBounds getLatLngBounds(List<LatLng> spots) {
     double minLat = spots[0].latitude;
     double maxLat = spots[0].latitude;
     double minLng = spots[0].longitude;

@@ -51,15 +51,15 @@ class SingleBoardMapPage extends StatelessWidget {
                       previous.markerLevel != current.markerLevel,
                   builder: (context, state) {
                     return GoogleMap(
-                        style: BlocProvider.of<HSThemeBloc>(context)
-                            .state
-                            .mapStyle,
-                        markers: state.markers,
-                        onMapCreated: cubit.mapWrapper.onMapCreated,
-                        onCameraIdle: cubit.mapWrapper.onCameraIdle,
-                        onCameraMove: cubit.mapWrapper.onCameraMove,
-                        initialCameraPosition:
-                            const CameraPosition(target: LatLng(0.0, 0.0)));
+                      style:
+                          BlocProvider.of<HSThemeBloc>(context).state.mapStyle,
+                      markers: state.markers,
+                      onMapCreated: cubit.mapWrapper.onMapCreated,
+                      onCameraIdle: cubit.mapWrapper.onCameraIdle,
+                      onCameraMove: cubit.mapWrapper.onCameraMove,
+                      initialCameraPosition:
+                          cubit.mapWrapper.initialCameraPosition,
+                    );
                   },
                 ),
                 Positioned(

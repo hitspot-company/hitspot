@@ -12,6 +12,7 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   late final GoogleMapController mapController;
   late final void Function(HSSpot)? onMarkerTapped;
   final _locationRepository = app.locationRepository;
+  late final CameraPosition initialCameraPosition;
 
   HSMapWrapperCubit() : super(const HSMapWrapperState());
 
@@ -24,6 +25,10 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
       visibleSpots: spots,
       // cachedSpots: [...state.cachedSpots, ...freshCached]
     ));
+  }
+
+  void setInitialCameraPosition(CameraPosition initialCameraPosition) {
+    this.initialCameraPosition = initialCameraPosition;
   }
 
   void setOnMarkerTapped(void Function(HSSpot)? onMarkerTapped) {
@@ -86,6 +91,8 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   void _onMarkerTapped(HSSpot spot) {
     if (onMarkerTapped != null) {
       onMarkerTapped!(spot);
+    } else {
+      HSDebugLogger.logError("onMarkerTapped is not set");
     }
   }
 
@@ -111,7 +118,9 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
 
   @override
   Future<void> close() {
-    mapController.dispose();
+    if (state.status == HSMapWrapperStatus.initialised) {
+      mapController.dispose();
+    }
     return super.close();
   }
 
