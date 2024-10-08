@@ -7,7 +7,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/authentication/hs_authentication_bloc.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/search/cubit/hs_main_search_cubit.dart';
-import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
+import 'package:hitspot/features/spots/create/form/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/firebase_options.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';

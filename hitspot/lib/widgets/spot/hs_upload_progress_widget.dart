@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
-import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
+import 'package:hitspot/features/spots/create/form/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 
 class HSUploadProgressWidget extends StatelessWidget {

@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/features/spots/create_2/create_spot_error_page.dart';
-import 'package:hitspot/features/spots/create_2/images/cubit/hs_create_spot_images_cubit.dart';
+import 'package:hitspot/features/spots/create/create_spot_error_page.dart';
+import 'package:hitspot/features/spots/create/images/cubit/hs_create_spot_images_cubit.dart';
 import 'package:hitspot/widgets/form/hs_form.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';

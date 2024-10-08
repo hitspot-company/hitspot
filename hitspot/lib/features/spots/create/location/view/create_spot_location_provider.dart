@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hitspot/features/spots/create_2/location/cubit/hs_create_spot_location_cubit.dart';
-import 'package:hitspot/features/spots/create_2/location/view/create_spot_location_page.dart';
+import 'package:hitspot/features/spots/create/location/cubit/hs_create_spot_location_cubit.dart';
+import 'package:hitspot/features/spots/create/location/view/create_spot_location_page.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:image_picker/image_picker.dart';
 

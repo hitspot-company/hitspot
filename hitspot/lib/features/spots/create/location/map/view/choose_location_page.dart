@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
+import 'package:hitspot/features/spots/create/location/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';

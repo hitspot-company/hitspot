@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/spots/create_2/location/view/create_spot_location_provider.dart';
+import 'package:hitspot/features/spots/create/location/view/create_spot_location_provider.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';

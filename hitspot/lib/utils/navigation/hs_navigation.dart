@@ -17,7 +17,7 @@ import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
 import 'package:hitspot/features/notifications/view/notifications_provider.dart';
 import 'package:hitspot/features/saved/view/saved_provider.dart';
 import 'package:hitspot/features/splash/view/splash_page.dart';
-import 'package:hitspot/features/spots/create_2/images/view/create_spot_images_provider.dart';
+import 'package:hitspot/features/spots/create/images/view/create_spot_images_provider.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/features/spots/multiple/view/multiple_spots_provider.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_provider.dart';
