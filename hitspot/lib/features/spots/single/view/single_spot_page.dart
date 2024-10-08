@@ -111,7 +111,7 @@ class SingleSpotPage extends StatelessWidget {
                 ).toSliver,
                 const Gap(16.0).toSliver,
                 AutoSizeText(
-                  "${spot.address}",
+                  spot.getAddress,
                   style: const TextStyle(fontSize: 14.0, color: Colors.grey),
                   maxLines: 2,
                 )
@@ -209,7 +209,7 @@ class _AnimatedMapView extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => app.locationRepository.launchMaps(
                   coords: spotLocation,
-                  description: singleSpotCubit.state.spot.address!,
+                  description: singleSpotCubit.state.spot.getAddress,
                   title: singleSpotCubit.state.spot.title!,
                 ),
                 child: AbsorbPointer(

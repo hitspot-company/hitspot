@@ -243,7 +243,7 @@ class _SpotDetails extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const SizedBox(height: 8),
-            Text(spot.address!,
+            Text(spot.getAddress,
                 style: Theme.of(context).textTheme.bodySmall!.hintify),
             const SizedBox(height: 8),
             Row(

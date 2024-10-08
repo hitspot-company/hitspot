@@ -18,6 +18,13 @@ class HSSpot {
   final int? spotIndex;
 
   List<String> get getTags => tags ?? [];
+  String get getAddress {
+    int i = 0;
+    while (address![i] == " " || address![i] == ',') {
+      i++;
+    }
+    return address!.substring(i);
+  }
 
   const HSSpot({
     this.sid,

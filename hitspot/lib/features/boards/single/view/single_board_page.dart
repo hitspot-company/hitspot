@@ -158,15 +158,24 @@ class SingleBoardPage extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            HSUserAvatar(
-                              radius: 24,
-                              imageUrl: state.author?.avatarUrl,
-                            ),
-                            const Gap(16.0),
-                            AutoSizeText(
-                              author?.username ?? "",
-                              style: Theme.of(context).textTheme.headlineMedium,
-                              maxLines: 1,
+                            GestureDetector(
+                              onTap: () => navi.toUser(userID: author!.uid!),
+                              child: Row(
+                                children: [
+                                  HSUserAvatar(
+                                    radius: 24,
+                                    imageUrl: state.author?.avatarUrl,
+                                  ),
+                                  const Gap(16.0),
+                                  AutoSizeText(
+                                    author?.username ?? "",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium,
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
                             ),
                             const Spacer(),
                             _SaveActionButton(

@@ -6,15 +6,12 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'hs_image_gallery_overlay.dart';
-
 enum HSImageGalleryType { asset, network }
 
 class HSGallery {
   HSGallery._privateConstructor();
   static final HSGallery _instance = HSGallery._privateConstructor();
   factory HSGallery() => _instance;
-  static OverlayEntry? _overlayEntry;
 
   void showImageGallery({
     required List<String> images,

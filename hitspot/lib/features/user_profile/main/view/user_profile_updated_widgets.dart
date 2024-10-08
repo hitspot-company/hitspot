@@ -230,7 +230,7 @@ class _UserProfileUpdatedSpotsBuilder extends StatelessWidget {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              spot.address!,
+                              spot.getAddress,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],

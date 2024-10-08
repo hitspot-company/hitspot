@@ -240,7 +240,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     try {
       emit(state.copyWith(status: HSClusterMapStatus.sharing));
       await Share.share("https://hitspot.app/spot/${spot.sid}",
-          subject: "Hey! Check out ${spot.title} at ${spot.address}");
+          subject: "Hey! Check out ${spot.title} at ${spot.getAddress}");
     } catch (_) {
       HSDebugLogger.logError("Could not share spot: $_");
     }
@@ -270,7 +270,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       emit(state.copyWith(status: HSClusterMapStatus.openingDirections));
       await _locationRepository.launchMaps(
         coords: LatLng(spot.latitude!, spot.longitude!),
-        description: spot.address!,
+        description: spot.getAddress,
         title: spot.title!,
       );
     } catch (e) {
