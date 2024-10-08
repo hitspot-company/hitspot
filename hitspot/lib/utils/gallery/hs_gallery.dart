@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'hs_image_gallery_overlay.dart';
 
@@ -33,6 +34,12 @@ class HSGallery {
   }
 }
 
+class _HSGalleryCubit extends Cubit<int> {
+  _HSGalleryCubit(super.initialIndex);
+
+  void changePage(int index) => emit(index);
+}
+
 class HSGalleryBuilder extends StatelessWidget {
   final List<String> images;
   final HSImageGalleryType type;
@@ -53,8 +60,42 @@ class HSGalleryBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => _HSGalleryCubit(initialIndex),
+      child: _HSGalleryBuilder(
+        images: images,
+        type: type,
+        backgroundDecoration: backgroundDecoration,
+        pageController: pageController,
+        onPageChanged: onPageChanged,
+        initialIndex: initialIndex,
+      ),
+    );
+  }
+}
+
+class _HSGalleryBuilder extends StatelessWidget {
+  final List<String> images;
+  final HSImageGalleryType type;
+  final BoxDecoration? backgroundDecoration;
+  final PageController? pageController;
+  final Function(int)? onPageChanged;
+  final int initialIndex;
+
+  const _HSGalleryBuilder({
+    required this.images,
+    this.type = HSImageGalleryType.network,
+    this.backgroundDecoration,
+    this.pageController,
+    this.onPageChanged,
+    this.initialIndex = 0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
-      color: backgroundDecoration?.color,
+      color: backgroundDecoration?.color ??
+          Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         child: Column(
           children: [
@@ -68,6 +109,11 @@ class HSGalleryBuilder extends StatelessWidget {
                     icon: const Icon(FontAwesomeIcons.xmark),
                     onPressed: () {
                       Navigator.of(context).pop();
+                    },
+                  ),
+                  BlocBuilder<_HSGalleryCubit, int>(
+                    builder: (context, state) {
+                      return Text('${state + 1} / ${images.length}');
                     },
                   ),
                 ],
@@ -104,10 +150,17 @@ class HSGalleryBuilder extends StatelessWidget {
                     ),
                   ),
                 ),
-                backgroundDecoration: backgroundDecoration,
+                backgroundDecoration: backgroundDecoration ??
+                    BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor),
                 pageController:
                     pageController ?? PageController(initialPage: initialIndex),
-                onPageChanged: onPageChanged,
+                onPageChanged: (index) {
+                  context.read<_HSGalleryCubit>().changePage(index);
+                  if (onPageChanged != null) {
+                    onPageChanged!(index);
+                  }
+                },
               ),
             ),
           ],

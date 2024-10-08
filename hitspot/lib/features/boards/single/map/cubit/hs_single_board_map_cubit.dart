@@ -89,7 +89,14 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   void _onMarkerTapped(HSSpot spot) {
     try {
       final index = spots.indexOf(spot);
-      pageController.jumpToPage(index);
+      if (index == pageController.page?.round()) {
+        final spot = mapWrapper.state.visibleSpots[index];
+        mapWrapper.setSelectedSpot(spot);
+        mapWrapper.updateMarkers();
+        mapWrapper.zoomInToMarker(15.0);
+      } else {
+        pageController.jumpToPage(index);
+      }
     } catch (e) {
       HSDebugLogger.logError("Error tapping marker: $e");
     }

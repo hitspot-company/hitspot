@@ -101,7 +101,6 @@ class SingleBoardPage extends StatelessWidget {
                                 : null,
                             borderRadius: BorderRadius.circular(14.0),
                             imageUrl: singleBoardCubit.state.board?.image,
-                            color: board?.color,
                           ),
                           Positioned(
                             bottom: 6,
