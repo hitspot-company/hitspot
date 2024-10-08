@@ -90,72 +90,110 @@ class _HSGalleryBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller =
+        pageController ?? PageController(initialPage: initialIndex);
     return Material(
       color: backgroundDecoration?.color ??
           Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(FontAwesomeIcons.xmark),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  BlocBuilder<_HSGalleryCubit, int>(
-                    builder: (context, state) {
-                      return Text('${state + 1} / ${images.length}');
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: PhotoViewGallery.builder(
-                scrollPhysics: const BouncingScrollPhysics(),
-                builder: (BuildContext context, int index) {
-                  final imageProvider = type == HSImageGalleryType.network
-                      ? CachedNetworkImageProvider(images[index])
-                      : AssetImage(images[index]) as ImageProvider;
-
-                  return PhotoViewGalleryPageOptions(
-                    imageProvider: imageProvider,
-                    initialScale: PhotoViewComputedScale.contained,
-                    minScale: PhotoViewComputedScale.contained,
-                    maxScale: PhotoViewComputedScale.contained,
-                    heroAttributes: PhotoViewHeroAttributes(tag: images[index]),
-                  );
-                },
-                itemCount: images.length,
-                loadingBuilder: (context, event) => Center(
-                  child: SizedBox(
-                    width: 20.0,
-                    height: 20.0,
-                    child: CircularProgressIndicator(
-                      value: event == null
-                          ? 0
-                          : event.cumulativeBytesLoaded /
-                              event.expectedTotalBytes!,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(appTheme.mainColor),
-                    ),
+            Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(FontAwesomeIcons.xmark),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      BlocBuilder<_HSGalleryCubit, int>(
+                        builder: (context, state) {
+                          return Text('${state + 1} / ${images.length}');
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                backgroundDecoration: backgroundDecoration ??
-                    BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor),
-                pageController:
-                    pageController ?? PageController(initialPage: initialIndex),
-                onPageChanged: (index) {
-                  context.read<_HSGalleryCubit>().changePage(index);
-                  if (onPageChanged != null) {
-                    onPageChanged!(index);
+                Expanded(
+                  child: PhotoViewGallery.builder(
+                    scrollPhysics: const BouncingScrollPhysics(),
+                    builder: (BuildContext context, int index) {
+                      final imageProvider = type == HSImageGalleryType.network
+                          ? CachedNetworkImageProvider(images[index])
+                          : AssetImage(images[index]) as ImageProvider;
+
+                      return PhotoViewGalleryPageOptions(
+                        imageProvider: imageProvider,
+                        initialScale: PhotoViewComputedScale.contained,
+                        minScale: PhotoViewComputedScale.contained,
+                        maxScale: PhotoViewComputedScale.contained,
+                        heroAttributes:
+                            PhotoViewHeroAttributes(tag: images[index]),
+                      );
+                    },
+                    itemCount: images.length,
+                    loadingBuilder: (context, event) => Center(
+                      child: SizedBox(
+                        width: 20.0,
+                        height: 20.0,
+                        child: CircularProgressIndicator(
+                          value: event == null
+                              ? 0
+                              : event.cumulativeBytesLoaded /
+                                  event.expectedTotalBytes!,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(appTheme.mainColor),
+                        ),
+                      ),
+                    ),
+                    backgroundDecoration: backgroundDecoration ??
+                        BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor),
+                    pageController: controller,
+                    onPageChanged: (index) {
+                      context.read<_HSGalleryCubit>().changePage(index);
+                      if (onPageChanged != null) {
+                        onPageChanged!(index);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              left: 10,
+              top: MediaQuery.of(context).size.height / 2 - 30,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                onPressed: () {
+                  final currentIndex = context.read<_HSGalleryCubit>().state;
+                  if (currentIndex > 0) {
+                    controller.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                },
+              ),
+            ),
+            Positioned(
+              right: 10,
+              top: MediaQuery.of(context).size.height / 2 - 30,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                onPressed: () {
+                  final currentIndex = context.read<_HSGalleryCubit>().state;
+                  if (currentIndex < images.length - 1) {
+                    controller.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
                   }
                 },
               ),
