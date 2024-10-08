@@ -9,6 +9,8 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_comments_page.dart';
+import 'package:hitspot/features/user_profile/multiple/cubit/hs_user_profile_multiple_cubit.dart';
+import 'package:hitspot/features/user_profile/multiple/view/user_profile_multiple_provider.dart';
 import 'package:hitspot/utils/gallery/hs_gallery.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
@@ -308,6 +310,13 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
                 children: [
                   _AnimatedActionButton(
                     onTap: singleSpotCubit.likeDislikeSpot,
+                    onLongPress: () {
+                      navi.pushPage(
+                          page: UserProfileMultipleProvider(
+                        type: HSUserProfileMultipleType.likes,
+                        spotID: singleSpotCubit.spotID,
+                      ));
+                    },
                     selector: (state) => state.isSpotLiked,
                     activeIcon: FontAwesomeIcons.solidHeart,
                     inactiveIcon: FontAwesomeIcons.heart,

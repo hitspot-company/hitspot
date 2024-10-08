@@ -138,7 +138,7 @@ class HSUsersRepository {
       assert(spot != null || spotID != null, "Spot or spotID must be provided");
       final String spotUID = spot?.sid ?? spotID!;
       final List<Map<String, dynamic>> fetched = await _supabase
-          .from('spot_likes')
+          .from('spots_likes')
           .select()
           .eq('spot_id', spotUID)
           .order('created_at', ascending: false)

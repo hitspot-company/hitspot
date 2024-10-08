@@ -70,30 +70,6 @@ class HsUserProfileMultipleCubit extends Cubit<HsUserProfileMultipleState> {
     }
   }
 
-  // Future<void> _initFetch() async {
-  //   emit(state.copyWith(status: HSUserProfileMultipleStatus.loading));
-  //   try {
-  //     final users = <HSUser>[];
-  //     switch (type) {
-  //       case HSUserProfileMultipleType.followers ||
-  //             HSUserProfileMultipleType.following:
-  //         await _fetchFollowers();
-  //         await _fetchFollowed();
-  //         break;
-  //       case HSUserProfileMultipleType.likes:
-  //         await _fetchLikers();
-  //         break;
-  //       case HSUserProfileMultipleType.collaborators:
-  //         HSDebugLogger.logInfo("Not implemented yet");
-  //         break;
-  //     }
-  //     emit(state.copyWith(
-  //         status: HSUserProfileMultipleStatus.loaded, users: users));
-  //   } catch (e) {
-  //     emit(state.copyWith(status: HSUserProfileMultipleStatus.error));
-  //   }
-  // }
-
   Future<List<HSUser>> _fetchFollowers(int size, int offset) async {
     try {
       final followers = await _databaseRepository.userFetchFollowers(
