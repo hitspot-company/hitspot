@@ -20,6 +20,7 @@ import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
+import 'package:hitspot/widgets/map/show_maps_choice_bottom_sheet.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -209,7 +210,8 @@ class _AnimatedMapView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: GestureDetector(
-                onTap: () => app.locationRepository.launchMaps(
+                onTap: () => showMapsChoiceBottomSheet(
+                  context: context,
                   coords: spotLocation,
                   description: singleSpotCubit.state.spot.getAddress,
                   title: singleSpotCubit.state.spot.title!,
@@ -297,8 +299,8 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
       children: [
         _UserTile(
           height: 100,
-          avatarRadius: 40,
-          iconSize: 40,
+          avatarRadius: 26,
+          iconSize: 26,
           user: singleSpotCubit.state.spot.author!,
         ),
         Expanded(

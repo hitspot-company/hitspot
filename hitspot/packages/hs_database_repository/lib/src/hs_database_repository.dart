@@ -3,11 +3,11 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
 import 'package:hs_database_repository/src/cache/hs_cache_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
-import 'package:hs_database_repository/src/recommendation_system/hs_recommendation_system_repository.dart';
 import 'package:hs_database_repository/src/spots/hs_spots_repository.dart';
 import 'package:hs_database_repository/src/tags/hs_tags_repository.dart';
 import 'package:pair/pair.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class HSDatabaseRepsitory {
   HSDatabaseRepsitory(this._supabaseClient) {
@@ -18,9 +18,7 @@ class HSDatabaseRepsitory {
         HSBoardsRepository(_supabaseClient, boards, _notificationsRepository);
     _spotsRepository =
         HSSpotsRepository(_supabaseClient, spots, _notificationsRepository);
-    _tagsRepository = HSTagsRepository(_supabaseClient, spots);
-    _recommendationSystemRepository =
-        HSRecommendationSystemRepository(_supabaseClient);
+    this._tagsRepository = HSTagsRepository(_supabaseClient, spots);
   }
 
   static const String users = "users";
@@ -33,9 +31,29 @@ class HSDatabaseRepsitory {
   late final HSBoardsRepository _boardsRepository;
   late final HSSpotsRepository _spotsRepository;
   late final HSTagsRepository _tagsRepository;
-  late final HSRecommendationSystemRepository _recommendationSystemRepository;
   late final HSNotificationsRepository _notificationsRepository;
   final HSCacheRepository _cacheRepository = HSCacheRepository();
+
+  Future<String> generateUniqueID(String table, String field) async {
+    late String token;
+    bool isUnique = false;
+
+    // Generate a unique token and ensure it's not already in the database
+    while (!isUnique) {
+      token = Uuid().v4();
+
+      final existingInvitation = await _supabaseClient
+          .from(table)
+          .select()
+          .eq(field, token)
+          .maybeSingle();
+
+      if (existingInvitation == null) {
+        isUnique = true;
+      }
+    }
+    return token;
+  }
 
   Future<void> userCreate({required HSUser user}) async =>
       await _usersRepository.create(user);
@@ -244,9 +262,10 @@ class HSDatabaseRepsitory {
     return fetchedBoards;
   }
 
-  Future<String> boardGenerateBoardInvitation(
-          {required String boardId}) async =>
-      await _boardsRepository.generateBoardInvitation(boardId);
+  Future<String> boardGenerateBoardInvitation({required String boardId}) async {
+    final String token = await generateUniqueID('board_invitations', 'token');
+    return await _boardsRepository.generateBoardInvitation(boardId, token);
+  }
 
   Future<bool> boardCheckIfInvitationIsValid(
           {required String boardId,
@@ -278,6 +297,11 @@ class HSDatabaseRepsitory {
 
   Future<String> spotCreate({required HSSpot spot}) async =>
       await _spotsRepository.create(spot);
+
+  Future<void> spotCreateWithImages(
+          {required Map<String, dynamic> spot,
+          required List<Map<String, dynamic>> images}) async =>
+      await _spotsRepository.createWithImages(spot, images);
 
   Future<HSSpot> spotRead({HSSpot? spot, String? spotID}) async =>
       await _spotsRepository.read(spot, spotID);
@@ -476,12 +500,6 @@ class HSDatabaseRepsitory {
           int batchSize = 20,
           int batchOffset = 0}) async =>
       await _tagsRepository.fetchTopSpots(tag, batchSize, batchOffset);
-
-  Future<void> recommendationSystemCaptureEvent(
-          {required String userId,
-          required HSSpot spot,
-          required HSInteractionType event}) async =>
-      await _recommendationSystemRepository.captureEvent(userId, spot, event);
 
   Future<void> notifactionChangeFcmToken(
           {required String userID, required String fcmToken}) async =>

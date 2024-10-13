@@ -144,12 +144,6 @@ class HSSingleSpotCommentsCubit extends Cubit<HSSingleSpotCommentsState> {
 
       emit(state.copyWith(
           commentingStatus: HsSingleSpotCommentsCommentingStatus.idle));
-
-      HSSpot spot = await _databaseRepository.spotRead(spotID: spotID);
-      _databaseRepository.recommendationSystemCaptureEvent(
-          userId: app.currentUser.uid ?? "",
-          spot: spot,
-          event: HSInteractionType.comment);
     } catch (_) {
       HSDebugLogger.logError("Error adding comment ${_.toString()}");
     }

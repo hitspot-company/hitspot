@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hitspot/constants/constants.dart';
+import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -30,6 +31,8 @@ class HSAuthenticationBloc
           emit(
               HSAuthenticationProfileIncompleteState(currentUser: fetchedUser));
         }
+
+        app.connectivityBloc.add(HSConnectivityRefresh());
       } on HSReadUserFailure catch (_) {
         HSDebugLogger.logError("Failed to read user: $_");
         app.signOut();
@@ -40,9 +43,6 @@ class HSAuthenticationBloc
     });
     on<HSAuthenticationMagicLinkSentEvent>(
       (event, emit) => emit(HSAuthenticationMagicLinkSentState(event.email)),
-    );
-    on<HSAuthenticationMagicLinkCancelled>(
-      (event, emit) => emit(const HSAuthenticationInitial()),
     );
     on<HSAuthenticationLogoutEvent>((event, emit) async {
       try {

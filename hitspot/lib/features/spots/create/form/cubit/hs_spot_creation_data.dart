@@ -48,7 +48,7 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
   try {
     // Create the spot
     sendProgress('Creating spot record...', 0.1);
-    final String sid = await databaseRepo.spotCreate(spot: data.spot);
+    final String sid = await databaseRepo.generateUniqueID('spots', 'id');
 
     // Upload images
     if (data.spot.images!.isNotEmpty) {
@@ -59,11 +59,22 @@ Future<void> _createSpotInIsolate(HSSpotCreationData data) async {
         uid: data.uid,
         sid: sid,
       );
-      await databaseRepo.spotUploadImages(
-        spotID: sid,
-        imageUrls: urls,
-        uid: data.uid,
-      );
+
+      // Images have been uploaded, we can add new records to tables 'spots' & 'spots_images'
+      // as an transaction
+
+      final List<Map<String, dynamic>> imagesData = urls.map((imageUrlPair) {
+        return {
+          "spot_id": sid,
+          "image_url": imageUrlPair.key,
+          "thumbnail_url": imageUrlPair.value,
+          "created_by": data.uid,
+          "image_type": "image"
+        };
+      }).toList();
+
+      await databaseRepo.spotCreateWithImages(
+          spot: data.spot.serialize(id: sid), images: imagesData);
     }
     await Future.delayed(const Duration(milliseconds: 500));
 

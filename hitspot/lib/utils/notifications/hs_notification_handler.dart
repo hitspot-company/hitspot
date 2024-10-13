@@ -21,6 +21,9 @@ class HSNotificationHandler {
       case HSNotificationType.spotcomment:
         navi.toSpot(sid: spotID);
         break;
+      case HSNotificationType.spotcreation:
+        navi.toSpot(sid: spotID);
+        break;
       case HSNotificationType.userfollow:
         navi.toUser(userID: senderID);
         break;

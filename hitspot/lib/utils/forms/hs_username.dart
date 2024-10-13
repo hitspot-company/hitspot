@@ -8,7 +8,6 @@ enum HSUsernameValidationError {
   long,
   notVerified,
   unavailable,
-  notLowerCase,
 }
 
 enum HSUsernameValidationState {
@@ -30,7 +29,7 @@ class HSUsername extends FormzInput<String, HSUsernameValidationError> {
   const HSUsername.dirty([super.value = '']) : super.dirty();
 
   static final RegExp usernameRegExp = RegExp(
-    r'^[a-z0-9_]{5,16}$',
+    r'^[a-zA-Z0-9_]{5,16}$',
   );
 
   @override
@@ -41,8 +40,6 @@ class HSUsername extends FormzInput<String, HSUsernameValidationError> {
       return HSUsernameValidationError.short;
     } else if (value.length > 16) {
       return HSUsernameValidationError.long;
-    } else if (value.contains(RegExp(r'[A-Z]'))) {
-      return HSUsernameValidationError.notLowerCase;
     } else {
       return HSUsernameValidationError.invalid;
     }
@@ -53,8 +50,6 @@ class HSUsername extends FormzInput<String, HSUsernameValidationError> {
     if (value.length < 5) ret += "\n· at least 5 characters long";
     if (value.length > 16) {
       ret += "\n· at most 16 characters long";
-    } else if (value.contains(RegExp(r'[A-Z]'))) {
-      ret += "\n· lowercase";
     }
     return ret;
   }

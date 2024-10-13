@@ -105,6 +105,7 @@ class HSFilesRepository {
 
         ret.add(Pair(imageUrl, thumbnailUrl));
       }
+
       return (ret);
     } catch (_) {
       throw ("Could not upload spot images: $_");

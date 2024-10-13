@@ -27,6 +27,20 @@ class HSSpotsRepository {
     }
   }
 
+  Future<void> createWithImages(
+      Map<String, dynamic> spot, List<Map<String, dynamic>> images) async {
+    try {
+      HSDebugLogger.logInfo("Creating spot with images: ${spot}");
+      await _supabase.rpc("spot_create_with_images", params: {
+        "p_spot_data": spot,
+        "p_images_data": images,
+      });
+      HSDebugLogger.logSuccess("Spot created with images!");
+    } catch (_) {
+      throw Exception("Error creating spot: $_");
+    }
+  }
+
   // READ
   Future<HSSpot> read(HSSpot? spot, String? spotID) async {
     assert(spot != null || spotID != null, "Spot or spotID must be provided");

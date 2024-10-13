@@ -7,9 +7,11 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/src/models/hs_place_details.dart';
 import 'package:hs_location_repository/src/models/hs_prediction.dart';
 import 'package:map_launcher/map_launcher.dart' as ml;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 enum HSSpotMarkerType { verified, unverified, selected }
@@ -175,26 +177,27 @@ class HSLocationRepository {
     }
   }
 
-  Future<void> launchMaps(
-      {required String title,
+  Future<bool> launchMaps(
+      {required ml.MapType mapType,
+      required String title,
       required String description,
       required LatLng coords}) async {
-    final List<ml.AvailableMap> availableMaps =
-        await ml.MapLauncher.installedMaps;
-    late final ml.MapType preferredMapType;
-    if (availableMaps.contains(ml.MapType.google)) {
-      preferredMapType = ml.MapType.google;
-    } else if (availableMaps.contains(ml.MapType.apple)) {
-      preferredMapType = ml.MapType.apple;
-    } else {
-      preferredMapType = availableMaps.first.mapType;
+    try {
+      if (await ml.MapLauncher.isMapAvailable(mapType) ?? false) {
+        await ml.MapLauncher.showMarker(
+          mapType: mapType,
+          coords: ml.Coords(coords.latitude, coords.longitude),
+          title: title,
+        );
+        return true;
+      } else {
+        return false;
+      }
+    } catch (_) {
+      HSDebugLogger.logError("Error launching maps: ${_.toString()}");
     }
-    final ml.Coords launchCoords = ml.Coords(coords.latitude, coords.longitude);
-    await ml.MapLauncher.showMarker(
-        coords: launchCoords,
-        title: title,
-        description: description,
-        mapType: preferredMapType);
+
+    return false;
   }
 
   double distanceBetween(

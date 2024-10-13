@@ -72,9 +72,9 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Our app needs access to your camera to allow you to take photos and videos directly within the app. This will enable you to capture moments and share them instantly with your friends and followers.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Hitspot needs access to your location, to provide full user experience. Creating a spot or accessing the map of spots needs your location.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Hitspot needs access to your location, to provide full user experience. Creating a spot or accessing the map of spots needs your location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Hitspot needs access to your location, to provide full user experience. Creating a spot or accessing the map of spots needs your location.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Our app requests access to your microphone to enable audio recording for voice messages, video creation, and other interactive features. This will help you communicate and create content more effectively.</string>
@@ -85,6 +85,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>location</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
