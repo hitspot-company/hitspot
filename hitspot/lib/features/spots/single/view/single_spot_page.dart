@@ -20,11 +20,11 @@ import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
+import 'package:hitspot/widgets/map/show_maps_choice_bottom_sheet.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:map_launcher/map_launcher.dart' as ml;
 
 part 'single_spot_widgets.dart';
 
@@ -210,8 +210,12 @@ class _AnimatedMapView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: GestureDetector(
-                onTap: () =>
-                    _showMapsChoiceBottomSheet(context, singleSpotCubit),
+                onTap: () => showMapsChoiceBottomSheet(
+                  context: context,
+                  coords: spotLocation,
+                  description: singleSpotCubit.state.spot.getAddress,
+                  title: singleSpotCubit.state.spot.title!,
+                ),
                 child: AbsorbPointer(
                   absorbing: true,
                   child: HSGoogleMap(
@@ -241,47 +245,6 @@ class _AnimatedMapView extends StatelessWidget {
       },
     );
   }
-}
-
-void _showMapsChoiceBottomSheet(BuildContext context, HSSingleSpotCubit cubit) {
-  final HSSingleSpotCubit singleSpotCubit = cubit;
-
-  showModalBottomSheet(
-    context: context,
-    builder: (context) => Padding(
-      padding:
-          const EdgeInsets.only(top: 8.0, bottom: 18.0, left: 8.0, right: 8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-              title: const Text("Open in Google Maps"),
-              onTap: () async {
-                if (await app.locationRepository.launchMaps(
-                  mapType: ml.MapType.google,
-                  coords: singleSpotCubit.spotLocation!,
-                  description: singleSpotCubit.state.spot.address!,
-                  title: singleSpotCubit.state.spot.title!,
-                )) {
-                  app.navigation.pop();
-                }
-              }),
-          ListTile(
-              title: const Text("Open in Apple Maps"),
-              onTap: () async {
-                if (await app.locationRepository.launchMaps(
-                  mapType: ml.MapType.apple,
-                  coords: singleSpotCubit.spotLocation!,
-                  description: singleSpotCubit.state.spot.address!,
-                  title: singleSpotCubit.state.spot.title!,
-                )) {
-                  app.navigation.pop();
-                }
-              }),
-        ],
-      ),
-    ),
-  );
 }
 
 class _AnimatedTagsBuilder extends StatelessWidget {
@@ -336,8 +299,8 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
       children: [
         _UserTile(
           height: 100,
-          avatarRadius: 40,
-          iconSize: 40,
+          avatarRadius: 26,
+          iconSize: 26,
           user: singleSpotCubit.state.spot.author!,
         ),
         Expanded(

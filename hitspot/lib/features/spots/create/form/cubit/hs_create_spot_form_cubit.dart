@@ -62,69 +62,6 @@ class HsCreateSpotFormCubit extends Cubit<HSCreateSpotFormState> {
         duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
   }
 
-  void _initializeCreatingSpot() async {
-    try {
-      HSDebugLogger.logInfo("Initializing creating spot");
-      emit(state.copyWith(
-          status: HSCreateSpotStatus.requestingLocationPermission));
-      await _requestLocationPermission();
-      if (prototype == null) {
-        await _chooseImages();
-      }
-      if (prototype != null) {
-        emit(
-          state.copyWith(
-            title: prototype!.title,
-            description: prototype!.description,
-            currentLocation: Position.fromMap({
-              'latitude': prototype!.latitude,
-              'longitude': prototype!.longitude
-            }),
-          ),
-        );
-      }
-      await _chooseLocation();
-    } catch (_) {
-      HSDebugLogger.logError("Error: $_");
-    }
-  }
-
-  Future<void> _requestLocationPermission() async {
-    try {
-      final Position currentPosition =
-          app.currentPosition ?? await _locationRepository.getCurrentLocation();
-      emit(state.copyWith(
-          currentLocation: currentPosition,
-          status: HSCreateSpotStatus.choosingImages));
-    } catch (_) {
-      rethrow;
-    }
-  }
-
-  Future<void> _chooseImages() async {
-    try {
-      final List<XFile> images = await app.pickers.multipleImages(
-          cropAspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1));
-      emit(state.copyWith(
-          images: images, status: HSCreateSpotStatus.choosingLocation));
-    } catch (_) {
-      throw Exception("No images selected: $_");
-    }
-  }
-
-  Future<void> _chooseLocation() async {
-    final HSLocation? result = await navi.pushPage(
-        page: ChooseLocationProvider(
-            initialUserLocation: state.currentLocation!));
-    if (result != null) {
-      HSDebugLogger.logSuccess("Received location: $result");
-      emit(state.copyWith(
-          spotLocation: result, status: HSCreateSpotStatus.fillingData));
-    } else {
-      throw "No location selected";
-    }
-  }
-
   void updateTitle(String value) => emit(state.copyWith(title: value));
   void updateDescription(String value) =>
       emit(state.copyWith(description: value));

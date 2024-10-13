@@ -9,6 +9,7 @@ import 'package:hitspot/features/map/search/cubit/hs_map_search_cubit.dart';
 import 'package:hitspot/features/map/search/view/map_search_delegate.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/map/show_maps_choice_bottom_sheet.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -268,11 +269,11 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   Future<void> launchMaps(HSSpot spot) async {
     try {
       emit(state.copyWith(status: HSClusterMapStatus.openingDirections));
-      await _locationRepository.launchMaps(
-        coords: LatLng(spot.latitude!, spot.longitude!),
-        description: spot.getAddress,
-        title: spot.title!,
-      );
+      showMapsChoiceBottomSheet(
+          context: app.context,
+          coords: LatLng(spot.latitude!, spot.longitude!),
+          description: spot.getAddress,
+          title: spot.title!);
     } catch (e) {
       HSDebugLogger.logError("Failed to launch maps: $e");
     }
