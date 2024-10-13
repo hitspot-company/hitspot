@@ -1,4 +1,4 @@
-import 'package:hs_authentication_repository/src/models/hs_user.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/notifications/hs_notifications_repository.dart';
 import 'package:hs_database_repository/src/users/exceptions/hs_update_user_failure.dart';
@@ -129,6 +129,93 @@ class HSUsersRepository {
     } catch (_) {
       HSDebugLogger.logError(_.toString());
       rethrow;
+    }
+  }
+
+  Future<List<HSUser>> fetchSpotLikers(
+      HSSpot? spot, String? spotID, int batchSize, int batchOffset) async {
+    try {
+      assert(spot != null || spotID != null, "Spot or spotID must be provided");
+      final String spotUID = spot?.sid ?? spotID!;
+      final List<Map<String, dynamic>> fetched = await _supabase
+          .from('spots_likes')
+          .select()
+          .eq('spot_id', spotUID)
+          .order('created_at', ascending: false)
+          .range(batchOffset, batchOffset + batchSize)
+          .select();
+      // final List<Map<String, dynamic>> fetched = await _supabase
+      //     .rpc("spot_fetch_likers", params: {
+      //   "p_spot_id": spotUID,
+      //   "p_batch_size": batchSize,
+      //   "p_batch_offset": batchOffset
+      // });
+      // final result = await Future.wait(fetched
+      //     .map((e) async => await read(null, e['followed_id']))
+      //     .toList());
+      final result = await Future.wait(
+          fetched.map((e) async => await read(null, e['user_id'])).toList());
+      return result;
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching spot likers: $e");
+      throw HSReadUserFailure(customDetails: e.toString());
+    }
+  }
+
+  Future<List<HSUser>> fetchFollowers(
+      HSUser? user, String? userID, int batchSize, int batchOffset) async {
+    try {
+      assert(user != null || userID != null, "User or userID must be provided");
+      final String uid = user?.uid ?? userID!;
+      final List<Map<String, dynamic>> fetched = await _supabase
+          .from('user_follows')
+          .select()
+          .eq('followed_id', uid)
+          .order('created_at', ascending: false)
+          .range(batchOffset, batchOffset + batchSize)
+          .select();
+      // final List<Map<String, dynamic>> fetched = await _supabase
+      //     .rpc("user_fetch_followers", params: {
+      //   "p_user_id": uid,
+      //   "p_batch_size": batchSize,
+      //   "p_batch_offset": batchOffset
+      // });
+      final result = await Future.wait(fetched
+          .map((e) async => await read(null, e['follower_id']))
+          .toList());
+      return result;
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching followers: $e");
+      throw HSReadUserFailure(customDetails: e.toString());
+    }
+  }
+
+  Future<List<HSUser>> fetchFollowed(
+      HSUser? user, String? userID, int batchSize, int batchOffset) async {
+    try {
+      assert(user != null || userID != null, "User or userID must be provided");
+      final String uid = user?.uid ?? userID!;
+      final List<Map<String, dynamic>> fetched = await _supabase
+          .from('user_follows')
+          .select()
+          .eq('follower_id', uid)
+          .order('created_at', ascending: false)
+          .range(batchOffset, batchOffset + batchSize)
+          .select();
+      final result = await Future.wait(fetched
+          .map((e) async => await read(null, e['followed_id']))
+          .toList());
+
+      // final List<Map<String, dynamic>> fetched = await _supabase
+      //     .rpc("user_fetch_followed", params: {
+      //   "p_user_id": uid,
+      //   "p_batch_size": batchSize,
+      //   "p_batch_offset": batchOffset
+      // });
+      return result;
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching followers: $e");
+      throw HSReadUserFailure(customDetails: e.toString());
     }
   }
 }

@@ -18,6 +18,7 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:hs_toasts/hs_toasts.dart';
 
 class SingleBoardPage extends StatelessWidget {
   SingleBoardPage({super.key});
@@ -71,18 +72,18 @@ class SingleBoardPage extends StatelessWidget {
           child: HSScaffold(
             onTap: singleBoardCubit.exitEditMode,
             appBar: HSAppBar(
-              enableDefaultBackButton: true,
-              right: IconButton(
-                onPressed: singleBoardCubit.showBottomSheet,
-                icon: const Icon(FontAwesomeIcons.ellipsisVertical),
-              )
-                  .animate()
-                  .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
-                  .scale(
-                    begin: const Offset(0.8, 0.8),
-                    end: const Offset(1, 1),
-                  ),
-            ),
+                enableDefaultBackButton: true,
+                right: IconButton(
+                  onPressed:
+                      !isLoading ? singleBoardCubit.showBottomSheet : null,
+                  icon: const Icon(FontAwesomeIcons.ellipsisVertical),
+                )
+                    .animate()
+                    .fadeIn(duration: 300.ms, curve: Curves.easeInOut)
+                    .scale(
+                      begin: const Offset(0.8, 0.8),
+                      end: const Offset(1, 1),
+                    )),
             body: CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -100,7 +101,6 @@ class SingleBoardPage extends StatelessWidget {
                                 : null,
                             borderRadius: BorderRadius.circular(14.0),
                             imageUrl: singleBoardCubit.state.board?.image,
-                            color: board?.color,
                           ),
                           Positioned(
                             bottom: 6,
@@ -158,15 +158,24 @@ class SingleBoardPage extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            HSUserAvatar(
-                              radius: 24,
-                              imageUrl: state.author?.avatarUrl,
-                            ),
-                            const Gap(16.0),
-                            AutoSizeText(
-                              author?.username ?? "",
-                              style: Theme.of(context).textTheme.headlineMedium,
-                              maxLines: 1,
+                            GestureDetector(
+                              onTap: () => navi.toUser(userID: author!.uid!),
+                              child: Row(
+                                children: [
+                                  HSUserAvatar(
+                                    radius: 24,
+                                    imageUrl: state.author?.avatarUrl,
+                                  ),
+                                  const Gap(16.0),
+                                  AutoSizeText(
+                                    author?.username ?? "",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium,
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
                             ),
                             const Spacer(),
                             _SaveActionButton(
@@ -177,13 +186,21 @@ class SingleBoardPage extends StatelessWidget {
                                 .fadeIn(duration: 300.ms, delay: 400.ms)
                                 .slideY(begin: 0.2, end: 0),
                             IconButton(
-                              onPressed: () => navi.pushPage(
-                                page: SingleBoardMapProvider(
-                                    boardID: board!.id!, board: board),
-                              ),
-                              icon: const Icon(
-                                FontAwesomeIcons.map,
-                              ),
+                              onPressed: () {
+                                if (state.spots.isEmpty) {
+                                  app.showToast(
+                                      toastType: HSToastType.warning,
+                                      title: "No spots in the board",
+                                      description:
+                                          "The board has no spots to show on the map.");
+                                  return;
+                                }
+                                navi.pushPage(
+                                  page: SingleBoardMapProvider(
+                                      boardID: board!.id!, board: board),
+                                );
+                              },
+                              icon: const Icon(FontAwesomeIcons.map),
                             )
                                 .animate()
                                 .fadeIn(duration: 300.ms, delay: 500.ms)

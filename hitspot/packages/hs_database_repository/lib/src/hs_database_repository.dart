@@ -1,4 +1,3 @@
-
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_database_repository/src/boards/hs_boards_repository.dart';
@@ -12,15 +11,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HSDatabaseRepsitory {
   HSDatabaseRepsitory(this._supabaseClient) {
-    this._notificationsRepository = HSNotificationsRepository(_supabaseClient);
-    this._usersRepository =
+    _notificationsRepository = HSNotificationsRepository(_supabaseClient);
+    _usersRepository =
         HSUsersRepository(_supabaseClient, users, _notificationsRepository);
-    this._boardsRepository =
+    _boardsRepository =
         HSBoardsRepository(_supabaseClient, boards, _notificationsRepository);
-    this._spotsRepository =
+    _spotsRepository =
         HSSpotsRepository(_supabaseClient, spots, _notificationsRepository);
-    this._tagsRepository = HSTagsRepository(_supabaseClient, spots);
-    this._recommendationSystemRepository =
+    _tagsRepository = HSTagsRepository(_supabaseClient, spots);
+    _recommendationSystemRepository =
         HSRecommendationSystemRepository(_supabaseClient);
   }
 
@@ -113,6 +112,30 @@ class HSDatabaseRepsitory {
       await _usersRepository.follow(followerID, followedID, follower, followed);
     }
   }
+
+  Future<List<HSUser>> userFetchFollowed(
+          {HSUser? user,
+          String? userID,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _usersRepository.fetchFollowed(
+          user, userID, batchSize, batchOffset);
+
+  Future<List<HSUser>> userFetchFollowers(
+          {HSUser? user,
+          String? userID,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _usersRepository.fetchFollowers(
+          user, userID, batchSize, batchOffset);
+
+  Future<List<HSUser>> userFetchSpotLikers(
+          {HSSpot? spot,
+          String? spotID,
+          int batchSize = 20,
+          int batchOffset = 0}) async =>
+      await _usersRepository.fetchSpotLikers(
+          spot, spotID, batchSize, batchOffset);
 
   Future<String> boardCreate({required HSBoard board}) async =>
       await _boardsRepository.create(board);
@@ -271,6 +294,9 @@ class HSDatabaseRepsitory {
           required String uid}) async =>
       await _spotsRepository.uploadImages(spotID, imageUrls, uid);
 
+  Future<void> spotDeleteImages({HSSpot? spot, String? spotID}) async =>
+      await _spotsRepository.deleteImages(spot, spotID);
+
   Future<HSComment> spotAddComment(
           {required String spotID,
           required String userID,
@@ -313,7 +339,7 @@ class HSDatabaseRepsitory {
           {HSSpot? spot, String? spotID, HSUser? user, String? userID}) async =>
       await _spotsRepository.saveUnsave(spot, spotID, user, userID);
 
-  Future<List<HSSpot>> spotFetchSpotsInView({
+  Future<List<HSSpot>> spotFetchInBounds({
     required double minLat,
     required double minLong,
     required double maxLat,
@@ -408,6 +434,15 @@ class HSDatabaseRepsitory {
     return savedSpots;
   }
 
+  Future<List<HSSpot>> spotFetchClosest(
+          {required double lat,
+          required double long,
+          int batchSize = 20,
+          int batchOffset = 0,
+          double distance = 60.0}) async =>
+      await _spotsRepository.fetchClosest(
+          lat, long, batchSize, batchOffset, distance);
+
   Future<void> tagCreate({required String tag}) async =>
       await _tagsRepository.create(tag);
   Future<HSTag> tagRead({HSTag? tag, String? tagID}) async =>
@@ -427,6 +462,9 @@ class HSDatabaseRepsitory {
       await _tagsRepository.tagExists(tagValue);
   Future<List<HSTag>> tagFetchSpotTags({HSSpot? spot, String? spotID}) async =>
       await _tagsRepository.fetchSpotTags(spot, spotID);
+  Future<void> tagDeleteSpotTags(
+          {HSSpot? spot, String? spotID, List<String>? tags}) async =>
+      await _tagsRepository.deleteSpotTags(spot, spotID, tags);
   Future<List<HSTag>> tagSearch(
           {required String query,
           int batchOffset = 0,

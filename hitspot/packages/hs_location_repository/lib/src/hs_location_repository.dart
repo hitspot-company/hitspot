@@ -53,37 +53,39 @@ class HSLocationRepository {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
 
-      var address = '';
-
-      if (placemarks.isNotEmpty) {
-        // Concatenate non-null components of the address
-        var streets = placemarks.reversed
-            .map((placemark) => placemark.street)
-            .where((street) => street != null && street != '');
-
-        // Filter out unwanted parts
-        streets = streets.where((street) =>
-            street!.toLowerCase() !=
-            placemarks.reversed.last.locality!
-                .toLowerCase()); // Remove city names
-        streets = streets
-            .where((street) => !street!.contains('+')); // Remove street codes
-
-        address += streets.join(', ');
-
-        address += ', ${placemarks.reversed.last.subLocality ?? ''}';
-        address += ', ${placemarks.reversed.last.locality ?? ''}';
-        address += ', ${placemarks.reversed.last.subAdministrativeArea ?? ''}';
-        address += ', ${placemarks.reversed.last.administrativeArea ?? ''}';
-        address += ', ${placemarks.reversed.last.postalCode ?? ''}';
-        address += ', ${placemarks.reversed.last.country ?? ''}';
+      if (placemarks.isEmpty) {
+        return 'No address found';
       }
+
+      Placemark placemark = placemarks.reversed.last;
+
+      // Helper function to clean and format address parts
+      String formatPart(String? part) =>
+          (part != null && part.isNotEmpty) ? part : '';
+
+      // Extracting relevant parts from the placemark
+      List<String> addressParts = [
+        formatPart(placemark.street),
+        formatPart(placemark.subLocality),
+        formatPart(placemark.locality),
+        formatPart(placemark.subAdministrativeArea),
+        formatPart(placemark.administrativeArea),
+        formatPart(placemark.postalCode),
+        formatPart(placemark.country),
+      ];
+
+      // Remove duplicates and empty parts
+      addressParts =
+          addressParts.toSet().where((part) => part.isNotEmpty).toList();
+
+      // Join parts with ', '
+      String address = addressParts.join(', ');
 
       print("Your Address for ($lat, $long) is: $address");
 
       return address;
-    } catch (_) {
-      throw "Could not fetch address : $_";
+    } catch (error) {
+      throw "Could not fetch address: $error";
     }
   }
 
@@ -232,50 +234,102 @@ class HSLocationRepository {
     );
   }
 
-  void zoomOutToFitAllMarkers(
-      GoogleMapController controller, Set<Marker> markers,
-      {Position? currentPosition}) {
-    if (markers.isEmpty) return;
+  Future<void> zoomToFitSpots(
+      List<HSSpot> spots, GoogleMapController controller,
+      {Position? currentPosition, double? padding}) async {
+    // if (spots.isEmpty) return;
 
-    double minLat;
-    double maxLat;
-    double minLng;
-    double maxLng;
+    // List<LatLng> spotPositions =
+    //     spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
 
-    // Start with the user position
-    if (currentPosition != null) {
-      minLat = currentPosition.latitude;
-      maxLat = currentPosition.latitude;
-      minLng = currentPosition.longitude;
-      maxLng = currentPosition.longitude;
-    } else {
-      minLat = markers.first.position.latitude;
-      maxLat = markers.first.position.latitude;
-      minLng = markers.first.position.longitude;
-      maxLng = markers.first.position.longitude;
+    // if (currentPosition != null) {
+    //   spotPositions
+    //       .add(LatLng(currentPosition.latitude, currentPosition.longitude));
+    // }
+
+    // LatLngBounds bounds = getLatLngBounds(spotPositions);
+    // LatLng center = LatLng(
+    //   (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+    //   (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+    // );
+
+    // double zoom = 21; // Start with maximum zoom
+    // bool allVisible = false;
+
+    // // Check if all spots are visible at the current zoom level
+    // LatLngBounds initialVisibleRegion = await controller.getVisibleRegion();
+    // allVisible = spotPositions.every((spot) =>
+    //     spot.latitude >= initialVisibleRegion.southwest.latitude &&
+    //     spot.latitude <= initialVisibleRegion.northeast.latitude &&
+    //     spot.longitude >= initialVisibleRegion.southwest.longitude &&
+    //     spot.longitude <= initialVisibleRegion.northeast.longitude);
+
+    // // If not all spots are visible, zoom out
+    // if (!allVisible) {
+    //   await _zoomOut(controller, spotPositions, center);
+    // } else {
+    //   await _zoomIn(controller, spotPositions, center);
+    // }
+
+    // // Add a little padding
+    // await controller.animateCamera(
+    //     CameraUpdate.newLatLngZoom(center, zoom - .6 - (padding ?? 0.0)));
+  }
+
+  Future<void> _zoomIn(GoogleMapController controller,
+      List<LatLng> spotPositions, LatLng center) async {
+    double zoom = await controller.getZoomLevel();
+    bool allVisible = false;
+    while (zoom < 21) {
+      await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
+      LatLngBounds visibleRegion = await controller.getVisibleRegion();
+
+      allVisible = spotPositions.every((spot) =>
+          spot.latitude >= visibleRegion.southwest.latitude &&
+          spot.latitude <= visibleRegion.northeast.latitude &&
+          spot.longitude >= visibleRegion.southwest.longitude &&
+          spot.longitude <= visibleRegion.northeast.longitude);
+
+      if (allVisible) zoom += 0.5;
+    }
+  }
+
+  Future<void> _zoomOut(GoogleMapController controller,
+      List<LatLng> spotPositions, LatLng center) async {
+    double zoom = await controller.getZoomLevel();
+    bool allVisible = false;
+    while (zoom > 0) {
+      await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
+      LatLngBounds visibleRegion = await controller.getVisibleRegion();
+
+      allVisible = spotPositions.every((spot) =>
+          spot.latitude >= visibleRegion.southwest.latitude &&
+          spot.latitude <= visibleRegion.northeast.latitude &&
+          spot.longitude >= visibleRegion.southwest.longitude &&
+          spot.longitude <= visibleRegion.northeast.longitude);
+
+      if (!allVisible) zoom -= 0.5;
+    }
+  }
+
+  // Calculate LatLngBounds that includes all the spots
+  LatLngBounds getLatLngBounds(List<LatLng> spots) {
+    double minLat = spots[0].latitude;
+    double maxLat = spots[0].latitude;
+    double minLng = spots[0].longitude;
+    double maxLng = spots[0].longitude;
+
+    for (LatLng spot in spots) {
+      if (spot.latitude < minLat) minLat = spot.latitude;
+      if (spot.latitude > maxLat) maxLat = spot.latitude;
+      if (spot.longitude < minLng) minLng = spot.longitude;
+      if (spot.longitude > maxLng) maxLng = spot.longitude;
     }
 
-    // Iterate through all markers to find the bounding box
-    for (Marker marker in markers) {
-      minLat = min(minLat, marker.position.latitude);
-      maxLat = max(maxLat, marker.position.latitude);
-      minLng = min(minLng, marker.position.longitude);
-      maxLng = max(maxLng, marker.position.longitude);
-    }
-
-    // Create the bounds
-    LatLngBounds bounds = LatLngBounds(
+    return LatLngBounds(
       southwest: LatLng(minLat, minLng),
       northeast: LatLng(maxLat, maxLng),
     );
-
-    // Create camera update
-    CameraUpdate cameraUpdate =
-        CameraUpdate.newLatLngBounds(bounds, /* padding */ 100.0);
-
-    // Move camera to fit bounds
-    controller.animateCamera(cameraUpdate);
-    print("Zooming out to fit all markers");
   }
 
   void resetPosition(Completer<GoogleMapController> controller,
@@ -283,9 +337,10 @@ class HSLocationRepository {
     late final Position pos;
     if (currentPosition == null) {
       pos = await getCurrentLocation();
-    } else
+    } else {
       pos = currentPosition;
+    }
     await animateCameraToNewLatLng(
-        controller, LatLng(pos.latitude, pos.longitude));
+        controller, LatLng(pos.latitude, pos.longitude), 13);
   }
 }

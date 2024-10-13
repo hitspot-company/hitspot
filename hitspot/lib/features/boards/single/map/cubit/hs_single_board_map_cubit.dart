@@ -1,11 +1,11 @@
 import 'dart:async';
-
+import 'dart:math' as math;
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/assets/hs_assets.dart';
+import 'package:hitspot/wrappers/map/cubit/hs_map_wrapper_cubit.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -13,24 +13,30 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 part 'hs_single_board_map_state.dart';
 
 class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
-  HSSingleBoardMapCubit({required this.board, required this.boardID})
+  HSSingleBoardMapCubit(
+      {required this.mapWrapper, required this.board, required this.boardID})
       : super(const HSSingleBoardMapState()) {
     _init();
   }
 
   final String boardID;
   final HSBoard board;
-  final Completer<GoogleMapController> controller = Completer();
+  final HSMapWrapperCubit mapWrapper;
   final _locationRepository = app.locationRepository;
   final _databaseRepository = app.databaseRepository;
   final pageController = PageController();
 
+  List<HSSpot> get spots => mapWrapper.state.visibleSpots;
+
   void _init() async {
     try {
       emit(state.copyWith(status: HSSingleBoardMapStatus.loading));
-      await loadCurrentPosition();
-      await loadSpots();
-      loadMarkers();
+      final spots =
+          await _databaseRepository.boardFetchBoardSpots(boardID: boardID);
+      mapWrapper.setOnMarkerTapped(_onMarkerTapped);
+      mapWrapper.setVisibleSpots(spots);
+      mapWrapper.updateMarkers(spots);
+      mapWrapper.setInitialCameraPosition(getInitialCameraPosition(spots));
       pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
     } catch (e) {
@@ -39,22 +45,34 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
     }
   }
 
-  void _pageListener() async {
-    final index = pageController.page?.round();
-    if (index != null) {
-      final spot = state.spots[index];
-      _locationRepository.animateCameraToNewLatLng(
-        controller,
-        LatLng(spot.latitude!, spot.longitude!),
-      );
-      _generateNewMarkers(spot);
-    }
+  CameraPosition getInitialCameraPosition(List<HSSpot> spots) {
+    const padding = 0.1;
+    final latlngs =
+        spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+    final bounds = _locationRepository.getLatLngBounds(latlngs);
+    final center = LatLng(
+      (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+      (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+    );
+
+    final latDelta = bounds.northeast.latitude - bounds.southwest.latitude;
+    final lngDelta = bounds.northeast.longitude - bounds.southwest.longitude;
+
+    final maxDelta = latDelta > lngDelta ? latDelta : lngDelta;
+    final zoom = math.log(360 / (maxDelta + padding)) / math.ln2;
+
+    return CameraPosition(
+      target: center,
+      zoom: zoom,
+    );
   }
 
-  void onMapCreated(GoogleMapController cont) async {
-    if (controller.isCompleted) return;
-    controller.complete(cont);
-    resetCamera();
+  void _pageListener() {
+    final index = pageController.page?.round() ?? 0;
+    final spot = mapWrapper.state.visibleSpots[index];
+    mapWrapper.setSelectedSpot(spot);
+    mapWrapper.updateMarkers();
+    mapWrapper.zoomInToMarker(15.0);
   }
 
   Future<void> loadCurrentPosition() async {
@@ -68,56 +86,35 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
     }
   }
 
-  Future<void> loadSpots() async {
-    try {
-      final spots =
-          await _databaseRepository.boardFetchBoardSpots(boardID: boardID);
-      emit(state.copyWith(spots: spots));
-    } catch (_) {
-      HSDebugLogger.logError("Error loading spots");
-      rethrow;
-    }
-  }
-
-  void loadMarkers() async {
-    try {
-      List<Marker> markers = app.assets.generateMarkers(state.spots,
-          onTap: _onMarkerTapped, selectedSpotID: state.spots.first.sid);
-      emit(state.copyWith(markers: markers.toSet()));
-    } catch (_) {
-      HSDebugLogger.logError("Error loading markers");
-      rethrow;
-    }
-  }
-
   void _onMarkerTapped(HSSpot spot) {
     try {
-      final index = state.spots.indexOf(spot);
-      pageController.jumpToPage(index);
-      _generateNewMarkers(spot);
-    } catch (_) {
-      HSDebugLogger.logError("Error tapping marker");
+      final index = spots.indexOf(spot);
+      if (index == pageController.page?.round()) {
+        final spot = mapWrapper.state.visibleSpots[index];
+        mapWrapper.setSelectedSpot(spot);
+        mapWrapper.updateMarkers();
+        mapWrapper.zoomInToMarker(15.0);
+      } else {
+        pageController.jumpToPage(index);
+      }
+    } catch (e) {
+      HSDebugLogger.logError("Error tapping marker: $e");
     }
-  }
-
-  void _generateNewMarkers(HSSpot spot) {
-    List<Marker> markers = app.assets.generateMarkers(state.spots,
-        currentPosition: state.currentPosition?.toLatLng,
-        onTap: _onMarkerTapped,
-        selectedSpotID: spot.sid);
-
-    emit(state.copyWith(markers: markers.toSet()));
   }
 
   void resetCamera() async {
     try {
-      if (state.currentPosition != null && state.markers.isNotEmpty) {
-        final HSSpot firstSpot = state.spots.first;
-        _locationRepository.animateCameraToNewLatLng(
-            controller, LatLng(firstSpot.latitude!, firstSpot.longitude!));
-      }
+      await mapWrapper.moveCamera(mapWrapper.initialCameraPosition.target,
+          mapWrapper.initialCameraPosition.zoom);
     } catch (_) {
       HSDebugLogger.logError("Error resetting camera");
     }
+  }
+
+  @override
+  Future<void> close() {
+    pageController.dispose();
+    mapWrapper.close();
+    return super.close();
   }
 }

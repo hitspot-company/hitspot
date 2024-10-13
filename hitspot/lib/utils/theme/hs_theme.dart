@@ -47,13 +47,13 @@ final class HSTheme {
     colorSchemeSeed: _mainColor,
     brightness: Brightness.light,
     textTheme: _HSTextThemes.lightTextTheme,
-  ).copyWith(highlightColor: Colors.black);
+  );
 
   final ThemeData darkTheme = ThemeData(
     colorSchemeSeed: _mainColor,
     brightness: Brightness.dark,
     textTheme: _HSTextThemes.darkTextTheme,
-  ).copyWith(highlightColor: Colors.black.withOpacity(.08));
+  );
 
   Color get highlightColor => currentTheme.highlightColor;
   Color get mainColor => _mainColor;

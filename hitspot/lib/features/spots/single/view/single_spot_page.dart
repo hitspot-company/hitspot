@@ -9,17 +9,23 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_comments_cubit.dart';
 import 'package:hitspot/features/spots/single/cubit/hs_single_spot_cubit.dart';
 import 'package:hitspot/features/spots/single/view/single_spot_comments_page.dart';
+import 'package:hitspot/features/user_profile/multiple/cubit/hs_user_profile_multiple_cubit.dart';
+import 'package:hitspot/features/user_profile/multiple/view/user_profile_multiple_provider.dart';
 import 'package:hitspot/utils/gallery/hs_gallery.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
 import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
+import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
+import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
+part 'single_spot_widgets.dart';
 
 class SingleSpotPage extends StatelessWidget {
   const SingleSpotPage({super.key});
@@ -107,7 +113,7 @@ class SingleSpotPage extends StatelessWidget {
                 ).toSliver,
                 const Gap(16.0).toSliver,
                 AutoSizeText(
-                  "${spot.address}",
+                  spot.getAddress,
                   style: const TextStyle(fontSize: 14.0, color: Colors.grey),
                   maxLines: 2,
                 )
@@ -160,10 +166,14 @@ class _AnimatedImageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = BlocProvider.of<HSSingleSpotCubit>(context);
     return GestureDetector(
-      onTap: () => app.gallery.showImageGallery(
-        images: cubit.state.spot.images!,
-        type: HSImageGalleryType.network,
-        initialIndex: cubit.state.spot.images!.indexOf(imageUrl),
+      onTap: () => navi.pushPage(
+        page: HSGalleryBuilder(
+          images: cubit.state.spot.images!,
+          initialIndex: cubit.state.spot.images!.indexOf(imageUrl),
+          type: HSImageGalleryType.network,
+          backgroundDecoration:
+              BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
+        ),
       ),
       child: Hero(
         tag: imageUrl,
@@ -201,7 +211,7 @@ class _AnimatedMapView extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => app.locationRepository.launchMaps(
                   coords: spotLocation,
-                  description: singleSpotCubit.state.spot.address!,
+                  description: singleSpotCubit.state.spot.getAddress,
                   title: singleSpotCubit.state.spot.title!,
                 ),
                 child: AbsorbPointer(
@@ -285,12 +295,12 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        HsUserTile(
+        _UserTile(
+          height: 100,
+          avatarRadius: 40,
+          iconSize: 40,
           user: singleSpotCubit.state.spot.author!,
-        )
-            .animate()
-            .fadeIn(duration: 300.ms, delay: 400.ms)
-            .slideX(begin: -0.2, end: 0),
+        ),
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -300,14 +310,20 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
                 children: [
                   _AnimatedActionButton(
                     onTap: singleSpotCubit.likeDislikeSpot,
+                    onLongPress: () {
+                      navi.pushPage(
+                          page: UserProfileMultipleProvider(
+                        type: HSUserProfileMultipleType.likes,
+                        spotID: singleSpotCubit.spotID,
+                      ));
+                    },
                     selector: (state) => state.isSpotLiked,
                     activeIcon: FontAwesomeIcons.solidHeart,
                     inactiveIcon: FontAwesomeIcons.heart,
                     loadingStatus: HSSingleSpotStatus.liking,
                     delay: 450.ms,
                   ),
-                  Text(singleSpotCubit.state.spot.formattedLikesCount,
-                      style: const TextStyle(fontSize: 12.0)),
+                  const _Counter(_CounterType.likes),
                 ],
               ),
               Column(
@@ -328,8 +344,7 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
                     loadingStatus: HSSingleSpotStatus.commenting,
                     delay: 500.ms,
                   ),
-                  Text(singleSpotCubit.state.spot.formattedCommentsCount,
-                      style: const TextStyle(fontSize: 12.0)),
+                  const _Counter(_CounterType.comments),
                 ],
               ),
               Column(

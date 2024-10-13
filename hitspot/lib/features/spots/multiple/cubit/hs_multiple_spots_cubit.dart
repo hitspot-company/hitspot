@@ -30,7 +30,7 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
       case HSMultipleSpotsType.trendingSpots:
         return "Trending spots";
       case HSMultipleSpotsType.userSpots:
-        return "@username spots";
+        return "@username spots"; // TODO: change this
     }
   }
 

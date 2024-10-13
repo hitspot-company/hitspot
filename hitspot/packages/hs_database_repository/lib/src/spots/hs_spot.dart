@@ -17,6 +17,15 @@ class HSSpot {
   // BOARDS RELATED
   final int? spotIndex;
 
+  List<String> get getTags => tags ?? [];
+  String get getAddress {
+    int i = 0;
+    while (address![i] == " " || address![i] == ',') {
+      i++;
+    }
+    return address!.substring(i);
+  }
+
   const HSSpot({
     this.sid,
     this.address,
@@ -131,8 +140,9 @@ class HSSpot {
   }
 
   String get getThumbnail {
-    if (thumbnails?[0] != null && thumbnails?[0] != "null")
+    if (thumbnails?[0] != null && thumbnails?[0] != "null") {
       return thumbnails![0];
+    }
     return images![0];
   }
 
@@ -169,6 +179,14 @@ class HSSpot {
       return NumberFormat.decimalPattern().format(number);
     }
   }
+
+  @override
+  operator ==(Object other) {
+    return other is HSSpot && other.sid == sid;
+  }
+
+  @override
+  int get hashCode => Object.hash(sid, createdBy);
 }
 
 extension HSSpotExtension on HSSpot {

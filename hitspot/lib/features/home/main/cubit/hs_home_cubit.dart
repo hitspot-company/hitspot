@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
-import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
-import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
+import 'package:hitspot/features/spots/create/form/cubit/hs_spot_upload_cubit.dart';
+import 'package:hitspot/features/spots/create/location/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/utils/upgrader/hs_upgrade_messages.dart.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -22,6 +22,11 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       Completer<GoogleMapController>();
   Completer<GoogleMapController> get mapController => _mapController;
   final _databaseRepository = app.databaseRepository;
+
+  bool get isPageEmpty =>
+      state.trendingSpots.isEmpty &&
+      state.nearbySpots.isEmpty &&
+      state.trendingBoards.isEmpty;
 
   void lateFetchNearby() => _fetchNearbySpots();
 
@@ -125,10 +130,10 @@ class HSHomeCubit extends Cubit<HSHomeState> {
           .spotFetchSpotsWithinRadius(
               lat: lat,
               long: long,
-              radius: 500000); // TODO: Change radius (now its 500km)
-      placeMarkers();
+              radius: 500 * 1000); // TODO: Change radius (now its 500km)
       emit(state.copyWith(
           nearbySpots: nearbySpots, currentPosition: currentPosition));
+      placeMarkers();
     } catch (_) {
       HSDebugLogger.logError("Error fetching nearby spots: $_");
     }
@@ -139,13 +144,6 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       final List<HSSpot> fetchedSpots =
           await _databaseRepository.spotFetchTrendingSpots();
       fetchedSpots.removeWhere((e) => state.nearbySpots.contains(e));
-      for (var i = 0; i < fetchedSpots.length; i++) {
-        for (var j = 0; j < state.nearbySpots.length; j++) {
-          if (state.nearbySpots[j].sid == fetchedSpots[i].sid) {
-            fetchedSpots.removeAt(i);
-          }
-        }
-      }
       return fetchedSpots;
     } catch (e) {
       HSDebugLogger.logError("Error $e");
@@ -154,12 +152,12 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   }
 
   void placeMarkers() {
-    final List<HSSpot> spots = state.nearbySpots;
-    List<Marker> markers = app.assets.generateMarkers(
-      spots,
-      currentPosition: state.currentPosition?.toLatLng,
-    );
-    emit(state.copyWith(markers: markers));
+    // final List<HSSpot> spots = state.nearbySpots;
+    // List<Marker> markers = app.assets.generateMarkers(
+    //   spots,
+    //   currentPosition: state.currentPosition?.toLatLng,
+    // );
+    // emit(state.copyWith(markers: markers));
   }
 
   Future<void> animateCameraToNewLatLng(LatLng location) async {

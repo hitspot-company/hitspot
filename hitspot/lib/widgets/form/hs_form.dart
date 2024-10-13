@@ -99,6 +99,12 @@ class HSFormButton extends StatelessWidget {
   factory HSFormButton.loading() {
     return const HSFormButton(child: HSLoadingIndicator(size: 24.0));
   }
+
+  factory HSFormButton.error() {
+    return const HSFormButton(
+      child: Icon(Icons.error, color: Colors.red),
+    );
+  }
 }
 
 class HSFormPageBody extends StatelessWidget {

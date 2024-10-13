@@ -8,6 +8,7 @@ import 'package:hs_location_repository/hs_location_repository.dart';
 class HSSpotInfoWindow extends StatefulWidget {
   const HSSpotInfoWindow({super.key, required this.spot});
   final HSSpot spot;
+
   @override
   _HSSpotInfoWindowState createState() => _HSSpotInfoWindowState();
 }

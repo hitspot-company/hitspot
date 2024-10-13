@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,9 +9,9 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
-import 'package:hitspot/features/map/main/view/map_provider.dart';
-import 'package:hitspot/features/spots/create/cubit/hs_spot_upload_cubit.dart';
-import 'package:hitspot/features/spots/create/map/cubit/hs_choose_location_cubit.dart';
+import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
+import 'package:hitspot/features/spots/create/form/cubit/hs_spot_upload_cubit.dart';
+import 'package:hitspot/features/spots/create/location/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
@@ -136,9 +137,8 @@ class HomePage extends StatelessWidget {
                           }
                           return GestureDetector(
                             onTap: () => navi.pushTransition(
-                              PageTransitionType.fade,
-                              const MapProvider(),
-                            ),
+                                PageTransitionType.fade,
+                                const ClusterMapProvider()),
                             child: AbsorbPointer(
                               absorbing: true,
                               child: HSGoogleMap(
@@ -226,13 +226,13 @@ class HSBoardGridItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
+                    AutoSizeText(
                       board.title!,
                       style: Theme.of(context)
                           .textTheme
                           .titleLarge!
                           .colorify(Colors.white),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

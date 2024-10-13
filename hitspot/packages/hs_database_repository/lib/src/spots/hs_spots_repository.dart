@@ -84,6 +84,15 @@ class HSSpotsRepository {
     }
   }
 
+  Future<void> deleteImages(HSSpot? spot, String? spotID) async {
+    try {
+      final sid = spot?.sid ?? spotID!;
+      await _supabase.from(_spotsImages).delete().eq("spot_id", sid);
+    } catch (e) {
+      throw Exception("Error deleting images: $e");
+    }
+  }
+
   Future<List<HSSpot>> fetchSpotsWithinRadius(double lat, double long,
       [double? radius]) async {
     const double DEFAULT_RADIUS = 1000 * 50; // 50km
@@ -310,6 +319,16 @@ class HSSpotsRepository {
     double maxLong,
   ) async {
     try {
+      if (minLat > maxLat) {
+        final temp = minLat;
+        minLat = maxLat;
+        maxLat = temp;
+      }
+      if (minLong > maxLong) {
+        final temp = minLong;
+        minLong = maxLong;
+        maxLong = temp;
+      }
       final List<Map<String, dynamic>> data =
           await _supabase.rpc('spot_fetch_within_bounding_box', params: {
         'p_min_lat': minLat,
@@ -466,6 +485,28 @@ class HSSpotsRepository {
         'p_batch_offset': batchOffset
       });
       return data.map(HSSpot.deserialize).toList();
+    } catch (_) {
+      throw Exception("Error fetching saved spots: $_");
+    }
+  }
+
+  Future<List<HSSpot>> fetchClosest(
+    double lat,
+    double long,
+    int batchSize,
+    int batchOffset,
+    double distance,
+  ) async {
+    try {
+      final List<Map<String, dynamic>> spots =
+          await _supabase.rpc('spot_fetch_closest', params: {
+        'p_user_lat': lat,
+        'p_user_long': long,
+        'p_batch_size': batchSize,
+        'p_batch_offset': batchOffset,
+        'p_distance_km': distance,
+      });
+      return (spots.map((e) => HSSpot.deserializeWithAuthor(e)).toList());
     } catch (_) {
       throw Exception("Error fetching saved spots: $_");
     }

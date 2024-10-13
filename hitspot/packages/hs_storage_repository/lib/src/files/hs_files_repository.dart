@@ -102,7 +102,6 @@ class HSFilesRepository {
             await uploadAndFetchPublicUrl(image, "spots", uploadPath, null);
         final String thumbnailUrl = await uploadAndFetchPublicUrl(
             thumbnail, "spots", thumbnailUploadPath, null);
-        ;
 
         ret.add(Pair(imageUrl, thumbnailUrl));
       }
@@ -111,4 +110,34 @@ class HSFilesRepository {
       throw ("Could not upload spot images: $_");
     }
   }
+
+  Future<void> spotDeleteImages(
+      [List<String>? images, List<String>? thumbnails]) async {
+    try {
+      await _supabase.storage
+          .from("spots")
+          .remove([...?images, ...?thumbnails]);
+    } catch (_) {
+      throw ("Could not delete spot images: $_");
+    }
+  }
+
+  // TODO: Add implementation
+  // Future<void> reorderImages(String url1, String url2) async {
+  //   try {
+  //     print("Reordering images: $url1, $url2");
+  //     var res = await _supabase.storage
+  //         .from("spots")
+  //         .list(path: "${url1.split('/spots').first}/spots");
+  //     for (var i = 0; i < res.length; i++) {
+  //       print(res[i].name);
+  //     }
+  //     // await _supabase.storage.from("spots").move(url1, "${url1}_temp");
+  //     // await _supabase.storage.from("spots").move(url2, url1);
+  //     // await _supabase.storage.from("spots").move("${url1}_temp", url2);
+  //   } catch (_) {
+  //     throw HSFileException(
+  //         details: _.toString(), message: "Could not reorder images");
+  //   }
+  // }
 }
