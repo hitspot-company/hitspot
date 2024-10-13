@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -9,7 +10,7 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 part 'hs_saved_state.dart';
 
 class HSSavedCubit extends Cubit<HSSavedState> {
-  HSSavedCubit() : super(const HSSavedState()) {
+  HSSavedCubit() : super(HSSavedState()) {
     _init(useCache: true);
   }
 
@@ -116,5 +117,11 @@ class HSSavedCubit extends Cubit<HSSavedState> {
 
   Future<void> refresh() async {
     await _init();
+  }
+
+  @override
+  Future<void> close() {
+    state.textEditingController.dispose();
+    return super.close();
   }
 }

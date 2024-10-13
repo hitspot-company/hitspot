@@ -3,7 +3,7 @@ part of 'hs_saved_cubit.dart';
 enum HSSavedStatus { loading, idle, error }
 
 final class HSSavedState extends Equatable {
-  const HSSavedState(
+  HSSavedState(
       {this.status = HSSavedStatus.loading,
       this.savedBoards = const [],
       this.savedSpots = const [],
@@ -22,6 +22,8 @@ final class HSSavedState extends Equatable {
   final List<HSBoard> searchedBoardsResults;
   final List<HSBoard> searchedSavedBoardsResults;
   final List<HSSpot> searchedSavedSpotsResults;
+
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   List<Object> get props => [

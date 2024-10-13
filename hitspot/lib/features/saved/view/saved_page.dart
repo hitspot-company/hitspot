@@ -11,23 +11,11 @@ import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
-class SavedPage extends StatefulWidget {
-  SavedPage({super.key});
-
-  @override
-  State<SavedPage> createState() => _SavedPageState();
-  final TextEditingController controller = TextEditingController();
-}
-
-class _SavedPageState extends State<SavedPage> {
-  @override
-  void dispose() {
-    widget.controller.dispose();
-    super.dispose();
-  }
-
+class SavedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    HSSavedCubit savedCubit = context.read<HSSavedCubit>();
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -46,13 +34,13 @@ class _SavedPageState extends State<SavedPage> {
           physics: const NeverScrollableScrollPhysics(),
           children: [
             _OwnBoardsBuilder(
-              controller: widget.controller,
+              controller: savedCubit.state.textEditingController,
             ),
             _SavedBoardsBuilder(
-              controller: widget.controller,
+              controller: savedCubit.state.textEditingController,
             ),
             _SpotsBuilder(
-              controller: widget.controller,
+              controller: savedCubit.state.textEditingController,
             )
           ],
         ),
