@@ -70,12 +70,14 @@ class HSDatabaseRepsitory {
 
     final fetchedUser = await _usersRepository.read(user, userID);
 
-    _cacheRepository.cacheUser(
-      userID: fetchedUser.uid,
-      user: fetchedUser,
-      userBoards: null,
-      userSpots: null,
-    );
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: fetchedUser.uid,
+        user: fetchedUser,
+        userBoards: null,
+        userSpots: null,
+      );
+    }
 
     return fetchedUser;
   }
@@ -104,13 +106,15 @@ class HSDatabaseRepsitory {
     final isUserFollowed = await _usersRepository.isUserFollowed(
         followerID, follower, followedID, followed);
 
-    _cacheRepository.cacheUser(
-      userID: followerID ?? follower!.uid!,
-      user: null,
-      userBoards: null,
-      userSpots: null,
-      isUserFollowed: Pair(followedID ?? followed!.uid!, isUserFollowed!),
-    );
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: followerID ?? follower!.uid!,
+        user: null,
+        userBoards: null,
+        userSpots: null,
+        isUserFollowed: Pair(followedID ?? followed!.uid!, isUserFollowed!),
+      );
+    }
 
     return isUserFollowed;
   }
@@ -180,7 +184,11 @@ class HSDatabaseRepsitory {
       _boardsRepository.saveUnsave(board, boardID, user, userID);
 
   Future<List<HSBoard>> boardFetchSavedBoards(
-      {HSUser? user, String? userID, bool useCache = false}) async {
+      {HSUser? user,
+      String? userID,
+      int batchSize = 10,
+      int batchOffset = 0,
+      bool useCache = false}) async {
     if (useCache) {
       final cachedBoards = _cacheRepository.getCachedSavedBoards();
       if (cachedBoards != null) {
@@ -188,9 +196,12 @@ class HSDatabaseRepsitory {
       }
     }
 
-    final fetchedBoards =
-        await _boardsRepository.fetchSavedBoards(user, userID);
-    _cacheRepository.cacheSavedData(savedBoards: fetchedBoards);
+    final fetchedBoards = await _boardsRepository.fetchSavedBoards(
+        user, userID, batchSize, batchOffset);
+
+    if (useCache) {
+      _cacheRepository.cacheSavedData(savedBoards: fetchedBoards);
+    }
 
     return fetchedBoards;
   }
@@ -252,12 +263,14 @@ class HSDatabaseRepsitory {
     final fetchedBoards = await _boardsRepository.fetchUserBoards(
         user, userID, batchOffset, batchSize);
 
-    _cacheRepository.cacheUser(
-      userID: userID ?? user!.uid!,
-      user: null,
-      userBoards: fetchedBoards,
-      userSpots: null,
-    );
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: userID ?? user!.uid!,
+        user: null,
+        userBoards: fetchedBoards,
+        userSpots: null,
+      );
+    }
 
     return fetchedBoards;
   }
@@ -400,12 +413,14 @@ class HSDatabaseRepsitory {
     final fetchedSpots =
         await _spotsRepository.userSpots(user, userID, batchOffset, batchSize);
 
-    _cacheRepository.cacheUser(
-      userID: userID ?? user!.uid!,
-      user: null,
-      userBoards: null,
-      userSpots: fetchedSpots,
-    );
+    if (useCache) {
+      _cacheRepository.cacheUser(
+        userID: userID ?? user!.uid!,
+        user: null,
+        userBoards: null,
+        userSpots: fetchedSpots,
+      );
+    }
 
     return fetchedSpots;
   }
@@ -453,7 +468,9 @@ class HSDatabaseRepsitory {
     final savedSpots =
         await _spotsRepository.fetchSavedSpots(userID, batchSize, batchOffset);
 
-    _cacheRepository.cacheSavedData(savedSpots: savedSpots);
+    if (useCache) {
+      _cacheRepository.cacheSavedData(savedSpots: savedSpots);
+    }
 
     return savedSpots;
   }

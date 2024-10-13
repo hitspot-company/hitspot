@@ -6,15 +6,26 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
 import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_search_bar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
+import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class SavedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     HSSavedCubit savedCubit = context.read<HSSavedCubit>();
+
+    void _onScroll(ScrollNotification scrollNotification) {
+      // Check if we reached the end of any scrollable content
+      if (scrollNotification.metrics.pixels ==
+          scrollNotification.metrics.maxScrollExtent) {
+        savedCubit.fetchMoreContent();
+        HSDebugLogger.logInfo("Fetching more saved content!");
+      }
+    }
 
     return DefaultTabController(
       length: 3,
@@ -30,19 +41,27 @@ class SavedPage extends StatelessWidget {
             ],
           ),
         ),
-        body: TabBarView(
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            _OwnBoardsBuilder(
-              controller: savedCubit.state.textEditingController,
-            ),
-            _SavedBoardsBuilder(
-              controller: savedCubit.state.textEditingController,
-            ),
-            _SpotsBuilder(
-              controller: savedCubit.state.textEditingController,
-            )
-          ],
+        body: NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollEndNotification) {
+              _onScroll(scrollNotification);
+            }
+            return false;
+          },
+          child: TabBarView(
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _OwnBoardsBuilder(
+                controller: savedCubit.state.textEditingController,
+              ),
+              _SavedBoardsBuilder(
+                controller: savedCubit.state.textEditingController,
+              ),
+              _SpotsBuilder(
+                controller: savedCubit.state.textEditingController,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -86,75 +105,96 @@ class _LoadingBuilder extends StatelessWidget {
 
 class _SavedBoardsBuilder extends StatelessWidget {
   const _SavedBoardsBuilder({required this.controller});
+
   final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<HSSavedCubit>();
+
     return RefreshIndicator(
-      onRefresh: context.read<HSSavedCubit>().refresh,
-      child: Column(
-        children: [
-          _SearchBar(controller: controller),
-          Expanded(
-            child: BlocBuilder<HSSavedCubit, HSSavedState>(
-              buildWhen: (previous, current) =>
-                  previous.searchedSavedBoardsResults !=
-                      current.searchedSavedBoardsResults ||
-                  previous.status != current.status,
-              builder: (context, state) {
-                if (state.status == HSSavedStatus.loading) {
-                  return const _LoadingBuilder();
-                }
-                if (state.savedBoards.isEmpty) {
-                  return const HSIconPrompt(
-                      useWithRefresh: true,
-                      message: "No saved boards",
-                      iconData: FontAwesomeIcons.bookmark);
-                }
-                return _BoardsBuilder(boards: state.searchedSavedBoardsResults);
-              },
-            ),
-          ),
-        ],
+      onRefresh: cubit.refresh,
+      child: BlocBuilder<HSSavedCubit, HSSavedState>(
+        buildWhen: (previous, current) =>
+            previous.searchedSavedBoardsResults !=
+                current.searchedSavedBoardsResults ||
+            previous.status != current.status,
+        builder: (context, state) {
+          // Search bar always shown
+          return Column(
+            children: [
+              _SearchBar(controller: controller),
+              Expanded(
+                child: _buildBoardsContent(state),
+              ),
+            ],
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildBoardsContent(HSSavedState state) {
+    if (state.status == HSSavedStatus.loading) {
+      return const _LoadingBuilder();
+    }
+
+    if (state.savedBoards.isEmpty) {
+      return const HSIconPrompt(
+        useWithRefresh: true,
+        message: "No saved boards",
+        iconData: FontAwesomeIcons.bookmark,
+      );
+    }
+
+    return _BoardsBuilder(boards: state.searchedSavedBoardsResults);
   }
 }
 
 class _OwnBoardsBuilder extends StatelessWidget {
   const _OwnBoardsBuilder({required this.controller});
+
   final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<HSSavedCubit>();
+
     return RefreshIndicator(
-      onRefresh: context.read<HSSavedCubit>().refresh,
-      child: Column(
-        children: [
-          _SearchBar(controller: controller),
-          Expanded(
-            child: BlocBuilder<HSSavedCubit, HSSavedState>(
-              buildWhen: (previous, current) =>
-                  previous.searchedBoardsResults !=
-                      current.searchedBoardsResults ||
-                  previous.status != current.status,
-              builder: (context, state) {
-                if (state.status == HSSavedStatus.loading) {
-                  return const _LoadingBuilder();
-                }
-                if (state.ownBoards.isEmpty) {
-                  return const HSIconPrompt(
-                      useWithRefresh: true,
-                      message: "You don't have any boards",
-                      iconData: FontAwesomeIcons.bookmark);
-                }
-                return _BoardsBuilder(boards: state.searchedBoardsResults);
-              },
-            ),
-          ),
-        ],
+      onRefresh: cubit.refresh,
+      child: BlocBuilder<HSSavedCubit, HSSavedState>(
+        buildWhen: (previous, current) =>
+            previous.searchedBoardsResults != current.searchedBoardsResults ||
+            previous.status != current.status,
+        builder: (context, state) {
+          // Search bar always shown
+          return Column(
+            children: [
+              _SearchBar(controller: controller),
+              Expanded(
+                child: _buildBoardsContent(state),
+              ),
+            ],
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildBoardsContent(HSSavedState state) {
+    if (state.status == HSSavedStatus.loading) {
+      return const _LoadingBuilder();
+    }
+
+    if (state.ownBoards.isEmpty) {
+      return const HSIconPrompt(
+        useWithRefresh: true,
+        message: "You don't have any boards",
+        iconData: FontAwesomeIcons.bookmark,
+      );
+    }
+
+    return _BoardsBuilder(boards: state.searchedBoardsResults);
   }
 }
 
@@ -199,52 +239,60 @@ class _SpotsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final HSSavedCubit cubit = context.read<HSSavedCubit>();
     return RefreshIndicator(
-      onRefresh: context.read<HSSavedCubit>().refresh,
-      child: Column(
-        children: [
-          _SearchBar(
-            controller: controller,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: BlocBuilder<HSSavedCubit, HSSavedState>(
-                buildWhen: (previous, current) =>
-                    previous.searchedSavedSpotsResults !=
-                        current.searchedSavedSpotsResults ||
-                    previous.status != current.status,
-                builder: (context, state) {
-                  if (state.status == HSSavedStatus.loading) {
-                    return const _LoadingBuilder(
-                        type: _LoadingBuilderType.grid);
-                  }
-                  if (state.searchedSavedSpotsResults.isEmpty) {
-                    return const HSIconPrompt(
-                        useWithRefresh: true,
-                        message: "No saved spots",
-                        iconData: FontAwesomeIcons.bookmark);
-                  }
-                  final spots = state.searchedSavedSpotsResults;
-                  return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.0,
-                      crossAxisSpacing: 16.0,
-                      mainAxisSpacing: 16.0,
-                    ),
-                    itemCount: spots.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final spot = spots[index];
-                      return AnimatedSpotTile(spot: spot, index: index);
-                    },
-                  );
-                },
+      onRefresh: cubit.refresh,
+      child: BlocBuilder<HSSavedCubit, HSSavedState>(
+        buildWhen: (previous, current) =>
+            previous.searchedSavedSpotsResults !=
+                current.searchedSavedSpotsResults ||
+            previous.status != current.status,
+        builder: (context, state) {
+          return Column(
+            children: [
+              _SearchBar(
+                controller: controller,
               ),
-            ),
-          ),
-        ],
+              Expanded(
+                child: _buildSpotsContent(state),
+              ),
+              if (cubit.state.status == HSSavedStatus.fetchingMoreContent)
+                const CircularProgressIndicator.adaptive(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSpotsContent(HSSavedState state) {
+    if (state.status == HSSavedStatus.loading) {
+      return const _LoadingBuilder(type: _LoadingBuilderType.grid);
+    }
+
+    if (state.searchedSavedSpotsResults.isEmpty) {
+      return const HSIconPrompt(
+        useWithRefresh: true,
+        message: "No saved spots",
+        iconData: FontAwesomeIcons.bookmark,
+      );
+    }
+
+    final spots = state.searchedSavedSpotsResults;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.0,
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 16.0,
+        ),
+        itemCount: spots.length,
+        itemBuilder: (BuildContext context, int index) {
+          final spot = spots[index];
+          return AnimatedSpotTile(spot: spot, index: index);
+        },
       ),
     );
   }

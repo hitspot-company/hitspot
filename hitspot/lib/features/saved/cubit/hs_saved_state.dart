@@ -1,6 +1,6 @@
 part of 'hs_saved_cubit.dart';
 
-enum HSSavedStatus { loading, idle, error }
+enum HSSavedStatus { loading, fetchingMoreContent, idle, error }
 
 final class HSSavedState extends Equatable {
   HSSavedState(
@@ -11,7 +11,8 @@ final class HSSavedState extends Equatable {
       this.query = "",
       this.searchedBoardsResults = const [],
       this.searchedSavedBoardsResults = const [],
-      this.searchedSavedSpotsResults = const []});
+      this.searchedSavedSpotsResults = const [],
+      this.batchOffset = 0});
 
   final HSSavedStatus status;
   final List<HSBoard> savedBoards;
@@ -24,6 +25,7 @@ final class HSSavedState extends Equatable {
   final List<HSSpot> searchedSavedSpotsResults;
 
   final TextEditingController textEditingController = TextEditingController();
+  final int batchOffset;
 
   @override
   List<Object> get props => [
@@ -34,7 +36,8 @@ final class HSSavedState extends Equatable {
         query,
         searchedBoardsResults,
         searchedSavedBoardsResults,
-        searchedSavedSpotsResults
+        searchedSavedSpotsResults,
+        batchOffset
       ];
 
   HSSavedState copyWith({
@@ -46,6 +49,7 @@ final class HSSavedState extends Equatable {
     List<HSBoard>? searchedBoardsResults,
     List<HSBoard>? searchedSavedBoardsResults,
     List<HSSpot>? searchedSavedSpotsResults,
+    int? batchOffset,
   }) {
     return HSSavedState(
       status: status ?? this.status,
@@ -59,6 +63,7 @@ final class HSSavedState extends Equatable {
           searchedSavedBoardsResults ?? this.searchedSavedBoardsResults,
       searchedSavedSpotsResults:
           searchedSavedSpotsResults ?? this.searchedSavedSpotsResults,
+      batchOffset: batchOffset ?? this.batchOffset,
     );
   }
 }

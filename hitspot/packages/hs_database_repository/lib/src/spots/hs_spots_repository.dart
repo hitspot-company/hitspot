@@ -492,11 +492,11 @@ class HSSpotsRepository {
   Future<List<HSSpot>> fetchSavedSpots(
       String userID, int batchSize, int batchOffset) async {
     try {
-      final List<Map<String, dynamic>> data = await _supabase
-          .rpc('spot_fetch_saved', params: {
+      final List<Map<String, dynamic>> data =
+          await _supabase.rpc('spot_fetch_saved', params: {
         'p_user_id': userID,
         'p_batch_size': batchSize,
-        'p_batch_offset': batchOffset
+        'p_batch_offset': batchOffset,
       });
       return data.map(HSSpot.deserialize).toList();
     } catch (_) {

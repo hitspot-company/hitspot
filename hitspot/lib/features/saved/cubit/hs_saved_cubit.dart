@@ -10,29 +10,46 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 part 'hs_saved_state.dart';
 
 class HSSavedCubit extends Cubit<HSSavedState> {
+  final int batchSize = 10;
+
   HSSavedCubit() : super(HSSavedState()) {
-    _init(useCache: true);
+    _fetch();
   }
 
   void updateStatus(HSSavedStatus status) =>
       emit(state.copyWith(status: status));
 
-  Future<void> _init({bool useCache = false}) async {
+  Future<void> _fetch() async {
     try {
       final List<HSBoard> ownBoards = await app.databaseRepository
-          .boardFetchUserBoards(userID: currentUser.uid!, useCache: useCache);
+          .boardFetchUserBoards(
+              userID: currentUser.uid!,
+              batchSize: batchSize,
+              batchOffset: state.batchOffset * batchSize,
+              useCache: state.batchOffset == 0);
       final List<HSBoard> savedBoards = await app.databaseRepository
-          .boardFetchSavedBoards(userID: currentUser.uid!, useCache: useCache);
-      final List<HSSpot> spots = await app.databaseRepository
-          .spotFetchSaved(userID: currentUser.uid!, useCache: useCache);
+          .boardFetchSavedBoards(
+              userID: currentUser.uid!,
+              batchSize: batchSize,
+              batchOffset: state.batchOffset * batchSize,
+              useCache: state.batchOffset == 0);
+      final List<HSSpot> spots = await app.databaseRepository.spotFetchSaved(
+          userID: currentUser.uid!,
+          batchSize: batchSize,
+          batchOffset: state.batchOffset * batchSize,
+          useCache: state.batchOffset == 0);
+
+      if (spots.isNotEmpty || ownBoards.isNotEmpty || savedBoards.isNotEmpty) {
+        emit(state.copyWith(batchOffset: state.batchOffset + 1));
+      }
 
       emit(state.copyWith(
-          savedBoards: savedBoards,
-          ownBoards: ownBoards,
-          savedSpots: spots,
-          searchedBoardsResults: List.from(ownBoards),
-          searchedSavedBoardsResults: List.from(savedBoards),
-          searchedSavedSpotsResults: List.from(spots)));
+          savedBoards: [...state.savedBoards, ...savedBoards],
+          ownBoards: [...state.ownBoards, ...ownBoards],
+          savedSpots: [...state.savedSpots, ...spots]));
+
+      _search();
+
       updateStatus(HSSavedStatus.idle);
     } catch (e) {
       HSDebugLogger.logError("Error fetching boards: $e");
@@ -48,6 +65,12 @@ class HSSavedCubit extends Cubit<HSSavedState> {
       emit(state.copyWith(query: val));
       _search();
     });
+  }
+
+  Future<void> fetchMoreContent() async {
+    emit(state.copyWith(status: HSSavedStatus.fetchingMoreContent));
+    await _fetch();
+    emit(state.copyWith(status: HSSavedStatus.idle));
   }
 
   void _search() {
@@ -116,7 +139,15 @@ class HSSavedCubit extends Cubit<HSSavedState> {
   }
 
   Future<void> refresh() async {
-    await _init();
+    emit(
+      state.copyWith(
+        savedBoards: [],
+        ownBoards: [],
+        savedSpots: [],
+        batchOffset: 0,
+      ),
+    );
+    await _fetch();
   }
 
   @override
