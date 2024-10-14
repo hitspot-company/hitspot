@@ -10,7 +10,7 @@ class SavedProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HSSavedCubit(),
-      child: const SavedPage(),
+      child: SavedPage(),
     );
   }
 }

@@ -73,7 +73,8 @@ class HSBoardsRepository {
     }
   }
 
-  Future<List<HSBoard>> fetchSavedBoards(HSUser? user, String? userID) async {
+  Future<List<HSBoard>> fetchSavedBoards(
+      HSUser? user, String? userID, int batchSize, int batchOffset) async {
     assert(user != null || userID != null, "User or userID must be provided");
     final uid = user?.uid ?? userID!;
     try {
@@ -81,7 +82,7 @@ class HSBoardsRepository {
           .from(_boards)
           .select('*, boards_saves!inner(board_id, user_id)')
           .eq("boards_saves.user_id", uid)
-          .range(0, 10);
+          .range(batchOffset, batchOffset + batchSize);
       return fetchedBoards.map((e) => HSBoard.deserialize(e)).toList();
     } catch (_) {
       throw HSBoardException(
