@@ -70,6 +70,7 @@ class SingleBoardPage extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: singleBoardCubit.refresh,
           child: HSScaffold(
+            ignoring: isLoading,
             onTap: singleBoardCubit.exitEditMode,
             appBar: HSAppBar(
                 enableDefaultBackButton: true,

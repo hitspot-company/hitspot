@@ -1,0 +1,365 @@
+commit ef1fbdd74d01c1b11092c1b7137d93312d95e21e
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 8 23:56:25 2024 +0200
+
+    Updated build number
+
+commit 7de8375cc112dcd6ce8cccd002761c1e96bfd2be
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 8 23:51:18 2024 +0200
+
+    Removed old spot adding cubit
+
+commit b3372df7c9722b7a75501c2d4d9b174bf0b0f0cf
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 8 17:06:59 2024 +0200
+
+    Added control buttons to HSGalleryBuilder
+
+commit 5703c69134425d36c7227e4fa6e894f2bb0966b6
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 8 17:00:06 2024 +0200
+
+    Likers page on like long press
+
+commit 7d81ff059cc2d726e9838704260159700680da6e
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 8 16:54:18 2024 +0200
+
+    Added an address getter for formatted addresses
+
+commit 79417d2f60ccd0f7acfa80deee349cf0451d556a
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 8 16:43:14 2024 +0200
+
+    Added image indicator to the image gallery
+
+commit 1f07c53c90391e6881b80ab1cf4f7cbed0a33cdc
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 8 16:24:22 2024 +0200
+
+    Zooming out on boiard map
+
+commit 64954eb68681e430cf23eb21d9327c67846a1ec7
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Oct 7 18:30:53 2024 +0200
+
+    Not moving when all visible
+
+commit 5f0a31739bf235a4abdd3cd6312040ad7fb14d81
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Oct 7 17:53:20 2024 +0200
+
+    Added follow button on user profile
+
+commit e7d98a8daa7f1411cf1d865115d10b412a0dfaf0
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Oct 7 17:39:35 2024 +0200
+
+    Single board map page
+
+commit 79a69c429e50b627b091873252de714a0c205876
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Oct 7 17:24:07 2024 +0200
+
+    Adding wrappers
+
+commit 3c230cfa68682ca80e0124b0ba95466f38521fb3
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Oct 4 14:56:05 2024 +0100
+
+    Wowrking on map wrapper
+
+commit 98951c9022d415fc39d3da21d9cccdfdc77ef9a9
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Oct 4 14:19:42 2024 +0100
+
+    Board Grid Item with max 1 line title
+
+commit aeb9e9f51a58e38816bffda1bd6a11acbeea223d
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Oct 4 13:39:32 2024 +0100
+
+    Updated image gallery, user tile and biogram
+
+commit 1492ef4cd0f9181c2110af1af8e148f6a89c826b
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Oct 4 13:20:55 2024 +0100
+
+    Change the user tile
+
+commit 5321c861f6b015a3cf9095f6824654a3fb703737
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Oct 3 19:37:59 2024 +0100
+
+    Followers and following pages, snapping map sheet
+
+commit 6a730e71673fa02805fda179a16517f3e635f434
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Oct 3 16:09:09 2024 +0100
+
+    Working on multiple users page
+
+commit 6609d51b920aae4a10509343a97ada36a2e11276
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Wed Oct 2 16:16:37 2024 +0100
+
+    Adding functions to fetch followers / likers
+
+commit 8df0dacb58dfa4ac5b51a06b2e0b931c41f41ee8
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Wed Oct 2 16:04:33 2024 +0100
+
+    Removed old user profile
+
+commit 6eb7be0a25afe8eec9a4426ebb564d4d8cf53817
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 1 17:23:31 2024 +0100
+
+    Need to use DevTools to find memory leaks and refactor the code
+
+commit 65b81415e9fb8746408150935c824dfd09b8e71b
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 1 16:47:56 2024 +0100
+
+    Updated map page
+
+commit 5ef93e900a2fa6b86ded170214b7568f910d1213
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 1 16:29:13 2024 +0100
+
+    Changed the image builder a bit
+
+commit 322d7c0e64473cb2004ef39946626a1feb8fbeb3
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 1 15:28:15 2024 +0100
+
+    Creating the gallery viewer
+
+commit 68edc14f3179fde933e648cb586ee1d9d7f8f14d
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Oct 1 15:18:40 2024 +0100
+
+    Profile stats symmetric, reimplemented settings
+
+commit 81836c1056c2633a76f1e04d7d8db115b6b62619
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Sep 30 18:02:10 2024 +0100
+
+    Updated version number
+
+commit 7be8ea3551ce109040f8118a4ccdcc7cdd7d3974
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Sep 30 17:55:59 2024 +0100
+
+    Navigating to selected spot on map, fixed user profile
+
+commit 4ebfc863c44533ef18f9271b6211a8d86bdd2553
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Sep 30 16:53:57 2024 +0100
+
+    Scrollable user profile
+
+commit 99138c8005c894af63d83a5354165be10c76c5b9
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Sep 30 16:48:49 2024 +0100
+
+    The user profile kills the out (out of memory crash)
+
+commit 4636cebaa747492441ff65a92d5e089aa31c0b92
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 17:33:32 2024 +0100
+
+    User profile to be fixed, finished map page
+
+commit 7656b4f69824e043c2ccc90c7f958fe981b50fac
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 17:04:08 2024 +0100
+
+    Added a draggable bottom sheet with spot details
+
+commit 400d08f2ae2b19d1db0e551b4732efe11de5c810
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 16:47:02 2024 +0100
+
+    Added loading indicators on buttons
+
+commit 05d89f793e3e42375de66a3f8dd295ffac0223f4
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 16:40:07 2024 +0100
+
+    Adding reactive buttons to the spot tile in clustered map
+
+commit f2c029b624cb5d68f00b6e02139cadf6d2094418
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 12:42:26 2024 +0100
+
+    Added a 'find nearby' feature to the map
+
+commit ec6ec9f0ef045276c0168e31540caf914fb9816f
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 12:26:06 2024 +0100
+
+    Added a MyLocation button
+
+commit 8e01fb50d01fd0c4cb2c128866285cdebb4921fa
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 12:14:01 2024 +0100
+
+    Filters working
+
+commit 60ffab02cdb87bbf969d9ed222eb14017f0962ff
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 12:01:45 2024 +0100
+
+    Need to implement a way to remove a tags from selected if not in visible spot
+
+commit 14e411f6d3a761ca626ef681a77f2821c1060d58
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 11:56:16 2024 +0100
+
+    Showing selected filters in popup
+
+commit 1b84a6e2d6912f753a4aabbe635cb22c1af0fd7a
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 11:53:16 2024 +0100
+
+    Added filters
+
+commit 8cf6cc018774a095845c9a3b18570a3fec4d2cc7
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Fri Sep 27 11:35:47 2024 +0100
+
+    General selected spot works
+
+commit d13bc16966480d44d0bfe00c60df9d6d6edcb613
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 23:34:11 2024 +0200
+
+    Fetching a list of tags
+
+commit cb874eb89620478f9dee0d41fae0e5cdad622e9f
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 23:32:38 2024 +0200
+
+    Working on filters & added trim to tags creation
+
+commit 179360c840c55fd52dd9cada8f30a6cde7120fdd
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 23:27:17 2024 +0200
+
+    A basic infowindow for spots
+
+commit d9ec8398ab9053692021d4a692bad587abe99c53
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 22:55:49 2024 +0200
+
+    Resizing markers works
+
+commit 53c240c7608a29901b736cdae223ae07d9813841
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 22:22:54 2024 +0200
+
+    Refactored HSAssets, working on map markers
+
+commit 7182fc0665fecf83ebb0f3150eb1a1e990ce4ce4
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 21:22:33 2024 +0200
+
+    Working on markers
+
+commit 82310e53e5cc91c4d279dcaa2d2b092cbec5d698
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 20:57:26 2024 +0200
+
+    Overriden '==' operator for HSSpot comparisons
+
+commit 76cb8a1eec10f60d423197d0fad02738ec50321a
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 18:33:14 2024 +0200
+
+    Custom markers do not work
+
+commit 3f3d78e88a261699e7d189dd6f6ed87e47f139c9
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Thu Sep 26 17:35:03 2024 +0200
+
+    Working on the map page
+
+commit 648d20753566add189328869df765682615e03a7
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Sep 24 02:22:17 2024 +0200
+
+    Working on map
+
+commit d9098624eec28333b0883a1605f31f3367e0646a
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Tue Sep 24 01:37:39 2024 +0200
+
+    Rebuilding map page
+
+commit 5f6c100962373008c08e7616bec5989ecff8040b
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Sep 23 14:39:50 2024 +0200
+
+    Changed map icons
+
+commit 6b67284402c08c9de72593045555fcad13c212df
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Mon Sep 23 14:33:40 2024 +0200
+
+    Add marker scaling and more marker assets for (restaurants, pubs, parks, etc.)
+
+commit a9bd73f0196c47c332e9a6be1793d723fe2a61d9
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 20:48:55 2024 +0200
+
+    Map zooms out to the first 20 spots
+
+commit 0133869871608dff440f48a7a18406cd0617eee6
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 19:56:25 2024 +0200
+
+    Indicator of reorderable / non-reorderable, evictFromCache working on thumbnails
+
+commit 802bd5e6b4ba1e311b676c24c9dd8e98f6f57096
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 16:47:51 2024 +0200
+
+    Hints on choosing location
+
+commit 67cd8251526c49b53306b8f44c7cab1ae4522845
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 16:45:26 2024 +0200
+
+    Updating tags
+
+commit 48d1b2d5eeae89cbe8d5beffcb7e32a9f60c825d
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 15:38:17 2024 +0200
+
+    Changing spot pictures
+
+commit 091e9d01073de70ffe267db56df8e05ce8eab03e
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 14:19:09 2024 +0200
+
+    Working on reordering files
+
+commit a8d89a2aecba0aef0d6475cb87a32fbb27d60996
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 02:53:19 2024 +0200
+
+    Duplicated categories when editing, images not changed when editing
+
+commit 564602924f2544dd8e977e0d215dd165510cbad7
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 02:49:27 2024 +0200
+
+    Added no notifications indicator
+
+commit fe37ff4fa7568daebd30545addc8ea9f65734731
+Author: Jakub Nenczak <kubanenczak@gmail.com>
+Date:   Sun Sep 22 02:48:05 2024 +0200
+
+    Creating a spot
