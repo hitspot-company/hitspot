@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hitspot/constants/constants.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,7 +26,7 @@ class HSAnnouncementDetailDialog extends StatelessWidget {
                 announcement.title!,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: appTheme.mainColor,
                     ),
               ),
               const SizedBox(height: 24),
@@ -37,7 +39,7 @@ class HSAnnouncementDetailDialog extends StatelessWidget {
                 'Message',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: appTheme.mainColor,
                     ),
               ),
               const SizedBox(height: 8),
@@ -45,9 +47,13 @@ class HSAnnouncementDetailDialog extends StatelessWidget {
               if (announcement.ctaText != null &&
                   announcement.ctaLink != null) ...[
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => _launchURL(announcement.ctaLink!),
-                  child: Text(announcement.ctaText!),
+                SizedBox(
+                  width: screenWidth,
+                  child: CupertinoButton(
+                    onPressed: () => _launchURL(announcement.ctaLink!),
+                    color: appTheme.mainColor,
+                    child: Text(announcement.ctaText!),
+                  ),
                 ),
               ],
               const SizedBox(height: 24),
