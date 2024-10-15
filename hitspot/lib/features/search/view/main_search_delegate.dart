@@ -85,7 +85,7 @@ class MainSearchDelegate extends SearchDelegate<String> {
             ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 0.0),
                 child: TabBarView(
                   physics: const NeverScrollableScrollPhysics(),
                   children: [

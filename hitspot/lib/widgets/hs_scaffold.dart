@@ -136,12 +136,12 @@ class _BottombarItem extends StatelessWidget {
         iconSize: 36.0,
         onPressed: _showCreateMenu),
     _BottombarItem(
-      iconData: FontAwesomeIcons.bell,
-      onPressed: navi.toNotifications,
-    ),
-    _BottombarItem(
       iconData: FontAwesomeIcons.bookmark,
       onPressed: () => navi.push("/saved"),
+    ),
+    _BottombarItem(
+      iconData: FontAwesomeIcons.user,
+      onPressed: navi.toCurrentUser,
     ),
   ];
 

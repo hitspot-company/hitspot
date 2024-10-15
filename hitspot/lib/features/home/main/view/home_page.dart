@@ -88,10 +88,8 @@ class HomePage extends StatelessWidget {
                               .slideX(begin: -0.2, end: 0),
                           actions: <Widget>[
                             IconButton(
-                              icon: HSUserAvatar(
-                                  radius: 20.0,
-                                  imageUrl: currentUser.avatarUrl),
-                              onPressed: navi.toCurrentUser,
+                              icon: const Icon(FontAwesomeIcons.bell),
+                              onPressed: navi.toNotifications,
                             )
                                 .animate()
                                 .fadeIn(duration: 300.ms)

@@ -62,26 +62,19 @@ class _AnimatedUsersBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Gap(16.0),
-        Expanded(
-          child: SizedBox(
-            width: screenWidth,
-            child: ListView.separated(
-              separatorBuilder: (context, index) => const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Divider(thickness: .084, color: Colors.grey),
-              ),
-              itemCount: users.length,
-              itemBuilder: (BuildContext context, int index) {
-                final user = users[index];
-                return _AnimatedUserTile(user: user, index: index);
-              },
-            ),
-          ),
+    return SizedBox(
+      width: screenWidth,
+      child: ListView.separated(
+        separatorBuilder: (context, index) => const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Divider(thickness: .084, color: Colors.grey),
         ),
-      ],
+        itemCount: users.length,
+        itemBuilder: (BuildContext context, int index) {
+          final user = users[index];
+          return _AnimatedUserTile(user: user, index: index);
+        },
+      ),
     );
   }
 }

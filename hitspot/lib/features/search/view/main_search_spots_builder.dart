@@ -63,24 +63,21 @@ class _AnimatedSpotsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.85,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-        ),
-        itemCount: spots.length,
-        itemBuilder: (BuildContext context, int index) {
-          return AnimatedSpotTile(
-            spot: spots[index],
-            index: index,
-          );
-        },
+    return GridView.builder(
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 16.0,
       ),
+      itemCount: spots.length,
+      itemBuilder: (BuildContext context, int index) {
+        return AnimatedSpotTile(
+          spot: spots[index],
+          index: index,
+        );
+      },
     );
   }
 }
