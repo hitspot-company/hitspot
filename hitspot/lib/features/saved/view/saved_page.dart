@@ -9,6 +9,7 @@ import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_search_bar.dart';
+import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
@@ -269,9 +270,9 @@ class _SearchBar extends StatelessWidget {
     final HSSavedCubit searchCubit = context.read<HSSavedCubit>();
     return Padding(
       padding: const EdgeInsets.all(12.0),
-      child: HSSearchBar(
-          initialValue: searchCubit.state.query,
-          height: 50.0,
+      child: HSTextField.filled(
+          hintText: "Search",
+          suffixIcon: const Icon(Icons.search),
           onChanged: (value) => searchCubit.updateQuery(value),
           controller: controller),
     );
