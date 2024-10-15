@@ -22,6 +22,7 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       Completer<GoogleMapController>();
   Completer<GoogleMapController> get mapController => _mapController;
   final _databaseRepository = app.databaseRepository;
+  late final CameraPosition initialCameraPosition;
 
   bool get isPageEmpty =>
       state.trendingSpots.isEmpty &&
@@ -38,6 +39,9 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     emit(state.copyWith(status: HSHomeStatus.loading));
     await fetchUpdateInfo();
     if (state.status != HSHomeStatus.updateRequired) {
+      final pos = app.connectivityBloc.state.location ?? kDefaultPosition;
+      initialCameraPosition = CameraPosition(
+          target: LatLng(pos.latitude, pos.longitude), zoom: 13.0);
       await _fetchInitial();
     }
   }

@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
+import 'package:hitspot/widgets/board/hs_board_list_tile.dart';
 import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
@@ -155,17 +156,7 @@ class _BoardsBuilder extends StatelessWidget {
         itemCount: results!.length,
         itemBuilder: (context, index) {
           final board = results![index];
-          return ListTile(
-            onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
-            leading: AspectRatio(
-                aspectRatio: 1.0,
-                child: HSImage(
-                  imageUrl: board.getThumbnail,
-                  borderRadius: BorderRadius.circular(10.0),
-                )),
-            title: Text(board.title!),
-            subtitle: Text(board.description!),
-          );
+          return HSBoardListTile(board: board);
         },
         separatorBuilder: (context, index) => const Gap(16.0),
       );

@@ -11,12 +11,14 @@ class HSModalBottomSheetItem extends StatelessWidget {
     this.height = 60.0,
     required this.title,
     this.iconData,
+    this.imageUrl,
   });
 
   final VoidCallback? onTap;
   final double borderRadius, leftPadding, height;
   final String title;
   final IconData? iconData;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +36,10 @@ class HSModalBottomSheetItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (iconData != null)
-                  Row(
-                    children: [
-                      Icon(iconData),
-                      const Gap(16.0),
-                    ],
-                  ),
+                if (iconData != null) ...[
+                  Icon(iconData),
+                  const Gap(16.0),
+                ],
                 Text(title, style: const TextStyle(fontSize: 16.0)),
               ],
             ),
