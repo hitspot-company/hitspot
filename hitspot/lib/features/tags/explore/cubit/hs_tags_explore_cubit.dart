@@ -12,20 +12,31 @@ class HSTagsExploreCubit extends Cubit<HSTagsExploreState> {
   }
 
   final String tag;
+  late final HSSpotsPage spotsPage;
 
   void initialize() async {
     try {
       emit(state.copyWith(status: HSTagsExploreStatus.loadingTopSpot));
       final HSSpot topSpot =
           await app.databaseRepository.spotFetchTopSpotWithTag(tag);
-      emit(state.copyWith(
-          status: HSTagsExploreStatus.loadingSpots, topSpot: topSpot));
-      final List<HSSpot> topSpots =
-          await app.databaseRepository.tagFetchTopSpots(tag: tag);
-      emit(state.copyWith(status: HSTagsExploreStatus.loaded, spots: topSpots));
-    } catch (_) {
-      HSDebugLogger.logError('Error fetching spot ${_.toString()}');
+      spotsPage = HSSpotsPage(fetch: _fetch);
+      emit(
+          state.copyWith(status: HSTagsExploreStatus.loaded, topSpot: topSpot));
+    } catch (e) {
+      HSDebugLogger.logError('Error fetching spot ${e.toString()}');
       emit(state.copyWith(status: HSTagsExploreStatus.error));
+    }
+  }
+
+  Future<List<HSSpot>> _fetch(int batchSize, int batchOffset) async {
+    try {
+      final List<HSSpot> spots = await app.databaseRepository.tagFetchTopSpots(
+          tag: tag, batchSize: batchSize, batchOffset: batchOffset);
+      return spots;
+    } catch (e) {
+      HSDebugLogger.logError('Error fetching spot ${e.toString()}');
+      emit(state.copyWith(status: HSTagsExploreStatus.error));
+      return [];
     }
   }
 }

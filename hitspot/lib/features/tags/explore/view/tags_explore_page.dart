@@ -21,7 +21,7 @@ class TagsExplorePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tagsExploreCubit = BlocProvider.of<HSTagsExploreCubit>(context);
+    final cubit = BlocProvider.of<HSTagsExploreCubit>(context);
     return HSScaffold(
       appBar: HSAppBar(
         enableDefaultBackButton: true,
@@ -52,9 +52,7 @@ class TagsExplorePage extends StatelessWidget {
                 .slideY(begin: 0.2, end: 0);
           }
 
-          final HSSpot topSpot = tagsExploreCubit.state.topSpot;
-          final List<HSSpot> spots = tagsExploreCubit.state.spots;
-
+          final HSSpot topSpot = cubit.state.topSpot;
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
@@ -62,8 +60,7 @@ class TagsExplorePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Gap(16.0),
-                    _AnimatedTopSpot(
-                        topSpot: topSpot, tag: tagsExploreCubit.tag),
+                    _AnimatedTopSpot(topSpot: topSpot, tag: cubit.tag),
                     const Gap(32.0),
                     const HSFormHeadline(
                       text: "Top Spots",
@@ -76,22 +73,23 @@ class TagsExplorePage extends StatelessWidget {
                   ],
                 ),
               ),
-              SliverGrid(
+              PagedSliverGrid(
+                pagingController: cubit.spotsPage.pagingController,
+                builderDelegate: PagedChildBuilderDelegate<HSSpot>(
+                  firstPageProgressIndicatorBuilder: (context) =>
+                      const HSLoadingIndicator(),
+                  newPageProgressIndicatorBuilder: (context) =>
+                      const HSLoadingIndicator(),
+                  itemBuilder: (context, spot, index) => _AnimatedSpotTile(
+                    spot: spot,
+                    index: index,
+                  ),
+                ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 16.0,
                   crossAxisSpacing: 16.0,
                   childAspectRatio: 0.8,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    final spot = spots[index];
-                    return _AnimatedSpotTile(
-                      spot: spot,
-                      index: index,
-                    );
-                  },
-                  childCount: spots.length,
                 ),
               ),
               const SliverGap(32.0),
