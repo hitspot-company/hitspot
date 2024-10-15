@@ -7,6 +7,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/notifications/cubit/hs_notifications_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
@@ -125,6 +126,8 @@ class _LoadedView extends StatelessWidget {
           PagedSliverList(
             pagingController: cubit.pagingController,
             builderDelegate: PagedChildBuilderDelegate<HSNotification>(
+                noItemsFoundIndicatorBuilder: (context) => const HSIconPrompt(
+                    message: "No notifications", iconData: Icons.notifications),
                 newPageProgressIndicatorBuilder: (context) =>
                     const HSLoadingIndicator(),
                 firstPageProgressIndicatorBuilder: (context) =>
