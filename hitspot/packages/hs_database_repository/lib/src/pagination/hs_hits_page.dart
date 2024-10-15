@@ -1,6 +1,6 @@
 import 'package:hs_database_repository/hs_database_repository.dart';
 
-enum HSHitsPageType { spots, boards, users }
+enum HSHitsPageType { spots, boards, users, notifications }
 
 class HSHitsPage<T> {
   HSHitsPage(
