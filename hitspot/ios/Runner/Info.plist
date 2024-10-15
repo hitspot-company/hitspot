@@ -80,6 +80,18 @@
 	<string>Our app requests access to your microphone to enable audio recording for voice messages, video creation, and other interactive features. This will help you communicate and create content more effectively.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Our app requires access to your photo library to enable you to upload and share your favorite photos. This will allow you to customize your profile and create posts with your own images.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app requires access to your calendar to help manage event scheduling and reminders.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This app requires access to your contacts to allow you to connect with people in your network and share locations with friends.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>This app requires access to your Apple Music library to enhance your experience with personalized music suggestions and playlists.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app requires access to motion data to track your steps and offer location-based recommendations based on your activity.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app requires access to speech recognition for hands-free controls and voice command features.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app requires access to Bluetooth to discover nearby devices and enhance user connectivity features.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
