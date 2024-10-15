@@ -1,9 +1,9 @@
 part of 'hs_saved_cubit.dart';
 
-enum HSSavedStatus { loading, fetchingMoreContent, idle, error }
+enum HSSavedStatus { loading, idle, error }
 
 final class HSSavedState extends Equatable {
-  HSSavedState(
+  const HSSavedState(
       {this.status = HSSavedStatus.loading,
       this.savedBoards = const [],
       this.savedSpots = const [],
@@ -24,7 +24,6 @@ final class HSSavedState extends Equatable {
   final List<HSBoard> searchedSavedBoardsResults;
   final List<HSSpot> searchedSavedSpotsResults;
 
-  final TextEditingController textEditingController = TextEditingController();
   final int batchOffset;
 
   @override

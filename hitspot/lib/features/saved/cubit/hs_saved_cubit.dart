@@ -12,65 +12,106 @@ part 'hs_saved_state.dart';
 class HSSavedCubit extends Cubit<HSSavedState> {
   final int batchSize = 10;
 
-  HSSavedCubit() : super(HSSavedState()) {
-    _fetch();
+  HSSavedCubit() : super(const HSSavedState()) {
+    init();
   }
+
+  final TextEditingController controller = TextEditingController();
+  Timer? _debounce;
 
   void updateStatus(HSSavedStatus status) =>
       emit(state.copyWith(status: status));
 
-  Future<void> _fetch() async {
+  void init() async {
     try {
-      final List<HSBoard> ownBoards = await app.databaseRepository
-          .boardFetchUserBoards(
-              userID: currentUser.uid!,
-              batchSize: batchSize,
-              batchOffset: state.batchOffset * batchSize,
-              useCache: state.batchOffset == 0);
+      emit(state.copyWith(status: HSSavedStatus.loading));
+      savedBoardsPage =
+          HSBoardsPage(pageSize: batchSize, fetch: _fetchSavedBoards);
+      yourBoardsPage =
+          HSBoardsPage(pageSize: batchSize, fetch: _fetchYourBoards);
+      savedSpotsPage =
+          HSSpotsPage(pageSize: batchSize, fetch: _fetchSavedSpots);
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching saved: $e");
+      emit(state.copyWith(status: HSSavedStatus.error));
+    }
+  }
+
+  late final HSBoardsPage yourBoardsPage;
+  late final HSBoardsPage savedBoardsPage;
+  late final HSSpotsPage savedSpotsPage;
+
+  Future<List<HSBoard>> _fetchSavedBoards(
+      int batchSize, int batchOffset) async {
+    try {
       final List<HSBoard> savedBoards = await app.databaseRepository
           .boardFetchSavedBoards(
               userID: currentUser.uid!,
               batchSize: batchSize,
-              batchOffset: state.batchOffset * batchSize,
-              useCache: state.batchOffset == 0);
-      final List<HSSpot> spots = await app.databaseRepository.spotFetchSaved(
-          userID: currentUser.uid!,
-          batchSize: batchSize,
-          batchOffset: state.batchOffset * batchSize,
-          useCache: state.batchOffset == 0);
-
-      if (spots.isNotEmpty || ownBoards.isNotEmpty || savedBoards.isNotEmpty) {
-        emit(state.copyWith(batchOffset: state.batchOffset + 1));
-      }
-
-      emit(state.copyWith(
-          savedBoards: [...state.savedBoards, ...savedBoards],
-          ownBoards: [...state.ownBoards, ...ownBoards],
-          savedSpots: [...state.savedSpots, ...spots]));
-
-      _search();
-
-      updateStatus(HSSavedStatus.idle);
+              batchOffset: batchOffset,
+              useCache: batchOffset == 0);
+      return savedBoards;
     } catch (e) {
-      HSDebugLogger.logError("Error fetching boards: $e");
-      updateStatus(HSSavedStatus.error);
+      HSDebugLogger.logError("Error fetching saved boards: $e");
+      return [];
     }
   }
 
-  Timer? _debounce;
+  Future<List<HSBoard>> _fetchYourBoards(int batchSize, int batchOffset) async {
+    try {
+      final List<HSBoard> yourBoards = await app.databaseRepository
+          .boardFetchUserBoards(
+              userID: currentUser.uid!,
+              batchSize: batchSize,
+              batchOffset: batchOffset,
+              useCache: batchOffset == 0);
+      return yourBoards;
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching saved boards: $e");
+      return [];
+    }
+  }
+
+  Future<List<HSSpot>> _fetchSavedSpots(int batchSize, int batchOffset) async {
+    try {
+      final List<HSSpot> savedSpots = await app.databaseRepository
+          .spotFetchSaved(
+              userID: currentUser.uid!,
+              batchSize: batchSize,
+              batchOffset: batchOffset,
+              useCache: batchOffset == 0);
+      return savedSpots;
+    } catch (e) {
+      HSDebugLogger.logError("Error fetching saved boards: $e");
+      return [];
+    }
+  }
 
   void updateQuery(String val) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 100), () async {
+    _debounce = Timer(const Duration(milliseconds: 300), () async {
+      HSDebugLogger.logInfo("Searching for $val");
       emit(state.copyWith(query: val));
       _search();
     });
   }
 
-  Future<void> fetchMoreContent() async {
-    emit(state.copyWith(status: HSSavedStatus.fetchingMoreContent));
-    await _fetch();
-    emit(state.copyWith(status: HSSavedStatus.idle));
+  void addSavedBoardToCache(HSBoard board) {
+    if (!state.savedBoards.contains(board)) {
+      emit(state.copyWith(savedBoards: [board, ...state.savedBoards]));
+    }
+  }
+
+  void addOwnBoardToCache(HSBoard board) {
+    if (!state.ownBoards.contains(board)) {
+      emit(state.copyWith(ownBoards: [board, ...state.ownBoards]));
+    }
+  }
+
+  void addSavedSpotToCache(HSSpot spot) {
+    if (!state.savedSpots.contains(spot)) {
+      emit(state.copyWith(savedSpots: [spot, ...state.savedSpots]));
+    }
   }
 
   void _search() {
@@ -147,12 +188,14 @@ class HSSavedCubit extends Cubit<HSSavedState> {
         batchOffset: 0,
       ),
     );
-    await _fetch();
   }
 
   @override
   Future<void> close() {
-    state.textEditingController.dispose();
+    controller.dispose();
+    yourBoardsPage.dispose();
+    savedBoardsPage.dispose();
+    savedSpotsPage.dispose();
     return super.close();
   }
 }
