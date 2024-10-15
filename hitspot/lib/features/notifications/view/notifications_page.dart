@@ -7,6 +7,7 @@ import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/notifications/cubit/hs_notifications_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
+import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:badges/badges.dart' as badges;
@@ -77,24 +78,9 @@ class _LoadedView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<HSNotificationsCubit>();
     final announcements = state.announcements;
-    final notifications = state.notifications;
-    final bool isEmpty = announcements.isEmpty && notifications.isEmpty;
     return CustomScrollView(
       slivers: [
-        if (isEmpty)
-          const SliverFillRemaining(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(FontAwesomeIcons.bellSlash, size: 64.0),
-                  Gap(16.0),
-                  Text("No notifications yet"),
-                ],
-              ),
-            ),
-          ),
-        if (cubit.state.announcements.isNotEmpty)
+        if (announcements.isNotEmpty)
           SliverMainAxisGroup(
             slivers: [
               SliverList(
@@ -128,19 +114,22 @@ class _LoadedView extends StatelessWidget {
               const Gap(32.0).toSliver,
             ],
           ),
-        if (cubit.state.notifications.isNotEmpty)
-          SliverMainAxisGroup(slivers: [
-            SliverList(
-              delegate: SliverChildListDelegate([
-                Text("Notifications",
-                    style: Theme.of(context).textTheme.headlineMedium),
-                const Gap(16.0),
-              ]),
-            ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final notification = state.notifications[index];
+        SliverMainAxisGroup(slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate([
+              Text("Notifications",
+                  style: Theme.of(context).textTheme.headlineMedium),
+              const Gap(16.0),
+            ]),
+          ),
+          PagedSliverList(
+            pagingController: cubit.pagingController,
+            builderDelegate: PagedChildBuilderDelegate<HSNotification>(
+                newPageProgressIndicatorBuilder: (context) =>
+                    const HSLoadingIndicator(),
+                firstPageProgressIndicatorBuilder: (context) =>
+                    const HSLoadingIndicator(),
+                itemBuilder: (context, notification, index) {
                   return ListTile(
                     contentPadding: const EdgeInsets.all(0.0),
                     onTap: () => cubit.openNotification(notification),
@@ -170,11 +159,9 @@ class _LoadedView extends StatelessWidget {
                             child: Icon(notification.icon, color: Colors.grey))
                         : Icon(notification.icon, color: Colors.grey),
                   );
-                },
-                childCount: state.notifications.length,
-              ),
-            ),
-          ]),
+                }),
+          ),
+        ]),
       ],
     );
   }

@@ -15,10 +15,15 @@ class HSNotificationsCubit extends Cubit<HSNotificationsState> {
 
   final _databaseRepository = app.databaseRepository;
 
+  // Pagination
+  late final HSNotificationsPage hitsPage;
+  PagingController<int, HSNotification> get pagingController =>
+      hitsPage.pagingController;
+
   void _init() async {
     try {
-      await _fetchNotifications();
       await _fetchAnnouncements();
+      hitsPage = HSNotificationsPage(pageSize: 10, fetch: _fetchNotifications);
       emit(state.copyWith(status: HSNotificationsStatus.loaded));
     } catch (_) {
       emit(state.copyWith(status: HSNotificationsStatus.error));
@@ -26,17 +31,16 @@ class HSNotificationsCubit extends Cubit<HSNotificationsState> {
     }
   }
 
-  Future<void> _fetchNotifications() async {
+  Future<List<HSNotification>> _fetchNotifications(
+      int batchSize, int batchOffset) async {
     try {
-      emit(state.copyWith(status: HSNotificationsStatus.loading));
-      List<HSNotification> notifications = await _databaseRepository
+      final List<HSNotification> notifications = await _databaseRepository
           .notificationReadUserNotifications(currentUser: currentUser);
-      HSDebugLogger.logSuccess("HSNotificationsCubit: Notifications fetched");
-      emit(state.copyWith(notifications: notifications));
-    } catch (_) {
+      return (notifications);
+    } catch (e) {
       emit(state.copyWith(status: HSNotificationsStatus.error));
-      HSDebugLogger.logError(
-          "HSNotificationsCubit: Error in _fetchNotifications");
+      HSDebugLogger.logError("HSNotificationsCubit: $e");
+      return [];
     }
   }
 
