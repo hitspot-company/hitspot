@@ -7,58 +7,50 @@ import 'package:hitspot/features/saved/cubit/hs_saved_cubit.dart';
 import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
+import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_search_bar.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
-import 'package:hs_debug_logger/hs_debug_logger.dart';
 
 class SavedPage extends StatelessWidget {
+  const SavedPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    HSSavedCubit savedCubit = context.read<HSSavedCubit>();
-
-    void _onScroll(ScrollNotification scrollNotification) {
-      // Check if we reached the end of any scrollable content
-      if (scrollNotification.metrics.pixels ==
-          scrollNotification.metrics.maxScrollExtent) {
-        savedCubit.fetchMoreContent();
-        HSDebugLogger.logInfo("Fetching more saved content!");
-      }
-    }
-
+    final savedCubit = context.read<HSSavedCubit>();
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Saved'),
-          bottom: const TabBar(
-            indicatorPadding: EdgeInsets.only(bottom: 6.0),
-            tabs: [
-              Tab(text: 'Your Boards'),
-              Tab(text: 'Saved Boards'),
-              Tab(text: 'Saved Spots'),
-            ],
+      child: GestureDetector(
+        onTap: HSScaffold.hideInput,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Saved'),
+            bottom: const TabBar(
+              indicatorPadding: EdgeInsets.only(bottom: 6.0),
+              tabs: [
+                Tab(text: 'Your Boards'),
+                Tab(text: 'Saved Boards'),
+                Tab(text: 'Saved Spots'),
+              ],
+            ),
           ),
-        ),
-        body: NotificationListener<ScrollNotification>(
-          onNotification: (scrollNotification) {
-            if (scrollNotification is ScrollEndNotification) {
-              _onScroll(scrollNotification);
-            }
-            return false;
-          },
-          child: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
+          body: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _OwnBoardsBuilder(
-                controller: savedCubit.state.textEditingController,
-              ),
-              _SavedBoardsBuilder(
-                controller: savedCubit.state.textEditingController,
-              ),
-              _SpotsBuilder(
-                controller: savedCubit.state.textEditingController,
+              _SearchBar(controller: savedCubit.controller),
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
+                    children: [
+                      _OwnBoardsBuilder(),
+                      _SavedBoardsBuilder(),
+                      _SpotsBuilder(),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -81,6 +73,7 @@ class _LoadingBuilder extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: type == _LoadingBuilderType.list
           ? ListView.separated(
+              shrinkWrap: true,
               itemCount: 4,
               separatorBuilder: (BuildContext context, int index) {
                 return const Gap(16.0);
@@ -90,6 +83,7 @@ class _LoadingBuilder extends StatelessWidget {
               },
             )
           : GridView.builder(
+              shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 1.0,
@@ -104,9 +98,7 @@ class _LoadingBuilder extends StatelessWidget {
 }
 
 class _SavedBoardsBuilder extends StatelessWidget {
-  const _SavedBoardsBuilder({required this.controller});
-
-  final TextEditingController controller;
+  const _SavedBoardsBuilder();
 
   @override
   Widget build(BuildContext context) {
@@ -120,41 +112,15 @@ class _SavedBoardsBuilder extends StatelessWidget {
                 current.searchedSavedBoardsResults ||
             previous.status != current.status,
         builder: (context, state) {
-          // Search bar always shown
-          return Column(
-            children: [
-              _SearchBar(controller: controller),
-              Expanded(
-                child: _buildBoardsContent(state),
-              ),
-            ],
-          );
+          return _BoardsBuilder(hitsPage: cubit.savedBoardsPage);
         },
       ),
     );
   }
-
-  Widget _buildBoardsContent(HSSavedState state) {
-    if (state.status == HSSavedStatus.loading) {
-      return const _LoadingBuilder();
-    }
-
-    if (state.savedBoards.isEmpty) {
-      return const HSIconPrompt(
-        useWithRefresh: true,
-        message: "No saved boards",
-        iconData: FontAwesomeIcons.bookmark,
-      );
-    }
-
-    return _BoardsBuilder(boards: state.searchedSavedBoardsResults);
-  }
 }
 
 class _OwnBoardsBuilder extends StatelessWidget {
-  const _OwnBoardsBuilder({required this.controller});
-
-  final TextEditingController controller;
+  const _OwnBoardsBuilder();
 
   @override
   Widget build(BuildContext context) {
@@ -164,78 +130,87 @@ class _OwnBoardsBuilder extends StatelessWidget {
       onRefresh: cubit.refresh,
       child: BlocBuilder<HSSavedCubit, HSSavedState>(
         buildWhen: (previous, current) =>
-            previous.searchedBoardsResults != current.searchedBoardsResults ||
-            previous.status != current.status,
+            previous.searchedBoardsResults != current.searchedBoardsResults,
         builder: (context, state) {
-          // Search bar always shown
-          return Column(
-            children: [
-              _SearchBar(controller: controller),
-              Expanded(
-                child: _buildBoardsContent(state),
-              ),
-            ],
-          );
+          final results = state.searchedBoardsResults;
+          return _BoardsBuilder(
+              hitsPage: cubit.yourBoardsPage, results: results);
         },
       ),
     );
   }
-
-  Widget _buildBoardsContent(HSSavedState state) {
-    if (state.status == HSSavedStatus.loading) {
-      return const _LoadingBuilder();
-    }
-
-    if (state.ownBoards.isEmpty) {
-      return const HSIconPrompt(
-        useWithRefresh: true,
-        message: "You don't have any boards",
-        iconData: FontAwesomeIcons.bookmark,
-      );
-    }
-
-    return _BoardsBuilder(boards: state.searchedBoardsResults);
-  }
 }
 
 class _BoardsBuilder extends StatelessWidget {
-  const _BoardsBuilder({
-    required this.boards,
-  });
-
-  final List<HSBoard> boards;
+  const _BoardsBuilder({required this.hitsPage, this.results});
+  final HSBoardsPage hitsPage;
+  final List<HSBoard>? results;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: ListView.separated(
-        itemCount: boards.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const Gap(16.0);
-        },
-        itemBuilder: (BuildContext context, int index) {
-          final board = boards[index];
+    final cubit = context.read<HSSavedCubit>();
+    if (results != null && results!.isNotEmpty) {
+      return ListView.separated(
+        itemCount: results!.length,
+        itemBuilder: (context, index) {
+          final board = results![index];
           return ListTile(
             onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
             leading: AspectRatio(
                 aspectRatio: 1.0,
                 child: HSImage(
-                  imageUrl: boards[index].getThumbnail,
+                  imageUrl: board.getThumbnail,
                   borderRadius: BorderRadius.circular(10.0),
                 )),
             title: Text(board.title!),
             subtitle: Text(board.description!),
           );
         },
-      ),
+        separatorBuilder: (context, index) => const Gap(16.0),
+      );
+    }
+    return PagedListView.separated(
+      pagingController: hitsPage.pagingController,
+      builderDelegate: PagedChildBuilderDelegate<HSBoard>(
+          firstPageProgressIndicatorBuilder: (context) =>
+              const HSLoadingIndicator(),
+          noItemsFoundIndicatorBuilder: (context) => HSIconPrompt(
+                message: getMessage(cubit),
+                iconData: FontAwesomeIcons.bookmark,
+              ),
+          itemBuilder: (context, board, index) {
+            if (hitsPage == cubit.savedBoardsPage) {
+              cubit.addSavedBoardToCache(board);
+            } else {
+              cubit.addOwnBoardToCache(board);
+            }
+            return ListTile(
+              onTap: () =>
+                  navi.toBoard(boardID: board.id!, title: board.title!),
+              leading: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: HSImage(
+                    imageUrl: board.getThumbnail,
+                    borderRadius: BorderRadius.circular(10.0),
+                  )),
+              title: Text(board.title!),
+              subtitle: Text(board.description!),
+            );
+          }),
+      separatorBuilder: (context, index) => const Gap(16.0),
     );
+  }
+
+  String getMessage(HSSavedCubit cubit) {
+    if (hitsPage == cubit.savedBoardsPage) {
+      return "No saved boards";
+    }
+    return "No boards";
   }
 }
 
 class _SpotsBuilder extends StatelessWidget {
-  const _SpotsBuilder({required this.controller});
-  final TextEditingController controller;
+  const _SpotsBuilder();
 
   @override
   Widget build(BuildContext context) {
@@ -245,53 +220,40 @@ class _SpotsBuilder extends StatelessWidget {
       child: BlocBuilder<HSSavedCubit, HSSavedState>(
         buildWhen: (previous, current) =>
             previous.searchedSavedSpotsResults !=
-                current.searchedSavedSpotsResults ||
-            previous.status != current.status,
+            current.searchedSavedSpotsResults,
         builder: (context, state) {
-          return Column(
-            children: [
-              _SearchBar(
-                controller: controller,
+          final results = state.searchedSavedSpotsResults;
+          final isSearching = state.query.isNotEmpty;
+          if (isSearching) {
+            return GridView.builder(
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1.0,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
               ),
-              Expanded(
-                child: _buildSpotsContent(state),
-              ),
-              if (cubit.state.status == HSSavedStatus.fetchingMoreContent)
-                const CircularProgressIndicator.adaptive(),
-            ],
+              itemBuilder: (context, index) {
+                final spot = results[index];
+                return AnimatedSpotTile(spot: spot, index: index);
+              },
+              itemCount: results.length,
+            );
+          }
+          return PagedGridView(
+            pagingController: cubit.savedSpotsPage.pagingController,
+            builderDelegate: PagedChildBuilderDelegate<HSSpot>(
+                itemBuilder: (context, spot, index) {
+              cubit.addSavedSpotToCache(spot);
+              return AnimatedSpotTile(spot: spot, index: index);
+            }),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.0,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+            ),
           );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSpotsContent(HSSavedState state) {
-    if (state.status == HSSavedStatus.loading) {
-      return const _LoadingBuilder(type: _LoadingBuilderType.grid);
-    }
-
-    if (state.searchedSavedSpotsResults.isEmpty) {
-      return const HSIconPrompt(
-        useWithRefresh: true,
-        message: "No saved spots",
-        iconData: FontAwesomeIcons.bookmark,
-      );
-    }
-
-    final spots = state.searchedSavedSpotsResults;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.0,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-        ),
-        itemCount: spots.length,
-        itemBuilder: (BuildContext context, int index) {
-          final spot = spots[index];
-          return AnimatedSpotTile(spot: spot, index: index);
         },
       ),
     );
@@ -305,7 +267,6 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HSSavedCubit searchCubit = context.read<HSSavedCubit>();
-
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: HSSearchBar(

@@ -2,7 +2,7 @@ import 'package:hs_database_repository/hs_database_repository.dart';
 
 enum HSHitsPageType { spots, boards, users }
 
-class HSHitsPage {
+class HSHitsPage<T> {
   HSHitsPage(
       {this.pageSize = 20,
       required this.fetch,
@@ -11,13 +11,14 @@ class HSHitsPage {
       _fetchPage(pageKey);
     });
   }
+
   final int pageSize;
-  final Future<List<dynamic>> Function(int batchSize, int batchOffset) fetch;
-  final PagingController<int, dynamic> _pagingController =
+  final Future<List<T>> Function(int batchSize, int batchOffset) fetch;
+  final PagingController<int, T> _pagingController =
       PagingController(firstPageKey: 0);
   final HSHitsPageType type;
 
-  PagingController<int, dynamic> get pagingController => _pagingController;
+  PagingController<int, T> get pagingController => _pagingController;
 
   Future<void> _fetchPage(int pageKey) async {
     try {

@@ -19,6 +19,7 @@ class HSIconPrompt extends StatelessWidget {
     final content = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             iconData,
