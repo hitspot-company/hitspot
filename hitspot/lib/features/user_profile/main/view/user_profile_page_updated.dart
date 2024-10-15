@@ -104,16 +104,40 @@ class UserProfilePageUpdated extends StatelessWidget {
                             selector: (state) => state.isFollowed,
                             builder: (context, isFollowed) {
                               if (isFollowed) {
-                                return CupertinoButton(
+                                return OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    backgroundColor: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    side: BorderSide(
+                                        color: appTheme.mainColor, width: 2.0),
+                                  ),
                                   onPressed: cubit.followUnfollow,
-                                  color: Theme.of(context).highlightColor,
-                                  child: const Text("Following"),
+                                  child: Text(
+                                    "Following",
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
                                 );
                               }
-                              return CupertinoButton(
+                              return OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  backgroundColor: appTheme.mainColor,
+                                  side: BorderSide(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor),
+                                ),
                                 onPressed: cubit.followUnfollow,
-                                color: appTheme.mainColor,
-                                child: const Text("Follow"),
+                                child: Text(
+                                  "Follow",
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
                               );
                             },
                           ).toSliver),

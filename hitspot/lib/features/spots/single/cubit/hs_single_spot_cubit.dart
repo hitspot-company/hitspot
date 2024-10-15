@@ -111,13 +111,13 @@ class HSSingleSpotCubit extends Cubit<HSSingleSpotState> {
       if (result) {
         app.showToast(
             toastType: HSToastType.success,
-            title: "Spot added.",
+            title: "Success.",
             description: "Spot added to board ${board.title}");
       } else {
         app.showToast(
             toastType: HSToastType.error,
             title: "Error",
-            description: "Board ${board.title} already contains this spot!");
+            description: "The board already contains this spot!");
       }
       navi.pop();
     } catch (_) {

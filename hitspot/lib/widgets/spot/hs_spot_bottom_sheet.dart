@@ -3,7 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/images/view/create_spot_images_provider.dart';
-import 'package:hitspot/widgets/auth/hs_text_prompt.dart';
+import 'package:hitspot/widgets/board/hs_board_list_tile.dart';
+import 'package:hitspot/widgets/hs_button.dart';
 import 'package:hitspot/widgets/hs_modal_bottom_sheet_item.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -81,26 +82,25 @@ class HSSpotAddToBoardSheet extends StatelessWidget {
         child: Column(
           children: [
             const Gap(16.0),
-            Text(
-              "Choose a board",
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const Gap(16.0),
-            if (boards.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: HSTextPrompt(
-                  prompt: "You don't have any boards yet.",
-                  pressableText: "\nCreate",
-                  promptColor: appTheme.mainColor,
-                  onTap: navi.toCreateBoard,
+            SizedBox(
+              width: screenWidth - 16.0,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  onPressed: navi.pop,
+                  icon: const Icon(FontAwesomeIcons.x),
                 ),
               ),
+            ),
             ...boards.map(
-              (e) => HSModalBottomSheetItem(
-                title: e.title!,
-                onTap: () => addToBoard(e),
-              ),
+                (board) => HSBoardListTile(board: board, onTap: addToBoard)),
+            const Gap(8.0),
+            SizedBox(
+              width: screenWidth - 32.0,
+              child: HSButton.icon(
+                  label: const Text("New board"),
+                  icon: const Icon(Icons.add),
+                  onPressed: navi.toCreateBoard),
             ),
             const Gap(32.0),
           ],

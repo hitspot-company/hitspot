@@ -13,6 +13,7 @@ import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
 import 'package:hitspot/features/spots/create/form/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/spots/create/location/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
+import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
@@ -88,10 +89,8 @@ class HomePage extends StatelessWidget {
                               .slideX(begin: -0.2, end: 0),
                           actions: <Widget>[
                             IconButton(
-                              icon: HSUserAvatar(
-                                  radius: 20.0,
-                                  imageUrl: currentUser.avatarUrl),
-                              onPressed: navi.toCurrentUser,
+                              icon: const Icon(FontAwesomeIcons.bell),
+                              onPressed: navi.toNotifications,
                             )
                                 .animate()
                                 .fadeIn(duration: 300.ms)
@@ -122,42 +121,19 @@ class HomePage extends StatelessWidget {
                   child: SizedBox(
                     height: 200,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16.0),
-                      child: BlocSelector<HSConnectivityLocationBloc,
-                          HSConnectivityLocationState, Position?>(
-                        selector: (state) => state.location,
-                        builder: (context, currentPosition) {
-                          if (currentPosition != null) {
-                            homeCubit.animateCameraToNewLatLng(
-                                currentPosition.toLatLng);
-                          }
-                          if (isLoading) {
-                            return HSShimmerBox(
-                                width: screenWidth, height: 240.0);
-                          }
-                          return GestureDetector(
-                            onTap: () => navi.pushTransition(
-                                PageTransitionType.fade,
-                                const ClusterMapProvider()),
-                            child: AbsorbPointer(
-                              absorbing: true,
-                              child: HSGoogleMap(
-                                initialCameraPosition: CameraPosition(
-                                  target: currentPosition?.toLatLng ??
-                                      const LatLng(0, 0),
-                                  zoom: 14.0,
-                                ),
-                                onMapCreated: (GoogleMapController controller) {
-                                  if (!mapController.isCompleted) {
-                                    mapController.complete(controller);
-                                  }
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: isLoading
+                            ? HSShimmerBox(width: screenWidth, height: 120)
+                            : GoogleMap(
+                                onTap: (argument) => navi.toSpotsMap(),
+                                style:
+                                    context.read<HSThemeBloc>().state.mapStyle,
+                                myLocationButtonEnabled: false,
+                                initialCameraPosition:
+                                    homeCubit.initialCameraPosition,
+                              )
+                        // ),
+                        ),
                   )
                       .animate()
                       .fadeIn(duration: 600.ms)

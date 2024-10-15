@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/user_profile/multiple/cubit/hs_user_profile_multiple_cubit.dart';
 import 'package:hitspot/widgets/hs_appbar.dart';
@@ -55,25 +56,33 @@ class _Builder extends StatelessWidget {
         if (state.status == HSUserProfileMultipleStatus.loading) {
           return const HSLoadingIndicator();
         }
-        return PagedListView.separated(
-          pagingController: cubit.pagingController,
-          builderDelegate: PagedChildBuilderDelegate<dynamic>(
-            newPageProgressIndicatorBuilder: (context) =>
-                const HSLoadingIndicator(),
-            firstPageProgressIndicatorBuilder: (context) =>
-                const HSLoadingIndicator(),
-            itemBuilder: (context, item, index) {
-              final user = item as HSUser;
-              return InkWell(
-                onTap: () => navi.toUser(userID: user.uid!),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: HSUserTile(user: user),
+        return Column(
+          children: [
+            Expanded(
+              child: PagedListView.separated(
+                pagingController: cubit.pagingController,
+                builderDelegate: PagedChildBuilderDelegate<dynamic>(
+                  newPageProgressIndicatorBuilder: (context) =>
+                      const HSLoadingIndicator(),
+                  firstPageProgressIndicatorBuilder: (context) =>
+                      const HSLoadingIndicator(),
+                  itemBuilder: (context, item, index) {
+                    final user = item as HSUser;
+                    return InkWell(
+                      onTap: () => navi.toUser(userID: user.uid!),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: HSUserTile(user: user),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-          separatorBuilder: (context, index) => const Divider(thickness: .2),
+                separatorBuilder: (context, index) =>
+                    const Divider(thickness: .2),
+              ),
+            ),
+            const Gap(32.0),
+          ],
         );
       },
     );
