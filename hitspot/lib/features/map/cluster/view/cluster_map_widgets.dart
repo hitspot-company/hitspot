@@ -248,10 +248,12 @@ class _SpotDetails extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                HSUserTile(user: spot.author!),
-                const Spacer(),
+                Expanded(
+                    child: HSUserTileUp(
+                        onTap: () => navi.toUser(userID: spot.createdBy!),
+                        user: spot.author!)),
                 HSButton.icon(
-                  label: const Text("Show on map"),
+                  label: const Text("Show on Map"),
                   icon: const Icon(FontAwesomeIcons.mapPin),
                   onPressed: cubit.showSpotOnMap,
                 ),

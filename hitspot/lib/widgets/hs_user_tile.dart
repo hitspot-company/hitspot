@@ -25,7 +25,7 @@ class HSUserTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
-      width: 100,
+      // width: 100,
       child: CachedNetworkImage(
           imageUrl: user.avatarUrl ?? "",
           errorWidget: (context, url, error) => _MainTile(

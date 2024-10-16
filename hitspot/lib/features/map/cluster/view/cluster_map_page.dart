@@ -11,7 +11,7 @@ import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_spot_tile.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
-import 'package:hitspot/widgets/hs_user_tile.dart';
+import 'package:hitspot/widgets/user/hs_user_widgets.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
 
