@@ -117,6 +117,13 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  /// Sets the initial camera position for the map.
+  ///
+  /// If the provided [initialCameraPosition] is `null`, it defaults to
+  /// [kDefaultCameraPosition]. Otherwise, it sets the initial camera
+  /// position to the provided value.
+  ///
+  /// - Parameter [initialCameraPosition]: The initial position of the camera.
   void setInitialCameraPosition(CameraPosition? initialCameraPosition) {
     if (initialCameraPosition == null) {
       this.initialCameraPosition = kDefaultCameraPosition;
@@ -125,6 +132,15 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  /// Sets the callback function to be executed when a marker is tapped on the map.
+  ///
+  /// If the provided [onMarkerTapped] callback is `null`, a default callback is used
+  /// which logs an info message and sets the selected spot.
+  ///
+  /// The [onMarkerTapped] callback takes an [HSSpot] as a parameter.
+  ///
+  /// - [onMarkerTapped]: The callback function to be executed when a marker is tapped.
+  ///   If `null`, a default callback is used.
   void setOnMarkerTapped(void Function(HSSpot)? onMarkerTapped) {
     if (onMarkerTapped == null) {
       HSDebugLogger.logError("onMarkerTapped is null");
@@ -137,6 +153,11 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  /// Called when the map is created. If the current state status is `initial`,
+  /// it assigns the provided [controller] to the [mapController] and updates
+  /// the state status to `initialised`.
+  ///
+  /// [controller] - The GoogleMapController instance created for the map.
   void onMapCreated(GoogleMapController controller) {
     if (state.status == HSMapWrapperStatus.initial) {
       mapController = controller;
@@ -144,6 +165,13 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  /// Updates the marker level based on the current camera position's zoom level.
+  ///
+  /// This method first checks if the initialization is complete. It then retrieves
+  /// the current camera position and calculates the appropriate marker level using
+  /// the zoom level. If the new marker level is different from the current one in
+  /// the state, it emits a new state with the updated marker level and calls
+  /// `updateMarkers` to refresh the markers.
   void updateMarkerLevel() {
     _initCheck();
     final position = state.cameraPosition;
@@ -154,9 +182,16 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  /// Updates the markers on the map based on the provided list of spots or the current visible spots in the state.
+  ///
+  /// If no list of spots is provided, the method uses the `visibleSpots` from the current state.
+  /// The method filters the spots based on the current filters in the state and creates a set of markers.
+  /// Each marker is created with a unique ID, position, icon, and an onTap callback.
+  /// Finally, the method emits a new state with the updated set of markers.
+  ///
+  /// [spots] - An optional list of [HSSpot] objects to update the markers with.
   void updateMarkers([List<HSSpot>? spots]) {
     _initCheck();
-    // if (spots != null && spots == state.visibleSpots) return;
     spots ??= state.visibleSpots;
     final markers = spots.where((spot) {
       if (state.filters.isEmpty) return true;
