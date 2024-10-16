@@ -7,9 +7,6 @@ import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'dart:math' as math;
-
-import 'package:pair/pair.dart';
 
 part 'hs_map_wrapper_state.dart';
 
@@ -20,7 +17,6 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   late final void Function(CameraPosition)? onCameraMove;
   final _locationRepository = app.locationRepository;
   late final CameraPosition initialCameraPosition;
-  final _databaseRepository = app.databaseRepository;
 
   CameraPosition get cameraPosition {
     _initCheck();
@@ -69,12 +65,30 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  /// Updates the visible spots on the map.
+  ///
+  /// This method compares the provided list of spots with the current list of
+  /// visible spots. If they are different, it updates the state with the new
+  /// list of visible spots.
+  ///
+  /// [spots] - A list of [HSSpot] objects representing the spots to be made
+  /// visible on the map. If the provided list is the same as the current list
+  /// of visible spots, no update will be made.
   void setVisibleSpots(List<HSSpot>? spots) async {
     final currentSpots = state.visibleSpots;
     if (currentSpots == spots) return;
     emit(state.copyWith(visibleSpots: spots));
   }
 
+  /// Sets the callback function to be executed when the camera moves.
+  ///
+  /// If the provided [onCameraMove] callback is `null`, a default callback is set
+  /// which logs an error message and updates the camera position in the state.
+  ///
+  /// If a non-null [onCameraMove] callback is provided, it will be executed along
+  /// with updating the camera position in the state and calling `updateMarkerLevel()`.
+  ///
+  /// [onCameraMove] - A callback function that takes a [CameraPosition] as a parameter.
   void setOnCameraMove(void Function(CameraPosition)? onCameraMove) {
     if (onCameraMove == null) {
       HSDebugLogger.logError("onCameraMove is null");
@@ -82,7 +96,11 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
         emit(state.copyWith(cameraPosition: position));
       };
     } else {
-      this.onCameraMove = onCameraMove;
+      this.onCameraMove = (CameraPosition pos) {
+        onCameraMove(pos);
+        emit(state.copyWith(cameraPosition: pos));
+        updateMarkerLevel();
+      };
     }
   }
 
@@ -132,12 +150,13 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
     if (markerLevel != state.markerLevel) {
       emit(state.copyWith(markerLevel: markerLevel));
+      updateMarkers();
     }
   }
 
   void updateMarkers([List<HSSpot>? spots]) {
     _initCheck();
-    if (spots == state.visibleSpots) return;
+    // if (spots != null && spots == state.visibleSpots) return;
     spots ??= state.visibleSpots;
     final markers = spots.where((spot) {
       if (state.filters.isEmpty) return true;
@@ -164,12 +183,7 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
       HSDebugLogger.logError("onCameraIdle is null");
       this.onCameraIdle = () {
         HSDebugLogger.logInfo("Using default onCameraIdle");
-        final position = state.cameraPosition;
-        final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
-        if (markerLevel != state.markerLevel) {
-          emit(state.copyWith(markerLevel: markerLevel));
-          updateMarkers();
-        }
+        updateMarkers();
       };
     } else {
       this.onCameraIdle = onCameraIdle;
@@ -208,16 +222,6 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
       HSDebugLogger.logError("Error zooming in to marker: $e");
     }
   }
-
-  // Future<void> zoomOut({bool force = false}) async {
-  //   _initCheck();
-  //   try {
-  //     await _locationRepository.zoomToFitSpots(
-  //         state.visibleSpots, mapController);
-  //   } catch (e) {
-  //     HSDebugLogger.logError("Error zooming out: $e");
-  //   }
-  // }
 
   Future<void> animateToCurrentPosition() async {
     try {
