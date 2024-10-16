@@ -5,26 +5,44 @@ import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'dart:math' as math;
+
+import 'package:pair/pair.dart';
 
 part 'hs_map_wrapper_state.dart';
 
 class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   late final GoogleMapController mapController;
   late final void Function(HSSpot)? onMarkerTapped;
+  late final void Function()? onCameraIdle;
   final _locationRepository = app.locationRepository;
   late final CameraPosition initialCameraPosition;
+  final _databaseRepository = app.databaseRepository;
 
   HSMapWrapperCubit() : super(const HSMapWrapperState());
+
+  // void init({
+  //   void Function(HSSpot)? onMarkerTapped,
+  //   void Function()? onCameraIdle,
+  //   List<HSSpot> visibleSpots = const [],
+  //   CameraPosition? initialCameraPosition,
+  // }) {
+  //   setOnMarkerTapped(onMarkerTapped);
+  //   setOnCameraIdle(onCameraIdle);
+  //   setVisibleSpots(visibleSpots);
+  //   if (initialCameraPosition != null) {
+  //     setInitialCameraPosition(initialCameraPosition);
+  //   }
+  // }
 
   void setVisibleSpots(List<HSSpot> spots) async {
     final currentSpots = state.visibleSpots;
     if (currentSpots == spots) return;
     // final freshCached =
     //     spots.where((e) => !state.cachedSpots.contains(e)).toList();
-    emit(state.copyWith(
-      visibleSpots: spots,
-      // cachedSpots: [...state.cachedSpots, ...freshCached]
-    ));
+    emit(state.copyWith(visibleSpots: spots
+        // cachedSpots: [...state.cachedSpots, ...freshCached]
+        ));
   }
 
   void setInitialCameraPosition(CameraPosition initialCameraPosition) {
@@ -32,7 +50,15 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   }
 
   void setOnMarkerTapped(void Function(HSSpot)? onMarkerTapped) {
-    this.onMarkerTapped = onMarkerTapped;
+    if (onMarkerTapped == null) {
+      HSDebugLogger.logError("onMarkerTapped is null");
+      this.onMarkerTapped = (spot) {
+        HSDebugLogger.logInfo("Using default onMarkerTapped");
+        setSelectedSpot(spot);
+      };
+    } else {
+      this.onMarkerTapped = onMarkerTapped;
+    }
   }
 
   void onMapCreated(GoogleMapController controller) {
@@ -43,6 +69,7 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   }
 
   void updateMarkers([List<HSSpot>? spots]) {
+    if (spots == state.visibleSpots) return;
     spots ??= state.visibleSpots;
     final markers = spots.where((spot) {
       if (state.filters.isEmpty) return true;
@@ -60,16 +87,24 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     emit(state.copyWith(markers: markers));
   }
 
-  void setSelectedSpot(HSSpot spot) {
+  void setSelectedSpot(HSSpot? spot) {
     emit(state.copyWith(selectedSpot: spot));
   }
 
-  void onCameraIdle() {
-    final position = state.cameraPosition;
-    final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
-    if (markerLevel != state.markerLevel) {
-      emit(state.copyWith(markerLevel: markerLevel));
-      updateMarkers();
+  void setOnCameraIdle(void Function()? onCameraIdle) {
+    if (onCameraIdle == null) {
+      HSDebugLogger.logError("onCameraIdle is null");
+      this.onCameraIdle = () {
+        HSDebugLogger.logInfo("Using default onCameraIdle");
+        final position = state.cameraPosition;
+        final markerLevel = HSSpotMarker.getMarkerLevel(position.zoom);
+        if (markerLevel != state.markerLevel) {
+          emit(state.copyWith(markerLevel: markerLevel));
+          updateMarkers();
+        }
+      };
+    } else {
+      this.onCameraIdle = onCameraIdle;
     }
   }
 
@@ -116,11 +151,44 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  Future<Pair<CameraPosition, List<HSSpot>>?> getInitialCameraPositionAndSpots(
+      Position currentPosition) async {
+    try {
+      final spots = await _databaseRepository.spotFetchClosest(
+          lat: currentPosition.latitude, long: currentPosition.longitude);
+
+      const padding = 0.1;
+      final latlngs =
+          spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+      final bounds = _locationRepository.getLatLngBounds(latlngs);
+      final center = LatLng(
+        (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+        (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+      );
+
+      final latDelta = bounds.northeast.latitude - bounds.southwest.latitude;
+      final lngDelta = bounds.northeast.longitude - bounds.southwest.longitude;
+
+      final maxDelta = latDelta > lngDelta ? latDelta : lngDelta;
+      final zoom = math.log(360 / (maxDelta + padding)) / math.ln2;
+
+      final cameraPosition = CameraPosition(
+        target: center,
+        zoom: zoom,
+      );
+      return Pair(cameraPosition, spots);
+    } catch (e) {
+      HSDebugLogger.logError("Error getting initial camera position: $e");
+      return null;
+    }
+  }
+
   @override
   Future<void> close() {
     if (state.status == HSMapWrapperStatus.initialised) {
       mapController.dispose();
     }
+    HSDebugLogger.logInfo('HSMapWrapperCubit closed');
     return super.close();
   }
 

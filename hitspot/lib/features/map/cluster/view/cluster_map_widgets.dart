@@ -66,7 +66,7 @@ class _SpotList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.watch<HsClusterMapCubit>();
-    return BlocSelector<HsClusterMapCubit, HsClusterMapState, List<HSSpot>>(
+    return BlocSelector<HSMapWrapperCubit, HSMapWrapperState, List<HSSpot>>(
       selector: (state) => state.visibleSpots,
       builder: (context, spots) {
         if (cubit.state.isSpotSelected) {
@@ -203,13 +203,16 @@ class _SpotInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<HsClusterMapCubit, HsClusterMapState, bool>(
-      selector: (state) => state.isSpotSelected,
-      builder: (context, isSpotSelected) {
+    return BlocBuilder<HSMapWrapperCubit, HSMapWrapperState>(
+      buildWhen: (previous, current) =>
+          previous.selectedSpot != current.selectedSpot ||
+          previous.isSpotSelected != current.isSpotSelected,
+      builder: (context, state) {
+        final isSpotSelected = state.isSpotSelected;
+        final spot = state.selectedSpot;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
-          child:
-              isSpotSelected ? const _SpotDetails() : const SizedBox.shrink(),
+          child: isSpotSelected ? _SpotDetails(spot) : const SizedBox.shrink(),
         );
       },
     );
@@ -217,12 +220,13 @@ class _SpotInfo extends StatelessWidget {
 }
 
 class _SpotDetails extends StatelessWidget {
-  const _SpotDetails();
+  const _SpotDetails(this.spot);
+
+  final HSSpot spot;
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<HsClusterMapCubit>();
-    final spot = cubit.state.selectedSpot;
     return InkWell(
       onTap: () => navi.toSpot(sid: spot.sid!),
       child: Padding(
@@ -255,7 +259,7 @@ class _SpotDetails extends StatelessWidget {
                 HSButton.icon(
                   label: const Text("Show on Map"),
                   icon: const Icon(FontAwesomeIcons.mapPin),
-                  onPressed: cubit.showSpotOnMap,
+                  // onPressed: cubit.showSpotOnMap,
                 ),
               ],
             ),

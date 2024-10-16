@@ -11,7 +11,6 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/src/models/hs_place_details.dart';
 import 'package:hs_location_repository/src/models/hs_prediction.dart';
 import 'package:map_launcher/map_launcher.dart' as ml;
-import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 enum HSSpotMarkerType { verified, unverified, selected }

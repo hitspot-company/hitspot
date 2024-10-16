@@ -112,9 +112,9 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     pageController.dispose();
-    mapWrapper.close();
+    await mapWrapper.close();
     return super.close();
   }
 }
