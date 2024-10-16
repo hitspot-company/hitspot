@@ -29,6 +29,7 @@ final class HSMapWrapperState extends Equatable {
     this.filters = const [],
     this.savedSpots = const [],
     this.mapType = MapType.normal,
+    this.isInitialised = false,
   });
 
   final HSMapWrapperStatus status;
@@ -40,6 +41,7 @@ final class HSMapWrapperState extends Equatable {
   final List<String> filters;
   final List<HSSpot> savedSpots;
   final MapType mapType;
+  final bool isInitialised;
 
   bool get isSpotSelected => selectedSpot.sid != null;
   bool get isSaving => status == HSMapWrapperStatus.saving;
@@ -59,7 +61,8 @@ final class HSMapWrapperState extends Equatable {
         selectedSpot,
         filters,
         savedSpots,
-        mapType
+        mapType,
+        isInitialised
       ];
 
   HSMapWrapperState copyWith({
@@ -73,6 +76,7 @@ final class HSMapWrapperState extends Equatable {
     List<String>? filters,
     List<HSSpot>? savedSpots,
     MapType? mapType,
+    bool? isInitialised,
   }) {
     final HSSpot? selSpot;
     if (selectedSpot != null) {
@@ -91,6 +95,7 @@ final class HSMapWrapperState extends Equatable {
       filters: filters ?? this.filters,
       savedSpots: savedSpots ?? this.savedSpots,
       mapType: mapType ?? this.mapType,
+      isInitialised: isInitialised ?? this.isInitialised,
     );
   }
 }

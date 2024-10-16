@@ -46,7 +46,7 @@ class ClusterMapPage extends StatelessWidget {
                     fortyFiveDegreeImageryEnabled: true,
                     style: context.read<HSThemeBloc>().state.mapStyle,
                     initialCameraPosition:
-                        mapWrapperCubit.initialCameraPosition,
+                        mapWrapperCubit.getInitialCameraPosition,
                     myLocationButtonEnabled: false,
                     myLocationEnabled: true,
                     mapType: state.mapType,

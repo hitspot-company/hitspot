@@ -182,14 +182,14 @@ class _ActionButtons extends StatelessWidget {
             child: _MapButton(
               icon: FontAwesomeIcons.locationCrosshairs,
               text: 'My Location',
-              onPressed: cubit.animateToCurrentLocation,
+              onPressed: cubit.mapWrapper.animateToCurrentPosition,
             ),
           ),
           Expanded(
             child: _MapButton(
               icon: FontAwesomeIcons.sliders,
               text: 'Filter',
-              onPressed: () => cubit.showFilters(context),
+              onPressed: () => cubit.mapWrapper.showFilters(context),
             ),
           ),
         ],

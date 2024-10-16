@@ -32,9 +32,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   final _databaseRepository = app.databaseRepository;
   final _locationRepository = app.locationRepository;
-  late final Position? _currentPosition;
-  final Completer<GoogleMapController> mapController =
-      Completer<GoogleMapController>();
   final DraggableScrollableController scrollController =
       DraggableScrollableController();
   bool get isSheetExpanded => scrollController.size == SHEET_MAX_SIZE;
@@ -46,9 +43,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   void _init() async {
     try {
       emit(state.copyWith(status: HSClusterMapStatus.loading));
-      await _setCameraPositionAndVisibleSpots();
-      mapWrapper.setOnMarkerTapped(_onMarkerTapped);
-      mapWrapper.setOnCameraIdle(_onCameraIdle);
+      await _initMapWrapper();
       final savedSpots = await _databaseRepository.spotFetchSaved(
           userID: app.currentUser.uid!);
       emit(state.copyWith(savedSpots: savedSpots));
@@ -59,60 +54,34 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     }
   }
 
-  Future<void> _setCameraPositionAndVisibleSpots() async {
-    _currentPosition = await _getPosition();
-    if (_currentPosition == null) return;
-    final Pair<CameraPosition, List<HSSpot>>? initialCameraPositionAndSpots =
-        await mapWrapper.getInitialCameraPositionAndSpots(_currentPosition);
-    if (initialCameraPositionAndSpots == null) return;
-    mapWrapper.setInitialCameraPosition(initialCameraPositionAndSpots.key);
-    mapWrapper.setVisibleSpots(initialCameraPositionAndSpots.value);
+  Future<void> _initMapWrapper() async {
+    final currentPosition = await _getPosition();
+    final initialCameraPositionAndSpots = await _locationRepository
+        .getInitialCameraPositionAndSpots(currentPosition);
+    mapWrapper.init(
+      onMarkerTapped: _onMarkerTapped,
+      onCameraIdle: _onCameraIdle,
+      onCameraMove: _onCameraMove,
+      visibleSpots: initialCameraPositionAndSpots?.value,
+      initialCameraPosition: initialCameraPositionAndSpots?.key,
+    );
   }
 
-  // void _init() async {
-  //   try {
-  //     emit(state.copyWith(status: HSSingleBoardMapStatus.loading));
-  //     final spots =
-  //         await _databaseRepository.boardFetchBoardSpots(boardID: boardID);
-  //     mapWrapper.setOnMarkerTapped(_onMarkerTapped);
-  //     mapWrapper.setVisibleSpots(spots);
-  //     mapWrapper.updateMarkers(spots);
-  //     mapWrapper.setInitialCameraPosition(getInitialCameraPosition(spots));
-  //     pageController.addListener(_pageListener);
-  //     emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
-  //   } catch (e) {
-  //     HSDebugLogger.logError("Error initializing board map: $e");
-  //     emit(state.copyWith(status: HSSingleBoardMapStatus.error));
-  //   }
-  // }
+  Timer? _timer;
 
   void _onCameraIdle() async {
-    final center = await mapWrapper.mapController.getVisibleRegion();
-    final spots = await _databaseRepository.spotFetchInBounds(
-      minLat: center.southwest.latitude,
-      minLong: center.southwest.longitude,
-      maxLat: center.northeast.latitude,
-      maxLong: center.northeast.longitude,
-    );
-    mapWrapper.setVisibleSpots(spots);
-    mapWrapper.updateMarkers();
-  }
-
-  void _placeMarkers() {
-    final markers = state.visibleSpots.where((spot) {
-      if (state.filters.isEmpty) return true;
-      return spot.tags?.any((tag) => state.filters.contains(tag)) ?? false;
-    }).map((e) {
-      final markerIcon = app.assets.getMarkerIcon(e,
-          level: state.markerLevel, isSelected: state.selectedSpot == e);
-      return Marker(
-        markerId: MarkerId(e.sid!),
-        position: LatLng(e.latitude!, e.longitude!),
-        icon: markerIcon,
-        onTap: () => _onMarkerTapped(e),
+    _timer?.cancel();
+    _timer = Timer(const Duration(milliseconds: 300), () async {
+      final center = await mapWrapper.mapController.getVisibleRegion();
+      final spots = await _databaseRepository.spotFetchInBounds(
+        minLat: center.southwest.latitude,
+        minLong: center.southwest.longitude,
+        maxLat: center.northeast.latitude,
+        maxLong: center.northeast.longitude,
       );
-    }).toSet();
-    emit(state.copyWith(markers: markers));
+      mapWrapper.setVisibleSpots(spots);
+      mapWrapper.updateMarkers();
+    });
   }
 
   void _onMarkerTapped(HSSpot spot) async {
@@ -128,6 +97,11 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
         duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
+  void _onCameraMove(CameraPosition position) {
+    if (isSheetExpanded) closeSheet();
+    _timer?.cancel();
+  }
+
   void resetSelectedSpot() {
     mapWrapper.setSelectedSpot(null);
   }
@@ -141,13 +115,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     }
   }
 
-  List<String> fetchFilters() {
-    final tags =
-        state.visibleSpots.expand((spot) => spot.tags ?? []).toSet().toList();
-    tags.sort();
-    return tags.cast<String>();
-  }
-
   Future<void> fetchSearch(BuildContext context) async {
     try {
       final HSPrediction? result = await showSearch(
@@ -159,30 +126,11 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
             .fetchPlaceDetails(placeID: result.placeID);
         closeSheet();
         HSScaffold.hideInput();
-        await _locationRepository.animateCameraToNewLatLng(mapController,
+        await mapWrapper.moveCamera(
             LatLng(placeDetails.latitude, placeDetails.longitude), 13.0);
       }
     } catch (e) {
       HSDebugLogger.logError(e.toString());
-    }
-  }
-
-  void showFilters(BuildContext context) async {
-    List<String> filterOptions = fetchFilters();
-
-    final List<String>? result = await showDialog<List<String>>(
-      context: context,
-      builder: (BuildContext context) {
-        return HSFilterPopup(
-            filterOptions: filterOptions, selected: state.filters);
-      },
-    );
-
-    if (result != null) {
-      emit(state.copyWith(status: HSClusterMapStatus.refreshing));
-      emit(state.copyWith(filters: result));
-      _placeMarkers();
-      emit(state.copyWith(status: HSClusterMapStatus.loaded));
     }
   }
 
@@ -197,35 +145,6 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
             ? MapType.satellite
             : MapType.normal));
     emit(state.copyWith(status: HSClusterMapStatus.loaded));
-  }
-
-  void findNearby() async {
-    try {
-      closeSheet();
-      emit(state.copyWith(status: HSClusterMapStatus.nearby));
-      final latlng = state.cameraPosition.target;
-      final nearbySpots = await _databaseRepository.spotFetchClosest(
-          lat: latlng.latitude, long: latlng.longitude);
-      if (nearbySpots.isNotEmpty) {
-        emit(state.copyWith(visibleSpots: nearbySpots));
-        await _locationRepository.zoomToFitSpots(
-            nearbySpots, await mapController.future,
-            padding: .3);
-        _placeMarkers();
-      }
-      emit(state.copyWith(status: HSClusterMapStatus.loaded));
-    } catch (e) {
-      HSDebugLogger.logError("Failed to get nearby spots: $e");
-    }
-  }
-
-  Future<void> animateToCurrentLocation() async {
-    try {
-      final currentPosition = await _getPosition();
-      _locationRepository.resetPosition(mapController, currentPosition);
-    } catch (e) {
-      HSDebugLogger.logError("Failed to animate to current location: $e");
-    }
   }
 
   Future<void> shareSpot(HSSpot spot) async {
@@ -275,8 +194,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
     try {
       emit(state.copyWith(status: HSClusterMapStatus.ignoringRefresh));
       final spot = state.selectedSpot;
-      await _locationRepository.animateCameraToNewLatLng(
-          mapController,
+      await mapWrapper.moveCamera(
           LatLng(spot.latitude! - DEFAULT_MARKER_PADDING, spot.longitude!),
           18.0);
       closeSheet(false);
@@ -288,21 +206,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   @override
   Future<void> close() async {
-    await mapController.future.then((v) => v.dispose());
     await mapWrapper.close();
     scrollController.dispose();
     return super.close();
-  }
-}
-
-extension on HSSpot {
-  Marker toMarker(HSSpotMarkerLevel level, bool isSelected) {
-    final markerIcon =
-        app.assets.getMarkerIcon(this, level: level, isSelected: isSelected);
-    return Marker(
-      markerId: MarkerId(sid!),
-      position: LatLng(latitude!, longitude!),
-      icon: markerIcon,
-    );
   }
 }
