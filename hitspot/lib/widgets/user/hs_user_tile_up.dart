@@ -12,7 +12,8 @@ class HSUserTileUp extends StatelessWidget {
       this.title,
       this.subtitle,
       this.avatarRadius = 24.0,
-      this.showLeading = true});
+      this.showLeading = true,
+      this.bottom});
 
   final HSUser user;
   final double? width, height;
@@ -21,6 +22,7 @@ class HSUserTileUp extends StatelessWidget {
   final Color? tileColor, textColor;
   final String? title, subtitle;
   final bool showLeading;
+  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class HSUserTileUp extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: user.avatarUrl ?? "",
         errorWidget: (context, url, error) => _Tile(user, avatarRadius,
-            tileColor, textColor, title, subtitle, showLeading, onTap),
+            tileColor, textColor, title, subtitle, showLeading, bottom, onTap),
         placeholder: (context, url) =>
             HSShimmerBox(width: width, height: height),
         imageBuilder: (context, imageProvider) => _Tile(
@@ -41,6 +43,7 @@ class HSUserTileUp extends StatelessWidget {
             title,
             subtitle,
             showLeading,
+            bottom,
             onTap,
             imageProvider),
       ),
@@ -50,7 +53,7 @@ class HSUserTileUp extends StatelessWidget {
 
 class _Tile extends StatelessWidget {
   const _Tile(this.user, this.avatarRadius, this.tileColor, this.textColor,
-      this.title, this.subtitle, this.showLeading,
+      this.title, this.subtitle, this.showLeading, this.bottom,
       [this.onTap, this.avatar]);
 
   final HSUser user;
@@ -60,6 +63,7 @@ class _Tile extends StatelessWidget {
   final Color? tileColor, textColor;
   final String? title, subtitle;
   final bool showLeading;
+  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
