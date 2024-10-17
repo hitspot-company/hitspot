@@ -9,6 +9,7 @@ import 'package:hitspot/extensions/hs_sliver_extensions.dart';
 import 'package:hitspot/features/user_profile/main/cubit/hs_user_profile_updated_cubit.dart';
 import 'package:hitspot/features/user_profile/multiple/cubit/hs_user_profile_multiple_cubit.dart';
 import 'package:hitspot/features/user_profile/multiple/view/user_profile_multiple_provider.dart';
+import 'package:hitspot/widgets/hs_icon_prompt.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
 import 'package:hitspot/widgets/shimmer_skeleton.dart';

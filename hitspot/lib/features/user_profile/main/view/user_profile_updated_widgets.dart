@@ -89,6 +89,9 @@ class _UserProfileUpdatedBoardsBuilder extends StatelessWidget {
         mainAxisSpacing: 8.0,
       ),
       builderDelegate: PagedChildBuilderDelegate<HSBoard>(
+        noItemsFoundIndicatorBuilder: (context) => const HSIconPrompt(
+            message: "The user does not have any boards",
+            iconData: FontAwesomeIcons.bookmark),
         firstPageProgressIndicatorBuilder: (context) =>
             const _FirstPageProgressIndicatorBuilder(),
         itemBuilder: (context, board, index) {
@@ -208,6 +211,9 @@ class _UserProfileUpdatedSpotsBuilder extends StatelessWidget {
         mainAxisSpacing: 8.0,
       ),
       builderDelegate: PagedChildBuilderDelegate<HSSpot>(
+        noItemsFoundIndicatorBuilder: (context) => const HSIconPrompt(
+            message: "The user does not have any spots",
+            iconData: FontAwesomeIcons.map),
         newPageProgressIndicatorBuilder: (context) =>
             const HSLoadingIndicator(size: 32.0),
         firstPageProgressIndicatorBuilder: (context) =>
