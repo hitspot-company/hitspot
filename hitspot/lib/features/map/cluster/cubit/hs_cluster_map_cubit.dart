@@ -72,6 +72,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   void _onCameraIdle() async {
     _timer?.cancel();
     _timer = Timer(const Duration(milliseconds: 300), () async {
+      emit(state.copyWith(status: HSClusterMapStatus.refreshing));
       final center = await mapWrapper.mapController.getVisibleRegion();
       final spots = await _databaseRepository.spotFetchInBounds(
         minLat: center.southwest.latitude,
@@ -81,6 +82,8 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
       );
       mapWrapper.setVisibleSpots(spots);
       mapWrapper.updateMarkers();
+      await Future.delayed(const Duration(milliseconds: 300));
+      emit(state.copyWith(status: HSClusterMapStatus.loaded));
     });
   }
 

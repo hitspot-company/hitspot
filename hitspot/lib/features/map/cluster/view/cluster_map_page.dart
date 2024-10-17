@@ -60,28 +60,6 @@ class ClusterMapPage extends StatelessWidget {
                   );
                 },
               ),
-              // BlocSelector<HsClusterMapCubit, HsClusterMapState,
-              //     HSClusterMapStatus>(
-              //   selector: (state) => state.status,
-              //   builder: (context, status) {
-              //     if (status == HSClusterMapStatus.loading) {
-              //       return const HSScaffold(body: HSLoadingIndicator());
-              //     }
-              //     return GoogleMap(
-              //       fortyFiveDegreeImageryEnabled: true,
-              //       style: context.read<HSThemeBloc>().state.mapStyle,
-              //       initialCameraPosition: cubit.state.cameraPosition,
-              //       myLocationButtonEnabled: false,
-              //       myLocationEnabled: true,
-              //       mapType: cubit.state.mapType,
-              //       onTap: (argument) => cubit.closeSheet(),
-              //       onMapCreated: cubit.mapWrapper.onMapCreated,
-              //       markers: cubit.state.markers,
-              //       onCameraIdle: cubit.onCameraIdle,
-              //       onCameraMove: cubit.onCameraMoved,
-              //     );
-              //   },
-              // ),
               Positioned(
                 left: 16.0,
                 child: SafeArea(
