@@ -119,8 +119,10 @@ class HomePage extends StatelessWidget {
                             ? HSShimmerBox(width: screenWidth, height: 120)
                             : GoogleMap(
                                 onTap: (argument) => navi.toSpotsMap(),
+                                markers: homeCubit.state.markers,
                                 style:
                                     context.read<HSThemeBloc>().state.mapStyle,
+                                myLocationEnabled: true,
                                 myLocationButtonEnabled: false,
                                 initialCameraPosition:
                                     homeCubit.initialCameraPosition,

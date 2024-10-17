@@ -241,7 +241,9 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   ///
   /// Also updates the markers on the map.
   void clearSelectedSpot() {
-    emit(state.copyWith(selectedSpot: const HSSpot()));
+    emit(state.copyWith(
+        selectedSpot: const HSSpot(),
+        visibleSpots: [...state.visibleSpots, state.selectedSpot]));
     updateMarkers();
   }
 

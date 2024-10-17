@@ -6,7 +6,7 @@ final class HSHomeState extends Equatable {
   const HSHomeState({
     this.status = HSHomeStatus.loading,
     this.trendingBoards = const [],
-    this.markers = const [],
+    this.markers = const {},
     this.nearbySpots = const [],
     this.trendingSpots = const [],
     this.currentPosition,
@@ -16,7 +16,7 @@ final class HSHomeState extends Equatable {
   final HSHomeStatus status;
   final List<HSBoard> trendingBoards;
   final List<HSSpot> nearbySpots, trendingSpots;
-  final List<Marker> markers;
+  final Set<Marker> markers;
   final Position? currentPosition;
   final bool hideUploadBar;
 
@@ -37,7 +37,7 @@ final class HSHomeState extends Equatable {
     List<HSSpot>? nearbySpots,
     List<HSSpot>? trendingSpots,
     Position? currentPosition,
-    List<Marker>? markers,
+    Set<Marker>? markers,
     bool? hideUploadBar,
   }) {
     return HSHomeState(
