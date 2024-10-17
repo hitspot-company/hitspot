@@ -131,27 +131,29 @@ class _Handle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<HsClusterMapCubit, HsClusterMapState, bool>(
-      selector: (state) => state.status == HSClusterMapStatus.refreshing,
-      builder: (context, isRefreshing) {
-        if (isRefreshing) {
-          return const Center(
-            child: HSLoadingIndicator(size: 24.0),
-          );
-        }
-        return Center(
-          child: Container(
-            margin: const EdgeInsets.only(top: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        );
-      },
+    return
+        //BlocSelector<HsClusterMapCubit, HsClusterMapState, bool>(
+        //   selector: (state) => state.status == HSClusterMapStatus.refreshing,
+        //   builder: (context, isRefreshing) {
+        //     if (isRefreshing) {
+        //       return const Center(
+        //         child: HSLoadingIndicator(size: 24.0),
+        //       );
+        //     }
+        //     return
+        Center(
+      child: Container(
+        margin: const EdgeInsets.only(top: 8),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
     );
+    //   },
+    // );
   }
 }
 
