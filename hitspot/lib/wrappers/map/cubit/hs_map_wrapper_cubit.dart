@@ -112,6 +112,7 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
       HSDebugLogger.logError("onCameraMove is null");
       this.onCameraMove = (CameraPosition position) {
         emit(state.copyWith(cameraPosition: position));
+        updateMarkerLevel();
       };
     } else {
       this.onCameraMove = (CameraPosition pos) {

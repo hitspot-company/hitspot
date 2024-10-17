@@ -51,6 +51,8 @@ class SingleBoardMapPage extends StatelessWidget {
                       previous.markerLevel != current.markerLevel,
                   builder: (context, state) {
                     return GoogleMap(
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
                       style:
                           BlocProvider.of<HSThemeBloc>(context).state.mapStyle,
                       markers: state.markers,
