@@ -131,17 +131,7 @@ class _Handle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-        //BlocSelector<HsClusterMapCubit, HsClusterMapState, bool>(
-        //   selector: (state) => state.status == HSClusterMapStatus.refreshing,
-        //   builder: (context, isRefreshing) {
-        //     if (isRefreshing) {
-        //       return const Center(
-        //         child: HSLoadingIndicator(size: 24.0),
-        //       );
-        //     }
-        //     return
-        Center(
+    return Center(
       child: Container(
         margin: const EdgeInsets.only(top: 8),
         width: 40,
@@ -216,13 +206,11 @@ class _SpotInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HSMapWrapperCubit, HSMapWrapperState>(
-      buildWhen: (previous, current) =>
-          previous.selectedSpot != current.selectedSpot ||
-          previous.isSpotSelected != current.isSpotSelected,
-      builder: (context, state) {
-        final isSpotSelected = state.isSpotSelected;
-        final spot = state.selectedSpot;
+    final wrapper = context.read<HSMapWrapperCubit>();
+    return BlocSelector<HSMapWrapperCubit, HSMapWrapperState, bool>(
+      selector: (state) => state.isSpotSelected,
+      builder: (context, isSpotSelected) {
+        final spot = wrapper.state.selectedSpot;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
           child: isSpotSelected ? _SpotDetails(spot) : const SizedBox.shrink(),

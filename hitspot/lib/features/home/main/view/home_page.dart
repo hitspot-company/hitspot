@@ -117,15 +117,22 @@ class HomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16.0),
                         child: isLoading
                             ? HSShimmerBox(width: screenWidth, height: 120)
-                            : GoogleMap(
-                                onTap: (argument) => navi.toSpotsMap(),
-                                markers: homeCubit.state.markers,
-                                style:
-                                    context.read<HSThemeBloc>().state.mapStyle,
-                                myLocationEnabled: true,
-                                myLocationButtonEnabled: false,
-                                initialCameraPosition:
-                                    homeCubit.initialCameraPosition,
+                            : GestureDetector(
+                                onTap: () => navi.toSpotsMap(),
+                                child: AbsorbPointer(
+                                  absorbing: true,
+                                  child: GoogleMap(
+                                    markers: homeCubit.state.markers,
+                                    style: context
+                                        .read<HSThemeBloc>()
+                                        .state
+                                        .mapStyle,
+                                    myLocationEnabled: true,
+                                    myLocationButtonEnabled: false,
+                                    initialCameraPosition:
+                                        homeCubit.initialCameraPosition,
+                                  ),
+                                ),
                               )
                         // ),
                         ),
