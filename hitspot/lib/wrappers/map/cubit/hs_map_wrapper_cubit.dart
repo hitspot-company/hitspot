@@ -40,6 +40,24 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
         "The HSMapWrapperCubit must be initialised. Please use the init() method to initialise the cubit.");
   }
 
+  /// Initializes the HSMapWrapperCubit with the provided parameters.
+  ///
+  /// This method sets up various callbacks and initial states for the map wrapper.
+  /// It handles marker taps, camera movements, and visibility of spots on the map.
+  /// If no visible spots or initial camera position are provided, it sets default values.
+  ///
+  /// Parameters:
+  /// - `onMarkerTapped`: A callback function that is called when a marker is tapped.
+  /// - `onCameraIdle`: A callback function that is called when the camera becomes idle.
+  /// - `visibleSpots`: A list of spots that should be visible on the map.
+  /// - `initialCameraPosition`: The initial position of the camera on the map.
+  /// - `onCameraMove`: A callback function that is called when the camera moves.
+  ///
+  /// Throws:
+  /// - Logs an error message if initialization fails.
+  ///
+  /// Emits:
+  /// - Updates the state to indicate that the map wrapper has been successfully initialized.
   void init({
     void Function(HSSpot)? onMarkerTapped,
     void Function()? onCameraIdle,
@@ -209,8 +227,22 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     emit(state.copyWith(markers: markers));
   }
 
+  /// Sets the selected spot in the state.
+  ///
+  /// This method updates the state with the provided [spot] by emitting a new state
+  /// with the selected spot updated.
+  ///
+  /// [spot] : The [HSSpot] to be set as the selected spot. It can be null.
   void setSelectedSpot(HSSpot? spot) {
     emit(state.copyWith(selectedSpot: spot));
+  }
+
+  /// Clears the currently selected spot by emitting a new state with an empty [HSSpot].
+  ///
+  /// Also updates the markers on the map.
+  void clearSelectedSpot() {
+    emit(state.copyWith(selectedSpot: const HSSpot()));
+    updateMarkers();
   }
 
   void setOnCameraIdle(void Function()? onCameraIdle) {

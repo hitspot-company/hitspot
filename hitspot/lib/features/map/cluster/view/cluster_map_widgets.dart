@@ -43,6 +43,7 @@ class MapBottomSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Handle(),
+                  Gap(16.0),
                   _SearchBar(),
                   _ActionButtons(),
                   Divider(thickness: 0.5, height: 1),
@@ -65,7 +66,7 @@ class _SpotList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.watch<HsClusterMapCubit>();
+    final cubit = context.watch<HSMapWrapperCubit>();
     return BlocSelector<HSMapWrapperCubit, HSMapWrapperState, List<HSSpot>>(
       selector: (state) => state.visibleSpots,
       builder: (context, spots) {
@@ -258,6 +259,7 @@ class _SpotDetails extends StatelessWidget {
                         user: spot.author!)),
                 HSButton.icon(
                   label: const Text("Show on Map"),
+                  onPressed: cubit.showSpotOnMap,
                   icon: const Icon(FontAwesomeIcons.mapPin),
                   // onPressed: cubit.showSpotOnMap,
                 ),

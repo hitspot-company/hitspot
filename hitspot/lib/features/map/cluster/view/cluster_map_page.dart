@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/map/cluster/cubit/hs_cluster_map_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
@@ -15,6 +16,7 @@ import 'package:hitspot/widgets/user/hs_user_widgets.dart';
 import 'package:hitspot/wrappers/map/cubit/hs_map_wrapper_cubit.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
+import 'package:rename/commands/rename_command_runner.dart';
 
 part 'cluster_map_widgets.dart';
 

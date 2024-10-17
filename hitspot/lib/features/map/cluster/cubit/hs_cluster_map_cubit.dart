@@ -93,17 +93,16 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void closeSheet([bool toggleSelected = true]) async {
+    if (toggleSelected) {
+      mapWrapper.clearSelectedSpot();
+    }
     await scrollController.animateTo(0,
         duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
   void _onCameraMove(CameraPosition position) {
-    if (isSheetExpanded) closeSheet();
+    if (isSheetExpanded) closeSheet(false);
     _timer?.cancel();
-  }
-
-  void resetSelectedSpot() {
-    mapWrapper.setSelectedSpot(null);
   }
 
   Future<Position?> _getPosition() async {
@@ -192,13 +191,11 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
 
   void showSpotOnMap() async {
     try {
-      emit(state.copyWith(status: HSClusterMapStatus.ignoringRefresh));
-      final spot = state.selectedSpot;
+      final spot = mapWrapper.state.selectedSpot;
       await mapWrapper.moveCamera(
           LatLng(spot.latitude! - DEFAULT_MARKER_PADDING, spot.longitude!),
           18.0);
       closeSheet(false);
-      emit(state.copyWith(status: HSClusterMapStatus.loaded));
     } catch (e) {
       HSDebugLogger.logError("Failed to show spot on map: $e");
     }

@@ -78,12 +78,6 @@ final class HSMapWrapperState extends Equatable {
     MapType? mapType,
     bool? isInitialised,
   }) {
-    final HSSpot? selSpot;
-    if (selectedSpot != null) {
-      selSpot = selectedSpot.sid == null ? null : selectedSpot;
-    } else {
-      selSpot = null;
-    }
     return HSMapWrapperState(
       status: status ?? this.status,
       visibleSpots: visibleSpots ?? this.visibleSpots,
@@ -91,7 +85,7 @@ final class HSMapWrapperState extends Equatable {
       cachedSpots: cachedSpots ?? this.cachedSpots,
       cameraPosition: cameraPosition ?? this.cameraPosition,
       markerLevel: markerLevel ?? this.markerLevel,
-      selectedSpot: selSpot ?? this.selectedSpot,
+      selectedSpot: selectedSpot ?? this.selectedSpot,
       filters: filters ?? this.filters,
       savedSpots: savedSpots ?? this.savedSpots,
       mapType: mapType ?? this.mapType,
