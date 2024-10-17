@@ -75,8 +75,7 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
     try {
       assert(
           app.currentPosition != null, "The current position cannot be null");
-      const double maxDistance =
-          1000 * 300; // 300 km (TODO: Find a dynamic way)
+      const double maxDistance = 300; // 300 km (TODO: Find a dynamic way)
       final List<HSSpot> spots = await _databaseRepository.spotFetchClosest(
         lat: app.currentPosition!.latitude,
         long: app.currentPosition!.longitude,
