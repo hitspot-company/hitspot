@@ -19,9 +19,7 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     _init();
   }
 
-  late final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
-  Completer<GoogleMapController> get mapController => _mapController;
+  late final GoogleMapController mapController;
   final _databaseRepository = app.databaseRepository;
   late final CameraPosition initialCameraPosition;
 
@@ -120,8 +118,21 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     );
     await _fetchInitial();
     if (state.currentPosition != null) {
-      app.locationRepository.animateCameraToNewLatLng(
-          mapController, state.currentPosition!.toLatLng, 16.0);
+      // TODO: Refresh map
+    }
+  }
+
+  Future<void> _refreshMap() async {
+    try {
+      final pos = app.connectivityBloc.state.location ?? kDefaultPosition;
+      final initialCameraPositionAndVisibleSpots =
+          await app.locationRepository.getInitialCameraPositionAndSpots(pos);
+      emit(state.copyWith(
+          nearbySpots: initialCameraPositionAndVisibleSpots?.value,
+          currentPosition: pos));
+      placeMarkers();
+    } catch (e) {
+      HSDebugLogger.logError("[!] Error refreshing map: $e");
     }
   }
 
@@ -163,10 +174,5 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       );
     }).toSet();
     emit(state.copyWith(markers: markers));
-  }
-
-  Future<void> animateCameraToNewLatLng(LatLng location) async {
-    final GoogleMapController controller = await mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(location, 14));
   }
 }

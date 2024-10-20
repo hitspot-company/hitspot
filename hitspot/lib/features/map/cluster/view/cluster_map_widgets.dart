@@ -206,11 +206,11 @@ class _SpotInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final wrapper = context.read<HSMapWrapperCubit>();
-    return BlocSelector<HSMapWrapperCubit, HSMapWrapperState, bool>(
-      selector: (state) => state.isSpotSelected,
-      builder: (context, isSpotSelected) {
-        final spot = wrapper.state.selectedSpot;
+    return BlocSelector<HSMapWrapperCubit, HSMapWrapperState, HSSpot>(
+      selector: (state) => state.selectedSpot,
+      builder: (context, spot) {
+        final bool isSpotSelected =
+            spot.sid != null && spot.sid != ""; // TODO: Test this
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
           child: isSpotSelected ? _SpotDetails(spot) : const SizedBox.shrink(),

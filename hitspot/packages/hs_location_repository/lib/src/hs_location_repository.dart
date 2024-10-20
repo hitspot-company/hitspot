@@ -251,6 +251,16 @@ class HSLocationRepository {
       final spots = await _databaseRepository.spotFetchClosest(
           lat: currentPosition.latitude, long: currentPosition.longitude);
 
+      if (spots.isEmpty) {
+        return Pair(
+            CameraPosition(
+              target:
+                  LatLng(currentPosition.latitude, currentPosition.longitude),
+              zoom: 13.0,
+            ),
+            []);
+      }
+
       const padding = 0.1;
       final latlngs =
           spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();

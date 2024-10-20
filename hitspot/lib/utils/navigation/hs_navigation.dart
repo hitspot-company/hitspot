@@ -11,6 +11,7 @@ import 'package:hitspot/features/boards/single/view/single_board_provider.dart';
 import 'package:hitspot/features/complete_profile/view/complete_profile_provider.dart';
 import 'package:hitspot/features/deep_link_error/view/deep_link_error_page.dart';
 import 'package:hitspot/features/home/main/view/home_provider.dart';
+import 'package:hitspot/features/home/update/view/home_provider_up.dart';
 import 'package:hitspot/features/login/magic_link/view/magic_link_sent_provider.dart';
 import 'package:hitspot/features/login/view/login_provider.dart';
 import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
