@@ -139,12 +139,7 @@ class HsClusterMapCubit extends Cubit<HsClusterMapState> {
   }
 
   void changeMapType() {
-    emit(state.copyWith(status: HSClusterMapStatus.refreshing));
-    emit(state.copyWith(
-        mapType: state.mapType == MapType.normal
-            ? MapType.satellite
-            : MapType.normal));
-    emit(state.copyWith(status: HSClusterMapStatus.loaded));
+    mapWrapper.switchMapType();
   }
 
   Future<void> shareSpot(HSSpot spot) async {

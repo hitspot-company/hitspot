@@ -42,6 +42,7 @@ class ClusterMapPage extends StatelessWidget {
               BlocBuilder<HSMapWrapperCubit, HSMapWrapperState>(
                 buildWhen: (previous, current) =>
                     previous.markers != current.markers ||
+                    previous.mapType != current.mapType ||
                     previous.markerLevel != current.markerLevel,
                 builder: (context, state) {
                   return GoogleMap(

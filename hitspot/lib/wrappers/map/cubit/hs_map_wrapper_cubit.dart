@@ -261,6 +261,17 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
     }
   }
 
+  /// Moves the camera to a new position with the specified zoom level.
+  ///
+  /// This method first checks if the map controller is initialized. Then, it
+  /// creates a new [CameraPosition] with the given [newPosition] and [zoom].
+  /// The camera is animated to the new position using the map controller.
+  /// Finally, the state is updated with the new camera position.
+  ///
+  /// [newPosition] - The new position to move the camera to.
+  /// [zoom] - The zoom level to set for the camera.
+  ///
+  /// Returns a [Future] that completes when the camera movement is finished.
   Future<void> moveCamera(LatLng newPosition, double zoom) async {
     _initCheck();
     final newCameraPosition = CameraPosition(target: newPosition, zoom: zoom);
@@ -350,6 +361,13 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
       emit(state.copyWith(filters: result));
       updateMarkers();
     }
+  }
+
+  void switchMapType() {
+    emit(state.copyWith(
+        mapType: state.mapType == MapType.normal
+            ? MapType.satellite
+            : MapType.normal));
   }
 
   @override
