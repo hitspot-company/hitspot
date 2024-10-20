@@ -109,7 +109,7 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
   /// [onCameraMove] - A callback function that takes a [CameraPosition] as a parameter.
   void setOnCameraMove(void Function(CameraPosition)? onCameraMove) {
     if (onCameraMove == null) {
-      HSDebugLogger.logError("onCameraMove is null");
+      HSDebugLogger.logInfo("onCameraMove is null");
       this.onCameraMove = (CameraPosition position) {
         emit(state.copyWith(cameraPosition: position));
         updateMarkerLevel();
@@ -251,9 +251,8 @@ class HSMapWrapperCubit extends Cubit<HSMapWrapperState> {
 
   void setOnCameraIdle(void Function()? onCameraIdle) {
     if (onCameraIdle == null) {
-      HSDebugLogger.logError("onCameraIdle is null");
+      HSDebugLogger.logInfo("onCameraIdle is null");
       this.onCameraIdle = () {
-        HSDebugLogger.logInfo("Using default onCameraIdle");
         updateMarkers();
       };
     } else {

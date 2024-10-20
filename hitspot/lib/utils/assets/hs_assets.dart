@@ -22,15 +22,23 @@ class HSAssets {
 
   // MAP MARKERS
   static const String mapIconsPath = "assets/map";
-  static const String generalMarkerPath = "$mapIconsPath/marker_general.svg";
+  // static const String generalMarkerPath = "$mapIconsPath/marker_general.svg";
+  static const String generalMarkerPath = "$mapIconsPath/dot_standard.svg";
   static const String favoriteMarkerPath = "$mapIconsPath/marker_favorite.svg";
   static const String barMarkerPath = "$mapIconsPath/marker_bar.svg";
+  // static const String generalMarkerSelectedPath =
+  //     "$mapIconsPath/marker_selected_general.svg";
   static const String generalMarkerSelectedPath =
-      "$mapIconsPath/marker_selected_general.svg";
-  static const String favoriteMarkerSelectedPath =
-      "$mapIconsPath/marker_selected_favorite.svg";
-  static const String barMarkerSelectedPath =
-      "$mapIconsPath/marker_selected_bar.svg";
+      "$mapIconsPath/dot_selected.svg";
+  // static const String favoriteMarkerSelectedPath =
+  //     "$mapIconsPath/marker_selected_favorite.svg";
+  // static const String barMarkerSelectedPath =
+  //     "$mapIconsPath/marker_selected_bar.svg";
+
+  static const markerScaleFactor = .7;
+  static const markerLow = 20.0 * markerScaleFactor;
+  static const markerMedium = 30.0 * markerScaleFactor;
+  static const markerHigh = 40.0 * markerScaleFactor;
 
   late final HSSpotMarker barMarker;
   late final HSSpotMarker favoriteMarker;
@@ -199,11 +207,11 @@ class HSSpotMarker {
 
   double markerSize(HSSpotMarkerLevel level) {
     if (level == HSSpotMarkerLevel.low) {
-      return 20.0;
+      return HSAssets.markerLow;
     } else if (level == HSSpotMarkerLevel.medium) {
-      return 30.0;
+      return HSAssets.markerMedium;
     } else {
-      return 40.0;
+      return HSAssets.markerHigh;
     }
   }
 
@@ -217,23 +225,23 @@ class HSSpotMarker {
   String getIconPath([bool isSelected = false]) {
     if (isSelected) {
       switch (type) {
-        case HSSpotMarkerType.bar:
-          return HSAssets.barMarkerSelectedPath;
-        case HSSpotMarkerType.favorite:
-          return HSAssets.favoriteMarkerSelectedPath;
-        case HSSpotMarkerType.general:
-          return HSAssets.generalMarkerSelectedPath;
+        // case HSSpotMarkerType.bar:
+        //   return HSAssets.barMarkerSelectedPath;
+        // case HSSpotMarkerType.favorite:
+        //   return HSAssets.favoriteMarkerSelectedPath;
+        // case HSSpotMarkerType.general:
+        //   return HSAssets.generalMarkerSelectedPath;
         default:
           return HSAssets.generalMarkerSelectedPath;
       }
     }
     switch (type) {
-      case HSSpotMarkerType.bar:
-        return HSAssets.barMarkerPath;
-      case HSSpotMarkerType.favorite:
-        return HSAssets.favoriteMarkerPath;
-      case HSSpotMarkerType.general:
-        return HSAssets.generalMarkerPath;
+      // case HSSpotMarkerType.bar:
+      //   return HSAssets.barMarkerPath;
+      // case HSSpotMarkerType.favorite:
+      //   return HSAssets.favoriteMarkerPath;
+      // case HSSpotMarkerType.general:
+      //   return HSAssets.generalMarkerPath;
       default:
         return HSAssets.generalMarkerPath;
     }

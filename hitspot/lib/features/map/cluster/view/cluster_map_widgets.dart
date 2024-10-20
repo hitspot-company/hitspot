@@ -5,19 +5,19 @@ class MapBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<HsClusterMapCubit>();
+    final cubit = context.read<HSClusterMapCubit>();
     final theme = Theme.of(context);
     final bool isLightTheme = theme.brightness == Brightness.light;
     return DraggableScrollableSheet(
       snap: true,
       snapSizes: const [
-        HsClusterMapCubit.SHEET_MIN_SIZE,
-        HsClusterMapCubit.SHEET_MAX_SIZE,
+        HSClusterMapCubit.SHEET_MIN_SIZE,
+        HSClusterMapCubit.SHEET_MAX_SIZE,
       ],
       controller: cubit.scrollController,
-      initialChildSize: HsClusterMapCubit.SHEET_MIN_SIZE,
-      minChildSize: HsClusterMapCubit.SHEET_MIN_SIZE,
-      maxChildSize: HsClusterMapCubit.SHEET_MAX_SIZE,
+      initialChildSize: HSClusterMapCubit.SHEET_MIN_SIZE,
+      minChildSize: HSClusterMapCubit.SHEET_MIN_SIZE,
+      maxChildSize: HSClusterMapCubit.SHEET_MAX_SIZE,
       builder: (BuildContext context, ScrollController scrollController) {
         return Container(
           decoration: BoxDecoration(
@@ -142,8 +142,6 @@ class _Handle extends StatelessWidget {
         ),
       ),
     );
-    //   },
-    // );
   }
 }
 
@@ -152,8 +150,9 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<HsClusterMapCubit>();
+    final cubit = context.read<HSClusterMapCubit>();
     return HSTextField.filled(
+      readOnly: true,
       hintText: 'Search for spots...',
       suffixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
       onTap: () => cubit.fetchSearch(context),
@@ -166,7 +165,7 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<HsClusterMapCubit>();
+    final cubit = context.read<HSClusterMapCubit>();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Row(
@@ -209,8 +208,7 @@ class _SpotInfo extends StatelessWidget {
     return BlocSelector<HSMapWrapperCubit, HSMapWrapperState, HSSpot>(
       selector: (state) => state.selectedSpot,
       builder: (context, spot) {
-        final bool isSpotSelected =
-            spot.sid != null && spot.sid != ""; // TODO: Test this
+        final bool isSpotSelected = spot.sid != null && spot.sid != "";
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
           child: isSpotSelected ? _SpotDetails(spot) : const SizedBox.shrink(),
@@ -227,7 +225,7 @@ class _SpotDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<HsClusterMapCubit>();
+    final cubit = context.read<HSClusterMapCubit>();
     return InkWell(
       onTap: () => navi.toSpot(sid: spot.sid!),
       child: Padding(
@@ -320,7 +318,7 @@ class _ReactiveSpotButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HsClusterMapCubit, HsClusterMapState>(
+    return BlocBuilder<HSClusterMapCubit, HsClusterMapState>(
       buildWhen: (previous, current) =>
           (previous.status == HSClusterMapStatus.loaded &&
               current.status == reactiveStatus) ||

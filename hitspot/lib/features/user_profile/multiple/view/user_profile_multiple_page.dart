@@ -8,6 +8,7 @@ import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_textfield.dart';
 import 'package:hitspot/widgets/hs_user_tile.dart';
+import 'package:hitspot/widgets/user/hs_user_widgets.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 
@@ -72,7 +73,7 @@ class _Builder extends StatelessWidget {
                       onTap: () => navi.toUser(userID: user.uid!),
                       child: Padding(
                         padding: const EdgeInsets.only(top: 8.0),
-                        child: HSUserTile(user: user),
+                        child: HSUserTileUp(user: user),
                       ),
                     );
                   },

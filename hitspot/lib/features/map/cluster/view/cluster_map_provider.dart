@@ -16,7 +16,7 @@ class ClusterMapProvider extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) =>
-              HsClusterMapCubit(context.read<HSMapWrapperCubit>()),
+              HSClusterMapCubit(context.read<HSMapWrapperCubit>()),
         ),
       ],
       child: const ClusterMapPage(),

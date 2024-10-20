@@ -25,11 +25,11 @@ class ClusterMapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = BlocProvider.of<HsClusterMapCubit>(context);
+    final cubit = BlocProvider.of<HSClusterMapCubit>(context);
     final mapWrapperCubit = cubit.mapWrapper;
     return Material(
       color: Colors.transparent,
-      child: BlocSelector<HsClusterMapCubit, HsClusterMapState,
+      child: BlocSelector<HSClusterMapCubit, HsClusterMapState,
           HSClusterMapStatus>(
         selector: (state) => state.status,
         builder: (context, status) {

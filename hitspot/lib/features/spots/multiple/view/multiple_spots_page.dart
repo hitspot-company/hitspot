@@ -50,7 +50,7 @@ class MultipleSpotsPage extends StatelessWidget {
                       height: 100,
                       width: screenWidth,
                       child: CachedNetworkImage(
-                        imageUrl: spot.getThumbnail,
+                        imageUrl: spot.getThumbnail ?? "",
                         errorWidget: (context, url, error) =>
                             const Icon(Icons.error),
                         fit: BoxFit.cover,

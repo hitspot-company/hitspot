@@ -31,10 +31,29 @@ class HSUserTileUp extends StatelessWidget {
       width: width,
       child: CachedNetworkImage(
         imageUrl: user.avatarUrl ?? "",
-        errorWidget: (context, url, error) => _Tile(user, avatarRadius,
-            tileColor, textColor, title, subtitle, showLeading, bottom, onTap),
-        placeholder: (context, url) =>
-            HSShimmerBox(width: width, height: height),
+        errorWidget: (context, url, error) => _Tile(
+            user,
+            avatarRadius,
+            tileColor,
+            textColor,
+            title,
+            subtitle,
+            showLeading,
+            bottom,
+            false,
+            onTap),
+        placeholder: (context, url) => _Tile(
+          user,
+          avatarRadius,
+          tileColor,
+          textColor,
+          title,
+          subtitle,
+          showLeading,
+          bottom,
+          true,
+          onTap,
+        ),
         imageBuilder: (context, imageProvider) => _Tile(
             user,
             avatarRadius,
@@ -44,6 +63,7 @@ class HSUserTileUp extends StatelessWidget {
             subtitle,
             showLeading,
             bottom,
+            false,
             onTap,
             imageProvider),
       ),
@@ -54,7 +74,7 @@ class HSUserTileUp extends StatelessWidget {
 class _Tile extends StatelessWidget {
   const _Tile(this.user, this.avatarRadius, this.tileColor, this.textColor,
       this.title, this.subtitle, this.showLeading, this.bottom,
-      [this.onTap, this.avatar]);
+      [this.isLoading = false, this.onTap, this.avatar]);
 
   final HSUser user;
   final ImageProvider? avatar;
@@ -64,13 +84,15 @@ class _Tile extends StatelessWidget {
   final String? title, subtitle;
   final bool showLeading;
   final Widget? bottom;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: const EdgeInsets.all(0.0),
       tileColor: tileColor,
       onTap: onTap ?? () => navi.toUser(userID: user.uid!),
-      leading: showLeading ? _buildAvatar() : null,
+      leading: showLeading ? _buildAvatar(context) : null,
       title: AutoSizeText(
         title ?? user.username!,
         maxLines: 1,
@@ -88,7 +110,15 @@ class _Tile extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(BuildContext context) {
+    if (isLoading) {
+      return CircleAvatar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          radius: avatarRadius,
+          child: HSShimmerCircleSkeleton(
+            size: avatarRadius,
+          ));
+    }
     if (user.avatarUrl != null) {
       return CircleAvatar(radius: avatarRadius, backgroundImage: avatar);
     } else {

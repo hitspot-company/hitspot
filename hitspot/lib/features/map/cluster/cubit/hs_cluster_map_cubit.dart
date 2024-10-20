@@ -17,8 +17,8 @@ import 'package:share_plus/share_plus.dart';
 
 part 'hs_cluster_map_state.dart';
 
-class HsClusterMapCubit extends Cubit<HsClusterMapState> {
-  HsClusterMapCubit(this.mapWrapper) : super(const HsClusterMapState()) {
+class HSClusterMapCubit extends Cubit<HsClusterMapState> {
+  HSClusterMapCubit(this.mapWrapper) : super(const HsClusterMapState()) {
     _init();
   }
 

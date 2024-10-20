@@ -248,7 +248,7 @@ class _SpotCard extends StatelessWidget {
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(4.0)),
               child: CachedNetworkImage(
-                imageUrl: spot.getThumbnail,
+                imageUrl: spot.getThumbnail!,
                 height: 120,
                 width: double.infinity,
                 fit: BoxFit.cover,
