@@ -109,13 +109,13 @@ class HSSpotsRepository {
 
   Future<List<HSSpot>> fetchSpotsWithinRadius(double lat, double long,
       [double? radius]) async {
-    const double DEFAULT_RADIUS = 1000 * 50; // 50km
+    const double defaultRadius = 1000 * 50; // 50km
     try {
       final List<Map<String, dynamic>> data =
           await _supabase.rpc('spot_fetch_within_radius', params: {
         'p_lat': lat,
         'p_long': long,
-        'p_radius': radius ?? DEFAULT_RADIUS,
+        'p_radius': radius ?? defaultRadius,
       });
       final List<HSSpot> spots =
           data.map(HSSpot.deserializeWithAuthor).toList();

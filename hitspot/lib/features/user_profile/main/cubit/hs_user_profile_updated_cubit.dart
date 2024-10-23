@@ -17,31 +17,50 @@ class HsUserProfileUpdatedCubit extends Cubit<HsUserProfileUpdatedState> {
   final _databaseRepository = app.databaseRepository;
   bool get isCurrentUser => userID == currentUser.uid;
 
+  late final HSSpotsPage spotsPage;
+  late final HSBoardsPage boardsPage;
+
   void _init() async {
     try {
       emit(state.copyWith(status: HSUserProfileUpdatedStatus.loading));
       final user = await _databaseRepository.userRead(userID: userID);
-      final spots =
-          await _databaseRepository.spotFetchUserSpots(userID: userID);
-      final boards =
-          await _databaseRepository.boardFetchUserBoards(userID: userID);
-
+      spotsPage = HSSpotsPage(fetch: _fetchSpots, pageSize: 10);
+      boardsPage = HSBoardsPage(fetch: _fetchBoards, pageSize: 10);
       final isFollowed = await _databaseRepository.userIsUserFollowed(
           followedID: userID, followerID: currentUser.uid);
       emit(state.copyWith(
         user: user,
         followersCount: user.followers,
         followingCount: user.following,
-        spots: spots,
         isFollowed: isFollowed,
-        boards: boards,
-        spotsCount: spots.length,
         status: HSUserProfileUpdatedStatus.ready,
       ));
     } catch (e) {
       emit(state.copyWith(status: HSUserProfileUpdatedStatus.error));
       HSDebugLogger.logError('Failed to load user profile $e');
     }
+  }
+
+  Future<List<HSSpot>> _fetchSpots(int batchSize, int batchOffset) async {
+    try {
+      final batch = await _databaseRepository.spotFetchUserSpots(
+          userID: userID, batchSize: batchSize, batchOffset: batchOffset);
+      return batch;
+    } catch (e) {
+      HSDebugLogger.logError("[!] Failed to fetch spots: $e");
+    }
+    return [];
+  }
+
+  Future<List<HSBoard>> _fetchBoards(int batchSize, int batchOffset) async {
+    try {
+      final batch = await _databaseRepository.boardFetchUserBoards(
+          userID: userID, batchOffset: batchOffset, batchSize: batchSize);
+      return batch;
+    } catch (e) {
+      HSDebugLogger.logError("[!] Failed to fetch spots: $e");
+    }
+    return [];
   }
 
   Future<void> followUnfollow() async {
@@ -60,5 +79,12 @@ class HsUserProfileUpdatedCubit extends Cubit<HsUserProfileUpdatedState> {
       emit(state.copyWith(status: HSUserProfileUpdatedStatus.error));
       HSDebugLogger.logError('Failed to follow/unfollow user $e');
     }
+  }
+
+  @override
+  Future<void> close() {
+    spotsPage.dispose();
+    boardsPage.dispose();
+    return super.close();
   }
 }

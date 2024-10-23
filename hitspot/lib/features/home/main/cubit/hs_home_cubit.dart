@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/features/spots/create/form/cubit/hs_spot_upload_cubit.dart';
 import 'package:hitspot/features/spots/create/location/map/cubit/hs_choose_location_cubit.dart';
+import 'package:hitspot/utils/assets/hs_assets.dart';
 import 'package:hitspot/utils/upgrader/hs_upgrade_messages.dart.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_debug_logger/hs_debug_logger.dart';
@@ -18,9 +19,7 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     _init();
   }
 
-  late final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
-  Completer<GoogleMapController> get mapController => _mapController;
+  late final GoogleMapController mapController;
   final _databaseRepository = app.databaseRepository;
   late final CameraPosition initialCameraPosition;
 
@@ -40,8 +39,10 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     await fetchUpdateInfo();
     if (state.status != HSHomeStatus.updateRequired) {
       final pos = app.connectivityBloc.state.location ?? kDefaultPosition;
-      initialCameraPosition = CameraPosition(
-          target: LatLng(pos.latitude, pos.longitude), zoom: 13.0);
+      final initialCameraPositionAndVisibleSpots =
+          await app.locationRepository.getInitialCameraPositionAndSpots(pos);
+      initialCameraPosition =
+          initialCameraPositionAndVisibleSpots?.key ?? kDefaultCameraPosition;
       await _fetchInitial();
     }
   }
@@ -69,8 +70,6 @@ class HSHomeCubit extends Cubit<HSHomeState> {
       final List<HSBoard> tredingBoards =
           await app.databaseRepository.boardFetchTrendingBoards();
       final permission = app.isLocationServiceEnabled;
-      HSDebugLogger.logInfo("Permission: $permission");
-      HSDebugLogger.logInfo("Current Position: ${app.currentPosition}");
       if (permission) {
         await _fetchNearbySpots();
       }
@@ -112,31 +111,39 @@ class HSHomeCubit extends Cubit<HSHomeState> {
     state.copyWith(
       status: HSHomeStatus.loading,
       tredingBoards: const [],
-      markers: const [],
+      markers: const {},
       nearbySpots: const [],
       trendingSpots: const [],
       currentPosition: null,
     );
     await _fetchInitial();
     if (state.currentPosition != null) {
-      app.locationRepository.animateCameraToNewLatLng(
-          mapController, state.currentPosition!.toLatLng, 16.0);
+      // TODO: Refresh map
+    }
+  }
+
+  Future<void> _refreshMap() async {
+    try {
+      final pos = app.connectivityBloc.state.location ?? kDefaultPosition;
+      final initialCameraPositionAndVisibleSpots =
+          await app.locationRepository.getInitialCameraPositionAndSpots(pos);
+      emit(state.copyWith(
+          nearbySpots: initialCameraPositionAndVisibleSpots?.value,
+          currentPosition: pos));
+      placeMarkers();
+    } catch (e) {
+      HSDebugLogger.logError("[!] Error refreshing map: $e");
     }
   }
 
   Future<void> _fetchNearbySpots() async {
     try {
-      final currentPosition = state.currentPosition ??
-          await app.locationRepository.getCurrentLocation();
-      final lat = currentPosition.latitude;
-      final long = currentPosition.longitude;
-      final List<HSSpot> nearbySpots = await app.databaseRepository
-          .spotFetchSpotsWithinRadius(
-              lat: lat,
-              long: long,
-              radius: 500 * 1000); // TODO: Change radius (now its 500km)
+      final pos = app.connectivityBloc.state.location ?? kDefaultPosition;
+      final initialCameraPositionAndVisibleSpots =
+          await app.locationRepository.getInitialCameraPositionAndSpots(pos);
       emit(state.copyWith(
-          nearbySpots: nearbySpots, currentPosition: currentPosition));
+          nearbySpots: initialCameraPositionAndVisibleSpots?.value,
+          currentPosition: pos));
       placeMarkers();
     } catch (_) {
       HSDebugLogger.logError("Error fetching nearby spots: $_");
@@ -156,16 +163,16 @@ class HSHomeCubit extends Cubit<HSHomeState> {
   }
 
   void placeMarkers() {
-    // final List<HSSpot> spots = state.nearbySpots;
-    // List<Marker> markers = app.assets.generateMarkers(
-    //   spots,
-    //   currentPosition: state.currentPosition?.toLatLng,
-    // );
-    // emit(state.copyWith(markers: markers));
-  }
-
-  Future<void> animateCameraToNewLatLng(LatLng location) async {
-    final GoogleMapController controller = await mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngZoom(location, 14));
+    final spots = state.nearbySpots + state.trendingSpots;
+    final markers = spots.map((e) {
+      final markerIcon =
+          app.assets.getMarkerIcon(e, level: HSSpotMarkerLevel.low);
+      return Marker(
+        markerId: MarkerId(e.sid!),
+        position: LatLng(e.latitude!, e.longitude!),
+        icon: markerIcon,
+      );
+    }).toSet();
+    emit(state.copyWith(markers: markers));
   }
 }

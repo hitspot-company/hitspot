@@ -78,7 +78,9 @@ class _UserProfileUpdatedBoardsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    final pagingController =
+        context.read<HsUserProfileUpdatedCubit>().boardsPage.pagingController;
+    return PagedGridView(
       padding: const EdgeInsets.all(8.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -86,88 +88,107 @@ class _UserProfileUpdatedBoardsBuilder extends StatelessWidget {
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),
-      itemCount: boards.length,
-      itemBuilder: (context, index) {
-        final board = boards[index];
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          margin: EdgeInsets.zero,
-          child: InkWell(
-            onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(4.0)),
-                  child: CachedNetworkImage(
-                    imageUrl: board.getThumbnail,
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+      builderDelegate: PagedChildBuilderDelegate<HSBoard>(
+        noItemsFoundIndicatorBuilder: (context) => const HSIconPrompt(
+            message: "The user does not have any boards",
+            iconData: FontAwesomeIcons.bookmark),
+        firstPageProgressIndicatorBuilder: (context) =>
+            const _FirstPageProgressIndicatorBuilder(),
+        itemBuilder: (context, board, index) {
+          return _BoardCard(board)
+              .animate()
+              .fadeIn(duration: const Duration(milliseconds: 300));
+        },
+      ),
+      pagingController: pagingController,
+    );
+  }
+}
+
+class _BoardCard extends StatelessWidget {
+  const _BoardCard(this.board);
+
+  final HSBoard board;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        onTap: () => navi.toBoard(boardID: board.id!, title: board.title!),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(4.0)),
+              child: CachedNetworkImage(
+                imageUrl: board.getThumbnail,
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    board.title!,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 4),
+                  Text(
+                    board.description!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
                     children: [
+                      const Icon(Icons.group, size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
                       Text(
-                        board.title!,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                        "0 collaborators",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        board.description!,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.group, size: 14, color: Colors.grey),
-                          const SizedBox(width: 4),
-                          Text(
-                            "0 collaborators",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.remove_red_eye_outlined,
-                              size: 14, color: Colors.grey),
-                          const SizedBox(width: 4),
-                          Text(
-                            board.visibility!.name,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.remove_red_eye_outlined,
+                          size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        board.visibility!.name,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ).animate().fadeIn(duration: const Duration(milliseconds: 300));
-      },
+          ],
+        ),
+      ),
     );
   }
 }
@@ -179,91 +200,138 @@ class _UserProfileUpdatedSpotsBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    final pagingController =
+        context.read<HsUserProfileUpdatedCubit>().spotsPage.pagingController;
+    return PagedGridView(
       padding: const EdgeInsets.all(8.0),
-      itemCount: spots.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.7,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
       ),
-      itemBuilder: (context, index) {
-        final spot = spots[index];
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          margin: EdgeInsets.zero,
-          child: InkWell(
-            onTap: () => navi.toSpot(sid: spot.sid!),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(4.0)),
-                  child: CachedNetworkImage(
-                    imageUrl: spot.getThumbnail,
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+      builderDelegate: PagedChildBuilderDelegate<HSSpot>(
+        noItemsFoundIndicatorBuilder: (context) => const HSIconPrompt(
+            message: "The user does not have any spots",
+            iconData: FontAwesomeIcons.map),
+        newPageProgressIndicatorBuilder: (context) =>
+            const HSLoadingIndicator(size: 32.0),
+        firstPageProgressIndicatorBuilder: (context) =>
+            const _FirstPageProgressIndicatorBuilder(),
+        itemBuilder: (context, spot, index) {
+          return _SpotCard(spot)
+              .animate()
+              .fadeIn(duration: const Duration(milliseconds: 300));
+        },
+      ),
+      pagingController: pagingController,
+    );
+  }
+}
+
+class _SpotCard extends StatelessWidget {
+  const _SpotCard(this.spot);
+
+  final HSSpot spot;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        onTap: () => navi.toSpot(sid: spot.sid!),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(4.0)),
+              child: CachedNetworkImage(
+                imageUrl: spot.getThumbnail!,
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    spot.title!,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 4),
+                  Row(
                     children: [
-                      Text(
-                        spot.title!,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      Icon(Icons.location_on,
+                          size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          spot.getAddress,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on,
-                              size: 14, color: Colors.grey[600]),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              spot.getAddress,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.favorite,
-                              size: 14, color: Colors.red),
-                          const SizedBox(width: 4),
-                          Text(
-                            "${spot.likesCount} likes",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.favorite, size: 14, color: Colors.red),
+                      const SizedBox(width: 4),
+                      Text(
+                        "${spot.likesCount} likes",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FirstPageProgressIndicatorBuilder extends StatelessWidget {
+  const _FirstPageProgressIndicatorBuilder();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 300,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: GridView.count(
+          padding: const EdgeInsets.all(0.0),
+          crossAxisCount: 2,
+          childAspectRatio: 0.7,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+          children: List.generate(
+            3,
+            (index) => const HSShimmerBox(width: 100, height: 100),
           ),
-        ).animate().fadeIn(duration: const Duration(milliseconds: 300));
-      },
+        ),
+      ),
     );
   }
 }
@@ -306,17 +374,14 @@ class _UserProfileUpdatedBiogram extends StatelessWidget {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       sliver: SliverMainAxisGroup(slivers: [
-        const SizedBox(height: 8).toSliver,
-        Center(
-          child: Text(
-            user.biogram!,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(color: Colors.grey),
-            textAlign: TextAlign.center,
-          ).animate().fadeIn(duration: 300.ms),
-        ).toSliver,
+        const SizedBox(height: 16).toSliver,
+        Text(
+          user.biogram!,
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(color: Colors.grey),
+        ).animate().fadeIn(duration: 300.ms).toSliver,
       ]),
     );
   }

@@ -86,8 +86,10 @@ class _LoadedView extends StatelessWidget {
             slivers: [
               SliverList(
                 delegate: SliverChildListDelegate([
-                  Text("Announcements",
-                      style: Theme.of(context).textTheme.headlineMedium),
+                  Text(
+                    "Announcements",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const Gap(16.0),
                 ]),
               ),
@@ -95,18 +97,23 @@ class _LoadedView extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     final announcement = state.announcements[index];
-                    return ListTile(
-                      onTap: () => cubit.openAnnouncement(announcement),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(0.0),
+                        onTap: () => cubit.openAnnouncement(announcement),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        title: Text(announcement.announcementType!.name,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(announcement.title!),
+                        trailing: !announcement.isRead
+                            ? const badges.Badge(
+                                child: Icon(FontAwesomeIcons.bullhorn))
+                            : const Icon(FontAwesomeIcons.bullhorn),
                       ),
-                      title: Text(announcement.announcementType!.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(announcement.title!),
-                      trailing: !announcement.isRead
-                          ? const badges.Badge(
-                              child: Icon(FontAwesomeIcons.bullhorn))
-                          : const Icon(FontAwesomeIcons.bullhorn),
                     );
                   },
                   childCount: state.announcements.length,
@@ -118,8 +125,10 @@ class _LoadedView extends StatelessWidget {
         SliverMainAxisGroup(slivers: [
           SliverList(
             delegate: SliverChildListDelegate([
-              Text("Notifications",
-                  style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                "Notifications",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const Gap(16.0),
             ]),
           ),
@@ -133,34 +142,38 @@ class _LoadedView extends StatelessWidget {
                 firstPageProgressIndicatorBuilder: (context) =>
                     const HSLoadingIndicator(),
                 itemBuilder: (context, notification, index) {
-                  return ListTile(
-                    contentPadding: const EdgeInsets.all(0.0),
-                    onTap: () => cubit.openNotification(notification),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    leading: HSUserAvatar(
-                      onTap: () => navi.toUser(userID: notification.from!),
-                      radius: 24,
-                      imageUrl: notification.fromUser?.avatarUrl,
-                    ),
-                    title: Text(notification.title,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: AutoSizeText.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(text: notification.body),
-                          TextSpan(
-                              text: "\n• ${notification.createdAt!.timeAgo}",
-                              style: const TextStyle(fontSize: 14.0)),
-                        ],
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(0.0),
+                      onTap: () => cubit.openNotification(notification),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      maxLines: 2,
+                      leading: HSUserAvatar(
+                        onTap: () => navi.toUser(userID: notification.from!),
+                        radius: 24,
+                        imageUrl: notification.fromUser?.avatarUrl,
+                      ),
+                      title: Text(notification.title,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: AutoSizeText.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: notification.body),
+                            TextSpan(
+                                text: "\n• ${notification.createdAt!.timeAgo}",
+                                style: const TextStyle(fontSize: 14.0)),
+                          ],
+                        ),
+                        maxLines: 2,
+                      ),
+                      trailing: !notification.isRead
+                          ? badges.Badge(
+                              child:
+                                  Icon(notification.icon, color: Colors.grey))
+                          : Icon(notification.icon, color: Colors.grey),
                     ),
-                    trailing: !notification.isRead
-                        ? badges.Badge(
-                            child: Icon(notification.icon, color: Colors.grey))
-                        : Icon(notification.icon, color: Colors.grey),
                   );
                 }),
           ),

@@ -33,10 +33,11 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
       emit(state.copyWith(status: HSSingleBoardMapStatus.loading));
       final spots =
           await _databaseRepository.boardFetchBoardSpots(boardID: boardID);
-      mapWrapper.setOnMarkerTapped(_onMarkerTapped);
-      mapWrapper.setVisibleSpots(spots);
-      mapWrapper.updateMarkers(spots);
-      mapWrapper.setInitialCameraPosition(getInitialCameraPosition(spots));
+      mapWrapper.init(
+        onMarkerTapped: _onMarkerTapped,
+        visibleSpots: spots,
+        initialCameraPosition: getInitialCameraPosition(spots),
+      );
       pageController.addListener(_pageListener);
       emit(state.copyWith(status: HSSingleBoardMapStatus.loaded));
     } catch (e) {
@@ -112,9 +113,9 @@ class HSSingleBoardMapCubit extends Cubit<HSSingleBoardMapState> {
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     pageController.dispose();
-    mapWrapper.close();
+    await mapWrapper.close();
     return super.close();
   }
 }

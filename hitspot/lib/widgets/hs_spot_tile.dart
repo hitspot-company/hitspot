@@ -38,7 +38,7 @@ class HSSpotTile extends StatelessWidget {
       child: Column(
         children: [
           CachedNetworkImage(
-            imageUrl: spot != null ? spot!.getThumbnail : "",
+            imageUrl: spot != null ? spot!.getThumbnail ?? "" : "",
             progressIndicatorBuilder: (context, url, progress) =>
                 _loadingWidget(),
             imageBuilder: (context, imageProvider) => Container(

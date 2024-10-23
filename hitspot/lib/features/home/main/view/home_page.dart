@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,23 +5,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hitspot/constants/constants.dart';
 import 'package:hitspot/extensions/hs_sliver_extensions.dart';
-import 'package:hitspot/features/connectivity/bloc/hs_connectivity_bloc.dart';
 import 'package:hitspot/features/home/main/cubit/hs_home_cubit.dart';
-import 'package:hitspot/features/map/cluster/view/cluster_map_provider.dart';
 import 'package:hitspot/features/spots/create/form/cubit/hs_spot_upload_cubit.dart';
-import 'package:hitspot/features/spots/create/location/map/cubit/hs_choose_location_cubit.dart';
 import 'package:hitspot/features/spots/multiple/cubit/hs_multiple_spots_cubit.dart';
 import 'package:hitspot/features/theme/bloc/hs_theme_bloc.dart';
 import 'package:hitspot/utils/theme/hs_theme.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
-import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hitspot/widgets/shimmers/hs_shimmer_box.dart';
 import 'package:hitspot/widgets/spot/hs_animated_spot_tile.dart';
 import 'package:hitspot/widgets/spot/hs_upload_progress_widget.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -33,7 +25,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HSHomeCubit>(context);
-    Completer<GoogleMapController> mapController = homeCubit.mapController;
     return BlocSelector<HSHomeCubit, HSHomeState, HSHomeStatus>(
       selector: (state) => state.status,
       builder: (context, status) {
@@ -124,13 +115,22 @@ class HomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16.0),
                         child: isLoading
                             ? HSShimmerBox(width: screenWidth, height: 120)
-                            : GoogleMap(
-                                onTap: (argument) => navi.toSpotsMap(),
-                                style:
-                                    context.read<HSThemeBloc>().state.mapStyle,
-                                myLocationButtonEnabled: false,
-                                initialCameraPosition:
-                                    homeCubit.initialCameraPosition,
+                            : GestureDetector(
+                                onTap: () => navi.toSpotsMap(),
+                                child: AbsorbPointer(
+                                  absorbing: true,
+                                  child: GoogleMap(
+                                    markers: homeCubit.state.markers,
+                                    style: context
+                                        .read<HSThemeBloc>()
+                                        .state
+                                        .mapStyle,
+                                    myLocationEnabled: true,
+                                    myLocationButtonEnabled: false,
+                                    initialCameraPosition:
+                                        homeCubit.initialCameraPosition,
+                                  ),
+                                ),
                               )
                         // ),
                         ),

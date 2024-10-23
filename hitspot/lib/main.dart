@@ -71,6 +71,7 @@ class MyApp extends StatelessWidget {
           create: (_) => HSLocationRepository(
             dotenv.env["GOOGLE_MAPS_KEY"]!,
             dotenv.env["GOOGLE_MAPS_KEY"]!,
+            supabase,
           ),
         ),
       ],

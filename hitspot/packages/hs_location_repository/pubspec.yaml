@@ -21,3 +21,5 @@ dependencies:
   hs_debug_logger:
     path: ../hs_debug_logger
   url_launcher: ^6.3.0
+  pair: ^0.1.2
+  supabase: ^2.5.0

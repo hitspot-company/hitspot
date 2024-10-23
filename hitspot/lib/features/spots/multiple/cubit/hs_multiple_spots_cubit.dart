@@ -75,10 +75,14 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
     try {
       assert(
           app.currentPosition != null, "The current position cannot be null");
-      List<HSSpot> spots = await _databaseRepository.spotFetchSpotsWithinRadius(
-          lat: app.currentPosition!.latitude,
-          long: app.currentPosition!.longitude,
-          radius: 500000);
+      const double maxDistance = 300; // 300 km (TODO: Find a dynamic way)
+      final List<HSSpot> spots = await _databaseRepository.spotFetchClosest(
+        lat: app.currentPosition!.latitude,
+        long: app.currentPosition!.longitude,
+        batchSize: size,
+        batchOffset: offset,
+        distance: maxDistance,
+      );
       return (spots);
     } catch (e) {
       HSDebugLogger.logError("Error fetching trending spots: $e");
@@ -88,8 +92,8 @@ class HsMultipleSpotsCubit extends Cubit<HsMultipleSpotsState> {
 
   Future<List<HSBoard>> _fetchTrendingBoards(int size, int offset) async {
     try {
-      List<HSBoard> boards =
-          await _databaseRepository.boardFetchTrendingBoards();
+      List<HSBoard> boards = await _databaseRepository.boardFetchTrendingBoards(
+          batchOffset: offset, batchSize: size);
       return (boards);
     } catch (e) {
       HSDebugLogger.logError("Error fetching trending spots: $e");

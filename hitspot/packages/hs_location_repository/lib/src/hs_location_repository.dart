@@ -11,19 +11,24 @@ import 'package:hs_debug_logger/hs_debug_logger.dart';
 import 'package:hs_location_repository/src/models/hs_place_details.dart';
 import 'package:hs_location_repository/src/models/hs_prediction.dart';
 import 'package:map_launcher/map_launcher.dart' as ml;
-import 'package:url_launcher/url_launcher.dart';
+import 'package:pair/pair.dart';
+import 'package:supabase/supabase.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:math' as math;
 
 enum HSSpotMarkerType { verified, unverified, selected }
 
 class HSLocationRepository {
-  HSLocationRepository(String googleMapsApiKey, String placesApiKey) {
+  HSLocationRepository(String googleMapsApiKey, String placesApiKey,
+      SupabaseClient _supabaseClient) {
     this.googleMapsApiKey = googleMapsApiKey;
     this.placesApiKey = placesApiKey;
+    this._databaseRepository = HSDatabaseRepsitory(_supabaseClient);
   }
 
   final Dio _dio = Dio();
   late final String googleMapsApiKey, placesApiKey;
+  late final HSDatabaseRepsitory _databaseRepository;
 
   Future<bool> requestLocationPermission() async {
     final permission = await Geolocator.requestPermission();
@@ -237,81 +242,48 @@ class HSLocationRepository {
     );
   }
 
-  Future<void> zoomToFitSpots(
-      List<HSSpot> spots, GoogleMapController controller,
-      {Position? currentPosition, double? padding}) async {
-    // if (spots.isEmpty) return;
+  Future<Pair<CameraPosition, List<HSSpot>>?> getInitialCameraPositionAndSpots(
+      Position? currentPosition) async {
+    try {
+      if (currentPosition == null) {
+        throw "Current position not specified";
+      }
+      final spots = await _databaseRepository.spotFetchClosest(
+          lat: currentPosition.latitude, long: currentPosition.longitude);
 
-    // List<LatLng> spotPositions =
-    //     spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+      if (spots.isEmpty) {
+        return Pair(
+            CameraPosition(
+              target:
+                  LatLng(currentPosition.latitude, currentPosition.longitude),
+              zoom: 13.0,
+            ),
+            []);
+      }
 
-    // if (currentPosition != null) {
-    //   spotPositions
-    //       .add(LatLng(currentPosition.latitude, currentPosition.longitude));
-    // }
+      const padding = 0.1;
+      final latlngs =
+          spots.map((e) => LatLng(e.latitude!, e.longitude!)).toList();
+      final bounds = getLatLngBounds(latlngs);
+      final center = LatLng(
+        (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+        (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+      );
 
-    // LatLngBounds bounds = getLatLngBounds(spotPositions);
-    // LatLng center = LatLng(
-    //   (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
-    //   (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
-    // );
+      final latDelta = bounds.northeast.latitude - bounds.southwest.latitude;
+      final lngDelta = bounds.northeast.longitude - bounds.southwest.longitude;
 
-    // double zoom = 21; // Start with maximum zoom
-    // bool allVisible = false;
+      final maxDelta = latDelta > lngDelta ? latDelta : lngDelta;
+      final zoom = math.log(360 / (maxDelta + padding)) / math.ln2;
 
-    // // Check if all spots are visible at the current zoom level
-    // LatLngBounds initialVisibleRegion = await controller.getVisibleRegion();
-    // allVisible = spotPositions.every((spot) =>
-    //     spot.latitude >= initialVisibleRegion.southwest.latitude &&
-    //     spot.latitude <= initialVisibleRegion.northeast.latitude &&
-    //     spot.longitude >= initialVisibleRegion.southwest.longitude &&
-    //     spot.longitude <= initialVisibleRegion.northeast.longitude);
-
-    // // If not all spots are visible, zoom out
-    // if (!allVisible) {
-    //   await _zoomOut(controller, spotPositions, center);
-    // } else {
-    //   await _zoomIn(controller, spotPositions, center);
-    // }
-
-    // // Add a little padding
-    // await controller.animateCamera(
-    //     CameraUpdate.newLatLngZoom(center, zoom - .6 - (padding ?? 0.0)));
-  }
-
-  Future<void> _zoomIn(GoogleMapController controller,
-      List<LatLng> spotPositions, LatLng center) async {
-    double zoom = await controller.getZoomLevel();
-    bool allVisible = false;
-    while (zoom < 21) {
-      await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
-      LatLngBounds visibleRegion = await controller.getVisibleRegion();
-
-      allVisible = spotPositions.every((spot) =>
-          spot.latitude >= visibleRegion.southwest.latitude &&
-          spot.latitude <= visibleRegion.northeast.latitude &&
-          spot.longitude >= visibleRegion.southwest.longitude &&
-          spot.longitude <= visibleRegion.northeast.longitude);
-
-      if (allVisible) zoom += 0.5;
-    }
-  }
-
-  Future<void> _zoomOut(GoogleMapController controller,
-      List<LatLng> spotPositions, LatLng center) async {
-    double zoom = await controller.getZoomLevel();
-    bool allVisible = false;
-    while (zoom > 0) {
-      await controller.moveCamera(CameraUpdate.newLatLngZoom(center, zoom));
-      LatLngBounds visibleRegion = await controller.getVisibleRegion();
-
-      allVisible = spotPositions.every((spot) =>
-          spot.latitude >= visibleRegion.southwest.latitude &&
-          spot.latitude <= visibleRegion.northeast.latitude &&
-          spot.longitude >= visibleRegion.southwest.longitude &&
-          spot.longitude <= visibleRegion.northeast.longitude);
-
-      if (!allVisible) zoom -= 0.5;
+      final cameraPosition = CameraPosition(
+        target: center,
+        zoom: zoom,
+      );
+      return Pair(cameraPosition, spots);
+    } catch (e) {
+      HSDebugLogger.logError("[!] Error getting initial camera position: $e");
+      return null;
     }
   }
 

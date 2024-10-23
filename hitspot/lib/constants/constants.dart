@@ -30,3 +30,7 @@ Position get kDefaultPosition => Position(
       altitudeAccuracy: 0.0,
       headingAccuracy: 0.0,
     );
+CameraPosition get kDefaultCameraPosition => CameraPosition(
+      target: LatLng(kDefaultLatitude, kDefaultLongitude),
+      zoom: 15.0,
+    );

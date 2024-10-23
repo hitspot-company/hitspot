@@ -18,9 +18,9 @@ import 'package:hitspot/widgets/hs_image.dart';
 import 'package:hitspot/widgets/hs_loading_indicator.dart';
 import 'package:hitspot/widgets/hs_scaffold.dart';
 import 'package:hitspot/widgets/hs_user_avatar.dart';
-import 'package:hitspot/widgets/hs_user_tile.dart';
 import 'package:hitspot/widgets/map/hs_google_map.dart';
 import 'package:hitspot/widgets/map/show_maps_choice_bottom_sheet.dart';
+import 'package:hitspot/widgets/user/hs_user_widgets.dart';
 import 'package:hs_authentication_repository/hs_authentication_repository.dart';
 import 'package:hs_database_repository/hs_database_repository.dart';
 import 'package:hs_location_repository/hs_location_repository.dart';
@@ -297,11 +297,9 @@ class _AnimatedUserAndActionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _UserTile(
-          height: 100,
-          avatarRadius: 26,
-          iconSize: 26,
+        HSUserTileUp(
           user: singleSpotCubit.state.spot.author!,
+          width: screenWidth / 2,
         ),
         Expanded(
           child: Row(
