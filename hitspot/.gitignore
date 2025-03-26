@@ -60,3 +60,6 @@ android/key.properties
 ios/Runner.xcodeproj/project.pbxproj
 ios/Podfile.lock
 *.lock
+
+# FVM Version Cache
+.fvm/
